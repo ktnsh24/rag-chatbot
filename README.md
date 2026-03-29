@@ -23,6 +23,7 @@ This project demonstrates end-to-end AI engineering: document ingestion, vector 
 | [Terraform Infrastructure](docs/terraform.md) | IaC for AWS + Azure |
 | [RAG Concepts](docs/rag-concepts.md) | What is RAG, embeddings, vector search, chunking — explained simply |
 | [AI & ML Learning Guide](docs/ai-learning-guide.md) | Learn every AI technology in this project from scratch — with examples |
+| [How Services Work — Under the Hood](docs/how-services-work.md) | Bedrock, OpenSearch, Azure OpenAI, AI Search — internal mechanics, API actions, data flow |
 | [API Reference](docs/api-reference.md) | Every endpoint, request/response, examples |
 
 ---
