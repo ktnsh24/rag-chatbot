@@ -1,0 +1,29 @@
+default_language_version:
+  python: python3.12
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+      - id: detect-private-key
+  - repo: local
+    hooks:
+      - id: ruff-lint
+        name: Ruff Linter
+        entry: poetry run ruff
+        args: [check, --fix, --exit-non-zero-on-fix]
+        language: system
+        types: [python]
+        stages: [pre-commit]
+      - id: ruff-format
+        name: Ruff Formatter
+        entry: poetry run ruff
+        args: [format, --check]
+        language: system
+        types: [python]
+        stages: [pre-commit]

@@ -1,0 +1,59 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Environment files (contain secrets)
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Poetry
+poetry.lock
+
+# Distribution
+dist/
+build/
+*.egg-info/
+
+# Data files (user documents — don't commit)
+data/*
+!data/.gitkeep
+
+# Vector DB local storage
+chroma_db/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Terraform
+infra/**/.terraform/
+infra/**/*.tfstate
+infra/**/*.tfstate.backup
+infra/**/.terraform.lock.hcl
+infra/**/*.tfvars
+!infra/**/*.tfvars.example
+
+# Test / coverage
+htmlcov/
+.coverage
+.pytest_cache/
+
+# Logs
+*.log
+logs/
