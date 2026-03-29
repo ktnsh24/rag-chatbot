@@ -121,6 +121,9 @@ User uploads: "refund-policy.pdf" (12 pages)
     │
     ├── 2c. chunk_document(text, chunk_size=1000, overlap=200)
     │       → Split into 45 overlapping chunks
+    │       → step = chunk_size - overlap = 1000 - 200 = 800 chars
+    │       → chunks = ~36,000 chars / 800 step = 45 chunks
+    │       → See docs/rag-concepts.md → "How many chunks?" for full explanation
     │       → ["Page 1: Introduction to our...", "...refund within 14...", ...]
     │
     ├── 2d. LLM.get_embeddings_batch(45 chunks)

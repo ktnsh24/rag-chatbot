@@ -172,6 +172,81 @@ Chunk 2: "CCCC DDDD EEEE FFFF"  ← overlap with chunk 1
 Chunk 3: "EEEE FFFF GGGG HHHH"  ← overlap with chunk 2
 ```
 
+### How many chunks? The math
+
+The number of chunks is determined by a simple formula:
+
+```
+                    document_length - chunk_overlap
+number_of_chunks ≈  ─────────────────────────────────
+                      chunk_size - chunk_overlap
+```
+
+The key insight is **step size** — how far forward we move for each new chunk:
+
+```
+step = chunk_size - chunk_overlap
+step = 1000 - 200 = 800 characters
+```
+
+So each chunk covers 1000 characters, but we only move forward 800 characters
+before starting the next one (because 200 characters overlap with the previous chunk).
+
+**Concrete example** — a 15-page PDF (~36,000 characters):
+
+```
+chunk_size    = 1000 characters
+chunk_overlap =  200 characters
+document      = 36,000 characters
+
+step = 1000 - 200 = 800
+chunks = 36,000 / 800 = 45 chunks
+```
+
+Visually, here's what happens across the document:
+
+```
+Document: |========================= 36,000 chars =========================|
+
+Chunk  1: [---- 1000 ----]
+Chunk  2:      [---- 1000 ----]           ← starts 800 chars later
+Chunk  3:           [---- 1000 ----]      ← starts 800 chars later
+...
+Chunk 45:                                                  [---- 1000 ---]
+
+          |←─ 200 ─→|
+           overlap zone (shared between consecutive chunks)
+```
+
+**Why does overlap matter?** Without it, a sentence at the boundary gets cut:
+
+```
+NO OVERLAP (bad):
+  Chunk 1: "...customers can request a"
+  Chunk 2: "refund within 14 days..."
+  → Searching for "refund" only finds Chunk 2, missing the full context
+
+WITH OVERLAP (good):
+  Chunk 1: "...customers can request a refund within 14"
+  Chunk 2: "request a refund within 14 days of purchase..."
+  → Both chunks contain the full sentence about refunds
+```
+
+**Quick reference** — chunk counts for different document sizes:
+
+| Document size | Pages (approx) | Chunks (size=1000, overlap=200) |
+| --- | --- | --- |
+| 5,000 chars | ~2 pages | 7 |
+| 10,000 chars | ~4 pages | 13 |
+| 20,000 chars | ~8 pages | 25 |
+| 36,000 chars | ~15 pages | 45 |
+| 80,000 chars | ~30 pages | 100 |
+
+> **Note:** The actual count may differ by ±2 because `RecursiveCharacterTextSplitter`
+> tries to split at natural boundaries (paragraph breaks, sentence endings) rather
+> than cutting mid-word. A chunk might end up at 950 characters instead of exactly
+> 1000 to preserve a complete sentence.
+
 **Other strategies (not used here, documented for reference):**
 - Sentence-based: split on sentence boundaries
 - Paragraph-based: split on double newlines
