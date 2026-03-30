@@ -26,6 +26,7 @@ This project demonstrates end-to-end AI engineering: document ingestion, vector 
 | [How Services Work — Under the Hood](docs/how-services-work.md) | Bedrock, OpenSearch, Azure OpenAI, AI Search — internal mechanics, API actions, data flow |
 | [Thinking Like an AI Engineer](docs/ai-engineer-guide.md) | DE → AI Engineer mindset shift, evaluation framework, quality checklist, interview guide |
 | [API Reference](docs/api-reference.md) | Every endpoint, request/response, examples |
+| [AI Theory Learning Roadmap](docs/ai-theory-roadmap.md) | LLMs, transformers, embeddings, RAG theory, agents, MCP, prompt engineering — full learning path |
 
 ---
 
