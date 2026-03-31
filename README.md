@@ -99,6 +99,8 @@ See [Getting Started](docs/getting-started.md) for the full step-by-step guide.
 | Package Manager | Poetry |
 | LLM (AWS) | Amazon Bedrock (Claude 3.5 Sonnet) |
 | LLM (Azure) | Azure OpenAI (GPT-4o) |
+| Embeddings (AWS) | Amazon Titan Embed Text v2 (via Bedrock) |
+| Embeddings (Azure) | text-embedding-3-small (via Azure OpenAI) |
 | Vector DB (AWS) | Amazon OpenSearch Serverless |
 | Vector DB (Azure) | Azure AI Search |
 | Document Storage (AWS) | Amazon S3 |
