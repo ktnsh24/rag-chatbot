@@ -27,6 +27,7 @@ This project demonstrates end-to-end AI engineering: document ingestion, vector 
 | [Thinking Like an AI Engineer](docs/ai-engineer-guide.md) | DE → AI Engineer mindset shift, evaluation framework, quality checklist, interview guide |
 | [API Reference](docs/api-reference.md) | Every endpoint, request/response, examples |
 | [AI Theory Learning Roadmap](docs/ai-theory-roadmap.md) | LLMs, transformers, embeddings, RAG theory, agents, MCP, prompt engineering — full learning path |
+| [30-Day Learning Plan](docs/learning-plan.md) | Day-by-day plan: theory + code files + exercises — concrete path from DE to AI Engineer |
 
 ---
 
