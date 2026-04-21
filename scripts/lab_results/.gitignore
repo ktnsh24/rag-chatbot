@@ -3,3 +3,4 @@
 # Don't commit to repo — they're personal/local output
 *
 !.gitignore
+!local-vs-azure-comparison.md

@@ -81,6 +81,8 @@ from lab_analysis import (
 
 DEFAULT_BASE_URL = "http://localhost:8000"
 DEFAULT_TIMEOUT = 900  # seconds (6d golden dataset suite runs 25 cases ~30s each)
+SERVER_RECOVERY_MAX_WAIT = 120  # seconds to wait for server to come back after crash
+SERVER_RECOVERY_INTERVAL = 5   # seconds between health check retries
 
 # ---------------------------------------------------------------------------
 # Test data configuration (loaded from YAML or hardcoded fallback)
@@ -400,6 +402,53 @@ def _extract_scores(data: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _wait_for_server(client: LabAPIClient, context: str = "") -> bool:
+    """Wait for the server to become healthy again after a crash.
+
+    Returns True if server recovered, False if max wait exceeded.
+    """
+    label = f" (after {context})" if context else ""
+    print(f"\n    🔄 Server unreachable{label} — waiting for recovery...", flush=True)
+    elapsed = 0
+    while elapsed < SERVER_RECOVERY_MAX_WAIT:
+        time.sleep(SERVER_RECOVERY_INTERVAL)
+        elapsed += SERVER_RECOVERY_INTERVAL
+        try:
+            client.health_check()
+            print(f"    ✅ Server recovered after {elapsed}s", flush=True)
+            return True
+        except Exception:
+            print(f"    ⏳ Still waiting... ({elapsed}s / {SERVER_RECOVERY_MAX_WAIT}s)", flush=True)
+    print(f"    ❌ Server did not recover within {SERVER_RECOVERY_MAX_WAIT}s", flush=True)
+    return False
+
+
+def _is_connection_error(e: Exception) -> bool:
+    """Check if an exception is a server connection/crash error."""
+    msg = str(e).lower()
+    return any(pattern in msg for pattern in [
+        "connection refused",
+        "server disconnected",
+        "connection reset",
+        "connection closed",
+        "remotedisconnected",
+        "broken pipe",
+        "eof occurred",
+    ])
+
+
+def _retry_on_crash(client: LabAPIClient, fn, *args, context: str = "", max_retries: int = 2, **kwargs):
+    """Call fn(*args, **kwargs) with automatic retry if server crashes."""
+    for attempt in range(max_retries + 1):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as e:
+            if _is_connection_error(e) and attempt < max_retries:
+                if _wait_for_server(client, context=f"{context}, attempt {attempt + 1}"):
+                    continue
+            raise
+
+
 def run_evaluate_experiment(
     client: LabAPIClient,
     exp_id: str,
@@ -410,7 +459,7 @@ def run_evaluate_experiment(
     top_k: int | None = None,
     expected_answer: str | None = None,
 ) -> ExperimentResult:
-    """Run a single evaluate experiment."""
+    """Run a single evaluate experiment (with server crash recovery)."""
     result = ExperimentResult(
         experiment_id=exp_id,
         phase=phase,
@@ -419,36 +468,43 @@ def run_evaluate_experiment(
         experiment_type="run",
         question=question,
     )
-    try:
-        print(f"  ▶ [{exp_id}] Evaluating: {question[:60]}...", flush=True)
-        data = client.evaluate(question=question, top_k=top_k, expected_answer=expected_answer)
-        scores = _extract_scores(data)
-        result.answer = data.get("answer", "")
-        result.retrieval = scores["retrieval"]
-        result.retrieval_quality = scores["retrieval_quality"]
-        result.faithfulness = scores["faithfulness"]
-        result.has_hallucination = scores["has_hallucination"]
-        result.answer_relevance = scores["answer_relevance"]
-        result.answer_relevance_quality = scores["answer_relevance_quality"]
-        result.overall = scores["overall"]
-        result.passed = scores["passed"]
-        result.sources_used = data.get("sources_used")
-        result.latency_ms = data.get("latency_ms")
-        result.request_id = data.get("request_id")
-        result.cloud_provider = data.get("cloud_provider")
-        result.evaluation_notes = data.get("evaluation_notes", [])
-        result.status = "success"
-        passed_str = "✅ PASS" if result.passed else "❌ FAIL"
-        print(
-            f"    → overall={result.overall:.3f} {passed_str} "
-            f"(ret={result.retrieval:.3f}, faith={result.faithfulness:.3f}, "
-            f"latency={result.latency_ms}ms)",
-            flush=True,
-        )
-    except Exception as e:
-        result.status = "error"
-        result.error_message = str(e)
-        print(f"    ✗ ERROR: {e}", flush=True)
+    max_retries = 2
+    for attempt in range(max_retries + 1):
+        try:
+            print(f"  ▶ [{exp_id}] Evaluating: {question[:60]}...", flush=True)
+            data = client.evaluate(question=question, top_k=top_k, expected_answer=expected_answer)
+            scores = _extract_scores(data)
+            result.answer = data.get("answer", "")
+            result.retrieval = scores["retrieval"]
+            result.retrieval_quality = scores["retrieval_quality"]
+            result.faithfulness = scores["faithfulness"]
+            result.has_hallucination = scores["has_hallucination"]
+            result.answer_relevance = scores["answer_relevance"]
+            result.answer_relevance_quality = scores["answer_relevance_quality"]
+            result.overall = scores["overall"]
+            result.passed = scores["passed"]
+            result.sources_used = data.get("sources_used")
+            result.latency_ms = data.get("latency_ms")
+            result.request_id = data.get("request_id")
+            result.cloud_provider = data.get("cloud_provider")
+            result.evaluation_notes = data.get("evaluation_notes", [])
+            result.status = "success"
+            passed_str = "✅ PASS" if result.passed else "❌ FAIL"
+            print(
+                f"    → overall={result.overall:.3f} {passed_str} "
+                f"(ret={result.retrieval:.3f}, faith={result.faithfulness:.3f}, "
+                f"latency={result.latency_ms}ms)",
+                flush=True,
+            )
+            return result
+        except Exception as e:
+            if _is_connection_error(e) and attempt < max_retries:
+                if _wait_for_server(client, context=f"exp {exp_id}, attempt {attempt + 1}"):
+                    continue  # retry the experiment
+                # server didn't recover — fall through to error
+            result.status = "error"
+            result.error_message = str(e)
+            print(f"    ✗ ERROR: {e}", flush=True)
     return result
 
 
@@ -461,7 +517,7 @@ def run_chat_experiment(
     question: str,
     top_k: int | None = None,
 ) -> ExperimentResult:
-    """Run a chat experiment (for prompt injection tests, etc.)."""
+    """Run a chat experiment with server crash recovery."""
     result = ExperimentResult(
         experiment_id=exp_id,
         phase=phase,
@@ -470,19 +526,25 @@ def run_chat_experiment(
         experiment_type="run",
         question=question,
     )
-    try:
-        print(f"  ▶ [{exp_id}] Chat: {question[:60]}...", flush=True)
-        data = client.chat(question=question, top_k=top_k)
-        result.answer = data.get("answer", "")
-        result.latency_ms = data.get("latency_ms")
-        result.request_id = data.get("request_id")
-        result.cloud_provider = data.get("cloud_provider")
-        result.status = "success"
-        print(f"    → answer: {result.answer[:80]}... (latency={result.latency_ms}ms)", flush=True)
-    except Exception as e:
-        result.status = "error"
-        result.error_message = str(e)
-        print(f"    ✗ ERROR: {e}", flush=True)
+    max_retries = 2
+    for attempt in range(max_retries + 1):
+        try:
+            print(f"  ▶ [{exp_id}] Chat: {question[:60]}...", flush=True)
+            data = client.chat(question=question, top_k=top_k)
+            result.answer = data.get("answer", "")
+            result.latency_ms = data.get("latency_ms")
+            result.request_id = data.get("request_id")
+            result.cloud_provider = data.get("cloud_provider")
+            result.status = "success"
+            print(f"    → answer: {result.answer[:80]}... (latency={result.latency_ms}ms)", flush=True)
+            return result
+        except Exception as e:
+            if _is_connection_error(e) and attempt < max_retries:
+                if _wait_for_server(client, context=f"exp {exp_id}, attempt {attempt + 1}"):
+                    continue
+            result.status = "error"
+            result.error_message = str(e)
+            print(f"    ✗ ERROR: {e}", flush=True)
     return result
 
 
@@ -752,7 +814,7 @@ def run_phase_3(client: LabAPIClient, output_dir: Path) -> list[ExperimentResult
     )
     try:
         print(f"  ▶ [6b] Uploading: {remote_work_file.name}...", flush=True)
-        data = client.upload_document(remote_work_file)
+        data = _retry_on_crash(client, client.upload_document, remote_work_file, context="exp 6b")
         result_6b.document_id = data.get("document_id")
         result_6b.chunk_count = data.get("chunk_count")
         result_6b.filename = data.get("filename")
@@ -791,7 +853,7 @@ def run_phase_3(client: LabAPIClient, output_dir: Path) -> list[ExperimentResult
     )
     try:
         print("  ▶ [6d] Running evaluation suite...", flush=True)
-        data = client.evaluate_suite()
+        data = _retry_on_crash(client, client.evaluate_suite, context="exp 6d")
         result_6d.total_cases = data.get("total_cases")
         result_6d.suite_passed = data.get("passed")
         result_6d.suite_failed = data.get("failed")
@@ -854,7 +916,7 @@ def run_phase_4(client: LabAPIClient, output_dir: Path) -> list[ExperimentResult
         try:
             print(f"  ▶ [9a-{i}] Injection test ({attack_type}): {prompt[:50]}...", flush=True)
             start = time.time()
-            data = client.chat_raw(question=prompt)
+            data = _retry_on_crash(client, client.chat_raw, question=prompt, context=f"exp 9a-{i}")
             elapsed_ms = int((time.time() - start) * 1000)
             result_9a.latency_ms = elapsed_ms
             result_9a.sub_results = [data]
@@ -890,7 +952,7 @@ def run_phase_4(client: LabAPIClient, output_dir: Path) -> list[ExperimentResult
         try:
             print(f"  ▶ [9b-{i}] PII test ({pii_type}): {prompt[:50]}...", flush=True)
             start = time.time()
-            data = client.chat_raw(question=prompt)
+            data = _retry_on_crash(client, client.chat_raw, question=prompt, context=f"exp 9b-{i}")
             elapsed_ms = int((time.time() - start) * 1000)
             result_9b.latency_ms = elapsed_ms
             result_9b.sub_results = [data]
@@ -922,7 +984,7 @@ def run_phase_4(client: LabAPIClient, output_dir: Path) -> list[ExperimentResult
         safe_q = phase4_cfg.get("guardrails_safe_question", "What is the company remote work policy?")
         print("  ▶ [9c] Safe question with current guardrail setting...", flush=True)
         start = time.time()
-        data = client.chat_raw(question=safe_q)
+        data = _retry_on_crash(client, client.chat_raw, question=safe_q, context="exp 9c")
         elapsed_ms = int((time.time() - start) * 1000)
         result_9c.latency_ms = elapsed_ms
         result_9c.sub_results = [data]
@@ -1065,7 +1127,7 @@ def run_phase_4(client: LabAPIClient, output_dir: Path) -> list[ExperimentResult
 
         print(f"  ▶ [12a] Batch uploading {len(doc_files)} test documents...", flush=True)
         start = time.time()
-        data = client.upload_batch(doc_files)
+        data = _retry_on_crash(client, client.upload_batch, doc_files, context="exp 12a")
         elapsed_ms = int((time.time() - start) * 1000)
         result_12a.latency_ms = elapsed_ms
         result_12a.sub_results = [data]
@@ -1177,7 +1239,7 @@ def run_phase_5(client: LabAPIClient) -> list[ExperimentResult]:
     )
     try:
         print("  ▶ [14a] Fetching query stats...", flush=True)
-        stats = client.query_stats(days=7)
+        stats = _retry_on_crash(client, client.query_stats, days=7, context="exp 14a")
         result_14a.sub_results = [stats]
         result_14a.status = "success"
         total = stats.get("total_queries", 0)
@@ -1199,7 +1261,7 @@ def run_phase_5(client: LabAPIClient) -> list[ExperimentResult]:
     )
     try:
         print("  ▶ [14b] Fetching recent failures...", flush=True)
-        failures = client.query_failures(limit=10, days=7)
+        failures = _retry_on_crash(client, client.query_failures, limit=10, days=7, context="exp 14b")
         failure_list = failures if isinstance(failures, list) else failures.get("failures", [])
         result_14b.sub_results = failure_list[:10]
         result_14b.status = "success"
@@ -1222,7 +1284,7 @@ def run_phase_5(client: LabAPIClient) -> list[ExperimentResult]:
     )
     try:
         print("  ▶ [15a] Fetching Prometheus metrics...", flush=True)
-        metrics_text = client.get_metrics()
+        metrics_text = _retry_on_crash(client, client.get_metrics, context="exp 15a")
         # Parse key metrics from Prometheus format
         parsed: dict[str, str] = {}
         for line in metrics_text.strip().split("\n"):
@@ -1255,7 +1317,7 @@ def run_phase_5(client: LabAPIClient) -> list[ExperimentResult]:
     )
     try:
         print("  ▶ [16a] Running golden dataset suite (full)...", flush=True)
-        data = client.evaluate_suite()
+        data = _retry_on_crash(client, client.evaluate_suite, context="exp 16a")
         result_16a.total_cases = data.get("total_cases")
         result_16a.suite_passed = data.get("passed")
         result_16a.suite_failed = data.get("failed")
@@ -1285,7 +1347,7 @@ def run_phase_5(client: LabAPIClient) -> list[ExperimentResult]:
     )
     try:
         print("  ▶ [16b] Running edge_case category...", flush=True)
-        data = client.evaluate_suite(categories=["edge_case"])
+        data = _retry_on_crash(client, client.evaluate_suite, categories=["edge_case"], context="exp 16b")
         result_16b.total_cases = data.get("total_cases")
         result_16b.suite_passed = data.get("passed")
         result_16b.suite_failed = data.get("failed")
@@ -2636,7 +2698,7 @@ def run_all_labs(
     if seed_doc.exists():
         try:
             print(f"  ▶ Uploading {seed_doc.name}...", flush=True)
-            data = client.upload_document(seed_doc)
+            data = _retry_on_crash(client, client.upload_document, seed_doc, context="seed upload")
             chunks = data.get("chunk_count", "?")
             doc_id = data.get("document_id", "?")
             print(f"    → Uploaded: chunks={chunks}, id={doc_id}", flush=True)
