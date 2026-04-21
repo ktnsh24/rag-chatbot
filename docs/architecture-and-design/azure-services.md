@@ -8,8 +8,6 @@
 - [Azure Cosmos DB](#azure-cosmos-db)
 - [Azure AI Search](#azure-ai-search)
 - [Azure Container Apps](#azure-container-apps)
-- [Azure Container Registry](#azure-container-registry)
-- [Azure Functions (document ingestion)](#azure-functions)
 - [Azure Monitor and App Insights](#azure-monitor-and-app-insights)
 - [Azure Managed Identity](#azure-managed-identity)
 

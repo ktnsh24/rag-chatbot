@@ -8,8 +8,6 @@
 - [Amazon DynamoDB](#amazon-dynamodb)
 - [Amazon OpenSearch Serverless](#amazon-opensearch-serverless)
 - [Amazon ECS Fargate](#amazon-ecs-fargate)
-- [Amazon ECR](#amazon-ecr)
-- [AWS Lambda (document ingestion)](#aws-lambda)
 - [Amazon CloudWatch](#amazon-cloudwatch)
 - [AWS IAM](#aws-iam)
 
@@ -21,8 +19,8 @@
 | --- | --- | --- |
 | **Bedrock** | LLM inference (Claude) + embeddings (Titan) | Pay per token |
 | **S3** | Store uploaded documents | Pay per GB stored |
-| **DynamoDB** | Conversation history | Pay per request |
-| **OpenSearch Serverless** | Vector store for embeddings | Pay per OCU-hour |
+| **DynamoDB** | Conversation history + **vector store** (cheap mode) | Pay per request |
+| **OpenSearch Serverless** | Vector store for embeddings (production) | Pay per OCU-hour |
 | **ECS Fargate** | Host the FastAPI container | Pay per vCPU/memory-hour |
 | **ECR** | Docker image registry | Pay per GB stored |
 | **Lambda** | Event-driven document ingestion | Pay per invocation |
@@ -99,7 +97,7 @@ Store uploaded documents (PDFs, TXTs, etc.) before and after ingestion.
 
 ### Code location
 
-`src/storage/aws_s3.py` (abstraction), `infra/aws/main.tf` (Terraform)
+`src/storage/aws_s3.py` (abstraction), `infra/aws/s3.tf` (Terraform)
 
 ### Terraform resource
 

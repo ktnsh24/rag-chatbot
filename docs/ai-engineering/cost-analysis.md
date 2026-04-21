@@ -12,7 +12,6 @@
   - [Container Hosting](#container-hosting)
   - [Container Registry](#container-registry)
   - [CI/CD Pipeline](#cicd-pipeline)
-  - [Monitoring](#monitoring)
 - [Free tier limits](#free-tier-limits)
 - [Cost for personal account (your setup)](#cost-for-personal-account-your-setup)
 - [Alternative pipelines — Why they cost more](#alternative-pipelines--why-they-cost-more)
@@ -26,6 +25,7 @@
   - [Alternative 8: AWS Glue for document ETL](#alternative-8-aws-glue-for-document-etl)
 - [Decision summary table](#decision-summary-table)
 - [How to minimize costs on your personal account](#how-to-minimize-costs-on-your-personal-account)
+- [Cost of running run_all_labs.py on cloud](#cost-of-running-run_all_labspy-on-cloud)
 
 ---
 
@@ -65,27 +65,28 @@
 
 ### LLM Inference
 
-| | AWS (Bedrock - Claude 3.5 Sonnet v2) | Azure (Azure OpenAI - GPT-4o) |
-| --- | --- | --- |
-| **Input tokens** | $0.003 / 1K tokens | $0.0025 / 1K tokens |
-| **Output tokens** | $0.015 / 1K tokens | $0.01 / 1K tokens |
-| **Free tier** | None | None |
-| **Minimum cost** | $0 (pay per token) | $0 (pay per token) |
-| **Per query (typical)** | ~$0.013 | ~$0.01 |
+| | AWS (Bedrock - Claude 3.5 Sonnet v2) | Azure (Azure OpenAI - GPT-4o) | Local (Ollama - llama3.2) |
+| --- | --- | --- | --- |
+| **Input tokens** | $0.003 / 1K tokens | $0.0025 / 1K tokens | **$0** |
+| **Output tokens** | $0.015 / 1K tokens | $0.01 / 1K tokens | **$0** |
+| **Free tier** | None | None | Free forever |
+| **Minimum cost** | $0 (pay per token) | $0 (pay per token) | $0 (runs on your machine) |
+| **Per query (typical)** | ~$0.013 | ~$0.01 | **$0** |
 
 **Why we chose this:**
-- Pay-per-token = no idle costs
-- No GPU instances to manage
-- Best-in-class models
-- Both are cheaper than OpenAI direct ($0.0025/$0.01 vs $0.005/$0.015 for GPT-4o)
+- Pay-per-token = no idle costs (cloud)
+- No GPU instances to manage (cloud)
+- Best-in-class models (cloud)
+- $0 cost for development and experimentation (local)
+- Both cloud options are cheaper than OpenAI direct ($0.0025/$0.01 vs $0.005/$0.015 for GPT-4o)
 
 ### Embeddings
 
-| | AWS (Titan Embeddings v2) | Azure (text-embedding-3-small) |
-| --- | --- | --- |
-| **Cost** | $0.00002 / 1K tokens | $0.00002 / 1K tokens |
-| **Dimensions** | 1024 | 1536 |
-| **Free tier** | None | None |
+| | AWS (Titan Embeddings v2) | Azure (text-embedding-3-small) | Local (Ollama - nomic-embed-text) |
+| --- | --- | --- | --- |
+| **Cost** | $0.00002 / 1K tokens | $0.00002 / 1K tokens | **$0** |
+| **Dimensions** | 1024 | 1536 | 768 |
+| **Free tier** | None | None | Free forever |
 
 **Both are extremely cheap.** A 100-page PDF with 500 chunks costs ~$0.01 to embed.
 
@@ -93,25 +94,31 @@
 
 **This is the most expensive service — and where choices matter most.**
 
-| Option | Cost/month | Min cost | Managed? | Scales to zero? |
-| --- | --- | --- | --- | --- |
-| **AWS OpenSearch Serverless** | ~$350+ | $350 (4 OCUs) | Yes | **No** (always on) |
-| **Azure AI Search Free** | $0 | $0 | Yes | N/A (free) |
-| **Azure AI Search Basic** | $75 | $75 | Yes | No |
-| **ChromaDB (local)** | $0 | $0 | No (self-hosted) | N/A |
-| **Pinecone Starter** | $0 | $0 (Free tier) | Yes | Yes |
-| **Qdrant Cloud Free** | $0 | $0 (1 GB) | Yes | Yes |
+| Option | Cost/month | Min cost | Managed? | Scales to zero? | Best for |
+| --- | --- | --- | --- | --- | --- |
+| **AWS OpenSearch Serverless** | ~$350+ | $350 (4 OCUs) | Yes | **No** (always on) | Production (>10K chunks) |
+| **AWS DynamoDB (brute-force)** | **~$0** | $0 (free tier) | Yes | Yes (pay-per-request) | **Portfolio, dev, testing** |
+| **Azure AI Search Free** | $0 | $0 | Yes | N/A (free) | Development |
+| **Azure AI Search Basic** | $75 | $75 | Yes | No | Production |
+| **ChromaDB (local)** | $0 | $0 | No (self-hosted) | N/A | Local development |
+| **Pinecone Starter** | $0 | $0 (Free tier) | Yes | Yes | Quick prototypes |
+| **Qdrant Cloud Free** | $0 | $0 (1 GB) | Yes | Yes | Quick prototypes |
 
 **What we chose and why:**
 
 - **Development:** ChromaDB (local, free, no cloud needed)
-- **AWS Production:** OpenSearch Serverless (expensive but fully managed and battle-tested)
+- **AWS (cheap):** DynamoDB + brute-force cosine (`VECTOR_STORE_TYPE=dynamodb`) — $0/month, suitable for < 10,000 chunks
+- **AWS Production:** OpenSearch Serverless (expensive but fully managed and battle-tested for scale)
 - **Azure Production:** AI Search Basic (good balance of cost and features)
 
 **⚠️ WARNING about OpenSearch Serverless:**
 The minimum is 4 OCUs (2 indexing + 2 search) at $0.24/hr each = **$0.96/hr = ~$700/month**.
 Even with activity-based scaling, the minimum when your collection exists is ~$350/month.
 **Do NOT create an OpenSearch Serverless collection for development.**
+Use `VECTOR_STORE_TYPE=dynamodb` instead — same Bedrock LLM, same S3 storage, but $0/month for vector search.
+
+**How DynamoDB vector search works:**
+DynamoDB stores each chunk with its embedding as a JSON string. On search, all vectors for the collection are loaded and cosine similarity is computed in Python using numpy. This is O(n) — fine for < 10,000 chunks (~50ms), too slow for 100K+ chunks. See [`src/vectorstore/aws_dynamodb.py`](../../src/vectorstore/aws_dynamodb.py) and the [Vector Store Providers Deep Dive](vectorstore-providers-deep-dive.md#aws-dynamodb-the-cheap-alternative--0month-vector-store) for the full implementation.
 
 ### Document Storage
 
@@ -214,7 +221,7 @@ Since you want to save money, here's the cheapest way to run this project:
 
 | Service | Why to avoid for personal use |
 | --- | --- |
-| OpenSearch Serverless | $350+/month minimum — use ChromaDB instead |
+| OpenSearch Serverless | $350+/month minimum — use `VECTOR_STORE_TYPE=dynamodb` or ChromaDB instead |
 | ECS Fargate | $30+/month — run locally instead |
 | Azure AI Search Basic | $75/month — use Free tier instead |
 | NAT Gateway (AWS) | $32/month — easy to create accidentally |
@@ -331,12 +338,12 @@ Glue spins up a full Spark cluster for each job. A single document ingestion tak
 
 | Decision | Chosen | Alternative | Why chosen wins |
 | --- | --- | --- | --- |
-| LLM | Bedrock / Azure OpenAI | SageMaker / Self-hosted | $0 idle vs $730/month GPU |
-| Vector Store | OpenSearch / AI Search | Kendra / Pinecone | Cheaper, more control |
+| LLM | Bedrock / Azure OpenAI / **Ollama (dev)** | SageMaker / Self-hosted | $0 idle vs $730/month GPU |
+| Vector Store | OpenSearch / AI Search / **DynamoDB (cheap AWS)** / **ChromaDB (dev)** | Kendra / Pinecone | Cheaper, more control, DynamoDB is $0/month |
 | Hosting | Fargate / Container Apps | EKS / AKS | Simpler, cheaper |
 | Orchestration | FastAPI (monolith) | Step Functions + Lambda | Lower latency, simpler |
 | Document pipeline | Lambda / Azure Functions | Glue / Data Factory | Faster startup, cheaper |
-| Embeddings | Managed (Titan / OpenAI) | Self-hosted (Sentence-BERT) | No GPU needed |
+| Embeddings | Managed (Titan / OpenAI) / **nomic-embed-text (dev)** | Self-hosted (Sentence-BERT) | No GPU needed |
 
 ---
 
@@ -344,7 +351,8 @@ Glue spins up a full Spark cluster for each job. A single document ingestion tak
 
 1. **Use ChromaDB locally** for development (no vector store cloud cost)
 2. **Use Azure AI Search Free tier** when you need cloud (50 MB, 3 indexes)
-3. **Never create OpenSearch Serverless** unless you're ready for $350+/month
+3. **Use `VECTOR_STORE_TYPE=dynamodb`** on AWS for $0/month vector search (free tier)
+4. **Never create OpenSearch Serverless** unless you're ready for $350+/month
 4. **Run locally** — don't deploy to Fargate/Container Apps until needed
 5. **Set billing alerts** in both AWS and Azure:
    - AWS: Budgets → Create budget → $10/month threshold
@@ -352,3 +360,108 @@ Glue spins up a full Spark cluster for each job. A single document ingestion tak
 6. **Delete resources when done testing** — especially anything with hourly charges
 7. **Use DynamoDB on-demand** (not provisioned) — you only pay for what you use
 8. **Use Cosmos DB Serverless** (not provisioned throughput) — same reason
+
+---
+
+## Cost of running `run_all_labs.py` on cloud
+
+Running the full lab suite (`poetry run python scripts/run_all_labs.py`) makes real API calls. Here's what one full run costs per provider:
+
+### Experiment count per phase
+
+| Phase | Experiments | API Calls | Type |
+| --- | --- | --- | --- |
+| Phase 1 (Labs 1-2) | 1a-2d | ~8 evaluate | LLM + embedding |
+| Phase 2 (Labs 3-5) | 3a-5b | ~8 evaluate + chat | LLM + embedding |
+| Phase 3 (Labs 6-8) | 6a-6d, 7-8 (thinking) | ~5 evaluate + 1 suite (25 cases) | LLM + embedding |
+| **Phase 4 (Labs 9-13)** | **9a-13d** | **7 chat + 22 evaluate + 1 batch upload** | **LLM + embedding** |
+| Phase 5 (Labs 14-16) | 14a-16a | 2 stats/failures + 1 metrics + 1 suite (25 cases) | LLM + embedding |
+| **Total** | **50 API experiments** | **~70 LLM calls** (including 2 golden suites of 25 each) | |
+
+### Cost per full run
+
+| Provider | LLM Cost | Embedding Cost | Vector Store Cost | Total per Run |
+| --- | --- | --- | --- | --- |
+| **Local (Ollama)** | $0 | $0 | $0 (ChromaDB) | **$0** |
+| **AWS (Bedrock + DynamoDB)** | ~$0.90 | ~$0.01 | $0 (DynamoDB free tier) | **~$0.91** |
+| **AWS (Bedrock + OpenSearch)** | ~$0.90 | ~$0.01 | $350/month (always on) | **~$0.91** + $350/month base |
+| **Azure (OpenAI + AI Search Free)** | ~$0.70 | ~$0.01 | $0 (free tier) | **~$0.71** |
+| **Azure (OpenAI + AI Search Basic)** | ~$0.70 | ~$0.01 | $75/month (always on) | **~$0.71** + $75/month base |
+
+### Cost breakdown assumptions
+
+- **Average tokens per query:** ~500 input + ~300 output = ~800 tokens
+- **70 LLM calls × 800 tokens:** ~56,000 tokens total
+- **AWS Bedrock (Claude 3.5 Sonnet):** 56K input × $0.003/1K + 21K output × $0.015/1K ≈ $0.49
+- **Azure OpenAI (GPT-4o):** 56K input × $0.0025/1K + 21K output × $0.01/1K ≈ $0.35
+- **Embeddings:** ~70 queries × 500 tokens × $0.00002/1K ≈ $0.001 (negligible)
+- **Phase 4 guardrails (Labs 9a-9c):** 7 chat calls — blocked requests cost $0 (no LLM call when blocked)
+
+### Phase 4 specifics
+
+| Lab | Experiments | Cloud Cost Notes |
+| --- | --- | --- |
+| **Lab 9 (Guardrails)** | 7 chat calls (3 injection, 3 PII, 1 baseline) | Blocked requests = $0 (no LLM invoked). Only the baseline and unblocked requests cost tokens. |
+| **Lab 10 (Re-ranking)** | 6 evaluate calls | Standard LLM + embedding cost. Cross-encoder re-ranking runs locally (no extra cloud cost). |
+| **Lab 11 (Hybrid Search)** | 8 evaluate calls | Standard LLM + embedding cost. BM25 runs locally or in the vector store (no extra cost). |
+| **Lab 12 (Bulk Upload)** | 1 batch upload + 1 evaluate | Embedding cost for 5 test docs (~25 chunks). Negligible. |
+| **Lab 13 (HNSW)** | 6 evaluate calls | Standard LLM + embedding cost. HNSW settings don't change per-query cost. |
+
+### Running labs 10× (for tuning)
+
+If you re-run labs multiple times to compare feature flag settings (e.g., guardrails ON vs OFF, reranker ON vs OFF):
+
+| Runs | Local | AWS (DynamoDB) | Azure (AI Search Free) |
+| --- | --- | --- | --- |
+| 1 run | $0 | ~$0.91 | ~$0.71 |
+| 5 runs | $0 | ~$4.55 | ~$3.55 |
+| 10 runs | $0 | ~$9.10 | ~$7.10 |
+
+> **Recommendation:** Run labs locally first (Ollama = $0), then run once on each cloud provider to verify cross-provider behaviour. Total cloud cost for the complete portfolio: **~$2 one-time**.
+
+---
+
+## Budget Guard — Automatic Cost Protection
+
+Both `infra/aws/` and `infra/azure/` include a **budget guard** (`budget.tf`) that automatically protects against runaway cloud costs.
+
+### How it works
+
+| Threshold | Action |
+|---|---|
+| **80% of limit (€4)** | Email warning sent to `alert_email` |
+| **100% of limit (€5)** | Email + automatic resource kill switch triggered |
+
+### AWS
+
+- **AWS Budget** monitors tagged resources (`Project=rag-chatbot`)
+- **SNS → Lambda** pipeline: at 100%, a Lambda function scales ECS to 0, deletes DynamoDB tables, and empties S3 buckets
+- File: `infra/aws/budget.tf` + `infra/aws/budget_killer_lambda/handler.py`
+
+### Azure
+
+- **Azure Consumption Budget** scoped to the resource group
+- **Action Group → Automation Runbook**: at 100%, a PowerShell runbook deletes all resources in the resource group
+- File: `infra/azure/budget.tf`
+
+### Configuration
+
+```hcl
+variable "cost_limit_eur" {
+  default = 5  # €5 kill switch
+}
+
+variable "alert_email" {
+  # Required — where budget warnings go
+}
+```
+
+### ⚠️ Important caveat
+
+Cloud cost reporting has a **6–24 hour lag**. The budget guard is your **safety net** (catches "I forgot to destroy"), not your primary defense. Always run:
+
+```bash
+terraform destroy  # immediately after finishing labs
+```
+
+Think of it as: `terraform destroy` = seatbelt (always use it), budget guard = airbag (catches you if you forget).

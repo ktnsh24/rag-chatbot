@@ -10,13 +10,17 @@
 - [Model 4: SourceChunk](#model-4-sourcechunk)
 - [Model 5: TokenUsage](#model-5-tokenusage)
 - [Model 6: DocumentUploadResponse](#model-6-documentuploadresponse)
-- [Model 7: DocumentInfo](#model-7-documentinfo)
-- [Model 8: DocumentListResponse](#model-8-documentlistresponse)
-- [Model 9: HealthResponse](#model-9-healthresponse)
-- [Model 10: ServiceHealth](#model-10-servicehealth)
-- [Model 11: ErrorResponse](#model-11-errorresponse)
 - [Pydantic patterns used in this project](#pydantic-patterns-used-in-this-project)
 - [How FastAPI uses Pydantic](#how-fastapi-uses-pydantic)
+
+> 📖 **Want to see how these models are used in the actual routes?** Each route has
+> its own deep dive showing exactly where each model is constructed and returned:
+> [Health](../architecture-and-design/api-routes/health-endpoint-explained.md) (`HealthResponse`, `ServiceHealth`) ·
+> [Chat](../architecture-and-design/api-routes/chat-endpoint-explained.md) (`ChatRequest`, `ChatResponse`, `Source`) ·
+> [Documents](../architecture-and-design/api-routes/documents-endpoint-explained.md) (`DocumentUploadResponse`, `DocumentInfo`) ·
+> [Evaluate](../architecture-and-design/api-routes/evaluate-endpoint-explained.md) (`EvaluateSingleRequest`, `EvaluateSuiteResponse`, `EvaluationScoreDetail`) ·
+> Queries (`QueryLogRecord`) · Metrics (Prometheus text output).
+> See the [Overview](../architecture-and-design/api-routes-explained.md) for how they all fit together.
 
 ---
 
@@ -92,7 +96,7 @@ class Settings(BaseSettings):
 
 | Field | Type | Default | Env Variable | Purpose |
 | --- | --- | --- | --- | --- |
-| `cloud_provider` | `CloudProvider` | `aws` | `CLOUD_PROVIDER` | Controls which cloud backends to use |
+| `cloud_provider` | `CloudProvider` | `local` | `CLOUD_PROVIDER` | Controls which cloud backends to use |
 | `app_name` | `str` | `rag-chatbot` | `APP_NAME` | Service name in logs |
 | `app_env` | `AppEnvironment` | `dev` | `APP_ENV` | Environment (affects logging) |
 | `app_port` | `int` | `8000` | `APP_PORT` | Server port |
@@ -104,13 +108,22 @@ class Settings(BaseSettings):
 | `aws_bedrock_model_id` | `str` | Claude 3.5 Sonnet | `AWS_BEDROCK_MODEL_ID` | Bedrock model |
 | `aws_opensearch_endpoint` | `str` | `""` | `AWS_OPENSEARCH_ENDPOINT` | OpenSearch URL |
 | `aws_s3_bucket_name` | `str` | `rag-chatbot-documents` | `AWS_S3_BUCKET_NAME` | S3 bucket |
-| `aws_dynamodb_table_name` | `str` | `rag-chatbot-conversations` | `AWS_DYNAMODB_TABLE_NAME` | DynamoDB table |
+| `aws_dynamodb_table_name` | `str` | `rag-chatbot-conversations` | `AWS_DYNAMODB_TABLE_NAME` | DynamoDB table (history) |
+| `aws_dynamodb_vector_table_name` | `str` | `rag-chatbot-vectors` | `AWS_DYNAMODB_VECTOR_TABLE_NAME` | DynamoDB table (vector store — cheap alternative to OpenSearch) |
+| `vector_store_type` | `VectorStoreType` | `auto` | `VECTOR_STORE_TYPE` | Override vector store: `auto` (default for provider) or `dynamodb` ($0/month) |
 | `azure_openai_endpoint` | `str` | `""` | `AZURE_OPENAI_ENDPOINT` | Azure OpenAI URL |
 | `azure_openai_api_key` | `str` | `""` | `AZURE_OPENAI_API_KEY` | Azure OpenAI key |
 | `azure_openai_deployment_name` | `str` | `gpt-4o` | `AZURE_OPENAI_DEPLOYMENT_NAME` | Model deployment |
 | `azure_search_endpoint` | `str` | `""` | `AZURE_SEARCH_ENDPOINT` | AI Search URL |
 | `azure_search_api_key` | `str` | `""` | `AZURE_SEARCH_API_KEY` | AI Search key |
+| `ollama_base_url` | `str` | `http://localhost:11434` | `OLLAMA_BASE_URL` | Ollama REST API URL |
+| `ollama_model` | `str` | `llama3.2` | `OLLAMA_MODEL` | Ollama chat model |
+| `ollama_embedding_model` | `str` | `nomic-embed-text` | `OLLAMA_EMBEDDING_MODEL` | Ollama embedding model |
+| `chroma_collection_name` | `str` | `rag-chatbot` | `CHROMA_COLLECTION_NAME` | ChromaDB collection |
+| `chroma_persist_directory` | `str` | `""` | `CHROMA_PERSIST_DIRECTORY` | ChromaDB storage path (empty = in-memory) |
 | `enable_tracing` | `bool` | `False` | `ENABLE_TRACING` | OpenTelemetry tracing |
+| `query_log_enabled` | `bool` | `True` | `QUERY_LOG_ENABLED` | Structured per-query JSONL logging (I30) |
+| `query_log_dir` | `str` | `logs/queries` | `QUERY_LOG_DIR` | Directory for daily JSONL log files |
 
 **How it works:**
 
@@ -121,7 +134,7 @@ settings = get_settings()
 # → validates every field
 # → returns a typed Settings object
 
-settings.cloud_provider  # → CloudProvider.AWS
+settings.cloud_provider  # → CloudProvider.LOCAL
 settings.app_port        # → 8000
 settings.rag_top_k       # → 5
 ```
@@ -269,8 +282,9 @@ session_id: str | None = Field(default=None)
 class CloudProvider(str, Enum):
     AWS = "aws"
     AZURE = "azure"
+    LOCAL = "local"
 
-cloud_provider: CloudProvider  # Only accepts "aws" or "azure"
+cloud_provider: CloudProvider  # Accepts "aws", "azure", or "local"
 ```
 
 ### Pattern 4: Forward references

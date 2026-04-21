@@ -6,14 +6,12 @@
 - [Poetry vs pip — what is different](#poetry-vs-pip--what-is-different)
 - [Key files Poetry uses](#key-files-poetry-uses)
 - [pyproject.toml explained](#pyprojecttoml-explained)
-- [poetry.lock explained](#poetrylock-explained)
+- [poetry.lock](#poetrylock)
 - [Every Poetry command you need](#every-poetry-command-you-need)
 - [How Poetry manages the virtual environment](#how-poetry-manages-the-virtual-environment)
 - [Adding a new package](#adding-a-new-package)
-- [Removing a package](#removing-a-package)
-- [Updating packages](#updating-packages)
-- [Dependency groups](#dependency-groups)
-- [Poetry scripts](#poetry-scripts)
+- [Removing packages](#removing-packages)
+- [Updating](#updating)
 - [Common issues and fixes](#common-issues-and-fixes)
 
 ---
@@ -103,7 +101,7 @@ Here's what each section in this project's `pyproject.toml` means:
 name = "rag-chatbot"          # Project name
 version = "0.1.0"             # Semantic version
 description = "..."           # One-line description
-authors = ["Ketan Sahu"]      # Who wrote it
+authors = ["Your Name"]      # Who wrote it
 packages = [{ include = "src" }]  # Where the source code is
 ```
 

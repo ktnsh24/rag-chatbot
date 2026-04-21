@@ -55,7 +55,7 @@ az account set --subscription "your-subscription-id"
 
 ## AWS Infrastructure
 
-**Location:** `infra/aws/main.tf`
+**Location:** `infra/aws/` — split by resource: `s3.tf`, `dynamodb.tf`, `ecr.tf`, `iam.tf`
 
 ### Resources Created
 
@@ -133,7 +133,7 @@ The ECS task role grants least-privilege access:
 
 ## Azure Infrastructure
 
-**Location:** `infra/azure/main.tf`
+**Location:** `infra/azure/` — split by resource: `resource_group.tf`, `storage.tf`, `cosmosdb.tf`, `acr.tf`
 
 ### Resources Created
 

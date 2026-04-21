@@ -48,7 +48,7 @@ When something goes wrong, `print()` statements won't cut it. You need to:
 ### Step 1: Open the project in VS Code
 
 ```bash
-code /home/ketan-odido/maestro/rag-chatbot
+code <project-root>/rag-chatbot
 ```
 
 Or: File → Open Folder → select `rag-chatbot/`
@@ -62,7 +62,7 @@ Or: File → Open Folder → select `rag-chatbot/`
 If you don't see it:
 - Make sure you ran `poetry install` first
 - Make sure `poetry config virtualenvs.in-project true` was set
-- Click "Enter interpreter path" and type: `/home/ketan-odido/maestro/rag-chatbot/.venv/bin/python`
+- Click "Enter interpreter path" and type: `<project-root>/rag-chatbot/.venv/bin/python`
 
 ### Step 3: Load your .env file
 
@@ -119,13 +119,15 @@ Click in the **gutter** (the space to the left of line numbers) to set a red dot
 
 ### Step 8: Send a request while debugging
 
-Open another terminal (or use Swagger UI) and send a request:
+Open another terminal (or use Swagger UI) and send a request.
 
-```bash
-curl -X POST http://localhost:8000/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"question": "What is this?"}'
+In **Swagger UI** (`http://localhost:8000/docs`) → `POST /api/chat` → **"Try it out"**:
+
+```json
+{"question": "What is this?"}
 ```
+
+Click **"Execute"**.
 
 If you have a breakpoint in `chat()`, VS Code will:
 1. **Pause execution** at the breakpoint
@@ -154,13 +156,13 @@ When the debugger pauses, you can:
 
 ### Step 1: Open the project in PyCharm
 
-File → Open → select `/home/ketan-odido/maestro/rag-chatbot/`
+File → Open → select the `rag-chatbot/` project folder
 
 ### Step 2: Configure the Python interpreter
 
 1. File → Settings → Project → Python Interpreter
 2. Click the gear icon → Add Interpreter → Existing
-3. Select: `/home/ketan-odido/maestro/rag-chatbot/.venv/bin/python`
+3. Select: `<project-root>/rag-chatbot/.venv/bin/python`
 4. Click OK
 
 ### Step 3: Create a Run Configuration
@@ -170,7 +172,7 @@ File → Open → select `/home/ketan-odido/maestro/rag-chatbot/`
    - **Name**: RAG Chatbot Server
    - **Module name**: `uvicorn` (not Script path)
    - **Parameters**: `src.main:app --reload --port 8000`
-   - **Working directory**: `/home/ketan-odido/maestro/rag-chatbot`
+   - **Working directory**: `<project-root>/rag-chatbot`
    - **Environment variables**: Click `...` → Load from `.env`
    - **Python interpreter**: `.venv/bin/python`
 
@@ -209,6 +211,113 @@ PyCharm's debugger has the same controls:
 
 ## What to debug in this project
 
+### 🤖 AI Pipeline Breakpoints — Chat Query (Read Path)
+
+These are the most important breakpoints to understand **how AI/RAG works** step by step.
+Set them all, press F5, send a chat question from http://localhost:8000/docs, and step through.
+
+#### File: `src/rag/chain.py` — `query()` method (⭐ start here)
+
+This is the central AI orchestrator. Set breakpoints on all 5 steps:
+
+| Step | Line (approx) | Code | What to inspect | AI concept you're seeing |
+| --- | --- | --- | --- | --- |
+| **1. Embed** | 188 | `query_embedding = await self._llm.get_embedding(question)` | Hover `query_embedding` → 768 floats representing your question's meaning | **Text → Vector embedding** |
+| **2. Search** | 191 | `search_results = await self._vector_store.search(` | Hover `search_results` → list of chunks with similarity scores (0.0–1.0) | **HNSW vector similarity search** |
+| **3. Context** | 204 | `context_texts = [result.text for result in search_results]` | Hover `context_texts` → the actual text chunks the LLM will read | **RAG context building** |
+| **4. Generate** | 207 | `llm_response = await self._llm.generate(` | After step-over: hover `llm_response` → the LLM's answer + token count | **LLM text generation** |
+| **5. Cost** | 223 | `token_usage = {` | Hover to see input/output tokens + estimated $ cost | **Token counting & cost estimation** |
+
+**What to look for:**
+- **Step 1**: The embedding is a list of ~768 floats (nomic-embed-text). Each number captures a dimension of meaning.
+- **Step 2**: Check `result.score` — values close to 1.0 mean high similarity. If scores are all low (<0.5), your documents may not contain relevant info.
+- **Step 3**: This is what the LLM actually "sees" as context. If the answer is wrong, the problem is usually here — wrong chunks retrieved.
+- **Step 4**: `llm_response.text` is the raw answer. `llm_response.input_tokens` shows how many tokens the prompt consumed.
+- **Step 5**: Local (Ollama) cost is always $0. Cloud providers charge per token.
+
+#### File: `src/llm/local_ollama.py` — Inside the LLM calls
+
+Go deeper to see the raw HTTP communication with Ollama:
+
+| Method | Line (approx) | Code | What to inspect | AI concept |
+| --- | --- | --- | --- | --- |
+| `generate()` | ~87 | `response = await self._client.post(` | Step over → hover `response` → see the raw JSON Ollama returns (model, created_at, response text) | **LLM HTTP API call** |
+| `get_embedding()` | ~135 | `response = await self._client.post(` | Step over → hover `response` → see the raw embedding array from nomic-embed-text | **Embedding API call** |
+| `get_embeddings_batch()` | ~167 | `response = await self._client.post(` | Same as above but for multiple texts at once (used during document upload) | **Batch embedding** |
+
+**What to look for:**
+- In `generate()`: The request body contains the full prompt with context. You can see exactly what question + context is sent to the LLM.
+- In `get_embedding()`: The response contains an `embedding` field — a list of 768 floats. Each float is one dimension of meaning.
+
+#### File: `src/vectorstore/local_chromadb.py` — Inside vector search
+
+| Method | Line (approx) | Code | What to inspect | AI concept |
+| --- | --- | --- | --- | --- |
+| `search()` | ~116 | `results = self._collection.query(` | Step over → hover `results` → see `distances`, `documents`, `metadatas` | **ChromaDB HNSW k-NN search** |
+| `store_vectors()` | ~104 | `self._collection.upsert(` | See the chunk IDs, texts, and embeddings being stored | **Vector indexing** |
+
+**What to look for:**
+- `results['distances']` — lower = more similar (ChromaDB uses distance, not similarity score)
+- `results['documents']` — the actual text chunks returned
+- `results['metadatas']` — document name, chunk index, etc.
+
+---
+
+### 📥 AI Pipeline Breakpoints — Document Ingestion (Write Path)
+
+Set these when uploading a document to see the full ETL-for-AI pipeline:
+
+#### File: `src/rag/chain.py` — `ingest()` method
+
+| Step | Line (approx) | Code | What to inspect | AI concept |
+| --- | --- | --- | --- | --- |
+| **1. Parse** | 140 | `text = read_document(filename, content)` | Hover `text` → raw text extracted from your PDF/DOCX/TXT | **Document parsing** |
+| **2. Chunk** | 144 | `chunks = chunk_document(` | Hover `chunks` → list of overlapping text pieces (1000 chars each, 200 overlap) | **Text chunking (RecursiveCharacterTextSplitter)** |
+| **3. Embed** | ~152 | `embeddings = await self._llm.get_embeddings_batch(chunks)` | Hover `embeddings` → N×768 matrix (N chunks, each with 768-dim vector) | **Batch embedding generation** |
+| **4. Store** | ~156 | `stored = await self._vector_store.store_vectors(` | Step over → see how many vectors were indexed in ChromaDB | **Vector storage & HNSW indexing** |
+
+**What to look for:**
+- **Step 2**: Check `len(chunks)` — a 10-page PDF might produce 50+ chunks. Check if chunks make sense (not cut mid-sentence).
+- **Step 3**: Check `len(embeddings)` — should equal `len(chunks)`. Each embedding is 768 floats.
+- **Step 3**: Try `len(embeddings[0])` in the Debug Console → should be 768 (nomic-embed-text dimensions).
+
+#### File: `src/rag/ingestion.py` — Chunking internals
+
+| Function | Line | What to inspect | AI concept |
+| --- | --- | --- | --- |
+| `read_document()` | Start of function | `filename` and `content` → see what format was uploaded | **Multi-format document parsing** |
+| `chunk_document()` | After `text_splitter.split_text()` | The `chunks` list → see exactly where the text was split and how overlap works | **Chunking strategy** |
+
+**Try in the Debug Console:**
+```python
+len(chunks)                    # How many chunks?
+len(chunks[0])                 # Characters in first chunk (~1000)
+chunks[0][:200]                # First 200 chars of first chunk
+chunks[1][:200]                # First 200 chars of second chunk — should overlap with end of chunks[0]
+```
+
+---
+
+### 🎯 Quick Start — Minimum 4 Breakpoints
+
+If you just want to see the entire AI pipeline with minimum effort, set breakpoints on these **4 lines in `src/rag/chain.py` → `query()`**:
+
+```
+Line 188  →  query_embedding = await self._llm.get_embedding(question)
+Line 191  →  search_results = await self._vector_store.search(...)
+Line 204  →  context_texts = [result.text for result in search_results]
+Line 207  →  llm_response = await self._llm.generate(...)
+```
+
+Then:
+1. Press **F5** (select "RAG Chatbot — Debug Server")
+2. Open http://localhost:8000/docs in your browser
+3. Try the **POST /api/chat** endpoint with a question
+4. VS Code will pause at each breakpoint — use **F10** (step over) to move through
+5. Hover over variables to see the AI data at each stage
+
+---
+
 ### Understanding the request flow
 
 Set breakpoints in this order to follow a chat request through the entire system:
@@ -220,7 +329,9 @@ Set breakpoints in this order to follow a chat request through the entire system
 4. src/llm/aws_bedrock.py           → get_embedding()  # Question → vector
 5. src/vectorstore/aws_opensearch.py → search()        # Vector search
 6. src/llm/aws_bedrock.py           → generate()       # LLM generates answer
-7. src/api/routes/chat.py           → return response  # Response sent
+7. src/api/routes/chat.py           → inline eval      # Heuristic evaluation (I30)
+8. src/monitoring/query_logger.py   → log_query()      # JSONL structured log (I30)
+9. src/api/routes/chat.py           → return response  # Response sent
 ```
 
 ### Understanding document ingestion
