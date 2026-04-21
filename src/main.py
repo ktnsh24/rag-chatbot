@@ -21,10 +21,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
 
+from src.api.middleware.guardrails import create_guardrails
 from src.api.middleware.logging import RequestLoggingMiddleware
-from src.api.routes import chat, documents, health
+from src.api.routes import chat, documents, evaluate, health, metrics, queries
 from src.config import get_settings
 from src.monitoring.metrics import MetricsCollector
+from src.monitoring.query_logger import QueryLogger
+from src.monitoring.tracing import setup_tracing
 
 
 @asynccontextmanager
@@ -57,6 +60,18 @@ async def lifespan(app: FastAPI):
     app.state.metrics = metrics
     logger.info("Metrics collector initialized")
 
+    # Initialize query logger (I30)
+    if settings.query_log_enabled:
+        query_logger = QueryLogger(log_dir=settings.query_log_dir)
+        app.state.query_logger = query_logger
+        logger.info(f"Query logger initialized — writing to {settings.query_log_dir}")
+    else:
+        app.state.query_logger = None
+        logger.info("Query logging disabled")
+
+    # Initialize OpenTelemetry tracing (I31)
+    setup_tracing(app, settings)
+
     # Initialize cloud-specific backends
     try:
         from src.rag.chain import RAGChain
@@ -68,6 +83,18 @@ async def lifespan(app: FastAPI):
         logger.error(f"Failed to initialize RAG chain: {e}")
         logger.warning("App will start but chat endpoint will return errors")
         app.state.rag_chain = None
+
+    # Initialize guardrails (if enabled)
+    try:
+        guardrails = create_guardrails(settings)
+        app.state.guardrails = guardrails
+        if guardrails:
+            logger.info(f"Guardrails initialized ({type(guardrails).__name__})")
+        else:
+            logger.info("Guardrails disabled")
+    except Exception as e:
+        logger.error(f"Failed to initialize guardrails: {e}")
+        app.state.guardrails = None
 
     logger.info("Startup complete — ready to serve requests")
 
@@ -112,6 +139,9 @@ def create_app() -> FastAPI:
     app.include_router(health.router, prefix="/api", tags=["Health"])
     app.include_router(chat.router, prefix="/api", tags=["Chat"])
     app.include_router(documents.router, prefix="/api", tags=["Documents"])
+    app.include_router(evaluate.router, prefix="/api", tags=["Evaluation"])
+    app.include_router(queries.router, prefix="/api", tags=["Query Analysis"])
+    app.include_router(metrics.router, prefix="/api", tags=["Monitoring"])
 
     # --- Static files (chat UI) ---
     try:

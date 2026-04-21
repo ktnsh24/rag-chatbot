@@ -4,7 +4,7 @@ Azure Cosmos DB Conversation History
 Stores chat messages in a Cosmos DB container (SQL/NoSQL API).
 Uses session_id as partition key for fast lookups within a session.
 
-Container schema (created by infra/azure/main.tf):
+Container schema (created by infra/azure/cosmosdb.tf):
     id             (String, UUID)
     session_id     (String) — partition key
     role           (String)

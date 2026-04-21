@@ -7,8 +7,10 @@ Defines the contract for vector stores:
     - Delete vectors by document_id
 
 Implementations:
-    - aws_opensearch.py  → Amazon OpenSearch Serverless
-    - azure_ai_search.py → Azure AI Search
+    - aws_opensearch.py    → Amazon OpenSearch Serverless (~$350/month)
+    - aws_dynamodb.py      → Amazon DynamoDB + brute-force cosine (~$0/month)
+    - azure_ai_search.py   → Azure AI Search
+    - local_chromadb.py    → ChromaDB (local development)
 """
 
 from abc import ABC, abstractmethod

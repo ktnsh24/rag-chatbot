@@ -27,6 +27,7 @@ class CloudProvider(str, Enum):
 
     AWS = "aws"
     AZURE = "azure"
+    LOCAL = "local"
 
 
 class DocumentStatus(str, Enum):
@@ -169,6 +170,46 @@ class DocumentUploadResponse(BaseModel):
     message: str = Field(..., description="Status message")
 
 
+class BatchDocumentResult(BaseModel):
+    """
+    Result of ingesting a single document within a batch upload.
+
+    Fields:
+        document_id: Unique identifier for this document.
+        filename: Original filename.
+        status: Processing status (ready or failed).
+        chunk_count: Number of chunks created.
+        error: Error message if ingestion failed.
+    """
+
+    document_id: str = Field(..., description="Unique document identifier")
+    filename: str = Field(..., description="Original filename")
+    status: DocumentStatus = Field(..., description="Processing status")
+    chunk_count: int = Field(default=0, ge=0, description="Number of chunks created")
+    error: str | None = Field(default=None, description="Error message if failed")
+
+
+class BatchUploadResponse(BaseModel):
+    """
+    Response after uploading multiple documents in a single batch.
+
+    Fields:
+        total_files: Number of files submitted.
+        succeeded: Number of files successfully ingested.
+        failed: Number of files that failed.
+        total_chunks: Total chunks created across all documents.
+        results: Per-file results.
+        message: Human-readable summary.
+    """
+
+    total_files: int = Field(..., ge=0, description="Total files in batch")
+    succeeded: int = Field(..., ge=0, description="Files successfully ingested")
+    failed: int = Field(..., ge=0, description="Files that failed")
+    total_chunks: int = Field(default=0, ge=0, description="Total chunks across all files")
+    results: list[BatchDocumentResult] = Field(default_factory=list, description="Per-file results")
+    message: str = Field(..., description="Summary message")
+
+
 class DocumentInfo(BaseModel):
     """
     Information about an ingested document.
@@ -268,3 +309,138 @@ class ErrorResponse(BaseModel):
     error: str = Field(..., description="Error type")
     message: str = Field(..., description="Error description")
     request_id: UUID = Field(default_factory=uuid4, description="Request ID for tracing")
+
+
+# =============================================================================
+# Evaluation Models
+# =============================================================================
+
+
+class EvaluateSingleRequest(BaseModel):
+    """
+    Request to evaluate a single question through the live RAG pipeline.
+
+    Fields:
+        question: The question to ask and evaluate.
+        expected_answer: Optional ground truth for comparison.
+        top_k: Override the default number of retrieved chunks.
+    """
+
+    question: str = Field(
+        ...,
+        min_length=1,
+        max_length=5000,
+        description="The question to evaluate.",
+        examples=["What is the refund policy?"],
+    )
+    expected_answer: str | None = Field(
+        default=None,
+        description="Optional expected answer (ground truth) for comparison.",
+    )
+    top_k: int | None = Field(
+        default=None,
+        ge=1,
+        le=20,
+        description="Number of chunks to retrieve. Overrides settings default.",
+    )
+
+
+class EvaluateSuiteRequest(BaseModel):
+    """
+    Request to run the golden dataset evaluation suite.
+
+    Fields:
+        categories: Optional list of categories to filter (e.g. ["policy", "edge_case"]).
+                    If omitted, runs all categories.
+        top_k: Override the default number of retrieved chunks for all cases.
+    """
+
+    categories: list[str] | None = Field(
+        default=None,
+        description="Filter by test case categories. Omit to run all.",
+        examples=[["policy", "edge_case"]],
+    )
+    top_k: int | None = Field(
+        default=None,
+        ge=1,
+        le=20,
+        description="Override top_k for all evaluation cases.",
+    )
+
+
+class EvaluationScoreDetail(BaseModel):
+    """
+    Detailed scores from the RAG evaluation.
+
+    These are the 3 dimensions that define RAG quality:
+        - Retrieval: Did vector search find relevant chunks?
+        - Faithfulness: Did the LLM stick to the context (no hallucination)?
+        - Answer Relevance: Did the LLM actually answer the question?
+    """
+
+    retrieval: float = Field(..., ge=0.0, le=1.0, description="Retrieval quality score")
+    retrieval_quality: str = Field(..., description="Quality label: excellent/good/fair/poor")
+    faithfulness: float = Field(..., ge=0.0, le=1.0, description="Faithfulness score (1.0 = no hallucination)")
+    has_hallucination: bool = Field(..., description="True if the answer contains claims not in the context")
+    answer_relevance: float = Field(..., ge=0.0, le=1.0, description="Answer relevance score")
+    answer_relevance_quality: str = Field(..., description="Quality label: highly relevant/partially relevant/off-topic")
+    overall: float = Field(..., ge=0.0, le=1.0, description="Weighted overall score (retrieval 30% + faithfulness 40% + relevance 30%)")
+    passed: bool = Field(..., description="True if overall score >= 0.7")
+
+
+class EvaluateSingleResponse(BaseModel):
+    """
+    Response from evaluating a single question.
+
+    Contains the answer (same as /api/chat) PLUS evaluation scores.
+    This is the key difference: /api/chat returns answers, /api/evaluate
+    returns answers WITH quality measurements.
+    """
+
+    question: str = Field(..., description="The evaluated question")
+    answer: str = Field(..., description="The LLM-generated answer")
+    scores: EvaluationScoreDetail = Field(..., description="Evaluation scores")
+    sources_used: int = Field(..., ge=0, description="Number of source chunks retrieved")
+    evaluation_notes: list[str] = Field(default_factory=list, description="Diagnostic notes from the evaluator")
+    cloud_provider: CloudProvider = Field(..., description="Which cloud processed this")
+    latency_ms: int = Field(..., description="Total processing time in milliseconds")
+    request_id: UUID = Field(default_factory=uuid4, description="Unique request ID")
+
+
+class EvaluationCaseResult(BaseModel):
+    """
+    Result of evaluating a single golden dataset test case.
+    Used as an item within the suite response.
+    """
+
+    case_id: str = Field(..., description="Golden dataset case ID (e.g. refund_basic)")
+    category: str = Field(..., description="Test case category")
+    question: str = Field(..., description="The test question")
+    answer_preview: str = Field(..., description="First 200 chars of the answer")
+    scores: EvaluationScoreDetail = Field(..., description="Evaluation scores")
+    passed: bool = Field(..., description="Whether this case passed")
+    notes: list[str] = Field(default_factory=list, description="Diagnostic notes")
+    latency_ms: int = Field(..., description="Processing time for this case")
+
+
+class EvaluateSuiteResponse(BaseModel):
+    """
+    Response from running the full golden dataset evaluation suite.
+
+    This is the AI Engineer's equivalent of a dbt test summary:
+    - How many passed/failed
+    - Overall quality score
+    - Per-case breakdown for debugging failures
+
+    DE parallel: Like `dbt test` output — total tests, passed, failed, warnings.
+    """
+
+    total_cases: int = Field(..., ge=0, description="Total test cases evaluated")
+    passed: int = Field(..., ge=0, description="Number of cases that passed")
+    failed: int = Field(..., ge=0, description="Number of cases that failed")
+    pass_rate: float = Field(..., ge=0.0, le=100.0, description="Pass rate percentage")
+    average_overall_score: float = Field(..., ge=0.0, le=1.0, description="Average overall score across all cases")
+    cases: list[EvaluationCaseResult] = Field(default_factory=list, description="Per-case results")
+    cloud_provider: CloudProvider = Field(..., description="Which cloud processed this")
+    latency_ms: int = Field(..., description="Total suite processing time")
+    request_id: UUID = Field(default_factory=uuid4, description="Unique request ID")

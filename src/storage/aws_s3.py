@@ -5,7 +5,7 @@ Stores uploaded documents in an S3 bucket.  Each file is keyed as
 ``documents/{document_id}/{filename}`` so that document-level deletion
 is a simple prefix-delete.
 
-Bucket is created by infra/aws/main.tf.
+Bucket is created by infra/aws/s3.tf.
 """
 
 from __future__ import annotations

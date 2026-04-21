@@ -2,7 +2,10 @@
 Abstract LLM Interface
 
 This defines the contract that every LLM provider must follow.
-Both aws_bedrock.py and azure_openai.py implement this interface.
+All three providers implement this interface:
+    - aws_bedrock.py    → Amazon Bedrock (Claude, Titan)
+    - azure_openai.py   → Azure OpenAI (GPT-4o, text-embedding-3-small)
+    - local_ollama.py   → Ollama (Llama 3.2, nomic-embed-text)
 
 Why abstract classes?
     - The RAG chain doesn't care whether it talks to Bedrock or Azure OpenAI

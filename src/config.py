@@ -17,6 +17,18 @@ class CloudProvider(str, Enum):
 
     AWS = "aws"
     AZURE = "azure"
+    LOCAL = "local"
+
+
+class VectorStoreType(str, Enum):
+    """Which vector store backend to use within a cloud provider.
+
+    This allows choosing a cheaper vector store (DynamoDB) on AWS
+    instead of the default OpenSearch Serverless ($350/month).
+    """
+
+    AUTO = "auto"  # Use the default for the cloud provider
+    DYNAMODB = "dynamodb"  # DynamoDB + brute-force cosine (~$0/month)
 
 
 class AppEnvironment(str, Enum):
@@ -53,13 +65,53 @@ class Settings(BaseSettings):
     # --- Cloud Provider ---
     cloud_provider: CloudProvider = Field(
         default=CloudProvider.AWS,
-        description="Which cloud to use: 'aws' or 'azure'. Controls all backend services.",
+        description="Which cloud to use: 'aws', 'azure', or 'local'. Controls all backend services.",
     )
 
     # --- RAG Settings ---
     rag_top_k: int = Field(default=5, description="Number of document chunks to retrieve per query")
     rag_chunk_size: int = Field(default=1000, description="Maximum characters per document chunk")
     rag_chunk_overlap: int = Field(default=200, description="Character overlap between consecutive chunks")
+
+    # --- HNSW Tuning (applies to all vector stores: OpenSearch, Azure AI Search, ChromaDB) ---
+    hnsw_m: int = Field(
+        default=16,
+        description=(
+            "HNSW max bi-directional connections per node (graph degree). "
+            "Higher = better recall but more memory. Typical: 8-32. Default 16."
+        ),
+    )
+    hnsw_ef_construction: int = Field(
+        default=512,
+        description=(
+            "HNSW exploration factor at build time. How many candidates to consider "
+            "when connecting a new node. Must be >= m. Higher = better graph, slower build. "
+            "Typical: 100-512. Default 512."
+        ),
+    )
+    hnsw_ef_search: int = Field(
+        default=512,
+        description=(
+            "HNSW exploration factor at query time. How many candidates to keep in the "
+            "running list during search. Higher = better recall, slower search. "
+            "Typical: 50-512. Can be changed per query. Default 512."
+        ),
+    )
+    opensearch_number_of_shards: int = Field(
+        default=1,
+        description=(
+            "Number of shards for the OpenSearch index. Each shard is searched in parallel. "
+            "Rule of thumb: 1 shard per 5M vectors. For < 1M vectors, 1 shard is fine. "
+            "Cannot be changed after index creation — must reindex."
+        ),
+    )
+    opensearch_number_of_replicas: int = Field(
+        default=0,
+        description=(
+            "Number of replica shards. 0 = no replicas (fine for dev). "
+            "1 = one copy per shard (production — survives node failure)."
+        ),
+    )
 
     # --- AWS ---
     aws_region: str = Field(default="eu-central-1", description="AWS region for all services")
@@ -73,6 +125,19 @@ class Settings(BaseSettings):
     aws_s3_bucket_name: str = Field(default="rag-chatbot-documents", description="S3 bucket for uploaded documents")
     aws_dynamodb_table_name: str = Field(
         default="rag-chatbot-conversations", description="DynamoDB table for conversation history"
+    )
+    aws_dynamodb_vector_table_name: str = Field(
+        default="rag-chatbot-vectors", description="DynamoDB table for vector storage (cheap alternative to OpenSearch)"
+    )
+
+    # --- Vector Store Override ---
+    vector_store_type: VectorStoreType = Field(
+        default=VectorStoreType.AUTO,
+        description=(
+            "Override the vector store backend. "
+            "'auto' = use default for cloud_provider (OpenSearch for AWS, AI Search for Azure, ChromaDB for local). "
+            "'dynamodb' = use DynamoDB + brute-force cosine similarity (~$0/month on AWS)."
+        ),
     )
 
     # --- Azure ---
@@ -95,10 +160,67 @@ class Settings(BaseSettings):
     azure_cosmos_database_name: str = Field(default="rag-chatbot", description="Cosmos DB database name")
     azure_cosmos_container_name: str = Field(default="conversations", description="Cosmos DB container name")
 
+    # --- Local (Ollama + ChromaDB) ---
+    ollama_base_url: str = Field(default="http://localhost:11434", description="Ollama server URL")
+    ollama_model: str = Field(default="llama3.2", description="Ollama model for generation")
+    ollama_embedding_model: str = Field(default="nomic-embed-text", description="Ollama model for embeddings")
+    chroma_collection_name: str = Field(default="rag-chatbot-vectors", description="ChromaDB collection name")
+    chroma_persist_directory: str = Field(default="", description="ChromaDB persistence path (empty = in-memory)")
+
+    # --- Guardrails (I23) ---
+    guardrails_enabled: bool = Field(
+        default=False, description="Enable input/output guardrails on /api/chat"
+    )
+    aws_bedrock_guardrail_id: str = Field(
+        default="", description="Bedrock Guardrails resource ID (AWS only)"
+    )
+    aws_bedrock_guardrail_version: str = Field(
+        default="DRAFT", description="Bedrock Guardrails version (AWS only)"
+    )
+    azure_content_safety_endpoint: str = Field(
+        default="", description="Azure AI Content Safety endpoint (Azure only)"
+    )
+    azure_content_safety_key: str = Field(
+        default="", description="Azure AI Content Safety API key (Azure only)"
+    )
+    azure_language_endpoint: str = Field(
+        default="", description="Azure AI Language endpoint for PII detection (Azure only)"
+    )
+    azure_language_key: str = Field(
+        default="", description="Azure AI Language API key (Azure only)"
+    )
+
+    # --- Re-ranker (I24) ---
+    reranker_enabled: bool = Field(
+        default=False, description="Enable two-stage retrieval with re-ranking"
+    )
+    reranker_candidate_count: int = Field(
+        default=20, description="Number of candidates to fetch before re-ranking (stage 1)"
+    )
+
+    # --- Hybrid Search (I25) ---
+    hybrid_search_enabled: bool = Field(
+        default=False, description="Enable hybrid search (BM25 + vector)"
+    )
+    hybrid_search_alpha: float = Field(
+        default=0.7,
+        description="Weight for vector results in hybrid search (0.0=BM25 only, 1.0=vector only)",
+    )
+
     # --- Monitoring ---
     otel_exporter_otlp_endpoint: str = Field(default="", description="OpenTelemetry collector endpoint")
     otel_service_name: str = Field(default="rag-chatbot", description="Service name in traces")
     enable_tracing: bool = Field(default=False, description="Enable OpenTelemetry distributed tracing")
+
+    # --- Query Logging (I30) ---
+    query_log_enabled: bool = Field(
+        default=True,
+        description="Enable structured per-query logging for production debugging. Logs to JSONL files.",
+    )
+    query_log_dir: str = Field(
+        default="logs/queries",
+        description="Directory for structured query log files (JSONL). One file per day.",
+    )
 
 
 @lru_cache

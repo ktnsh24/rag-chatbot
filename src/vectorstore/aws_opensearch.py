@@ -41,9 +41,24 @@ class OpenSearchVectorStore(BaseVectorStore):
         )
     """
 
-    def __init__(self, endpoint: str, index_name: str, region: str):
+    def __init__(
+        self,
+        endpoint: str,
+        index_name: str,
+        region: str,
+        hnsw_m: int = 16,
+        hnsw_ef_construction: int = 512,
+        hnsw_ef_search: int = 512,
+        number_of_shards: int = 1,
+        number_of_replicas: int = 0,
+    ):
         self.index_name = index_name
         self.endpoint = endpoint
+        self._hnsw_m = hnsw_m
+        self._hnsw_ef_construction = hnsw_ef_construction
+        self._hnsw_ef_search = hnsw_ef_search
+        self._number_of_shards = number_of_shards
+        self._number_of_replicas = number_of_replicas
 
         # Create OpenSearch client with AWS SigV4 auth
         import boto3
@@ -65,13 +80,15 @@ class OpenSearchVectorStore(BaseVectorStore):
         logger.info(f"OpenSearch vector store initialized: {endpoint}/{index_name}")
 
     def _ensure_index(self):
-        """Create the vector index with k-NN settings if it doesn't exist."""
+        """Create the vector index with k-NN and HNSW settings if it doesn't exist."""
         if not self._client.indices.exists(self.index_name):
             body = {
                 "settings": {
                     "index": {
                         "knn": True,
-                        "knn.algo_param.ef_search": 512,
+                        "knn.algo_param.ef_search": self._hnsw_ef_search,
+                        "number_of_shards": self._number_of_shards,
+                        "number_of_replicas": self._number_of_replicas,
                     }
                 },
                 "mappings": {
@@ -83,6 +100,10 @@ class OpenSearchVectorStore(BaseVectorStore):
                                 "name": "hnsw",
                                 "space_type": "cosinesimil",
                                 "engine": "nmslib",
+                                "parameters": {
+                                    "m": self._hnsw_m,
+                                    "ef_construction": self._hnsw_ef_construction,
+                                },
                             },
                         },
                         "text": {"type": "text"},
@@ -104,26 +125,47 @@ class OpenSearchVectorStore(BaseVectorStore):
         embeddings: list[list[float]],
         metadatas: list[dict] | None = None,
     ) -> int:
-        """Store document chunk embeddings in OpenSearch."""
+        """
+        Store document chunk embeddings in OpenSearch using the _bulk API.
+
+        Why _bulk instead of individual index() calls?
+            - 1 HTTP request instead of N (one per chunk)
+            - OpenSearch batches the writes internally
+            - 10-50x faster for documents with many chunks
+            - Reduces network round-trips and connection overhead
+
+        The _bulk API expects alternating action/document lines:
+            {"index": {"_index": "...", "_id": "..."}}
+            {"embedding": [...], "text": "...", ...}
+        """
+        bulk_body: list[dict] = []
         for i, (text, embedding) in enumerate(zip(texts, embeddings)):
             metadata = metadatas[i] if metadatas else {}
-            doc = {
-                "embedding": embedding,
-                "text": text,
-                "document_id": document_id,
-                "document_name": document_name,
-                "chunk_index": i,
-                "page_number": metadata.get("page_number"),
-            }
-            self._client.index(
-                index=self.index_name,
-                body=doc,
-                id=f"{document_id}_{i}",
+            # Action line: tells OpenSearch what to do
+            bulk_body.append(
+                {"index": {"_index": self.index_name, "_id": f"{document_id}_{i}"}}
             )
+            # Document line: the actual data to store
+            bulk_body.append(
+                {
+                    "embedding": embedding,
+                    "text": text,
+                    "document_id": document_id,
+                    "document_name": document_name,
+                    "chunk_index": i,
+                    "page_number": metadata.get("page_number"),
+                }
+            )
+
+        # Send all chunks in one HTTP request
+        response = self._client.bulk(body=bulk_body)
+        if response.get("errors"):
+            failed = [item for item in response["items"] if "error" in item.get("index", {})]
+            logger.error(f"Bulk indexing had {len(failed)} errors for document {document_id}")
 
         # Refresh index to make documents searchable immediately
         self._client.indices.refresh(self.index_name)
-        logger.info(f"Stored {len(texts)} vectors for document {document_id}")
+        logger.info(f"Stored {len(texts)} vectors for document {document_id} (bulk)")
         return len(texts)
 
     async def search(self, query_embedding: list[float], top_k: int = 5) -> list[VectorSearchResult]:

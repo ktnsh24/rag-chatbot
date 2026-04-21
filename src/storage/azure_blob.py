@@ -4,7 +4,7 @@ Azure Blob Storage Document Storage
 Stores uploaded documents in an Azure Blob Storage container.
 Each blob is named ``documents/{document_id}/{filename}``.
 
-Resources are created by infra/azure/main.tf.
+Resources are created by infra/azure/storage.tf.
 """
 
 from __future__ import annotations

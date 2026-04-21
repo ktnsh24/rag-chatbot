@@ -14,7 +14,14 @@ from uuid import uuid4
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 from loguru import logger
 
-from src.api.models import DocumentInfo, DocumentListResponse, DocumentStatus, DocumentUploadResponse
+from src.api.models import (
+    BatchDocumentResult,
+    BatchUploadResponse,
+    DocumentInfo,
+    DocumentListResponse,
+    DocumentStatus,
+    DocumentUploadResponse,
+)
 from src.config import get_settings
 
 router = APIRouter()
@@ -111,6 +118,112 @@ async def upload_document(request: Request, file: UploadFile = File(...)) -> Doc
             file_size_bytes=0,
         )
         raise HTTPException(status_code=500, detail=f"Document ingestion failed: {e}")
+
+
+@router.post(
+    "/documents/upload-batch",
+    response_model=BatchUploadResponse,
+    summary="Batch Upload Documents",
+    description=(
+        "Upload multiple documents to the RAG knowledge base in a single request. "
+        "Supported formats: PDF, TXT, MD, CSV, DOCX. "
+        "Uses bulk ingestion for better performance (OpenSearch _bulk API, Azure batch upload)."
+    ),
+)
+async def upload_documents_batch(
+    request: Request,
+    files: list[UploadFile] = File(..., description="Multiple files to upload"),
+) -> BatchUploadResponse:
+    """
+    Upload and ingest multiple documents in a single batch.
+
+    Flow:
+        1. Validate all file types
+        2. Read all file contents
+        3. Ingest each document (chunk → embed → store)
+        4. Return per-file results with overall summary
+
+    Why batch?
+        - 1 HTTP request instead of N
+        - Vector store bulk APIs reduce write latency
+        - Better for initial knowledge base loading (10-100 files at once)
+    """
+    # Validate all files first
+    for file in files:
+        filename = file.filename or "unknown"
+        extension = "." + filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+        if extension not in SUPPORTED_EXTENSIONS:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Unsupported file type '{extension}' in file '{filename}'. "
+                    f"Supported: {', '.join(sorted(SUPPORTED_EXTENSIONS))}"
+                ),
+            )
+
+    # Check RAG chain
+    rag_chain = getattr(request.app.state, "rag_chain", None)
+    if rag_chain is None:
+        raise HTTPException(
+            status_code=500,
+            detail="RAG chain not initialized. Cannot ingest documents.",
+        )
+
+    # Read all files and prepare batch
+    documents: list[tuple[str, str, bytes]] = []
+    for file in files:
+        document_id = str(uuid4())
+        filename = file.filename or "unknown"
+        content = await file.read()
+        documents.append((document_id, filename, content))
+
+    # Ingest all documents
+    batch_results = await rag_chain.ingest_documents(documents)
+
+    # Build response
+    results: list[BatchDocumentResult] = []
+    succeeded = 0
+    total_chunks = 0
+
+    for document_id, filename, chunk_count, error in batch_results:
+        status = DocumentStatus.READY if error is None else DocumentStatus.FAILED
+        results.append(
+            BatchDocumentResult(
+                document_id=document_id,
+                filename=filename,
+                status=status,
+                chunk_count=chunk_count,
+                error=error,
+            )
+        )
+
+        if error is None:
+            succeeded += 1
+            total_chunks += chunk_count
+
+        # Track in document registry
+        # Find the original content bytes for file size
+        file_bytes = next(d[2] for d in documents if d[0] == document_id)
+        _documents[document_id] = DocumentInfo(
+            document_id=document_id,
+            filename=filename,
+            status=status,
+            chunk_count=chunk_count,
+            uploaded_at=datetime.now(timezone.utc),
+            file_size_bytes=len(file_bytes),
+        )
+
+    failed = len(files) - succeeded
+    logger.info(f"Batch upload: {succeeded}/{len(files)} succeeded, {total_chunks} total chunks")
+
+    return BatchUploadResponse(
+        total_files=len(files),
+        succeeded=succeeded,
+        failed=failed,
+        total_chunks=total_chunks,
+        results=results,
+        message=f"Batch complete: {succeeded}/{len(files)} files ingested, {total_chunks} chunks created.",
+    )
 
 
 @router.get(

@@ -51,8 +51,19 @@ class AzureAISearchVectorStore(BaseVectorStore):
         )
     """
 
-    def __init__(self, endpoint: str, api_key: str, index_name: str):
+    def __init__(
+        self,
+        endpoint: str,
+        api_key: str,
+        index_name: str,
+        hnsw_m: int = 4,
+        hnsw_ef_construction: int = 400,
+        hnsw_ef_search: int = 500,
+    ):
         self.index_name = index_name
+        self._hnsw_m = hnsw_m
+        self._hnsw_ef_construction = hnsw_ef_construction
+        self._hnsw_ef_search = hnsw_ef_search
         credential = AzureKeyCredential(api_key)
 
         self._search_client = SearchClient(
@@ -76,10 +87,17 @@ class AzureAISearchVectorStore(BaseVectorStore):
         except Exception:
             pass  # Index doesn't exist, create it
 
-        # Define vector search configuration
+        # Define vector search configuration with explicit HNSW parameters
         vector_search = VectorSearch(
             algorithms=[
-                HnswAlgorithmConfiguration(name="hnsw-config"),
+                HnswAlgorithmConfiguration(
+                    name="hnsw-config",
+                    parameters={
+                        "m": self._hnsw_m,
+                        "efConstruction": self._hnsw_ef_construction,
+                        "efSearch": self._hnsw_ef_search,
+                    },
+                ),
             ],
             profiles=[
                 VectorSearchProfile(

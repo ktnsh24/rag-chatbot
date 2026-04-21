@@ -5,7 +5,7 @@ Stores chat messages in a DynamoDB table with session_id as partition key
 and timestamp as sort key.  This gives O(1) lookups by session and natural
 time ordering.
 
-Table schema (created by infra/aws/main.tf):
+Table schema (created by infra/aws/dynamodb.tf):
     PK  = session_id  (String)
     SK  = timestamp    (String, ISO-8601)
     role    (String)
