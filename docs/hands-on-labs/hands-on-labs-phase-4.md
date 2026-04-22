@@ -168,6 +168,8 @@ GUARDRAILS_ENABLED=true CLOUD_PROVIDER=local python -m uvicorn src.main:app --re
 > This is the same principle as data masking in analytics — you don't want PII
 > in your data warehouse, and you don't want PII in your dashboards.
 
+> **🌍 Real-World:** Under GDPR (which applies to Odido, ING, and every EU company), if your chatbot logs a customer's BSN, email, or phone number without consent, you face fines up to €20M or 4% of global revenue. PII detection isn't optional — it's a legal requirement. In 2023, Italy temporarily banned ChatGPT over GDPR concerns.
+
 ### Experiment 9c — Test guardrails disabled (compare)
 
 1. Restart without guardrails:
@@ -713,6 +715,16 @@ HNSW builds a social network graph of your vectors:
 | `ef_search` | `HNSW_EF_SEARCH` | 512 | All 3 providers |
 | Shards | `OPENSEARCH_NUMBER_OF_SHARDS` | 1 | OpenSearch only |
 | Replicas | `OPENSEARCH_NUMBER_OF_REPLICAS` | 0 | OpenSearch only |
+
+> **🌍 Real-World: When to Pick Which Vector Store**
+>
+> | Scale | Best Choice | Why |
+> |-------|------------|-----|
+> | <10K docs, dev/testing | ChromaDB (local) | Free, zero setup, fast iteration |
+> | 10K–1M docs, serverless | DynamoDB + brute-force (AWS) or Cosmos DB (Azure) | Pay-per-query, no cluster management |
+> | 1M+ docs, low-latency required | OpenSearch / Azure AI Search with HNSW | Purpose-built for vector search at scale |
+>
+> Your rag-chatbot supports all three — this is what "production-grade" means: choosing the right tool for the scale.
 
 ### Experiment 13a — Compare different `m` values (local ChromaDB)
 

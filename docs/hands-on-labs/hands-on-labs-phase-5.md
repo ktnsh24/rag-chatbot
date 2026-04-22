@@ -290,6 +290,8 @@ Based on the metrics available, design alerts for these scenarios:
 | Quality dropping | `evaluation_pass_rate` | < 0.6 for 1 hour | More than 40% of answers are bad |
 | Hallucinating | `failure_category_hallucination` | > 10 in 1 hour | Spike in fabricated answers |
 
+> **🌍 Real-World:** Google research shows 53% of mobile users abandon a page if it takes over 3 seconds to load. For AI chatbots, the tolerance is slightly higher (~5-10 seconds) because users expect "thinking time" — but beyond 10 seconds, abandonment spikes. Your Local environment averaging 21 seconds per query would lose most users in production. This is why latency is a Prometheus metric, not just a nice-to-have.
+
 > ### 🏢 Business & Technical Questions This Lab Helps You Answer
 >
 > **Q: "How would you set up monitoring for an AI chatbot in production?"**
@@ -422,6 +424,9 @@ Add this case to `golden_dataset.py`:
 > Two layers: (1) Guardrails (I23) block known injection patterns before they reach the LLM.
 > (2) Golden dataset (I32) includes injection test cases that verify the system doesn't leak
 > its system prompt. The `expected_not_in_answer` field checks for forbidden content.
+
+> **🌍 Real-World: The Cost of Not Routing**
+> A company handling 100K queries/day on Claude Sonnet 4.6 (~$0.003/query) spends ~€9,000/month. But 80% of queries are simple FAQ-style questions that Haiku 4.5 handles equally well at 1/10th the cost. Smart model routing: €9,000 → €2,700/month (€75K/year savings). This is exactly what the `ai-gateway` repo teaches — and why your 3-provider comparison (Local vs Azure vs AWS) matters. The data from your labs IS the routing decision input.
 
 ---
 

@@ -403,6 +403,8 @@ This trade-off is the first thing an AI engineer checks when debugging a bad ans
 
 **Maps to:** Phase 3, item 14 (`src/evaluation/evaluator.py` → `_evaluate_faithfulness()`)
 
+> **🌍 Real-World:** In 2024, Air Canada's chatbot hallucinated a bereavement discount policy that didn't exist. A customer relied on it, and a tribunal ruled Air Canada must honor the chatbot's promise. One hallucination = real financial liability. This is why faithfulness gets 40% weight in the evaluation formula — it's the most expensive failure mode.
+
 ### Experiment 2a — Trick question (partial context)
 
 The document says "14 business days" — ask a slightly different question:
