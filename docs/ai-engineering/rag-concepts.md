@@ -128,6 +128,7 @@ RAG has three completely different components. Confusing them is the #1 beginner
 | **Analogy** | Translator (English → coordinates) | Library catalogue | Author who writes answers |
 | **Example** | Titan Embeddings v2, text-embedding-3-small, nomic-embed-text | OpenSearch, Azure AI Search, ChromaDB | Claude 3.5 Sonnet, GPT-4o, llama3.2 |
 | **Runs when** | Ingestion + every query | Every query (search) | Every query (generation) |
+| **🫏 Donkey** | The translator who converts your text into GPS coordinates the warehouse understands | The GPS-indexed warehouse — finds the nearest shelf in milliseconds using stadium signs | The donkey — picks up the retrieved packages, reads them, and writes the final answer |
 
 **Key insight:** OpenSearch / Azure AI Search / ChromaDB is a **database**, not a model.
 It doesn't understand text — it stores vectors and finds similar ones. The embedding
@@ -514,6 +515,7 @@ They are independent:
 | **Can you change it?** | Yes — config parameter | No — fixed by model architecture |
 | **Typical values** | 200–2000 characters | 768, 1024, 1536, 3072 |
 | **Affects** | How many chunks you get | How "detailed" the meaning representation is |
+| **🫏 Donkey** | Size of each saddlebag — you pack it bigger or smaller before the trip | The GPS label format printed on every bag — always 1024 numbers, the model decides, you can't change it |
 
 ### The relationship
 
@@ -660,6 +662,7 @@ Your code just reads these numbers and passes them through to the `TokenUsage` m
 | **Azure GPT-4o** | $0.0025 / 1K tokens | $0.01 / 1K tokens |
 | **Local Ollama** | **$0** (runs on your machine) | **$0** |
 | **Ratio** | 1x | ~4-5x more expensive |
+| **🫏 Donkey** | Cargo the donkey picks up and loads into its saddlebag — reading is easy | Words the donkey writes on the delivery receipt — writing from scratch is harder work, so it costs more |
 
 ### Quick cost math for a RAG query
 
@@ -684,14 +687,14 @@ Tokens matter because:
 
 ## RAG vs Fine-tuning
 
-| | RAG (what we build) | Fine-tuning |
-| --- | --- | --- |
-| **How** | Add documents at runtime | Retrain the model on your data |
-| **Data updates** | Upload new documents instantly | Retrain the model (hours/days) |
-| **Cost** | Per-query (token costs) | Upfront training cost ($100–$10K+) |
-| **Accuracy** | Good with good retrieval | Better for specialized domains |
-| **Sources** | Can cite exact documents | No source attribution |
-| **Best for** | Knowledge bases, Q&A | Tone/style changes, specialized tasks |
+| | RAG (what we build) | Fine-tuning | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **How** | Add documents at runtime | Retrain the model on your data | Pack today's map in the saddlebag vs. teach the donkey a new route permanently |
+| **Data updates** | Upload new documents instantly | Retrain the model (hours/days) | Swap the map tonight vs. send the donkey back to school for months |
+| **Cost** | Per-query (token costs) | Upfront training cost ($100–$10K+) | Pay a small fee per delivery vs. pay a large school fee upfront |
+| **Accuracy** | Good with good retrieval | Better for specialized domains | Good if the map is accurate vs. donkey memorised every back alley |
+| **Sources** | Can cite exact documents | No source attribution | Donkey shows you the exact page of the map it used vs. donkey just knows, can't explain how |
+| **Best for** | Knowledge bases, Q&A | Tone/style changes, specialized tasks | Maps that change over time vs. tasks needing a permanently specialist donkey |
 
 **For this project:** RAG is the right choice. Your documents change over time, you need source citations, and you don't want to pay for model training.
 
@@ -701,13 +704,11 @@ Tokens matter because:
 
 ## Common RAG problems and solutions
 
-| Problem | Cause | Solution |
-| --- | --- | --- |
-| Wrong answer | Irrelevant chunks retrieved | Increase `top_k`, improve chunking |
-| "I don't know" when answer exists | Chunk too small, question too vague | Increase chunk size, rephrase question |
-| Hallucination | LLM ignores context | Stronger system prompt ("ONLY use context") |
-| Slow responses | Too many chunks sent to LLM | Reduce `top_k`, use faster model |
-| High cost | Too many tokens per query | Reduce chunk size, reduce `top_k` |
-| Duplicate information | Overlapping chunks | Reduce `chunk_overlap` |
-
-> 🫏 **Donkey analogy:** Common RAG problems are potholes on the delivery road. Wrong answer = donkey picked up the wrong packages (irrelevant chunks — widen the search). "I don't know" when answer exists = packages were cut too small and the answer fell in the gap between chunks (increase chunk size or overlap). Hallucination = donkey ignored the saddlebag and answered from memory (strengthen the system prompt, say "ONLY use what is in the bag"). Slow responses = donkey is carrying 20 heavy bags when 3 would do (reduce top_k). High cost = same problem, measured in money instead of time. Duplicate info = bag edges overlap too much (reduce chunk_overlap). Every pothole has a fill.
+| Problem | Cause | Solution | 🫏 Donkey |
+| --- | --- | --- | --- |
+| Wrong answer | Irrelevant chunks retrieved | Increase `top_k`, improve chunking | Donkey grabbed the wrong saddlebags — they looked similar but were from the wrong shelf |
+| "I don't know" when answer exists | Chunk too small, question too vague | Increase chunk size, rephrase question | The answer was cut in half between two bags — neither bag had the full sentence |
+| Hallucination | LLM ignores context | Stronger system prompt ("ONLY use context") | Donkey ignored the saddlebag entirely and answered from memory — wrong, but confident |
+| Slow responses | Too many chunks sent to LLM | Reduce `top_k`, use faster model | Donkey is carrying 20 heavy bags when 3 would do — overloaded and slow |
+| High cost | Too many tokens per query | Reduce chunk size, reduce `top_k` | Same overloading problem, but measured in money instead of sweat |
+| Duplicate information | Overlapping chunks | Reduce `chunk_overlap` | Bag edges overlap too much — donkey delivers the same letter twice in different bags |
