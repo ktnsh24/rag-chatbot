@@ -60,3 +60,21 @@ logs/
 
 # Lab results contain ingested document content — keep local, regenerate per-environment
 scripts/lab_results/
+
+# Backup .env files (may contain real secrets)
+.env.*backup
+.env.*.bak
+.env.local
+.env.azure*
+.env.aws*
+
+# Internal working notes — never publish
+replacement_summary.txt
+*_summary.txt
+
+# Personal lab runners (may contain real account IDs / paths)
+scripts/*_personal.sh
+scripts/*_personal.py
+
+# Terraform build artifacts
+infra/**/.build/
