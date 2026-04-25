@@ -2,7 +2,7 @@
 
 > **Date**: 2026-04-22  
 >
-> **Account**: 211132580210 (personal)  
+> **Account**: <personal AWS account>  
 >
 > **Region**: eu-central-1 (Frankfurt)  
 >

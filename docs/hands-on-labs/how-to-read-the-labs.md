@@ -58,7 +58,7 @@ Every lab in this repo reports against these 5 numbers. Memorise them once and t
 
 There is also a **composite `overall_score`** = `0.4 × retrieval + 0.4 × faithfulness + 0.2 × answer_relevance`. Pass threshold = **0.70**. That's the single number you'll see at the top of every results table.
 
-For the full cross-repo metrics catalogue (including knowledge-engine extras like ContextPrecision, ContextRecall, etc.), see `~/maestro/ai-portfolio/personal/evaluation-metrics-cheatsheet.md`. For a per-metric description in this repo's own language, see `docs/ai-engineering/evaluation-metrics.md`.
+For the full cross-repo metrics catalogue (including knowledge-engine extras like ContextPrecision, ContextRecall, etc.), see the portfolio cheatsheet (kept locally). For a per-metric description in this repo's own language, see `docs/ai-engineering/evaluation-metrics.md`.
 
 ---
 

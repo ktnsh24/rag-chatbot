@@ -5,7 +5,7 @@
 Enterprise-grade **Retrieval-Augmented Generation (RAG)** chatbot built with FastAPI.
 Multi-cloud: deployable to **AWS** (Bedrock + OpenSearch), **Azure** (Azure OpenAI + AI Search), or **locally** (Ollama + ChromaDB).
 
-**Owner**: Ketan Sahu (ketan-odido)
+**Owner**: Ketan Sahu (ktnsh24)
 
 ## Tech Stack
 

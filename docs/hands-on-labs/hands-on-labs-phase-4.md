@@ -170,7 +170,7 @@ GUARDRAILS_ENABLED=true CLOUD_PROVIDER=local python -m uvicorn src.main:app --re
 > This is the same principle as data masking in analytics — you don't want PII
 > in your data warehouse, and you don't want PII in your dashboards.
 
-> **🌍 Real-World:** Under GDPR (which applies to Odido, ING, and every EU company), if your chatbot logs a customer's BSN, email, or phone number without consent, you face fines up to €20M or 4% of global revenue. PII detection isn't optional — it's a legal requirement. In 2023, Italy temporarily banned ChatGPT over GDPR concerns.
+> **🌍 Real-World:** Under GDPR (which applies to every EU company), if your chatbot logs a customer's BSN, email, or phone number without consent, you face fines up to €20M or 4% of global revenue. PII detection isn't optional — it's a legal requirement. In 2023, Italy temporarily banned ChatGPT over GDPR concerns.
 
 ### Experiment 9c — Test guardrails disabled (compare)
 

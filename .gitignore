@@ -57,3 +57,6 @@ htmlcov/
 # Logs
 *.log
 logs/
+
+# Lab results contain ingested document content — keep local, regenerate per-environment
+scripts/lab_results/

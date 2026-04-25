@@ -1084,7 +1084,7 @@ def create_portfolio_overview_pdf(output_path: Path) -> None:
     )
     pdf.ln(2)
     pdf.body_text(
-        "Background: Data Engineer with 5+ years experience in Python, Terraform, AWS, and Azure at Odido. "
+        "Background: Data Engineer with 5+ years experience in Python, Terraform, AWS, and Azure. "
         "This portfolio proves that data engineering principles — schema validation, pipeline testing, IaC, "
         "observability, cost governance — transfer directly to AI systems and give a DE-turned-AI-engineer "
         "a unique advantage over developers who only know the AI frameworks."
@@ -1376,7 +1376,7 @@ def create_portfolio_overview_pdf(output_path: Path) -> None:
 # Main
 # ---------------------------------------------------------------------------
 def main() -> None:
-    base = Path("/home/ketan-odido/maestro/ai-portfolio/personal/career")
+    base = Path("Path.home() / "projects" / "ai-portfolio" / "personal" / "career"")
 
     print("Generating portfolio PDFs...")
     create_rag_chatbot_pdf(base / "rag-chatbot-portfolio.pdf")

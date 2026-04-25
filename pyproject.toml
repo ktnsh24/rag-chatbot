@@ -2,7 +2,7 @@
 name = "rag-chatbot"
 version = "0.1.0"
 description = "Enterprise RAG Chatbot — Multi-cloud (AWS + Azure) retrieval-augmented generation service with FastAPI"
-authors = ["Ketan Sahu <Ketan.Sahu@odido.nl>"]
+authors = ["Ketan Sahu <ktnsh24@users.noreply.github.com>"]
 readme = "README.md"
 license = "MIT"
 packages = [{ include = "src" }]

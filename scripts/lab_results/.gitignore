@@ -1,6 +1,0 @@
-# Lab results are generated per-run and per-environment
-# Each run creates a timestamped folder (e.g., local/2026-04-18T14-30-00/)
-# Don't commit to repo — they're personal/local output
-*
-!.gitignore
-!local-vs-azure-comparison.md
