@@ -114,7 +114,7 @@ After running the labs, read the results to see how Local, Azure, and AWS compar
 | # | Document | What you'll learn | 🫏 Donkey |
 |---|----------|-------------------|-----------|
 | 41 | [AWS Cloud Labs Results](aws-cloud-labs-results.md) | 4 AWS runs, root causes, fixes, donkey analogy | The AWS trip report — 4 runs, what broke, what was fixed, full donkey post-mortem included |
-| 42 | [3-Way Comparison](../scripts/lab_results/local-vs-azure-comparison.md) | Local vs Azure vs AWS — head-to-head on all 40 experiments | Three stables, one race — local barn vs Azure vs AWS across all 40 experiments, winner per metric |
+| 42 | [3-Way Comparison: Local vs Azure vs AWS](../scripts/lab_results/local-vs-azure-comparison.md) | Head-to-head on 40 comparable experiments across Labs 1–13 (Phases 1–4) | Three providers, one race — local barn vs Azure vs AWS, winner per metric per lab |
 | 43 | [History Explained](architecture-and-design/history-explained.md) | Conversation history and session management | The donkey's memory between trips — how it remembers what you said 3 questions ago without losing the thread |
 
 ---
