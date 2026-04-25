@@ -1,8 +1,8 @@
 # Deep Dive: Evaluation Framework — `src/evaluation/evaluator.py`
 
-> **Study order:** #14 · **Difficulty:** ★★★★☆ (this is how you measure if AI is working — the concepts are new)
-> **File:** [`src/evaluation/evaluator.py`](../../src/evaluation/evaluator.py)
-> **Prerequisite:** [#13 — RAG Chain](rag-chain-deep-dive.md) · [#12 — Prompts](prompts-deep-dive.md)
+> **Study order:** #14 · **Difficulty:** ★★★★☆ (this is how you measure if AI is working — the concepts are new)  
+> **File:** [`src/evaluation/evaluator.py`](../../src/evaluation/evaluator.py)  
+> **Prerequisite:** [#13 — RAG Chain](rag-chain-deep-dive.md) · [#12 — Prompts](prompts-deep-dive.md)  
 > **Part of:** [Architecture Overview](../architecture-and-design/architecture.md)
 
 ---

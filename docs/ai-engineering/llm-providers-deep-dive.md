@@ -1,8 +1,8 @@
 # Deep Dive: LLM Providers — AWS Bedrock, Azure OpenAI & Local Ollama
 
-> **Study order:** #8 · **Difficulty:** ★★☆☆☆ (you know boto3 and API clients — the new part is *what* you're calling)
-> **Files:** [`src/llm/aws_bedrock.py`](../../src/llm/aws_bedrock.py) · [`src/llm/azure_openai.py`](../../src/llm/azure_openai.py) · [`src/llm/local_ollama.py`](../../src/llm/local_ollama.py)
-> **Prerequisite:** [#7 — The LLM Interface (`base.py`)](llm-interface-deep-dive.md)
+> **Study order:** #8 · **Difficulty:** ★★☆☆☆ (you know boto3 and API clients — the new part is *what* you're calling)  
+> **Files:** [`src/llm/aws_bedrock.py`](../../src/llm/aws_bedrock.py) · [`src/llm/azure_openai.py`](../../src/llm/azure_openai.py) · [`src/llm/local_ollama.py`](../../src/llm/local_ollama.py)  
+> **Prerequisite:** [#7 — The LLM Interface (`base.py`)](llm-interface-deep-dive.md)  
 > **Part of:** [Architecture Overview](../architecture-and-design/architecture.md)
 
 ---

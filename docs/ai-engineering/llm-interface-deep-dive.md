@@ -1,7 +1,7 @@
 # Deep Dive: The LLM Interface — `src/llm/base.py`
 
-> **Study order:** #7 · **Difficulty:** ★☆☆☆☆ (the code is simple — the concepts are what you're learning)
-> **File:** [`src/llm/base.py`](../../src/llm/base.py)
+> **Study order:** #7 · **Difficulty:** ★☆☆☆☆ (the code is simple — the concepts are what you're learning)  
+> **File:** [`src/llm/base.py`](../../src/llm/base.py)  
 > **Part of:** [Architecture Overview](../architecture-and-design/architecture.md)
 
 ---

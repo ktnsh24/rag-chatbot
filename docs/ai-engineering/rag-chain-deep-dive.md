@@ -1,8 +1,8 @@
 # Deep Dive: RAG Chain Orchestrator — `src/rag/chain.py`
 
-> **Study order:** #13 · **Difficulty:** ★★★★☆ (this is the central orchestrator — every concept comes together here)
-> **File:** [`src/rag/chain.py`](../../src/rag/chain.py)
-> **Prerequisite:** [#12 — Prompt Engineering](prompts-deep-dive.md) · [#7 — LLM Interface](llm-interface-deep-dive.md) · [#9 — Vector Store Interface](vectorstore-interface-deep-dive.md)
+> **Study order:** #13 · **Difficulty:** ★★★★☆ (this is the central orchestrator — every concept comes together here)  
+> **File:** [`src/rag/chain.py`](../../src/rag/chain.py)  
+> **Prerequisite:** [#12 — Prompt Engineering](prompts-deep-dive.md) · [#7 — LLM Interface](llm-interface-deep-dive.md) · [#9 — Vector Store Interface](vectorstore-interface-deep-dive.md)  
 > **Part of:** [Architecture Overview](../architecture-and-design/architecture.md)
 
 ---

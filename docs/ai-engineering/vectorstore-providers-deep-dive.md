@@ -1,8 +1,8 @@
 # Deep Dive: Vector Store Providers — AWS OpenSearch, AWS DynamoDB, Azure AI Search & Local ChromaDB
 
-> **Study order:** #10 · **Difficulty:** ★★☆☆☆ (you know OpenSearch for logs — the new part is *vector search*)
-> **Files:** [`src/vectorstore/aws_opensearch.py`](../../src/vectorstore/aws_opensearch.py) · [`src/vectorstore/aws_dynamodb.py`](../../src/vectorstore/aws_dynamodb.py) · [`src/vectorstore/azure_ai_search.py`](../../src/vectorstore/azure_ai_search.py) · [`src/vectorstore/local_chromadb.py`](../../src/vectorstore/local_chromadb.py)
-> **Prerequisite:** [#9 — The Vector Store Interface](vectorstore-interface-deep-dive.md)
+> **Study order:** #10 · **Difficulty:** ★★☆☆☆ (you know OpenSearch for logs — the new part is *vector search*)  
+> **Files:** [`src/vectorstore/aws_opensearch.py`](../../src/vectorstore/aws_opensearch.py) · [`src/vectorstore/aws_dynamodb.py`](../../src/vectorstore/aws_dynamodb.py) · [`src/vectorstore/azure_ai_search.py`](../../src/vectorstore/azure_ai_search.py) · [`src/vectorstore/local_chromadb.py`](../../src/vectorstore/local_chromadb.py)  
+> **Prerequisite:** [#9 — The Vector Store Interface](vectorstore-interface-deep-dive.md)  
 > **Part of:** [Architecture Overview](../architecture-and-design/architecture.md)
 
 ---

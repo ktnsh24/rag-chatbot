@@ -1,8 +1,8 @@
 # Deep Dive: The Vector Store Interface — `src/vectorstore/base.py`
 
-> **Study order:** #9 · **Difficulty:** ★☆☆☆☆ (another abstract class — the new part is *what* it stores)
-> **File:** [`src/vectorstore/base.py`](../../src/vectorstore/base.py)
-> **Prerequisite:** [#7 — The LLM Interface](llm-interface-deep-dive.md) (especially Concept 4: Embeddings)
+> **Study order:** #9 · **Difficulty:** ★☆☆☆☆ (another abstract class — the new part is *what* it stores)  
+> **File:** [`src/vectorstore/base.py`](../../src/vectorstore/base.py)  
+> **Prerequisite:** [#7 — The LLM Interface](llm-interface-deep-dive.md) (especially Concept 4: Embeddings)  
 > **Part of:** [Architecture Overview](../architecture-and-design/architecture.md)
 
 ---

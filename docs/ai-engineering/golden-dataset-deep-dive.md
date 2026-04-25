@@ -1,8 +1,8 @@
 # Deep Dive: Golden Dataset — `src/evaluation/golden_dataset.py`
 
-> **Study order:** #15 · **Difficulty:** ★★★☆☆ (mostly data structures — the AI concept is "regression testing for LLMs")
-> **File:** [`src/evaluation/golden_dataset.py`](../../src/evaluation/golden_dataset.py)
-> **Prerequisite:** [#14 — Evaluation Framework](evaluation-framework-deep-dive.md)
+> **Study order:** #15 · **Difficulty:** ★★★☆☆ (mostly data structures — the AI concept is "regression testing for LLMs")  
+> **File:** [`src/evaluation/golden_dataset.py`](../../src/evaluation/golden_dataset.py)  
+> **Prerequisite:** [#14 — Evaluation Framework](evaluation-framework-deep-dive.md)  
 > **Part of:** [Architecture Overview](../architecture-and-design/architecture.md)
 
 ---

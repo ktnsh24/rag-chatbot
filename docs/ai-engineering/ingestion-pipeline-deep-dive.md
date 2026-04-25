@@ -1,8 +1,8 @@
 # Deep Dive: The Ingestion Pipeline — `src/rag/ingestion.py`
 
-> **Study order:** #11 · **Difficulty:** ★★☆☆☆ (this IS your ETL — just with different transforms)
-> **File:** [`src/rag/ingestion.py`](../../src/rag/ingestion.py)
-> **Prerequisite:** [#7 — Embeddings](llm-interface-deep-dive.md#concept-4-embeddings--turning-meaning-into-math-get_embedding) · [#9 — store_vectors()](vectorstore-interface-deep-dive.md#concept-2-store_vectors--writing-embeddings-to-the-database)
+> **Study order:** #11 · **Difficulty:** ★★☆☆☆ (this IS your ETL — just with different transforms)  
+> **File:** [`src/rag/ingestion.py`](../../src/rag/ingestion.py)  
+> **Prerequisite:** [#7 — Embeddings](llm-interface-deep-dive.md#concept-4-embeddings--turning-meaning-into-math-get_embedding) · [#9 — store_vectors()](vectorstore-interface-deep-dive.md#concept-2-store_vectors--writing-embeddings-to-the-database)  
 > **Part of:** [Architecture Overview](../architecture-and-design/architecture.md)
 
 ---

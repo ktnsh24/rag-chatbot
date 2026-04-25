@@ -863,6 +863,10 @@ terraform destroy -var="cost_limit_eur=5" -var="alert_email=you@example.com"
 
 ## Step 10 — Run the tests
 
+> **⏭️ Skip if you used the automated setup script.**
+> If you ran the bootstrap script earlier (instead of doing Steps 1–9 manually), the tests have already been executed for you — you can move on to the next step.
+> Only run the commands below if you followed the manual steps.
+
 Before starting the server, verify everything is installed correctly by running the test suite:
 
 ```bash
