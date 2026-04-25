@@ -85,6 +85,7 @@ How to measure quality and run the 58-experiment lab suite.
 | # | Document | What you'll learn | 🫏 Donkey |
 |---|----------|-------------------|-----------|
 | 30 | [Evaluation Framework](ai-engineering/evaluation-framework-deep-dive.md) | Retrieval, faithfulness, answer relevance — how scoring works | The donkey's report card — did it grab the right bags? Was the answer faithful to the contents? |
+| 30b | [Evaluation Metrics (this repo)](ai-engineering/evaluation-metrics.md) | The 3+2 metrics every result row reports, with thresholds and reading-row examples | The yardstick — same 5 numbers on every report card; learn to read them in 10 seconds |
 | 31 | [Metrics Deep Dive](ai-engineering/metrics-deep-dive.md) | Prometheus metrics, latency tracking, cost tracking | The tachograph — every delivery time, token cost, and quality score recorded and graphed |
 | 32 | [Golden Dataset](ai-engineering/golden-dataset-deep-dive.md) | The 25-question benchmark suite | The 25 standard test deliveries — the benchmark every donkey run must pass before going to production |
 | 33 | [Testing](ai-engineering/testing.md) | Unit tests, integration tests, evaluation tests | Quality gates before every delivery — unit checks per component, full-run integration, and scoring tests |
@@ -95,10 +96,13 @@ How to measure quality and run the 58-experiment lab suite.
 
 ## Level 7 — Hands-On Labs (Do the Exercises)
 
-Run all 58 experiments yourself — follow Phase 1 → 5 in order.
+**Read [How to Read the Labs](hands-on-labs/how-to-read-the-labs.md) FIRST.** It explains why every lab seems to report the same metrics — without that mental model the labs feel repetitive and confusing.
+
+Then run all 58 experiments yourself — follow Phase 1 → 5 in order.
 
 | # | Document | What you'll learn | 🫏 Donkey |
 |---|----------|-------------------|-----------|
+| 35b | [How to Read the Labs](hands-on-labs/how-to-read-the-labs.md) | Why all labs share the same yardstick; 5-question method to read any lab; suggested study order | Read this BEFORE Phase 1 — the missing intro that makes the report card make sense |
 | 36 | [Phase 1 — Foundation](hands-on-labs/hands-on-labs-phase-1.md) | Basic queries, top_k tuning, first evaluation | First solo trips — basic deliveries, tune the backpack size, read the first report card |
 | 37 | [Phase 2 — Bridge Skills](hands-on-labs/hands-on-labs-phase-2.md) | Multi-turn, injection tests, tracing, dashboards | Advanced trips — multi-leg journeys, injection attack tests, live GPS tracking on the dashboard |
 | 38 | [Phase 3 — Production AI](hands-on-labs/hands-on-labs-phase-3.md) | Document upload, golden dataset, guardrails | Real-world runs — upload your own docs, run the 25-question benchmark, add safety guardrails |
