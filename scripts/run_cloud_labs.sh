@@ -16,6 +16,26 @@
 
 set -euo pipefail
 
+# ---------------------------------------------------------------------------
+# Credential isolation — prevents leaking work SSO creds into personal runs
+# ---------------------------------------------------------------------------
+if [[ "${AWS_CREDS_ISOLATED:-}" != "1" ]]; then
+    unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN \
+          AWS_SECURITY_TOKEN AWS_CREDENTIAL_EXPIRATION AWS_ROLE_ARN \
+          AWS_ROLE_SESSION_NAME AWS_WEB_IDENTITY_TOKEN_FILE 2>/dev/null || true
+    export AWS_PROFILE="${AWS_PROFILE:-personal}"
+    export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-eu-central-1}"
+    export PYTHONDONTWRITEBYTECODE=1
+    find "$(dirname "$0")/../src" -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+    ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text 2>&1 || true)
+    if [[ "$ACCOUNT_ID" == "$EXPECTED_PERSONAL_ACCOUNT_ID" ]]; then
+        echo "✅ Account verified: $ACCOUNT_ID (personal)"
+    else
+        echo "⚠️  AWS account: $ACCOUNT_ID (verify this is correct)"
+    fi
+    export AWS_CREDS_ISOLATED=1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
 REPO_NAME="rag-chatbot"
