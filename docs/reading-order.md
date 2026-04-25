@@ -85,7 +85,6 @@ How to measure quality and run the 58-experiment lab suite.
 | # | Document | What you'll learn | 🫏 Donkey |
 |---|----------|-------------------|-----------|
 | 30 | [Evaluation Framework](ai-engineering/evaluation-framework-deep-dive.md) | Retrieval, faithfulness, answer relevance — how scoring works | The donkey's report card — did it grab the right bags? Was the answer faithful to the contents? |
-| 30b | [Evaluation Metrics (this repo)](ai-engineering/evaluation-metrics.md) | The 3+2 metrics every result row reports, with thresholds and reading-row examples | The yardstick — same 5 numbers on every report card; learn to read them in 10 seconds |
 | 31 | [Metrics Deep Dive](ai-engineering/metrics-deep-dive.md) | Prometheus metrics, latency tracking, cost tracking | The tachograph — every delivery time, token cost, and quality score recorded and graphed |
 | 32 | [Golden Dataset](ai-engineering/golden-dataset-deep-dive.md) | The 25-question benchmark suite | The 25 standard test deliveries — the benchmark every donkey run must pass before going to production |
 | 33 | [Testing](ai-engineering/testing.md) | Unit tests, integration tests, evaluation tests | Quality gates before every delivery — unit checks per component, full-run integration, and scoring tests |
