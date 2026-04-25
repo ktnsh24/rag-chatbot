@@ -67,8 +67,8 @@ class RAGChain:
         else:
             raise ValueError(f"Unknown cloud provider: {settings.cloud_provider}")
 
-        # Override vector store if explicitly requested
-        if settings.vector_store_type == VectorStoreType.DYNAMODB:
+        # Override vector store if explicitly requested (skips default that may need unconfigured endpoints)
+        if settings.vector_store_type == VectorStoreType.DYNAMODB and settings.cloud_provider != CloudProvider.AWS:
             vector_store = cls._create_dynamodb_vector_store(settings)
             logger.info("Vector store overridden to DynamoDB (cheap mode)")
 
@@ -82,22 +82,27 @@ class RAGChain:
     async def _create_aws_backends(settings: Settings) -> tuple[BaseLLM, BaseVectorStore]:
         """Initialize AWS-specific backends."""
         from src.llm.aws_bedrock import BedrockLLM
-        from src.vectorstore.aws_opensearch import OpenSearchVectorStore
 
         llm = BedrockLLM(
             model_id=settings.aws_bedrock_model_id,
             region=settings.aws_bedrock_region,
         )
-        vector_store = OpenSearchVectorStore(
-            endpoint=settings.aws_opensearch_endpoint,
-            index_name=settings.aws_opensearch_index_name,
-            region=settings.aws_region,
-            hnsw_m=settings.hnsw_m,
-            hnsw_ef_construction=settings.hnsw_ef_construction,
-            hnsw_ef_search=settings.hnsw_ef_search,
-            number_of_shards=settings.opensearch_number_of_shards,
-            number_of_replicas=settings.opensearch_number_of_replicas,
-        )
+
+        # Skip OpenSearch when DynamoDB is explicitly requested (avoids empty endpoint error)
+        if settings.vector_store_type == VectorStoreType.DYNAMODB:
+            vector_store = RAGChain._create_dynamodb_vector_store(settings)
+        else:
+            from src.vectorstore.aws_opensearch import OpenSearchVectorStore
+            vector_store = OpenSearchVectorStore(
+                endpoint=settings.aws_opensearch_endpoint,
+                index_name=settings.aws_opensearch_index_name,
+                region=settings.aws_region,
+                hnsw_m=settings.hnsw_m,
+                hnsw_ef_construction=settings.hnsw_ef_construction,
+                hnsw_ef_search=settings.hnsw_ef_search,
+                number_of_shards=settings.opensearch_number_of_shards,
+                number_of_replicas=settings.opensearch_number_of_replicas,
+            )
         return llm, vector_store
 
     @staticmethod

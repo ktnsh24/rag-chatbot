@@ -86,7 +86,6 @@ class BedrockLLM(BaseLLM):
                 inferenceConfig={
                     "maxTokens": 2048,
                     "temperature": temperature,
-                    "topP": 0.9,
                 },
             )
 

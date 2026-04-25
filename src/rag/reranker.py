@@ -163,12 +163,15 @@ class AWSReranker(BaseReranker):
                 for result in results
             ]
 
+            # Guard: numberOfResults must not exceed len(sources)
+            safe_top_k = min(top_k, len(sources))
+
             response = self._client.rerank(
                 rerankingConfiguration={
                     "type": "BEDROCK_RERANKING_MODEL",
                     "bedrockRerankingConfiguration": {
                         "modelConfiguration": {"modelArn": f"arn:aws:bedrock:{self._region}::foundation-model/{self._model_id}"},
-                        "numberOfResults": top_k,
+                        "numberOfResults": safe_top_k,
                     },
                 },
                 sources=sources,

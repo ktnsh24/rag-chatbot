@@ -24,7 +24,7 @@ resource "aws_iam_role" "ecs_execution_role" {
   })
 
   tags = {
-    Purpose = "ECS task execution — pull images, write CloudWatch logs"
+    Purpose = "ECS task execution: pull images and write CloudWatch logs"
   }
 }
 
@@ -52,7 +52,7 @@ resource "aws_iam_role" "ecs_task_role" {
   })
 
   tags = {
-    Purpose = "Application-level access to S3, DynamoDB, Bedrock"
+    Purpose = "Application-level access to S3 DynamoDB Bedrock"
   }
 }
 

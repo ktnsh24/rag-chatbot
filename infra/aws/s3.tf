@@ -6,7 +6,7 @@
 # =============================================================================
 
 resource "aws_s3_bucket" "documents" {
-  bucket = "${local.prefix}-documents"
+  bucket = "${local.prefix}-documents-${data.aws_caller_identity.current.account_id}"
 
   tags = {
     Purpose = "Store uploaded documents for RAG ingestion"
