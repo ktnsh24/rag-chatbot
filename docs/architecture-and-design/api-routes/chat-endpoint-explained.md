@@ -180,7 +180,7 @@ yourself — Pydantic does it.
 
 | Line | Purpose | 🫏 Donkey |
 | --- | --- | --- |
-| `start_time = time.time()` | Start a stopwatch to measure total latency | Feed bill 🌾 |
+| `start_time = time.time()` | Start a stopwatch to measure total latency | Cost of keeping the donkey fed — start_time = time.time(): Start a stopwatch to measure total latency |
 | `settings = get_settings()` | Load config (for default `top_k`, cloud provider, etc.) | How many backpacks the donkey grabs from the warehouse for one delivery |
 | `request_id = uuid4()` | Generate unique ID for this request (for log tracing) | Donkey's trip log — every delivery's details written to disk for later review |
 | `body.question[:100]` | Log only first 100 chars of question (privacy + log size) | Donkey's trip log — every delivery's details written to disk for later review |
@@ -196,7 +196,7 @@ yourself — Pydantic does it.
 
 | Variable | If user provided it | If user didn't provide it | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `session_id` | Use theirs (for multi-turn conversations) | Generate a new UUID (new conversation) | Trip log 📒 |
+| `session_id` | Use theirs (for multi-turn conversations) | Generate a new UUID (new conversation) | Trip log entry — session_id: Use theirs (for multi-turn conversations) · Generate a new UUID (new conversation) |
 | `top_k` | Use theirs (1–20) | Use default from settings (usually 5) | How many backpacks the donkey grabs from the warehouse for one delivery |
 
 **What is `top_k`?** It's how many document chunks to retrieve from the vector store.
@@ -995,7 +995,7 @@ except Exception:
 |---|---|---| --- |
 | **Inline evaluation** | Scores every answer in real-time (< 5ms, no LLM call) | DQ check after every pipeline run | Quick report card on every delivery without sending the donkey back out for a second opinion |
 | **Failure classification** | Categories: `bad_retrieval`, `hallucination`, `off_topic`, etc. | Error taxonomy in Airflow | Each failed delivery gets a reason code — bad_retrieval, hallucination, off_topic — so the stable knows which fix to apply. |
-| **JSONL logging** | One structured record per query in `logs/queries/YYYY-MM-DD.jsonl` | Structured task logs | Gate guard 🔐 |
+| **JSONL logging** | One structured record per query in `logs/queries/YYYY-MM-DD.jsonl` | Structured task logs | Bouncer at the stable door — JSONL logging: One structured record per query in logs/queries/YYYY-MM-DD.jsonl · Structured task logs |
 | **Non-fatal** | If logging fails, user still gets their answer | Airflow: logging fails ≠ task fails | If the trip log can't be written, the donkey still hands the customer their answer — logging failure never blocks delivery |
 
 📖 **See:** [Monitoring Reference](../../reference/monitoring.md) · [API Reference → Queries](../../reference/api-reference.md#query-debugging-i30)
@@ -1010,13 +1010,13 @@ Here's a breakdown of what one question costs across all 5 steps:
 
 | Step | What happens | AWS cost | Azure cost | Local cost | Time | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1. EMBED | Question → vector | $0.0000003 (Titan) | $0.0000003 (text-embedding-3-small) | **$0** | ~50ms | GPS stamp 📍 |
-| 2. SEARCH | Find top 5 chunks | ~$0 (OpenSearch, per-OCU) | ~$0 (AI Search, per-tier) | **$0** | ~30ms | AWS search hub 🔍 |
-| 3. BUILD | Assemble prompt | $0 | $0 | $0 | <1ms | Delivery note 📋 |
+| 1. EMBED | Question → vector | $0.0000003 (Titan) | $0.0000003 (text-embedding-3-small) | **$0** | ~50ms | Coordinates inked on the saddlebag — 1. EMBED: Question → vector · $0.0000003 (Titan) · $0.0000003 (text-embedding-3-small) · $0 · ~50ms |
+| 2. SEARCH | Find top 5 chunks | ~$0 (OpenSearch, per-OCU) | ~$0 (AI Search, per-tier) | **$0** | ~30ms | AWS search hub — 2. SEARCH: Find top 5 chunks · ~$0 (OpenSearch, per-OCU) · ~$0 (AI Search, per-tier) · $0 · ~30ms |
+| 3. BUILD | Assemble prompt | $0 | $0 | $0 | <1ms | Note the donkey carries — 3. BUILD: Assemble prompt · $0 · $0 · $0 · <1ms |
 | 4. GENERATE | LLM generates answer | **$0.0065** (Claude) | **$0.005** (GPT-4o) | **$0** (llama3.2) | ~350ms | The donkey writes the answer — by far the slowest and most expensive step of every trip |
-| 5. BUILD | Format response | $0 | $0 | $0 | <1ms | Free hay 🌿 |
-| **Total per query** | | **~$0.0065** | **~$0.005** | **$0** | **~430ms** | Feed bill 🌾 |
-| **Monthly infra** | | ~$350 (OpenSearch 2 OCU) | ~$75 (AI Search Basic) | **$0** | — | AWS search hub 🔍 |
+| 5. BUILD | Format response | $0 | $0 | $0 | <1ms | Complimentary feed allowance — 5. BUILD: Format response · $0 · $0 · $0 · <1ms |
+| **Total per query** | | **~$0.0065** | **~$0.005** | **$0** | **~430ms** | Hay-and-oats invoice — Total per query: ~$0.0065 · ~$0.005 · $0 · ~430ms |
+| **Monthly infra** | | ~$350 (OpenSearch 2 OCU) | ~$75 (AI Search Basic) | **$0** | — | OpenSearch sorting office — Monthly infra: ~$350 (OpenSearch 2 OCU) · ~$75 (AI Search Basic) · $0 · — |
 
 **Key insight:** 99.9% of the cost is in Step 4 (the LLM call). The embedding is
 essentially free. Optimising costs means reducing what you send to the LLM:
@@ -1036,7 +1036,7 @@ What does each role see when they look at this endpoint?
 
 | Aspect | DE sees | AI engineer sees | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `rag_chain.query()` | "Async service call" | "What embedding model? Is 1024 dimensions enough? Should I use cosine or dot product?" | GPS stamp 📍 |
+| `rag_chain.query()` | "Async service call" | "What embedding model? Is 1024 dimensions enough? Should I use cosine or dot product?" | Coordinates inked on the saddlebag — rag_chain.query(): "Async service call" · "What embedding model? Is 1024 dimensions enough? Should I use cosine or dot product?" |
 | `top_k=5` | "Like LIMIT 5" | "Is 5 optimal? Should I use 3 for simple questions and 10 for complex ones?" | How many backpacks the donkey grabs from the warehouse for one delivery |
 | `sources` | "List of dicts" | "Are low-scoring chunks diluting the context? Should I filter below 0.5 before sending to the LLM?" | AI engineer asks if low-score backpack items are diluting what the donkey actually reads |
 | `token_usage: 1250 input` | "A counter" | "That's 5 chunks × ~250 tokens each. Can I use 200-token chunks to save 20%?" | 1250 input tokens of hay equals roughly 5 backpacks at 250 tokens each — shrink the pockets to cut the feed bill. |
@@ -1052,7 +1052,7 @@ What does each role see when they look at this endpoint?
 
 | Error scenario | What happens | HTTP status | 🫏 Donkey |
 | --- | --- | --- | --- |
-| Invalid question (empty or >5000 chars) | Pydantic rejects it before the route runs | `422` | Stable door 🚪 |
+| Invalid question (empty or >5000 chars) | Pydantic rejects it before the route runs | `422` | Door the customer knocks on — Invalid question (empty or >5000 chars): Pydantic rejects it before the route runs · 422 |
 | RAG chain not initialised | Route returns error immediately (no AI call) | `500` | Stable's front door — the URL customers use to drop off a question |
 | Embedding API fails (Bedrock / Azure OpenAI / Ollama down) | Exception in Step 1 → caught by try/except | `500` | Donkey can't convert the question into GPS coordinates because the embedding stable is down |
 | Vector store empty (no documents) | Step 2 returns [] → friendly "upload docs first" message | `200` (not an error) | GPS warehouse shelves are empty, so the donkey returns a polite 'upload some documents first' note instead of an error. |

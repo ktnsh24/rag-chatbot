@@ -32,10 +32,10 @@ This is the **most important file in the entire application**. Every other file 
 | What you'll learn | DE parallel | 🫏 Donkey |
 |---|---| --- |
 | Factory pattern for multi-provider setup | Database connection factory (`get_engine('postgres')` vs `get_engine('mysql')`) | The stable foreman picks the right donkey for the cloud (AWS Bedrock vs Azure OpenAI vs local Ollama) at startup |
-| Ingestion pipeline orchestration | ETL pipeline — extract, transform, load | Pre-sort 📮 |
-| Query pipeline orchestration | Read-path pipeline — query, join, format, return | Robot hand 🤖 |
-| Cost estimation per provider | Cloud cost monitoring per service | Tachograph 📊 |
-| Dependency injection | Airflow's `provide_session` decorator | Trip log 📒 |
+| Ingestion pipeline orchestration | ETL pipeline — extract, transform, load | Loading-bay pre-sort — Ingestion pipeline orchestration: ETL pipeline — extract, transform, load |
+| Query pipeline orchestration | Read-path pipeline — query, join, format, return | Automated harness rig — Query pipeline orchestration: Read-path pipeline — query, join, format, return |
+| Cost estimation per provider | Cloud cost monitoring per service | Tachograph reading — Cost estimation per provider: Cloud cost monitoring per service |
+| Dependency injection | Airflow's `provide_session` decorator | Line scribbled in the trip ledger — Dependency injection: Airflow's provide_session decorator |
 
 - 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
@@ -202,15 +202,15 @@ def _create_local_backends(settings: Settings) -> tuple[BaseLLM, BaseVectorStore
 
 | Setting | AWS | AWS (cheap) | Azure | Local | 🫏 Donkey |
 |---|---|---|---|---| --- |
-| **Env var** | `CLOUD_PROVIDER=aws` | `CLOUD_PROVIDER=aws` | `CLOUD_PROVIDER=azure` | `CLOUD_PROVIDER=local` | AWS depot 🏭 |
-| **Extra env** | — | `VECTOR_STORE_TYPE=dynamodb` | — | — | AWS depot 🏭 |
+| **Env var** | `CLOUD_PROVIDER=aws` | `CLOUD_PROVIDER=aws` | `CLOUD_PROVIDER=azure` | `CLOUD_PROVIDER=local` | AWS depot — Env var: CLOUD_PROVIDER=aws · CLOUD_PROVIDER=aws · CLOUD_PROVIDER=azure · CLOUD_PROVIDER=local |
+| **Extra env** | — | `VECTOR_STORE_TYPE=dynamodb` | — | — | AWS-side stable yard — Extra env: — · VECTOR_STORE_TYPE=dynamodb · — · — |
 | **LLM class** | `BedrockLLM` | `BedrockLLM` | `AzureOpenAILLM` | `OllamaLLM` | Which donkey breed shows up at the stable's front door to do the writing |
 | **LLM model** | Claude 3.5 Sonnet | Claude 3.5 Sonnet | GPT-4o | llama3.2 | The specific donkey assigned — older, faster, or smarter — that actually writes the answer |
-| **Vector store** | `OpenSearchVectorStore` | `DynamoDBVectorStore` | `AzureAISearchVectorStore` | `ChromaDBVectorStore` | AWS search hub 🔍 |
-| **Vector cost** | ~$350/month | **~$0/month** | $0–75/month | $0 | Feed bill 🌾 |
-| **Embedding source** | Amazon Titan | Amazon Titan | Azure text-embedding-3 | nomic-embed-text | GPS stamp 📍 |
-| **Auth** | IAM (SigV4) | IAM (SigV4) | API key | None | Stable door 🚪 |
-| **Cost** | ~$0.0065/query | ~$0.0065/query | ~$0.005/query | **$0** | Feed bill 🌾 |
+| **Vector store** | `OpenSearchVectorStore` | `DynamoDBVectorStore` | `AzureAISearchVectorStore` | `ChromaDBVectorStore` | Amazon's index room — Vector store: OpenSearchVectorStore · DynamoDBVectorStore · AzureAISearchVectorStore · ChromaDBVectorStore |
+| **Vector cost** | ~$350/month | **~$0/month** | $0–75/month | $0 | Donkey-hire fee — Vector cost: ~$350/month · ~$0/month · $0–75/month · $0 |
+| **Embedding source** | Amazon Titan | Amazon Titan | Azure text-embedding-3 | nomic-embed-text | GPS stamp on the parcel — Embedding source: Amazon Titan · Amazon Titan · Azure text-embedding-3 · nomic-embed-text |
+| **Auth** | IAM (SigV4) | IAM (SigV4) | API key | None | Door the customer knocks on — Auth: IAM (SigV4) · IAM (SigV4) · API key · None |
+| **Cost** | ~$0.0065/query | ~$0.0065/query | ~$0.005/query | **$0** | Cost of keeping the donkey fed — Cost: ~$0.0065/query · ~$0.0065/query · ~$0.005/query · $0 |
 
 - 🫏 **Donkey:** Choosing which stable to work with — AWS Bedrock, Azure OpenAI, or a local Ollama barn each offer different donkeys at different prices.
 
@@ -351,7 +351,7 @@ async def query(
 | Vector search | `SELECT * WHERE similarity > threshold ORDER BY score LIMIT 5` | Find relevant data | GPS warehouse robot finds the 5 nearest backpack coordinates to the question in ~9 HNSW hops |
 | Build context | JOIN results into a single payload | Combine search results | Closest SQL/DE concept — for engineers who think in tables not GPS coordinates |
 | LLM generate | Apply business logic / stored procedure | Transform data into answer | The donkey reads the delivery note plus the backpack and writes the final reply |
-| Build response | Format as API response | Package result for caller | Stable door 🚪 |
+| Build response | Format as API response | Package result for caller | Stable's front door — Build response: Format as API response · Package result for caller |
 
 - 🫏 **Donkey:** The warehouse robot dispatched to find the right backpack shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
@@ -484,11 +484,11 @@ CHROMA_PERSIST_DIRECTORY=./data/chromadb
 |---|---|---|---| --- |
 | `ValueError: Unsupported cloud provider` | App crashes on startup | `CLOUD_PROVIDER` not set or misspelled | Set `CLOUD_PROVIDER=local` in `.env` | Stable refuses to open because the donkey doesn't know which warehouse to deliver to — set the provider in `.env` |
 | `ConnectionRefusedError` (local) | Ingestion fails | Ollama not running | `ollama serve` in a separate terminal | The local barn donkey isn't awake yet — boot it before asking it to deliver |
-| Empty search results | "I don't have enough information" | Documents not ingested yet | Upload documents first via `POST /documents` | Pre-sort 📮 |
+| Empty search results | "I don't have enough information" | Documents not ingested yet | Upload documents first via `POST /documents` | Post office pre-sort — Empty search results: "I don't have enough information" · Documents not ingested yet · Upload documents first via POST /documents |
 | High latency (>5s) | Slow responses | LLM is slow (especially local) | Use a smaller model or increase hardware | The donkey is plodding — swap in a lighter breed or feed it stronger hardware |
 | Token limit exceeded | API error from LLM | Too many chunks in context (`top_k` too high) | Reduce `top_k` from 5 to 3 | Backpack overstuffed with hay — the donkey can't carry it; pack fewer chunks |
-| Zero cost in metrics | Metrics show $0.000 | Using local provider | Expected — local is free | Feed bill 🌾 |
-| Stale embeddings | Old documents still returned | Vectors not deleted after re-upload | Implement delete + re-ingest flow | Pre-sort 📮 |
+| Zero cost in metrics | Metrics show $0.000 | Using local provider | Expected — local is free | Donkey-hire fee — Zero cost in metrics: Metrics show $0.000 · Using local provider · Expected — local is free |
+| Stale embeddings | Old documents still returned | Vectors not deleted after re-upload | Implement delete + re-ingest flow | Post office pre-sort — Stale embeddings: Old documents still returned · Vectors not deleted after re-upload · Implement delete + re-ingest flow |
 
 - 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
 

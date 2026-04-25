@@ -146,7 +146,7 @@ Aggregate: total, passed, failed, pass_rate, average_score
 
 | Field | Type | What it tells you | 🫏 Donkey |
 |---|---|---| --- |
-| `total_cases` | int | How many cases were run | Feed bill 🌾 |
+| `total_cases` | int | How many cases were run | What the stable charges this month — total_cases: int · How many cases were run |
 | `passed` | int | Cases with overall ≥ 0.7 | Donkey's report card — share of test deliveries that scored above the bar |
 | `failed` | int | Cases with overall < 0.7 | Number of test deliveries that came back below the report-card pass mark — these need investigation |
 | `pass_rate` | float | Percentage passed (e.g. 80.0) | Donkey's report card — share of test deliveries that scored above the bar |
@@ -163,16 +163,16 @@ Aggregate: total, passed, failed, pass_rate, average_score
 |---|---|---|---|---| --- |
 | **Retrieval** | ≥ 0.85 | ≥ 0.70 | ≥ 0.50 | < 0.50 | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
 | **Faithfulness** | ≥ 0.95 | ≥ 0.80 | ≥ 0.60 | < 0.60 | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
-| **Answer Relevance** | ≥ 0.80 | ≥ 0.60 | ≥ 0.40 | < 0.40 | Right address 🎯 |
+| **Answer Relevance** | ≥ 0.80 | ≥ 0.60 | ≥ 0.40 | < 0.40 | Routing tag on the saddlebag — Answer Relevance: ≥ 0.80 · ≥ 0.60 · ≥ 0.40 · < 0.40 |
 | **Overall** | ≥ 0.85 | ≥ 0.70 | ≥ 0.50 | < 0.50 | Donkey-side view of Overall — affects how the donkey loads, reads, or delivers the cargo |
 
 **If a score is low, here's what to fix:**
 
 | Low score | What to try | 🫏 Donkey |
 |---|---| --- |
-| Retrieval < 0.7 | Smaller `chunk_size`, different embedding model, more overlap | GPS stamp 📍 |
-| Faithfulness < 0.8 | Stricter prompt instructions, lower temperature | Delivery note 📋 |
-| Relevance < 0.6 | Better prompt, check if question is ambiguous | Delivery note 📋 |
+| Retrieval < 0.7 | Smaller `chunk_size`, different embedding model, more overlap | GPS stamp on the parcel — Retrieval < 0.7: Smaller chunk_size, different embedding model, more overlap |
+| Faithfulness < 0.8 | Stricter prompt instructions, lower temperature | Note the donkey carries — Faithfulness < 0.8: Stricter prompt instructions, lower temperature |
+| Relevance < 0.6 | Better prompt, check if question is ambiguous | Note the donkey carries — Relevance < 0.6: Better prompt, check if question is ambiguous |
 | Overall < 0.7 | Debug each sub-score individually | Whole report card slipped — work through retrieval, faithfulness, and relevance one by one to find the weakest link |
 
 - 🫏 **Donkey:** The quality inspector's stamp — each delivered answer is graded on retrieval accuracy, faithfulness, and relevance before the customer signs.

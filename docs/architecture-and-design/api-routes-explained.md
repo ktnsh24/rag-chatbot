@@ -94,8 +94,8 @@ def create_app() -> FastAPI:
 | Line | What it does | DE parallel | 🫏 Donkey |
 | --- | --- | --- | --- |
 | `lifespan=lifespan` | Runs startup/shutdown code (initialise RAG chain, close connections) | Like `@app.on_event("startup")` in shared-proxy | Donkey-side view of lifespan=lifespan — affects how the donkey loads, reads, or delivers the cargo |
-| `prefix="/api"` | All routes get `/api` prefix → `/chat` becomes `/api/chat` | Same as any FastAPI app | Stable door 🚪 |
-| `tags=["Chat"]` | Groups endpoints in Swagger UI | Same as any FastAPI app | Stable door 🚪 |
+| `prefix="/api"` | All routes get `/api` prefix → `/chat` becomes `/api/chat` | Same as any FastAPI app | Stable's front door — prefix="/api": All routes get /api prefix → /chat becomes /api/chat · Same as any FastAPI app |
+| `tags=["Chat"]` | Groups endpoints in Swagger UI | Same as any FastAPI app | Where parcels are dropped at the stable — tags=["Chat"]: Groups endpoints in Swagger UI · Same as any FastAPI app |
 
 ### The Lifespan — Where the AI Engine Gets Created
 
@@ -203,10 +203,10 @@ detailed deep-dive document:
 | --- | --- | --- | --- | --- |
 | `health.py` | `GET /api/health` | ★☆☆☆☆ — nothing new | 📖 [Health Endpoint Deep Dive](api-routes/health-endpoint-explained.md) | Stable manager peeks through the door to ask whether the donkey is awake and loaded — nothing fancy. |
 | `chat.py` | `POST /api/chat` | ★★★★★ — the RAG query pipeline | 📖 [Chat Endpoint Deep Dive](api-routes/chat-endpoint-explained.md) | Stable's front door — the URL customers use to drop off a question |
-| `documents.py` | `POST /api/documents/upload`, `GET /api/documents`, `DELETE /api/documents/{id}` | ★★★★☆ — the ingestion pipeline | 📖 [Documents Endpoint Deep Dive](api-routes/documents-endpoint-explained.md) | Pre-sort 📮 |
+| `documents.py` | `POST /api/documents/upload`, `GET /api/documents`, `DELETE /api/documents/{id}` | ★★★★☆ — the ingestion pipeline | 📖 [Documents Endpoint Deep Dive](api-routes/documents-endpoint-explained.md) | Loading-bay pre-sort — documents.py: POST /api/documents/upload, GET /api/documents, DELETE /api/documents/{id} · ★★★★☆ — the ingestion pipeline · 📖 [Documents Endpoint Deep Dive](api-routes/documents-endpoint-explained.md) |
 | `evaluate.py` | `POST /api/evaluate`, `POST /api/evaluate/suite` | ★★★★★ — the AI quality pipeline | 📖 [Evaluate Endpoint Deep Dive](api-routes/evaluate-endpoint-explained.md) | Stable's grading window — submit a question and get back the donkey's report card with per-dimension scores |
-| `queries.py` | `GET /api/queries/stats`, `GET /api/queries/failures` | ★★★☆☆ — production debugging | 📖 [Queries Endpoint Deep Dive](api-routes/queries-endpoint-explained.md) | Stable door 🚪 |
-| `metrics.py` | `GET /api/metrics` | ★★☆☆☆ — Prometheus metrics | 📖 [Metrics Endpoint Deep Dive](api-routes/metrics-endpoint-explained.md) | Tachograph 📊 |
+| `queries.py` | `GET /api/queries/stats`, `GET /api/queries/failures` | ★★★☆☆ — production debugging | 📖 [Queries Endpoint Deep Dive](api-routes/queries-endpoint-explained.md) | Door the customer knocks on — queries.py: GET /api/queries/stats, GET /api/queries/failures · ★★★☆☆ — production debugging · 📖 [Queries Endpoint Deep Dive](api-routes/queries-endpoint-explained.md) |
+| `metrics.py` | `GET /api/metrics` | ★★☆☆☆ — Prometheus metrics | 📖 [Metrics Endpoint Deep Dive](api-routes/metrics-endpoint-explained.md) | Tally board on the stable wall — metrics.py: GET /api/metrics · ★★☆☆☆ — Prometheus metrics · 📖 [Metrics Endpoint Deep Dive](api-routes/metrics-endpoint-explained.md) |
 
 ### Quick summary of each
 
@@ -322,13 +322,13 @@ the same and what's different:
 
 | Aspect | A Typical FastAPI API | RAG Chatbot | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Framework** | FastAPI | FastAPI | Stable door 🚪 |
-| **Router pattern** | `APIRouter()` + `include_router()` | `APIRouter()` + `include_router()` | Stable door 🚪 |
-| **Middleware** | `BnaEventMiddleware` | `RequestLoggingMiddleware` | Gate guard 🔐 |
-| **Request validation** | Pydantic models | Pydantic models | Manifest template 📋 |
+| **Framework** | FastAPI | FastAPI | Where parcels are dropped at the stable — Framework: FastAPI · FastAPI |
+| **Router pattern** | `APIRouter()` + `include_router()` | `APIRouter()` + `include_router()` | Stable's front door — Router pattern: APIRouter() + include_router() · APIRouter() + include_router() |
+| **Middleware** | `BnaEventMiddleware` | `RequestLoggingMiddleware` | Bouncer at the stable door — Middleware: BnaEventMiddleware · RequestLoggingMiddleware |
+| **Request validation** | Pydantic models | Pydantic models | Pre-printed waybill — Request validation: Pydantic models · Pydantic models |
 | **Dependency injection** | `app.state` or FastAPI `Depends()` | `app.state` (for rag_chain) | Stable manager — receives requests at the front door and dispatches the donkey |
-| **Error handling** | `HTTPException` | `HTTPException` | Stable door 🚪 |
-| **Logging** | Loguru | Loguru | Gate guard 🔐 |
+| **Error handling** | `HTTPException` | `HTTPException` | Stable's front door — Error handling: HTTPException · HTTPException |
+| **Logging** | Loguru | Loguru | Bouncer at the stable door — Logging: Loguru · Loguru |
 | **What routes call** | Service classes → DynamoDB/S3 | `rag_chain` → LLM + Vector Store + Storage | DE routes hit databases; AI routes wake the donkey, send it to the GPS warehouse, and pick up storage on the way back |
 | **Response contains** | Data records | Answer + sources + token usage | Chat response carries the donkey's answer, cited backpack pockets, and a tachograph of hay consumed. |
 | **New concepts** | None | Embeddings, semantic search, token costs | Brings in three new ideas: GPS coordinates, vector similarity search, and counting hay for cost. |

@@ -84,7 +84,7 @@ Document uploaded
 | What | Where | Format | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
 | Original file | S3 / Blob Storage | Raw bytes (PDF, TXT) | Re-download, delete, audit trail | The original parcel kept in the warehouse — needed to re-pack chunks if the donkey's bag size changes |
-| Chunks + vectors | OpenSearch / AI Search / ChromaDB | Text + vectors | Semantic search during chat | AWS search hub 🔍 |
+| Chunks + vectors | OpenSearch / AI Search / ChromaDB | Text + vectors | Semantic search during chat | Amazon's index room — Chunks + vectors: OpenSearch / AI Search / ChromaDB · Text + vectors · Semantic search during chat |
 
 **Why not just keep one?** Because:
 - You can't reconstruct the original PDF from text chunks (formatting, images lost)
@@ -251,14 +251,14 @@ workaround. For high-traffic apps this matters; for this project, the difference
 | --- | --- | --- | --- |
 | **SDK** | `boto3` (sync) | `azure-storage-blob` (async native) | Donkey can run other errands while waiting for the warehouse to respond |
 | **Container concept** | Bucket | Storage Account → Container | Cloud cupboard where raw mail is parked before the post office sorts it |
-| **Object path** | `s3://bucket/key` | `container/blob-name` | Stable stall 🐎 |
+| **Object path** | `s3://bucket/key` | `container/blob-name` | Stall that houses the worker — Object path: s3://bucket/key · container/blob-name |
 | **Authentication** | IAM role / access key | Connection string / managed identity | Stable keys — only authorised callers may ask the donkey to deliver |
 | **Upload** | `put_object()` | `upload_blob()` | Same shelving action — different cloud's vocabulary for handing the parcel to the warehouse |
 | **Download** | `get_object()["Body"].read()` | `download_blob()` → `readall()` | Same pickup action — both clouds hand the parcel bytes back to the donkey |
 | **Delete** | `delete_objects()` (batch) | Loop + `delete_blob()` (one by one) | AWS lets the donkey discard many parcels in one trip; Azure makes the donkey go back for each one |
 | **List** | Paginator pattern | `async for` iterator | Donkey can run other errands while waiting for the warehouse to respond |
 | **Encryption** | AES256 / KMS (server-side) | Azure Storage encryption (default on) | Donkey-side view of Encryption — affects how the donkey loads, reads, or delivers the cargo |
-| **Cost (10 GB)** | ~$0.23/month | ~$0.20/month | Feed bill 🌾 |
+| **Cost (10 GB)** | ~$0.23/month | ~$0.20/month | Donkey-hire fee — Cost (10 GB): ~$0.23/month · ~$0.20/month |
 
 ### The code patterns side by side
 
@@ -375,7 +375,7 @@ vector store — the chunks + embeddings created during ingestion.
 
 | Aspect | What a DE sees | What an AI Engineer sees | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `StoredDocument` model | Standard metadata DTO | Audit trail for data lineage | Manifest template 📋 |
+| `StoredDocument` model | Standard metadata DTO | Audit trail for data lineage | Blank cargo manifest — StoredDocument model: Standard metadata DTO · Audit trail for data lineage |
 | `upload()` | S3 put_object, nothing new | Source-of-truth for re-ingestion if chunking strategy changes | S3 keeps the original document so the post office can re-stitch backpack pockets if chunking changes. |
 | `list_documents()` | Paginated list, standard | Knowledge base inventory — what data has the LLM seen? | Roll-call of every backpack the donkey is allowed to read from when answering |
 | `delete()` | Prefix delete, standard | Must delete from BOTH storage AND vector store, or orphan vectors remain | How the warehouse measures which backpacks are nearest to the customer's question |

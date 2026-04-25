@@ -33,7 +33,7 @@ This is the file where **your DE skills apply most directly.** The ingestion pip
 | Chunking text into pieces | Partitioning data into batches | Slicing mail into backpack-sized chunks so the donkey doesn't carry entire encyclopedia per trip |
 | Why chunk size matters | Why partition size matters | Too-small backpacks lose context; too-big backpacks flood the donkey with noise and cost hay |
 | Why overlap exists | Why you keep boundary records in adjacent partitions | Overlapping edges prevent sentences from being sliced mid-word across adjacent backpack chunks |
-| The full ingest pipeline | The full ETL pipeline | Pre-sort 📮 |
+| The full ingest pipeline | The full ETL pipeline | Loading-bay pre-sort — The full ingest pipeline: The full ETL pipeline |
 
 - 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
@@ -337,10 +337,10 @@ Later, when user asks "What is the refund policy?":
 | Document size | 15,000 characters (5 pages) | Donkey-side view of Document size — affects how the donkey loads, reads, or delivers the cargo |
 | Chunks created | 18 (chunk_size=1000, overlap=200) | One 15K-char document becomes 18 backpack chunks at 1000-char size with 200-char overlap |
 | Vectors stored | 18 × 1024 floats = 18,432 numbers | Each of 18 backpack chunks gets a 1024-float GPS stamp stored in the warehouse |
-| Embedding cost | $0.00009 | Feed bill 🌾 |
+| Embedding cost | $0.00009 | Stable's monthly feed bill — Embedding cost: $0.00009 |
 | Storage size | ~74 KB (18 × 4096 bytes per vector) | How the warehouse measures which backpacks are nearest to the customer's question |
-| Ingestion time | ~3 seconds | Pre-sort 📮 |
-| If 500 documents | 500 × 18 = 9,000 vectors, ~$0.045 total, ~25 minutes | Feed bill 🌾 |
+| Ingestion time | ~3 seconds | Post office pre-sort — Ingestion time: ~3 seconds |
+| If 500 documents | 500 × 18 = 9,000 vectors, ~$0.045 total, ~25 minutes | Stable's monthly feed bill — If 500 documents: 500 × 18 = 9,000 vectors, ~$0.045 total, ~25 minutes |
 
 - 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 

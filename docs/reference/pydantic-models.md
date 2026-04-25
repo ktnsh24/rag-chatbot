@@ -70,9 +70,9 @@ Pydantic models appear in **three roles**:
 
 | Role | Example | What it does | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Request model** | `ChatRequest` | Validates incoming JSON from the client | Manifest template 📋 |
-| **Response model** | `ChatResponse` | Defines the shape of the JSON we return | Manifest template 📋 |
-| **Settings model** | `Settings` | Reads and validates environment variables | Manifest template 📋 |
+| **Request model** | `ChatRequest` | Validates incoming JSON from the client | Pre-printed waybill — Request model: ChatRequest · Validates incoming JSON from the client |
+| **Response model** | `ChatResponse` | Defines the shape of the JSON we return | Pre-printed waybill — Response model: ChatResponse · Defines the shape of the JSON we return |
+| **Settings model** | `Settings` | Reads and validates environment variables | Manifest template — Settings model: Settings · Reads and validates environment variables |
 
 When FastAPI sees `def chat(body: ChatRequest)`:
 1. It reads the raw JSON from the HTTP request body
@@ -102,19 +102,19 @@ class Settings(BaseSettings):
 | --- | --- | --- | --- | --- | --- |
 | `cloud_provider` | `CloudProvider` | `local` | `CLOUD_PROVIDER` | Controls which cloud backends to use | Picks which barn — local hay shed or AWS/Azure depot — handles the donkey's deliveries. |
 | `app_name` | `str` | `rag-chatbot` | `APP_NAME` | Service name in logs | Donkey's trip log — every delivery's details written to disk for later review |
-| `app_env` | `AppEnvironment` | `dev` | `APP_ENV` | Environment (affects logging) | Gate guard 🔐 |
+| `app_env` | `AppEnvironment` | `dev` | `APP_ENV` | Environment (affects logging) | Stable gate guard — app_env: AppEnvironment · dev · APP_ENV · Environment (affects logging) |
 | `app_port` | `int` | `8000` | `APP_PORT` | Server port | Donkey-side view of app_port — affects how the donkey loads, reads, or delivers the cargo |
-| `log_level` | `str` | `INFO` | `LOG_LEVEL` | Logging verbosity | Gate guard 🔐 |
+| `log_level` | `str` | `INFO` | `LOG_LEVEL` | Logging verbosity | Stable gate guard — log_level: str · INFO · LOG_LEVEL · Logging verbosity |
 | `rag_top_k` | `int` | `5` | `RAG_TOP_K` | Chunks retrieved per query | Sets how many backpack pockets the donkey grabs per delivery — five chunks fetched each query. |
 | `rag_chunk_size` | `int` | `1000` | `RAG_CHUNK_SIZE` | Max characters per chunk | Caps each backpack pocket at 1000 characters so no single chunk overstuffs the donkey's load. |
 | `rag_chunk_overlap` | `int` | `200` | `RAG_CHUNK_OVERLAP` | Overlap between chunks | Sews 200 characters of overlap between adjacent backpack pockets so the donkey never loses context at the edges. |
-| `aws_region` | `str` | `eu-central-1` | `AWS_REGION` | AWS region | AWS depot 🏭 |
+| `aws_region` | `str` | `eu-central-1` | `AWS_REGION` | AWS region | Amazon's loading dock — aws_region: str · eu-central-1 · AWS_REGION · AWS region |
 | `aws_bedrock_model_id` | `str` | Claude 3.5 Sonnet | `AWS_BEDROCK_MODEL_ID` | Bedrock model | Which AWS-depot donkey breed shows up to write the answer |
-| `aws_opensearch_endpoint` | `str` | `""` | `AWS_OPENSEARCH_ENDPOINT` | OpenSearch URL | AWS search hub 🔍 |
+| `aws_opensearch_endpoint` | `str` | `""` | `AWS_OPENSEARCH_ENDPOINT` | OpenSearch URL | AWS search hub — aws_opensearch_endpoint: str · "" · AWS_OPENSEARCH_ENDPOINT · OpenSearch URL |
 | `aws_s3_bucket_name` | `str` | `rag-chatbot-documents` | `AWS_S3_BUCKET_NAME` | S3 bucket | The AWS warehouse name where source documents are uploaded for the donkey to fetch |
-| `aws_dynamodb_table_name` | `str` | `rag-chatbot-conversations` | `AWS_DYNAMODB_TABLE_NAME` | DynamoDB table (history) | AWS depot 🏭 |
-| `aws_dynamodb_vector_table_name` | `str` | `rag-chatbot-vectors` | `AWS_DYNAMODB_VECTOR_TABLE_NAME` | DynamoDB table (vector store — cheap alternative to OpenSearch) | AWS search hub 🔍 |
-| `vector_store_type` | `VectorStoreType` | `auto` | `VECTOR_STORE_TYPE` | Override vector store: `auto` (default for provider) or `dynamodb` ($0/month) | AWS depot 🏭 |
+| `aws_dynamodb_table_name` | `str` | `rag-chatbot-conversations` | `AWS_DYNAMODB_TABLE_NAME` | DynamoDB table (history) | Amazon's loading dock — aws_dynamodb_table_name: str · rag-chatbot-conversations · AWS_DYNAMODB_TABLE_NAME · DynamoDB table (history) |
+| `aws_dynamodb_vector_table_name` | `str` | `rag-chatbot-vectors` | `AWS_DYNAMODB_VECTOR_TABLE_NAME` | DynamoDB table (vector store — cheap alternative to OpenSearch) | OpenSearch sorting office — aws_dynamodb_vector_table_name: str · rag-chatbot-vectors · AWS_DYNAMODB_VECTOR_TABLE_NAME · DynamoDB table (vector store — cheap alternative to OpenSearch) |
+| `vector_store_type` | `VectorStoreType` | `auto` | `VECTOR_STORE_TYPE` | Override vector store: `auto` (default for provider) or `dynamodb` ($0/month) | AWS depot — vector_store_type: VectorStoreType · auto · VECTOR_STORE_TYPE · Override vector store: auto (default for provider) or dynamodb ($0/month) |
 | `azure_openai_endpoint` | `str` | `""` | `AZURE_OPENAI_ENDPOINT` | Azure OpenAI URL | The street address of the Azure-hub stable where the donkey reports for work |
 | `azure_openai_api_key` | `str` | `""` | `AZURE_OPENAI_API_KEY` | Azure OpenAI key | The stable-gate password that lets you summon the Azure-hub donkey |
 | `azure_openai_deployment_name` | `str` | `gpt-4o` | `AZURE_OPENAI_DEPLOYMENT_NAME` | Model deployment | Which specific Azure-hub donkey (by name) gets dispatched for each delivery |
@@ -126,7 +126,7 @@ class Settings(BaseSettings):
 | `chroma_collection_name` | `str` | `rag-chatbot` | `CHROMA_COLLECTION_NAME` | ChromaDB collection | Name of the stall inside the local barn where ChromaDB keeps this project's chunk vectors. |
 | `chroma_persist_directory` | `str` | `""` | `CHROMA_PERSIST_DIRECTORY` | ChromaDB storage path (empty = in-memory) | Folder on disk where the local barn stores chunks; empty means the donkey forgets after restart. |
 | `enable_tracing` | `bool` | `False` | `ENABLE_TRACING` | OpenTelemetry tracing | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
-| `query_log_enabled` | `bool` | `True` | `QUERY_LOG_ENABLED` | Structured per-query JSONL logging (I30) | Gate guard 🔐 |
+| `query_log_enabled` | `bool` | `True` | `QUERY_LOG_ENABLED` | Structured per-query JSONL logging (I30) | Stable gate guard — query_log_enabled: bool · True · QUERY_LOG_ENABLED · Structured per-query JSONL logging (I30) |
 | `query_log_dir` | `str` | `logs/queries` | `QUERY_LOG_DIR` | Directory for daily JSONL log files | Donkey's trip log — every delivery's details written to disk for later review |
 
 **How it works:**
@@ -163,7 +163,7 @@ class ChatRequest(BaseModel):
 | Field | Type | Required? | Validation | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
 | `question` | `str` | **Yes** | 1–5000 chars | The user's question | Stable broke down — donkey couldn't complete the trip, customer sees an error |
-| `session_id` | `str` or `None` | No | None | Links follow-up questions together | Trip log 📒 |
+| `session_id` | `str` or `None` | No | None | Links follow-up questions together | Line scribbled in the trip ledger — session_id: str or None · No · None · Links follow-up questions together |
 | `top_k` | `int` or `None` | No | 1–20 if provided | Override default chunk count | Per-request override telling the donkey to grab between 1 and 20 backpack pockets instead of the default. |
 
 **What happens on invalid input:**
@@ -208,10 +208,10 @@ class ChatResponse(BaseModel):
 | --- | --- | --- | --- |
 | `answer` | `str` | The AI-generated answer | What the donkey wrote and brought back to the customer |
 | `sources` | `list[SourceChunk]` | Which document chunks were used (citations) | List of backpack pockets the donkey actually used as citations when writing the answer. |
-| `session_id` | `str` | Session ID for follow-up questions | Trip log 📒 |
+| `session_id` | `str` | Session ID for follow-up questions | Trip log entry — session_id: str · Session ID for follow-up questions |
 | `request_id` | `UUID` | Unique ID for debugging/tracing | Tracking number stamped on every donkey trip — quote it to find this exact delivery in the logs |
 | `cloud_provider` | `CloudProvider` | Which cloud processed this request | Donkey-side view of cloud_provider — affects how the donkey loads, reads, or delivers the cargo |
-| `latency_ms` | `int` | Total processing time | Feed bill 🌾 |
+| `latency_ms` | `int` | Total processing time | Stable's monthly feed bill — latency_ms: int · Total processing time |
 | `token_usage` | `TokenUsage` or `None` | Token counts for cost tracking | Tachograph reading of how much hay the donkey burned producing this answer, used for cost tracking. |
 
 - 🫏 **Donkey:** The cargo manifest template — every field is typed and validated before the donkey is loaded, preventing mispackaged deliveries.
@@ -226,7 +226,7 @@ class ChatResponse(BaseModel):
 | --- | --- | --- | --- |
 | `document_name` | `str` | Which file this chunk came from | Label on the backpack pocket showing which original document this chunk was torn from. |
 | `chunk_text` | `str` | The actual text content | The actual hay inside the backpack pocket — raw text the donkey reads when composing answers. |
-| `relevance_score` | `float` (0.0–1.0) | How similar to the question (1.0 = perfect) | Right address 🎯 |
+| `relevance_score` | `float` (0.0–1.0) | How similar to the question (1.0 = perfect) | Routing tag on the saddlebag — relevance_score: float (0.0–1.0) · How similar to the question (1.0 = perfect) |
 | `page_number` | `int` or `None` | Page in original PDF | Which page of the original mail the backpack came from |
 
 - 🫏 **Donkey:** backpack-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
@@ -242,7 +242,7 @@ class ChatResponse(BaseModel):
 | `input_tokens` | `int` | Tokens in the prompt (question + context) | Hay bales loaded into the donkey on the way in — the question plus retrieved context. |
 | `output_tokens` | `int` | Tokens in the generated answer | Hay bales the donkey produced on the way out — every token in the generated answer. |
 | `total_tokens` | `int` | Sum of input + output | Combined hay tally of input plus output, used to compute the trip's full delivery cost. |
-| `estimated_cost_usd` | `float` | Estimated cost based on model pricing | Feed bill 🌾 |
+| `estimated_cost_usd` | `float` | Estimated cost based on model pricing | Donkey-hire fee — estimated_cost_usd: float · Estimated cost based on model pricing |
 
 **Why this matters:**
 

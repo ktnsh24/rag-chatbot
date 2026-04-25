@@ -78,7 +78,7 @@ Send a question and get an answer grounded in your uploaded documents.
 | Field | Type | Required | Default | Description | 🫏 Donkey |
 |---|---|---|---|---| --- |
 | `message` | string | ✅ | — | The user's question | Donkey-side view of message — affects how the donkey loads, reads, or delivers the cargo |
-| `session_id` | string | ❌ | auto-generated UUID | Conversation session ID for history | Trip log 📒 |
+| `session_id` | string | ❌ | auto-generated UUID | Conversation session ID for history | Line scribbled in the trip ledger — session_id: string · ❌ · auto-generated UUID · Conversation session ID for history |
 | `max_sources` | integer | ❌ | `5` | Max source chunks to retrieve | Caps how many backpack pockets the donkey returns as citation sources for this chat answer. |
 
 **Example Request:**
@@ -329,7 +329,7 @@ per-case results and aggregated metrics.
 
 | Field | Type | Required | Default | Description | 🫏 Donkey |
 |---|---|---|---|---| --- |
-| `categories` | string[] | ❌ | all | Filter by test categories (e.g. `["policy", "edge_case"]`) | Test delivery 🧪 |
+| `categories` | string[] | ❌ | all | Filter by test categories (e.g. `["policy", "edge_case"]`) | Dry-run trip to check the harness — categories: string[] · ❌ · all · Filter by test categories (e.g. ["policy", "edge_case"]) |
 | `top_k` | integer | ❌ | `5` | Override top_k for all cases | How many backpacks the donkey grabs from the warehouse for one delivery |
 
 **Example Request:**

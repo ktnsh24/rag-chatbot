@@ -59,10 +59,10 @@ This is identical to building a pipeline monitoring API:
 | Concept | Data Engineering | RAG Chatbot | 🫏 Donkey |
 | --- | --- | --- | --- |
 | **Log source** | Airflow task logs, DAG run metadata | JSONL query logs from QueryLogger | Donkey's trip log — every delivery's details written to disk for later review |
-| **Failure list** | `/pipeline/failures` — which DAGs failed and why | `/queries/failures` — which queries failed and why | Robot hand 🤖 |
+| **Failure list** | `/pipeline/failures` — which DAGs failed and why | `/queries/failures` — which queries failed and why | Robot stable hand — Failure list: /pipeline/failures — which DAGs failed and why · /queries/failures — which queries failed and why |
 | **Aggregate stats** | DAG success rate, avg duration, failure reasons | Pass rate, avg scores, failure categories | Stable-wide summary of how many donkey trips passed, average scores, and which reason codes dominated failures |
 | **Triage** | "data_quality", "timeout", "permission_denied" | "bad_retrieval", "hallucination", "both_bad" | Reason codes stamped on failed deliveries so the stable hand knows which donkey-trip failure to investigate first. |
-| **Action** | Fix the DAG, re-run, verify | Fix retrieval/prompt, re-evaluate, verify | Delivery note 📋 |
+| **Action** | Fix the DAG, re-run, verify | Fix retrieval/prompt, re-evaluate, verify | Instructions tucked in the pannier — Action: Fix the DAG, re-run, verify · Fix retrieval/prompt, re-evaluate, verify |
 
 **Bottom line:** The route code is pure CRUD over structured logs. The AI
 complexity lives in how the logs were *produced* (by the evaluate pipeline), not

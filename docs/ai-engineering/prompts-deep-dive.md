@@ -36,8 +36,8 @@ This 65-line file controls **100% of the LLM's behaviour**. Change one word in t
 | System prompts that set LLM behaviour | SQL query templates with bind variables | The standing-orders sheet pinned to the stable wall that every donkey reads before any trip |
 | Constraints that prevent hallucination | CHECK constraints that prevent bad data | Guardrails that stop the donkey from inventing facts not found in its loaded backpack chunks |
 | Template variables (`{context}`, `{question}`) | Parameterised queries (`?`, `$1`) | Blank slots on the delivery note where the cargo manifest and question get pasted in |
-| Multi-turn conversation context | Session state management | Trip log 📒 |
-| The cost impact of prompt length | The cost of scanning too many rows | Delivery note 📋 |
+| Multi-turn conversation context | Session state management | Trip log entry — Multi-turn conversation context: Session state management |
+| The cost impact of prompt length | The cost of scanning too many rows | Instructions tucked in the pannier — The cost impact of prompt length: The cost of scanning too many rows |
 
 - 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
@@ -283,11 +283,11 @@ RAG_SYSTEM_PROMPT                   query():
 
 | Aspect | AWS (Bedrock/Claude) | Azure (OpenAI/GPT-4o) | Local (Ollama/llama3.2) | 🫏 Donkey |
 |---|---|---|---| --- |
-| **System prompt placement** | Separate `system` field | `role: "system"` message | `role: "system"` message | Delivery note 📋 |
+| **System prompt placement** | Separate `system` field | `role: "system"` message | `role: "system"` message | Delivery note pinned to the saddle — System prompt placement: Separate system field · role: "system" message · role: "system" message |
 | **User message** | `content: [{text: ...}]` (nested) | `content: "..."` (flat string) | `content: "..."` (flat string) | The customer's question — written on the delivery note for the donkey to read |
-| **Prompt format** | Identical template text | Identical template text | Identical template text | Delivery note 📋 |
+| **Prompt format** | Identical template text | Identical template text | Identical template text | Note the donkey carries — Prompt format: Identical template text · Identical template text · Identical template text |
 | **Behaviour difference** | Best instruction following | More creative/verbose | Good but less nuanced | How precisely the donkey obeys the standing orders on the delivery note |
-| **Cost per prompt** | ~$0.0025 | ~$0.0021 | **$0** | Delivery note 📋 |
+| **Cost per prompt** | ~$0.0025 | ~$0.0021 | **$0** | Customer's written brief — Cost per prompt: ~$0.0025 · ~$0.0021 · $0 |
 
 **Key insight:** The prompt text is the same across all providers. Only the API format differs. This is handled by each provider's `generate()` method, not by the prompt itself.
 
@@ -316,7 +316,7 @@ RAG_SYSTEM_PROMPT                   query():
 | Hallucination | Rules too weak or model ignores them | Stronger constraints, lower temperature | Faithfulness score < 0.8 in evaluator | Donkey invents facts not in its backpack — tighten prompt rules or lower temperature |
 | Verbose answers | No length constraint | Add "Keep answers under 200 words" | Token count > 500 output tokens | Donkey rambles for 500+ tokens — add word limit to delivery note to control hay waste |
 | Ignores citations | Model doesn't see "[Document chunk N]" pattern | Add example output in prompt | Missing `[Document chunk` in answer | Donkey forgets to label which backpack it read — show citation example on the delivery note |
-| Wrong language | User asks in Dutch, prompt is English | Add "Answer in the same language as the question" | Manual review | Delivery note 📋 |
+| Wrong language | User asks in Dutch, prompt is English | Add "Answer in the same language as the question" | Manual review | Delivery note pinned to the saddle — Wrong language: User asks in Dutch, prompt is English · Add "Answer in the same language as the |
 | Off-topic | Context chunks are irrelevant | Better chunking/retrieval, not a prompt fix | Answer relevance score < 0.5 | Donkey got wrong backpacks from the warehouse — fix GPS search, not the delivery note |
 
 - 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
@@ -333,8 +333,8 @@ The same prompt produces different quality answers depending on the model:
 | **Citation accuracy** | Almost always cites correctly | Usually cites, sometimes forgets | May not cite consistently | Receipts the donkey hands over — which backpacks the answer came from |
 | **"I don't know" response** | Reliably says it when context is empty | Usually says it | Sometimes tries to answer anyway | What the donkey wrote and brought back to the customer |
 | **Temperature sensitivity** | Very responsive to 0.1 | Responsive | Less precise control | How predictable the donkey's writing is — low = same words every trip, high = the donkey gets creative |
-| **Recommended for** | Production (highest quality) | Production (good balance) | Development and testing | Test delivery 🧪 |
-| **Cost per query** | ~$0.0065 | ~$0.005 | **$0** | Feed bill 🌾 |
+| **Recommended for** | Production (highest quality) | Production (good balance) | Development and testing | Practice run for the donkey — Recommended for: Production (highest quality) · Production (good balance) · Development and testing |
+| **Cost per query** | ~$0.0065 | ~$0.005 | **$0** | Hay-and-oats invoice — Cost per query: ~$0.0065 · ~$0.005 · $0 |
 
 **Practical advice:**
 - **Develop and iterate** with `CLOUD_PROVIDER=local` — test prompt changes for free

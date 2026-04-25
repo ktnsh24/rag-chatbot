@@ -15,9 +15,9 @@ The RAG Chatbot implements all three pillars of observability:
 
 | Pillar | Implementation | Story | Endpoint | 🫏 Donkey |
 |---|---|---|---| --- |
-| **Logs** | JSONL per-query structured logs with failure categories | I30 | `GET /api/queries/failures`, `GET /api/queries/stats` | Stable door 🚪 |
-| **Metrics** | Prometheus text format (counters, gauges) | I31 | `GET /api/metrics` | Tachograph 📊 |
-| **Traces** | OpenTelemetry TracerProvider + FastAPIInstrumentor | I31 | OTLP exporter (configurable) | Stable door 🚪 |
+| **Logs** | JSONL per-query structured logs with failure categories | I30 | `GET /api/queries/failures`, `GET /api/queries/stats` | Door the customer knocks on — Logs: JSONL per-query structured logs with failure categories · I30 · GET /api/queries/failures, GET /api/queries/stats |
+| **Metrics** | Prometheus text format (counters, gauges) | I31 | `GET /api/metrics` | Tachograph reading — Metrics: Prometheus text format (counters, gauges) · I31 · GET /api/metrics |
+| **Traces** | OpenTelemetry TracerProvider + FastAPIInstrumentor | I31 | OTLP exporter (configurable) | Entry gate to the stable — Traces: OpenTelemetry TracerProvider + FastAPIInstrumentor · I31 · OTLP exporter (configurable) |
 
 - 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
@@ -37,9 +37,9 @@ Every `/api/chat` request is logged as a structured JSONL record in `logs/querie
 | `answer` | LLM response | What the donkey wrote on the delivery note after reading the backpack |
 | `retrieval_score` | How relevant the chunks were (0–1) | Score from 0 to 1 grading how on-target the backpack pockets were for the user's question. |
 | `faithfulness_score` | Did the answer stick to the chunks? (0–1) | Did the donkey stick to what was inside the backpack pockets, or invent extra hay? Scored 0–1. |
-| `answer_relevance_score` | Did the answer address the question? (0–1) | Right address 🎯 |
+| `answer_relevance_score` | Did the answer address the question? (0–1) | Right address on the parcel — answer_relevance_score: Did the answer address the question? (0–1) |
 | `failure_category` | Triage: `none`, `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`, `marginal` | Triage tag explaining why the donkey wandered off — bad retrieval, hallucination, off-topic, or marginal delivery. |
-| `latency_ms` | Total response time | Feed bill 🌾 |
+| `latency_ms` | Total response time | Cost of keeping the donkey fed — latency_ms: Total response time |
 
 **Failure triage table:**
 
@@ -49,13 +49,13 @@ Every `/api/chat` request is logged as a structured JSONL record in `logs/querie
 | `hallucination` | Good chunks, LLM fabricated | Better system prompt, lower temperature | Backpack was fine, but the donkey embellished — tighten the standing orders and lower temperature so it sticks to the cargo |
 | `both_bad` | Wrong chunks AND fabrication | Both fixes above | Wrong backpack pockets AND the donkey hallucinated on top — apply both retrieval and faithfulness fixes. |
 | `off_topic` | Question outside document scope | Add documents or refuse gracefully | Donkey-side view of off_topic — affects how the donkey loads, reads, or delivers the cargo |
-| `marginal` | Borderline scores | Monitor, may need prompt tuning | Delivery note 📋 |
+| `marginal` | Borderline scores | Monitor, may need prompt tuning | Instructions tucked in the pannier — marginal: Borderline scores · Monitor, may need prompt tuning |
 
 **Config:**
 
 | Env Var | Default | Description | 🫏 Donkey |
 |---|---|---| --- |
-| `QUERY_LOG_ENABLED` | `true` | Enable/disable query logging | Gate guard 🔐 |
+| `QUERY_LOG_ENABLED` | `true` | Enable/disable query logging | Bouncer at the stable door — QUERY_LOG_ENABLED: true · Enable/disable query logging |
 | `QUERY_LOG_DIR` | `logs/queries` | Directory for JSONL files | Donkey's trip log — every delivery's details written to disk for later review |
 
 **Files:** `src/monitoring/query_logger.py`, `src/api/routes/queries.py`
@@ -118,7 +118,7 @@ OpenTelemetry is wired up in `src/monitoring/tracing.py`. When enabled, every HT
 | Env Var | Default | Description | 🫏 Donkey |
 |---|---|---| --- |
 | `OTEL_ENABLED` | `false` | Enable OpenTelemetry tracing | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | — | OTLP collector endpoint | Stable door 🚪 |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | — | OTLP collector endpoint | Stable's front door — OTEL_EXPORTER_OTLP_ENDPOINT: — · OTLP collector endpoint |
 | `OTEL_SERVICE_NAME` | `rag-chatbot` | Service name in traces | Donkey-side view of OTEL_SERVICE_NAME — affects how the donkey loads, reads, or delivers the cargo |
 
 **What's traced:**
@@ -153,17 +153,17 @@ OpenTelemetry is wired up in `src/monitoring/tracing.py`. When enabled, every HT
 
 | Feature | Setup | 🫏 Donkey |
 |---|---| --- |
-| **Logs** | ECS tasks → CloudWatch Logs (stdout) | Tachograph 📊 |
-| **Metrics** | Prometheus → CloudWatch via `aws-otel-collector` sidecar | Tachograph 📊 |
-| **Dashboard** | CloudWatch → Dashboards → import metrics | Tachograph 📊 |
-| **Alarms** | CloudWatch → Alarms → select metric → set threshold | Tachograph 📊 |
+| **Logs** | ECS tasks → CloudWatch Logs (stdout) | Stopwatch on the donkey's harness — Logs: ECS tasks → CloudWatch Logs (stdout) |
+| **Metrics** | Prometheus → CloudWatch via `aws-otel-collector` sidecar | Tally board on the stable wall — Metrics: Prometheus → CloudWatch via aws-otel-collector sidecar |
+| **Dashboard** | CloudWatch → Dashboards → import metrics | Tachograph reading — Dashboard: CloudWatch → Dashboards → import metrics |
+| **Alarms** | CloudWatch → Alarms → select metric → set threshold | Stopwatch on the donkey's harness — Alarms: CloudWatch → Alarms → select metric → set threshold |
 
 ### Azure (App Insights)
 
 | Feature | Setup | 🫏 Donkey |
 |---|---| --- |
-| **Logs** | Container Apps → Log Analytics | Stable stall 🐎 |
-| **Metrics** | OpenTelemetry → Azure Monitor via OTLP exporter | Tachograph 📊 |
+| **Logs** | Container Apps → Log Analytics | Stall that houses the worker — Logs: Container Apps → Log Analytics |
+| **Metrics** | OpenTelemetry → Azure Monitor via OTLP exporter | Donkey's odometer dial — Metrics: OpenTelemetry → Azure Monitor via OTLP exporter |
 | **Dashboard** | Azure Portal → Monitor → Workbooks | Workbook on the Azure hub where stable-hands view all the donkey's tachograph charts. |
 | **Alerts** | Azure Monitor → Alerts → create rule | Azure hub paging system that wakes stable-hands when donkey metrics breach thresholds. |
 

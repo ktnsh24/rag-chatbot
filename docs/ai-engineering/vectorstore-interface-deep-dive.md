@@ -32,9 +32,9 @@ The vector store is the **"database" of the RAG system**. But unlike a regular D
 
 | What you'll learn | DE parallel | 🫏 Donkey |
 |---|---| --- |
-| How embeddings are stored | How rows are inserted into DynamoDB | AWS depot 🏭 |
+| How embeddings are stored | How rows are inserted into DynamoDB | AWS-side stable yard — How embeddings are stored: How rows are inserted into DynamoDB |
 | How semantic search works (conceptually) | How key-based or index-based lookups work | Donkey-side view of How semantic search works (conceptually) — affects how the donkey loads, reads, or delivers the cargo |
-| What a similarity score means | What a query result set means | Compass bearing 🧭 |
+| What a similarity score means | What a query result set means | Compass bearing — What a similarity score means: What a query result set means |
 | How documents are managed (store + delete) | How records are managed (put + delete) | Donkey-side view of How documents are managed (store + delete) — affects how the donkey loads, reads, or delivers the cargo |
 
 - 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
@@ -288,10 +288,10 @@ QUERY (every user question):                    │
 | Question | Answer | Concept it tests | 🫏 Donkey |
 |---|---|---| --- |
 | "What does a score of 0.3 mean?" | The chunk is semantically far from the query — probably not relevant. It's like a SQL query returning a row that doesn't match your intent. | Similarity scores | Score 0.3 means the backpack's GPS is far from the question — probably the wrong shelf |
-| "Why does `search()` always return K results even when nothing is relevant?" | Vector search finds the K **nearest** vectors regardless. "Nearest" doesn't mean "relevant" — just closest in the vector space. | Semantic search vs exact match | Stable door 🚪 |
+| "Why does `search()` always return K results even when nothing is relevant?" | Vector search finds the K **nearest** vectors regardless. "Nearest" doesn't mean "relevant" — just closest in the vector space. | Semantic search vs exact match | Where parcels are dropped at the stable — "Why does search() always return K results even when nothing is relevant?": Vector search finds the K |
 | "Why store the original `text` alongside the `embedding`?" | Embeddings are one-way (can't reverse vector → text). You need the original text to send as context to the LLM. | Embedding properties | GPS coordinates can't be unstamped back into cargo, so the warehouse keeps the original text on every shelf |
 | "What happens if `texts` and `embeddings` have different lengths?" | Bug — they must be paired by index. text[i] matches embedding[i]. | Store contract | Every backpack text must have its matching GPS stamp — misaligned lists break the warehouse |
-| "Why is `document_id` important?" | It lets you delete all vectors for a document when re-ingesting. Without it, you'd have orphaned old vectors. | Document management | Pre-sort 📮 |
+| "Why is `document_id` important?" | It lets you delete all vectors for a document when re-ingesting. Without it, you'd have orphaned old vectors. | Document management | Loading-bay pre-sort — "Why is document_id important?": It lets you delete all vectors for a document when re-ingesting. Without it, you'd have orphaned old vectors.… |
 
 - 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 

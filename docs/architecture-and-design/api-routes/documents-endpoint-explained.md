@@ -172,8 +172,8 @@ SUPPORTED_EXTENSIONS = {".pdf", ".txt", ".md", ".csv", ".docx"}
 
 | Line | Purpose | DE parallel | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `_documents: dict[str, DocumentInfo] = {}` | In-memory storage for document metadata | Like a cache dict — in prod you'd use DynamoDB | AWS depot 🏭 |
-| `SUPPORTED_EXTENSIONS` | Allowlist of file types we can parse | Input validation — same as any upload endpoint | Stable door 🚪 |
+| `_documents: dict[str, DocumentInfo] = {}` | In-memory storage for document metadata | Like a cache dict — in prod you'd use DynamoDB | Amazon's loading dock — _documents: dict[str, DocumentInfo] = {}: In-memory storage for document metadata · Like a cache dict — in prod you'd use DynamoDB |
+| `SUPPORTED_EXTENSIONS` | Allowlist of file types we can parse | Input validation — same as any upload endpoint | Where parcels are dropped at the stable — SUPPORTED_EXTENSIONS: Allowlist of file types we can parse · Input validation — same as any upload endpoint |
 
 **Why in-memory?** This is a portfolio project. In production, you'd store this in
 DynamoDB (AWS) or CosmosDB (Azure) so it survives app restarts. The pattern is the
@@ -327,7 +327,7 @@ regardless of input format.
 | ETL Extract | RAG Extract | 🫏 Donkey |
 | --- | --- | --- |
 | Read CSV from S3 → DataFrame | Read PDF from upload → string | Same fetch-and-parse skill — instead of loading rows into pandas, the donkey loads pages into a string |
-| Read JSON from API → DataFrame | Read DOCX from upload → string | Stable door 🚪 |
+| Read JSON from API → DataFrame | Read DOCX from upload → string | Door the customer knocks on — Read JSON from API → DataFrame: Read DOCX from upload → string |
 | Read Parquet from S3 → DataFrame | Read TXT from upload → string | Same fetch-and-parse skill — instead of columnar tables, the donkey reads plain text |
 
 **Why `[Page N]` markers?** When the document is later chunked, these markers help
@@ -708,9 +708,9 @@ you're storing vectors in OpenSearch.
 
 | ETL Load | RAG Load | 🫏 Donkey |
 | --- | --- | --- |
-| Write rows to Redshift | Write vectors to OpenSearch / Azure AI Search | AWS search hub 🔍 |
+| Write rows to Redshift | Write vectors to OpenSearch / Azure AI Search | Amazon's index room — Write rows to Redshift: Write vectors to OpenSearch / Azure AI Search |
 | CREATE TABLE with columns | CREATE INDEX with knn_vector mapping (AWS) or SearchIndex (Azure) | Lay out the GPS warehouse aisles up front — declare the vector field and HNSW signs so the donkey can navigate. |
-| INSERT INTO table VALUES | `client.index(body=doc)` (AWS) or `upload_documents(batch)` (Azure) | AWS depot 🏭 |
+| INSERT INTO table VALUES | `client.index(body=doc)` (AWS) or `upload_documents(batch)` (Azure) | Amazon's loading dock — INSERT INTO table VALUES: client.index(body=doc) (AWS) or upload_documents(batch) (Azure) |
 | Each row has typed columns | Each doc has text + vector + metadata | Every backpack on the GPS warehouse shelf carries its text, its coordinate stamp, and a routing-label metadata tag. |
 | Queried with SQL WHERE | Queried with k-NN vector search | The donkey asks the GPS warehouse for the k nearest backpacks to the question's coordinate, not for an exact label match. |
 
@@ -1013,12 +1013,12 @@ For a 12-page PDF (~8000 words, ~42 chunks):
 
 | Step | What happens | AWS cost | Azure cost | AWS time | Azure time | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1. READ | Parse PDF → text | $0 | $0 | ~50ms | ~50ms | Free hay 🌿 |
+| 1. READ | Parse PDF → text | $0 | $0 | ~50ms | ~50ms | Free hay for the donkey — 1. READ: Parse PDF → text · $0 · $0 · ~50ms · ~50ms |
 | 2. CHUNK | Split into 42 pieces | $0 | $0 | ~5ms | ~5ms | Slice the parsed document into 42 backpack pockets — pure local Python, no API calls, costs nothing. |
-| 3. EMBED | Convert chunks → vectors | $0.000168 (Titan, 42 calls) | $0.000168 (text-embedding-3-small, 1 call) | **~2100ms** | **~150ms** | GPS stamp 📍 |
-| 4. STORE | Write to vector database | ~$0 (OpenSearch) | ~$0 (AI Search) | **~420ms** | **~50ms** | AWS search hub 🔍 |
-| **Total per doc** | | **~$0.0002** | **~$0.0002** | **~2.6s** | **~0.25s** | Feed bill 🌾 |
-| **Monthly infra** | | ~$350 (OpenSearch 2 OCU) | ~$75 (AI Search Basic) | — | — | AWS search hub 🔍 |
+| 3. EMBED | Convert chunks → vectors | $0.000168 (Titan, 42 calls) | $0.000168 (text-embedding-3-small, 1 call) | **~2100ms** | **~150ms** | GPS stamp on the parcel — 3. EMBED: Convert chunks → vectors · $0.000168 (Titan, 42 calls) · $0.000168 (text-embedding-3-small, 1 call) · ~2100ms · |
+| 4. STORE | Write to vector database | ~$0 (OpenSearch) | ~$0 (AI Search) | **~420ms** | **~50ms** | OpenSearch sorting office — 4. STORE: Write to vector database · ~$0 (OpenSearch) · ~$0 (AI Search) · ~420ms · ~50ms |
+| **Total per doc** | | **~$0.0002** | **~$0.0002** | **~2.6s** | **~0.25s** | Stable's monthly feed bill — Total per doc: ~$0.0002 · ~$0.0002 · ~2.6s · ~0.25s |
+| **Monthly infra** | | ~$350 (OpenSearch 2 OCU) | ~$75 (AI Search Basic) | — | — | AWS search hub — Monthly infra: ~$350 (OpenSearch 2 OCU) · ~$75 (AI Search Basic) · — · — |
 
 **Key insight:** Same cost, but **Azure is ~10x faster for ingestion** due to native
 batch support in both embedding and storage. The per-document cost is negligible on
@@ -1041,8 +1041,8 @@ the ingestion cost 1000x.
 | PDF is corrupted / unparseable | `read_document()` throws → caught by try/except | `500` | Stable broke down — donkey couldn't complete the trip, customer sees an error |
 | PDF is scanned images (no text) | `read_document()` returns empty string → 0 chunks | `200` (with chunk_count=0) | Scanned-image PDF yields no text, so the post office produces zero backpacks and the donkey has nothing to deliver. |
 | Embedding API fails (Bedrock / Azure OpenAI down) | Exception in Step 3 → document saved as FAILED | `500` | GPS stamper is offline — the post office can't label parcels for the warehouse, so the document is shelved as FAILED |
-| Vector store down (OpenSearch / Azure AI Search) | Exception in Step 4 → document saved as FAILED | `500` | AWS search hub 🔍 |
-| File is too large (out of memory) | `await file.read()` fails → exception | `500` | Trip log 📒 |
+| Vector store down (OpenSearch / Azure AI Search) | Exception in Step 4 → document saved as FAILED | `500` | AWS search hub — Vector store down (OpenSearch / Azure AI Search): Exception in Step 4 → document saved as FAILED · 500 |
+| File is too large (out of memory) | `await file.read()` fails → exception | `500` | Line scribbled in the trip ledger — File is too large (out of memory): await file.read() fails → exception · 500 |
 
 - 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 

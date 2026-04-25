@@ -33,11 +33,11 @@ In data engineering, you monitor pipeline runs, row counts, and job durations. I
 
 | What you'll learn | DE parallel | 🫏 Donkey |
 |---|---| --- |
-| Request counting and error rates | Pipeline run counts and failure rates | Robot hand 🤖 |
-| Latency tracking (P50/P95/P99) | Job duration monitoring | Tachograph 📊 |
+| Request counting and error rates | Pipeline run counts and failure rates | Mechanical groom — Request counting and error rates: Pipeline run counts and failure rates |
+| Latency tracking (P50/P95/P99) | Job duration monitoring | Stopwatch on the donkey's harness — Latency tracking (P50/P95/P99): Job duration monitoring |
 | Token usage tracking | Row count / byte count tracking | Tracks how many hay bales (tokens) the donkey ate per trip — key for cost monitoring |
-| Cost estimation per request | Cloud cost per pipeline run | Feed bill 🌾 |
-| In-memory metrics collection | StatsD / Prometheus client | Tachograph 📊 |
+| Cost estimation per request | Cloud cost per pipeline run | What the stable charges this month — Cost estimation per request: Cloud cost per pipeline run |
+| In-memory metrics collection | StatsD / Prometheus client | Donkey's odometer dial — In-memory metrics collection: StatsD / Prometheus client |
 
 - 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
@@ -194,11 +194,11 @@ metrics.record_chat_request(
 
 | Counter | What it measures | Why it matters | 🫏 Donkey |
 |---|---|---| --- |
-| `_chat_requests` | Total queries served | Throughput — are people using the system? | Feed bill 🌾 |
+| `_chat_requests` | Total queries served | Throughput — are people using the system? | Donkey-hire fee — _chat_requests: Total queries served · Throughput — are people using the system? |
 | `_latencies` | Response time in ms | UX — are responses fast enough? | Tachograph reading — how long the donkey took on the round trip |
 | `_total_input_tokens` | Cumulative tokens sent to LLM | Cost driver — input tokens are cheaper | Hay loaded onto the donkey on the way out — cheaper per bale, but it adds up across every trip |
 | `_total_output_tokens` | Cumulative tokens received from LLM | Cost driver — output tokens are 3-5x more expensive | Hay the donkey burns writing the reply — 3–5x pricier than input hay, so verbose answers hurt the budget |
-| `_total_estimated_cost` | Running cost total | Budget tracking — are we within SLA? | Feed bill 🌾 |
+| `_total_estimated_cost` | Running cost total | Budget tracking — are we within SLA? | Stable's monthly feed bill — _total_estimated_cost: Running cost total · Budget tracking — are we within SLA? |
 
 - 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
@@ -415,9 +415,9 @@ The `MetricsCollector` stores metrics in-memory. To make them persistent, you'd 
 
 | Provider | Export target | How | Cost | 🫏 Donkey |
 |---|---|---|---| --- |
-| **AWS** | CloudWatch Metrics | `boto3.client('cloudwatch').put_metric_data()` | ~$0.30/metric/month | Tachograph 📊 |
-| **Azure** | Application Insights | `opencensus` or `azure-monitor-opentelemetry` | ~$2.30/GB ingested | Pre-sort 📮 |
-| **Local** | Console / Prometheus | `print()` or Prometheus client library | **$0** | Tachograph 📊 |
+| **AWS** | CloudWatch Metrics | `boto3.client('cloudwatch').put_metric_data()` | ~$0.30/metric/month | Tachograph reading — AWS: CloudWatch Metrics · boto3.client('cloudwatch').put_metric_data() · ~$0.30/metric/month |
+| **Azure** | Application Insights | `opencensus` or `azure-monitor-opentelemetry` | ~$2.30/GB ingested | Loading-bay pre-sort — Azure: Application Insights · opencensus or azure-monitor-opentelemetry · ~$2.30/GB ingested |
+| **Local** | Console / Prometheus | `print()` or Prometheus client library | **$0** | Donkey's odometer dial — Local: Console / Prometheus · print() or Prometheus client library · $0 |
 
 ### 🏠 Local development — console export
 
@@ -469,10 +469,10 @@ These are metrics that **don't exist in traditional software** but are critical 
 | Metric | What it measures | Alert threshold | Why | 🫏 Donkey |
 |---|---|---|---| --- |
 | **Token usage / request** | How much context + answer per query | > 2000 tokens/request | Cost growth | Over 2000 hay bales per trip means the donkey is eating too much — review backpack sizes |
-| **Cost per query** | $ per chat interaction | > $0.02/query | Budget overrun | Feed bill 🌾 |
+| **Cost per query** | $ per chat interaction | > $0.02/query | Budget overrun | Cost of keeping the donkey fed — Cost per query: $ per chat interaction · > $0.02/query · Budget overrun |
 | **Input/output ratio** | Input tokens ÷ output tokens | > 10:1 means verbose context | Over-retrieval | Input-to-output ratio over 10:1 means backpacks are huge relative to the answer the donkey wrote |
 | **Latency P99** | Worst-case response time | > 10s | UX degradation | Tachograph reading — how long the donkey took on the round trip |
-| **Error rate** | Failures / total requests | > 5% | System reliability | Feed bill 🌾 |
+| **Error rate** | Failures / total requests | > 5% | System reliability | Stable's monthly feed bill — Error rate: Failures / total requests · > 5% · System reliability |
 | **Chunks per document** | Average chunk count | > 500/doc | Storage bloat | Over 500 backpack chunks per document means the post office is slicing cargo too finely |
 
 ### Cost monitoring formula

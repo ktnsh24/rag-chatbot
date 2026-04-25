@@ -55,10 +55,10 @@ No JSON. No HTML. Just the Prometheus text format that monitoring tools expect.
 | Concept | Data Engineering | RAG Chatbot | 🫏 Donkey |
 | --- | --- | --- | --- |
 | **What you expose** | DAG run count, task duration, queue depth | Chat requests, LLM latency, token usage | Tachograph entries — every chat trip's count, latency, and token usage published for scrapers |
-| **Format** | Prometheus text exposition | Prometheus text exposition | Tachograph 📊 |
-| **Scraper** | Prometheus → Grafana | Prometheus → Grafana | Tachograph 📊 |
+| **Format** | Prometheus text exposition | Prometheus text exposition | Tally board on the stable wall — Format: Prometheus text exposition · Prometheus text exposition |
+| **Scraper** | Prometheus → Grafana | Prometheus → Grafana | Stopwatch on the donkey's harness — Scraper: Prometheus → Grafana · Prometheus → Grafana |
 | **Alert on** | DAG failure rate > 5%, task duration > SLA | Pass rate < 80%, latency p95 > 2s | Stable-owner alarms — wake someone if too few donkey trips pass or the round trips get too slow |
-| **Pattern** | `GET /metrics` on Airflow webserver | `GET /api/metrics` on FastAPI | Tachograph 📊 |
+| **Pattern** | `GET /metrics` on Airflow webserver | `GET /api/metrics` on FastAPI | Tally board on the stable wall — Pattern: GET /metrics on Airflow webserver · GET /api/metrics on FastAPI |
 
 **Bottom line:** Same infrastructure pattern, different business metrics.
 

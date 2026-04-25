@@ -31,7 +31,7 @@ This is the **first AI file** you encounter after Phase 1. It defines the contra
 | 2 | **Generation** | `generate()` | `db.query(sql)` → rows | Send prompt + context → get text + token counts back | Donkey reads delivery note and backpack, then writes answer and reports hay consumed |
 | 3 | **Temperature** | `temperature` param | ❌ No parallel — pure AI | Controls randomness: 0.0 = deterministic, 1.0 = creative | How predictable the donkey's writing is — low = same words every trip, high = the donkey gets creative |
 | 4 | **Embeddings** | `get_embedding()` | ❌ No parallel — brand new | Converts text → fixed-size vector that captures meaning | GPS-stamping cargo so the warehouse robot knows exactly where to shelve this backpack |
-| 5 | **Batch embeddings** | `get_embeddings_batch()` | Batch INSERT | One API call instead of N — same performance pattern | Stable door 🚪 |
+| 5 | **Batch embeddings** | `get_embeddings_batch()` | Batch INSERT | One API call instead of N — same performance pattern | Where parcels are dropped at the stable — 5: Batch embeddings · get_embeddings_batch() · Batch INSERT · One API call instead of N — same |
 
 - 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
@@ -88,7 +88,7 @@ Because they have different prices:
 
 | Token type | Who produces it | Claude 3.5 Sonnet price | DE parallel | 🫏 Donkey |
 |---|---|---|---| --- |
-| **Input tokens** | You send them (prompt + context) | $0.003 / 1K tokens | Like DynamoDB Read Capacity Units | AWS depot 🏭 |
+| **Input tokens** | You send them (prompt + context) | $0.003 / 1K tokens | Like DynamoDB Read Capacity Units | Amazon's loading dock — Input tokens: You send them (prompt + context) · $0.003 / 1K tokens · Like DynamoDB Read Capacity Units |
 | **Output tokens** | LLM generates them (the answer) | $0.015 / 1K tokens (**5× more**) | Like DynamoDB Write Capacity Units | Hay the donkey burns while writing the reply — costs five times more than hay it eats while reading |
 
 Output tokens cost **5× more** than input tokens — same pattern as DynamoDB where writes cost more than reads. Tracking them separately lets you optimise: a verbose LLM answer costs more than a concise one.
@@ -120,7 +120,7 @@ async def generate(
 
 | Parameter | What it is | What goes in | DE parallel | 🫏 Donkey |
 |---|---|---|---| --- |
-| `prompt` | The user's question + system instructions | `"What is the refund policy?"` | The SQL query | Delivery note 📋 |
+| `prompt` | The user's question + system instructions | `"What is the refund policy?"` | The SQL query | Customer's written brief — prompt: The user's question + system instructions · "What is the refund policy?" · The SQL query |
 | `context` | Document chunks retrieved by vector search | `["Our refund policy allows...", "Returns must be..."]` | The tables the query runs against | Retrieved backpack chunks the donkey reads before writing — the donkey can't answer without them |
 | `temperature` | Randomness control (0.0 = deterministic, 1.0 = creative) | `0.1` | ❌ No DE parallel — pure AI concept | How predictable the donkey's writing is — low = same words every trip, high = the donkey gets creative |
 

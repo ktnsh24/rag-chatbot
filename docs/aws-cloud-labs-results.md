@@ -158,10 +158,10 @@ Most remaining failures fall into these categories:
 
 | Category | Examples | Root Cause | 🫏 Donkey |
 |----------|---------|-----------| --- |
-| **Guardrails** | lab-4a (all), lab-9a/b/c | Guardrail tests need AWS Comprehend subscription | Test delivery 🧪 |
+| **Guardrails** | lab-4a (all), lab-9a/b/c | Guardrail tests need AWS Comprehend subscription | Sandbox delivery — Guardrails: lab-4a (all), lab-9a/b/c · Guardrail tests need AWS Comprehend subscription |
 | **Low faithfulness** | lab-2c, lab-5b_q3/q5 | Model hallucinates or adds context not in chunks | Donkey hallucinated extra hay not present in the backpack pockets — labs 2c, 5b_q3, 5b_q5 caught it. |
-| **Data mismatch** | lab-1c, lab-6a | Golden dataset expects "14 days" but document says "5-7 days" | Test delivery 🧪 |
-| **Reranker labs** | lab-9, lab-10 (some) | Reranker was disabled for this run | Quality sort 📊 |
+| **Data mismatch** | lab-1c, lab-6a | Golden dataset expects "14 days" but document says "5-7 days" | Sandbox delivery — Data mismatch: lab-1c, lab-6a · Golden dataset expects "14 days" but document says "5-7 days" |
+| **Reranker labs** | lab-9, lab-10 (some) | Reranker was disabled for this run | Quality sort — Reranker labs: lab-9, lab-10 (some) · Reranker was disabled for this run |
 | **Bulk ops** | lab-14, lab-15, lab-16 | Multi-document operations with timing issues | Donkey-side view of Bulk ops — affects how the donkey loads, reads, or delivers the cargo |
 
 - 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
@@ -170,14 +170,14 @@ Most remaining failures fall into these categories:
 
 | File | Change | Impact | 🫏 Donkey |
 |------|--------|--------| --- |
-| `src/vectorstore/aws_dynamodb.py` | Min-max score normalization | ret: 0.03 → 0.33+ | AWS depot 🏭 |
+| `src/vectorstore/aws_dynamodb.py` | Min-max score normalization | ret: 0.03 → 0.33+ | Amazon's loading dock — src/vectorstore/aws_dynamodb.py: Min-max score normalization · ret: 0.03 → 0.33+ |
 | `src/rag/reranker.py` | `safe_top_k = min(top_k, len(sources))` | Prevents reranker crash | How many backpacks the donkey grabs from the warehouse for one delivery |
 | `src/llm/aws_bedrock.py` | Removed `topP` from inferenceConfig | Fixes Sonnet 4.6 error | The AWS-depot donkey kept tripping on an unsupported parameter — removed it so it runs cleanly |
 | `infra/aws/iam.tf` | Fixed IAM tag values (removed em-dashes) | Terraform apply succeeds | Fixed IAM tag values (em-dashes removed) so the Terraform stable blueprint applies cleanly. |
 | `infra/aws/s3.tf` | Added account ID to bucket name | S3 global uniqueness | Added the AWS account ID into the bucket name so the S3 stable blueprint passes global uniqueness. |
 | `infra/aws/locals.tf` | Added `data.aws_caller_identity.current` | Supports account ID lookup | Added `data.aws_caller_identity.current` to the blueprint so other resources can read the account ID. |
-| `src/rag/chain.py` | Skip OpenSearch when DynamoDB selected | Prevents empty endpoint error | AWS search hub 🔍 |
-| `scripts/run_cloud_labs_personal.sh` | Credential isolation + PYTHONDONTWRITEBYTECODE | Safe AWS usage | AWS depot 🏭 |
+| `src/rag/chain.py` | Skip OpenSearch when DynamoDB selected | Prevents empty endpoint error | OpenSearch sorting office — src/rag/chain.py: Skip OpenSearch when DynamoDB selected · Prevents empty endpoint error |
+| `scripts/run_cloud_labs_personal.sh` | Credential isolation + PYTHONDONTWRITEBYTECODE | Safe AWS usage | AWS-side stable yard — scripts/run_cloud_labs_personal.sh: Credential isolation + PYTHONDONTWRITEBYTECODE · Safe AWS usage |
 
 - 🫏 **Donkey:** The head groom's final checklist — all trade-offs weighed, best bag chosen, donkey ready to dispatch.
 
@@ -185,11 +185,11 @@ Most remaining failures fall into these categories:
 
 | Run | Model | Est. Bedrock Cost | Est. DynamoDB | Est. Total | 🫏 Donkey |
 |-----|-------|------------------|--------------|-----------| --- |
-| 1 | Nova Lite | ~$0.02 | ~$0.01 | ~€0.03 | Free hay 🌿 |
-| 2 | Haiku 4.5 | ~$0.03 | ~$0.01 | ~€0.04 | Free hay 🌿 |
-| 3 | Sonnet 4.6 | ~$0.15 | ~$0.01 | ~€0.16 | Free hay 🌿 |
-| 4 | Sonnet 4.6 | ~$0.20 | ~$0.01 | ~€0.21 | Free hay 🌿 |
-| **Total** | | | | **~€0.44** | Feed bill 🌾 |
+| 1 | Nova Lite | ~$0.02 | ~$0.01 | ~€0.03 | Free hay for the donkey — 1: Nova Lite · ~$0.02 · ~$0.01 · ~€0.03 |
+| 2 | Haiku 4.5 | ~$0.03 | ~$0.01 | ~€0.04 | Complimentary feed allowance — 2: Haiku 4.5 · ~$0.03 · ~$0.01 · ~€0.04 |
+| 3 | Sonnet 4.6 | ~$0.15 | ~$0.01 | ~€0.16 | Stable throws in free fodder — 3: Sonnet 4.6 · ~$0.15 · ~$0.01 · ~€0.16 |
+| 4 | Sonnet 4.6 | ~$0.20 | ~$0.01 | ~€0.21 | No-charge bale from the stable — 4: Sonnet 4.6 · ~$0.20 · ~$0.01 · ~€0.21 |
+| **Total** | | | | **~€0.44** | Stable's monthly feed bill — Total: ~€0.44 |
 
 All runs well within the €5 budget. Terraform auto-destroys all resources after each run.
 

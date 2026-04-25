@@ -122,9 +122,9 @@ _start_time = datetime.now(timezone.utc)
 
 | Line | Purpose | DE parallel | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `from fastapi import APIRouter, Request` | Create a router, access the request object | Same as shared-proxy | Stable door 🚪 |
-| `from src.api.models import ...` | Import Pydantic response models | Same as any FastAPI app | Stable door 🚪 |
-| `router = APIRouter()` | Create the router that `main.py` will register | Same pattern everywhere | Stable door 🚪 |
+| `from fastapi import APIRouter, Request` | Create a router, access the request object | Same as shared-proxy | Entry gate to the stable — from fastapi import APIRouter, Request: Create a router, access the request object · Same as shared-proxy |
+| `from src.api.models import ...` | Import Pydantic response models | Same as any FastAPI app | Entry gate to the stable — from src.api.models import ...: Import Pydantic response models · Same as any FastAPI app |
+| `router = APIRouter()` | Create the router that `main.py` will register | Same pattern everywhere | Stable's front door — router = APIRouter(): Create the router that main.py will register · Same pattern everywhere |
 | `_start_time = datetime.now(timezone.utc)` | Record when the module was loaded (= app startup) | Common pattern for uptime tracking | Timestamp stamped on the trip log entry — when the donkey set off or returned |
 
 **Why `_start_time` is module-level:** This line runs once when Python imports the

@@ -36,12 +36,12 @@ Think of it as npm/yarn for Python.
 | --- | --- | --- | --- |
 | Define dependencies | `requirements.txt` (manual) | `pyproject.toml` (structured) | The supply shed manifest — every tool the donkey needs, structured and versioned |
 | Lock exact versions | `pip freeze > requirements.txt` (fragile) | `poetry.lock` (automatic) | Locks every tool to an exact version so any stable rebuilds the donkey identically |
-| Install dependencies | `pip install -r requirements.txt` | `poetry install` | Supply manifest 📜 |
-| Add a package | Edit requirements.txt + `pip install` | `poetry add <package>` | Supply manifest 📜 |
-| Remove a package | Edit requirements.txt + `pip uninstall` | `poetry remove <package>` | Supply manifest 📜 |
-| Create venv | `python -m venv .venv` (manual) | `poetry install` (automatic) | Supply manifest 📜 |
-| Run a command in venv | `source .venv/bin/activate && python` | `poetry run python` | Supply manifest 📜 |
-| Separate dev deps | Multiple requirements files | `[tool.poetry.group.dev.dependencies]` | Supply manifest 📜 |
+| Install dependencies | `pip install -r requirements.txt` | `poetry install` | Tack-room inventory list — Install dependencies: pip install -r requirements.txt · poetry install |
+| Add a package | Edit requirements.txt + `pip install` | `poetry add <package>` | Supply shed manifest — Add a package: Edit requirements.txt + pip install · poetry add <package> |
+| Remove a package | Edit requirements.txt + `pip uninstall` | `poetry remove <package>` | Stable's supply ledger — Remove a package: Edit requirements.txt + pip uninstall · poetry remove <package> |
+| Create venv | `python -m venv .venv` (manual) | `poetry install` (automatic) | Stable's supply ledger — Create venv: python -m venv .venv (manual) · poetry install (automatic) |
+| Run a command in venv | `source .venv/bin/activate && python` | `poetry run python` | Stable's supply ledger — Run a command in venv: source .venv/bin/activate && python · poetry run python |
+| Separate dev deps | Multiple requirements files | `[tool.poetry.group.dev.dependencies]` | Tack-room inventory list — Separate dev deps: Multiple requirements files · [tool.poetry.group.dev.dependencies] |
 
 - 🫏 **Donkey:** The supply shed manifest — every tool and library is pinned to an exact version so any stable can reproduce the same setup.
 

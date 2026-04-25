@@ -19,13 +19,13 @@
 | --- | --- | --- | --- |
 | **Azure OpenAI** | LLM inference (GPT-4o) + embeddings | Pay per token | Azure-hosted stable that rents the donkey by the hay bale — GPT-4o writes answers, embeddings turn text into GPS coordinates |
 | **Blob Storage** | Store uploaded documents | Pay per GB stored | Azure's document warehouse — where the donkey picks up source files before pre-sorting them into chunks |
-| **Cosmos DB** | Conversation history | Pay per RU (serverless) | Azure trip-log 📒 |
+| **Cosmos DB** | Conversation history | Pay per RU (serverless) | Azure's stable journal — Cosmos DB: Conversation history · Pay per RU (serverless) |
 | **AI Search** | Vector store for embeddings | Tier-based (Free available) | Azure hub's vector index where the donkey's embeddings live — billed by tier with a free option. |
-| **Container Apps** | Host the FastAPI container | Pay per vCPU/memory-second | Stable stall 🐎 |
+| **Container Apps** | Host the FastAPI container | Pay per vCPU/memory-second | Donkey's stall — Container Apps: Host the FastAPI container · Pay per vCPU/memory-second |
 | **Container Registry** | Docker image registry | Tier-based ($5/month Basic) | Azure hub's Docker registry address for the donkey image — Basic SKU runs about $5/month. |
-| **Azure Functions** | Event-driven document ingestion | Pay per execution | Pre-sort 📮 |
-| **Azure Monitor** | Logs, metrics, dashboards, alerts | Free tier generous | Tachograph 📊 |
-| **Managed Identity** | Passwordless auth between services | Free | Free hay 🌿 |
+| **Azure Functions** | Event-driven document ingestion | Pay per execution | Sorting bench before loading — Azure Functions: Event-driven document ingestion · Pay per execution |
+| **Azure Monitor** | Logs, metrics, dashboards, alerts | Free tier generous | Donkey's odometer dial — Azure Monitor: Logs, metrics, dashboards, alerts · Free tier generous |
+| **Managed Identity** | Passwordless auth between services | Free | Free hay for the donkey — Managed Identity: Passwordless auth between services · Free |
 
 - 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
@@ -72,7 +72,7 @@ response = await self._client.chat.completions.create(
 | Model | Deployment name | Purpose | Input cost | Output cost | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
 | gpt-4o | `gpt-4o` | Answer generation | $0.0025/1K | $0.01/1K | The premium donkey on Azure — strong and accurate, the default carrier for answer generation |
-| text-embedding-3-small | `text-embedding-3-small` | Text to vectors | $0.00002/1K | N/A | GPS stamp 📍 |
+| text-embedding-3-small | `text-embedding-3-small` | Text to vectors | $0.00002/1K | N/A | Coordinates inked on the saddlebag — text-embedding-3-small: text-embedding-3-small · Text to vectors · $0.00002/1K · N/A |
 
 ### Setup steps
 
@@ -115,9 +115,9 @@ resource "azurerm_storage_account" "documents" {
 
 | Replication | Cost | Durability | Use case | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| **LRS** (our choice) | $0.02/GB | 11 nines (one datacenter) | Dev/personal | Free hay 🌿 |
-| GRS | $0.04/GB | 16 nines (two regions) | Production | Free hay 🌿 |
-| ZRS | $0.025/GB | 12 nines (three zones) | Balanced | Free hay 🌿 |
+| **LRS** (our choice) | $0.02/GB | 11 nines (one datacenter) | Dev/personal | Free hay for the donkey — LRS (our choice): $0.02/GB · 11 nines (one datacenter) · Dev/personal |
+| GRS | $0.04/GB | 16 nines (two regions) | Production | Complimentary feed allowance — GRS: $0.04/GB · 16 nines (two regions) · Production |
+| ZRS | $0.025/GB | 12 nines (three zones) | Balanced | Free hay for the donkey — ZRS: $0.025/GB · 12 nines (three zones) · Balanced |
 
 For a personal project, LRS is the cheapest option. Your documents are also on your local machine, so you can re-upload if anything happens.
 
@@ -150,8 +150,8 @@ resource "azurerm_cosmosdb_account" "main" {
 
 | Mode | Cost | Idle cost | Best for | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| **Serverless** (our choice) | ~$0.25/million RU | **$0** | Low traffic, dev | Free hay 🌿 |
-| Provisioned (autoscale) | $0.008/RU-hour | $$$$ | Production, steady traffic | Free hay 🌿 |
+| **Serverless** (our choice) | ~$0.25/million RU | **$0** | Low traffic, dev | Complimentary feed allowance — Serverless (our choice): ~$0.25/million RU · $0 · Low traffic, dev |
+| Provisioned (autoscale) | $0.008/RU-hour | $$$$ | Production, steady traffic | Stable throws in free fodder — Provisioned (autoscale): $0.008/RU-hour · $$$$ · Production, steady traffic |
 
 ### Container design
 
@@ -192,7 +192,7 @@ Store document chunk embeddings and perform vector similarity search.
 
 | Tier | Cost/month | Storage | Indexes | Best for | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
-| **Free** | $0 | 50 MB | 3 | **Development (use this!)** | Free hay 🌿 |
+| **Free** | $0 | 50 MB | 3 | **Development (use this!)** | Complimentary feed allowance — Free: $0 · 50 MB · 3 · Development (use this!) |
 | Basic | $75 | 2 GB | 15 | Small production | Fuel-and-feed bill for keeping the donkey and stable running |
 | Standard S1 | $250 | 25 GB | 50 | Medium production | Fuel-and-feed bill for keeping the donkey and stable running |
 
@@ -239,9 +239,9 @@ Host the FastAPI application in production.
 | | Container Apps (our choice) | App Service | AKS (Kubernetes) | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
 | Scale to zero | **Yes** | No (min 1 instance) | No (min 1 node) | How the stable adds or removes donkeys when delivery volume changes |
-| Min cost | $0 (idle) | ~$13/month (B1) | ~$100/month | Feed bill 🌾 |
+| Min cost | $0 (idle) | ~$13/month (B1) | ~$100/month | Cost of keeping the donkey fed — Min cost: $0 (idle) · ~$13/month (B1) · ~$100/month |
 | Complexity | Low | Low | High | Donkey-side view of Complexity — affects how the donkey loads, reads, or delivers the cargo |
-| Container support | Docker | Docker or code | Docker | Stable stall 🐎 |
+| Container support | Docker | Docker or code | Docker | Hay-lined stall — Container support: Docker · Docker or code · Docker |
 
 ### Cost advantage
 

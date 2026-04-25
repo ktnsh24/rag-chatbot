@@ -148,8 +148,8 @@ The `BaseConversationHistory` abstract class defines three operations:
 | Method | What it does | DE equivalent | 🫏 Donkey |
 | --- | --- | --- | --- |
 | `add_message()` | Store one message | `INSERT INTO messages VALUES (...)` | Donkey-side view of add_message() — affects how the donkey loads, reads, or delivers the cargo |
-| `get_history()` | Get last N messages for a session | `SELECT * FROM messages WHERE session_id = ? ORDER BY timestamp DESC LIMIT 10` | Trip log 📒 |
-| `delete_session()` | Delete all messages for a session | `DELETE FROM messages WHERE session_id = ?` | Trip log 📒 |
+| `get_history()` | Get last N messages for a session | `SELECT * FROM messages WHERE session_id = ? ORDER BY timestamp DESC LIMIT 10` | Line scribbled in the trip ledger — get_history(): Get last N messages for a session · SELECT * FROM messages WHERE session_id = ? ORDER |
+| `delete_session()` | Delete all messages for a session | `DELETE FROM messages WHERE session_id = ?` | Line scribbled in the trip ledger — delete_session(): Delete all messages for a session · DELETE FROM messages WHERE session_id = ? |
 
 ### Key design decisions
 
@@ -325,15 +325,15 @@ Same concept as DynamoDB TTL — conversations auto-expire.
 
 | Aspect | AWS DynamoDB | Azure Cosmos DB | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **SDK** | `boto3` (sync) | `azure-cosmos` (async native) | Azure trip-log 📒 |
-| **Key design** | Composite: `session_id` (PK) + `timestamp` (SK) | `id` (unique) + `session_id` (partition key) | Trip log 📒 |
+| **SDK** | `boto3` (sync) | `azure-cosmos` (async native) | Application Insights diary — SDK: boto3 (sync) · azure-cosmos (async native) |
+| **Key design** | Composite: `session_id` (PK) + `timestamp` (SK) | `id` (unique) + `session_id` (partition key) | Line scribbled in the trip ledger — Key design: Composite: session_id (PK) + timestamp (SK) · id (unique) + session_id (partition key) |
 | **Unique ID** | Not needed — PK+SK is unique | Required — `id` field with UUID | Tracking number stamped on the parcel so the donkey can find it again |
-| **Query language** | `KeyConditionExpression` (DynamoDB-specific) | SQL-like syntax (`SELECT`, `WHERE`, `ORDER BY`) | AWS depot 🏭 |
-| **Get latest N** | `ScanIndexForward=False, Limit=N` + reverse | `SELECT TOP N ... ORDER BY timestamp DESC` + reverse | Test delivery 🧪 |
+| **Query language** | `KeyConditionExpression` (DynamoDB-specific) | SQL-like syntax (`SELECT`, `WHERE`, `ORDER BY`) | Amazon's loading dock — Query language: KeyConditionExpression (DynamoDB-specific) · SQL-like syntax (SELECT, WHERE, ORDER BY) |
+| **Get latest N** | `ScanIndexForward=False, Limit=N` + reverse | `SELECT TOP N ... ORDER BY timestamp DESC` + reverse | Practice run for the donkey — Get latest N: ScanIndexForward=False, Limit=N + reverse · SELECT TOP N ... ORDER BY timestamp DESC + reverse |
 | **Batch delete** | `batch_writer()` + loop | `async for` + `delete_item()` one by one | Donkey can run other errands while waiting for the warehouse to respond |
-| **TTL** | `expires_at` attribute | `default_ttl` on container (seconds) | Stable stall 🐎 |
-| **Cost (serverless)** | ~$0 idle, $1.25/M writes, $0.25/M reads | ~$0 idle, ~$0.28/M RUs | Feed bill 🌾 |
-| **Consistency** | Eventually consistent (default) | Session consistency (configured) | Trip log 📒 |
+| **TTL** | `expires_at` attribute | `default_ttl` on container (seconds) | Donkey's stall — TTL: expires_at attribute · default_ttl on container (seconds) |
+| **Cost (serverless)** | ~$0 idle, $1.25/M writes, $0.25/M reads | ~$0 idle, ~$0.28/M RUs | Cost of keeping the donkey fed — Cost (serverless): ~$0 idle, $1.25/M writes, $0.25/M reads · ~$0 idle, ~$0.28/M RUs |
+| **Consistency** | Eventually consistent (default) | Session consistency (configured) | Stable diary records — Consistency: Eventually consistent (default) · Session consistency (configured) |
 
 ### The code patterns side by side
 
@@ -431,11 +431,11 @@ With the default `limit=10` (10 messages = 5 conversation turns):
 
 | Messages in history | Extra input tokens | Extra cost per query (Claude) | 🫏 Donkey |
 | --- | --- | --- | --- |
-| 0 (first question) | 0 | $0.000 | Free hay 🌿 |
-| 2 (1 turn) | ~60 | $0.00018 | Free hay 🌿 |
-| 6 (3 turns) | ~180 | $0.00054 | Free hay 🌿 |
-| 10 (5 turns) | ~300 | $0.00090 | Free hay 🌿 |
-| 20 (10 turns) | ~600 | $0.00180 | Free hay 🌿 |
+| 0 (first question) | 0 | $0.000 | Free hay for the donkey — 0 (first question): 0 · $0.000 |
+| 2 (1 turn) | ~60 | $0.00018 | Stable throws in free fodder — 2 (1 turn): ~60 · $0.00018 |
+| 6 (3 turns) | ~180 | $0.00054 | Stable throws in free fodder — 6 (3 turns): ~180 · $0.00054 |
+| 10 (5 turns) | ~300 | $0.00090 | Stable throws in free fodder — 10 (5 turns): ~300 · $0.00090 |
+| 20 (10 turns) | ~600 | $0.00180 | Free hay for the donkey — 20 (10 turns): ~600 · $0.00180 |
 
 **This is why there's a limit.** Without it, a 50-message conversation would add ~1500
 tokens to every prompt — tripling the cost per query for diminishing returns.
@@ -444,10 +444,10 @@ tokens to every prompt — tripling the cost per query for diminishing returns.
 
 | Fewer history messages | More history messages | 🫏 Donkey |
 | --- | --- | --- |
-| Lower cost per query | Higher cost per query | Feed bill 🌾 |
-| Less context for follow-ups | Better understanding of conversation | Trip log 📒 |
-| User may need to repeat context | Smooth, natural conversation | Trip log 📒 |
-| `limit=4` is minimum for usable follow-ups | `limit=20` is maximum before costs explode | Feed bill 🌾 |
+| Lower cost per query | Higher cost per query | Cost of keeping the donkey fed — Lower cost per query: Higher cost per query |
+| Less context for follow-ups | Better understanding of conversation | Stable diary records — Less context for follow-ups: Better understanding of conversation |
+| User may need to repeat context | Smooth, natural conversation | Stable diary records — User may need to repeat context: Smooth, natural conversation |
+| `limit=4` is minimum for usable follow-ups | `limit=20` is maximum before costs explode | Hay-and-oats invoice — limit=4 is minimum for usable follow-ups: limit=20 is maximum before costs explode |
 
 The default `limit=10` is a good balance — 5 conversation turns gives enough context
 for most follow-up questions without excessive token costs.
@@ -463,8 +463,8 @@ for most follow-up questions without excessive token costs.
 | `ConversationMessage` model | Standard message table schema | Token budget — each message costs tokens in the next prompt | Each stored message costs hay later — every prior turn gets re-loaded into the donkey's next prompt. |
 | `add_message()` | Insert row, done | Must save BOTH user and assistant messages for complete replay | Donkey-side view of add_message() — affects how the donkey loads, reads, or delivers the cargo |
 | `get_history(limit=10)` | Pagination, standard | Token cost control — limit = max tokens spent on history | Pagination doubles as a hay budget — the limit caps how much trip log the donkey re-chews per turn. |
-| `delete_session()` | Cleanup, standard | Privacy + cost — old sessions = wasted storage + prompt bloat | Delivery note 📋 |
-| TTL (7 days) | Standard data retention | Context window management — conversations older than 7 days aren't useful | Trip log 📒 |
+| `delete_session()` | Cleanup, standard | Privacy + cost — old sessions = wasted storage + prompt bloat | Instructions tucked in the pannier — delete_session(): Cleanup, standard · Privacy + cost — old sessions = wasted storage + prompt bloat |
+| TTL (7 days) | Standard data retention | Context window management — conversations older than 7 days aren't useful | Line scribbled in the trip ledger — TTL (7 days): Standard data retention · Context window management — conversations older than 7 days aren't useful |
 | `session_id` | Partition key for grouping | Session isolation — one user's history never leaks into another's prompt | Partition key keeps each user in their own stable so trip logs never leak into another donkey's prompt. |
 | Sort by timestamp | Standard ordering | Chronological replay is required — LLM needs messages in order | Donkey replays the trip log in order — out-of-order messages would confuse the next answer |
 

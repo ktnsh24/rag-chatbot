@@ -99,7 +99,7 @@ Click in the **gutter** (the space to the left of line numbers) to set a red dot
 | File | Line | Why | 🫏 Donkey |
 | --- | --- | --- | --- |
 | `src/main.py` | Line inside `lifespan()` | See what happens at startup | Donkey-side view of src/main.py — affects how the donkey loads, reads, or delivers the cargo |
-| `src/api/routes/chat.py` | First line of `chat()` | See every incoming chat request | Stable door 🚪 |
+| `src/api/routes/chat.py` | First line of `chat()` | See every incoming chat request | Where parcels are dropped at the stable — src/api/routes/chat.py: First line of chat() · See every incoming chat request |
 | `src/rag/chain.py` | Inside `query()` | See RAG retrieval + generation | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
 | `src/llm/aws_bedrock.py` | Inside `generate()` | See the Bedrock API call | Inspect the donkey's call to AWS Bedrock — see the raw Converse request and response |
 | `src/llm/azure_openai.py` | Inside `generate()` | See the Azure OpenAI API call | Inspect the donkey's call to Azure OpenAI — see the raw chat.completions request and response |
@@ -250,7 +250,7 @@ Go deeper to see the raw HTTP communication with Ollama:
 | Method | Line (approx) | Code | What to inspect | AI concept | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
 | `generate()` | ~87 | `response = await self._client.post(` | Step over → hover `response` → see the raw JSON Ollama returns (model, created_at, response text) | **LLM HTTP API call** | See the raw HTTP call the donkey makes to the local Ollama stable to compose an answer |
-| `get_embedding()` | ~135 | `response = await self._client.post(` | Step over → hover `response` → see the raw embedding array from nomic-embed-text | **Embedding API call** | Stable door 🚪 |
+| `get_embedding()` | ~135 | `response = await self._client.post(` | Step over → hover `response` → see the raw embedding array from nomic-embed-text | **Embedding API call** | Where parcels are dropped at the stable — get_embedding(): ~135 · response = await self._client.post( · Step over → hover response → see the raw |
 | `get_embeddings_batch()` | ~167 | `response = await self._client.post(` | Same as above but for multiple texts at once (used during document upload) | **Batch embedding** | Same coordinate lookup but for many texts at once during upload, batched into the GPS warehouse. |
 
 **What to look for:**

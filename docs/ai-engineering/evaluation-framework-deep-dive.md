@@ -535,11 +535,11 @@ Or use Swagger UI at `http://localhost:8000/docs` → find the **Evaluation** se
 | Score too low? | Likely cause | How to debug | 🫏 Donkey |
 |---|---|---| --- |
 | **Retrieval < 0.5** | Chunks are irrelevant | Check chunk content — is the right document ingested? | GPS warehouse fetched wrong backpacks — verify the source documents are ingested and chunks make sense |
-| **Retrieval < 0.5** | Embedding quality poor | Try different embedding model (local: `nomic-embed-text` → `all-minilm`) | GPS stamp 📍 |
+| **Retrieval < 0.5** | Embedding quality poor | Try different embedding model (local: `nomic-embed-text` → `all-minilm`) | Coordinates inked on the saddlebag — Retrieval < 0.5: Embedding quality poor · Try different embedding model (local: nomic-embed-text → all-minilm) |
 | **Faithfulness < 0.8** | LLM is hallucinating | Tighten prompt rules, lower temperature | The donkey is making things up — tighten the delivery note and make its writing more predictable |
 | **Faithfulness < 0.8** | Keyword extraction too strict | Check if answer uses synonyms not in context | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
 | **Relevance < 0.6** | LLM answered different question | Check if question is ambiguous | The donkey answered a different question than the one on the order — check if the customer was vague |
-| **Relevance < 0.6** | Answer is a refusal | Check if context was empty (correct behaviour) | Right address 🎯 |
+| **Relevance < 0.6** | Answer is a refusal | Check if context was empty (correct behaviour) | Routing tag on the saddlebag — Relevance < 0.6: Answer is a refusal · Check if context was empty (correct behaviour) |
 | **Overall < 0.7** | Multiple issues | Debug each score individually | Whole report card slipped — work through retrieval, faithfulness, and relevance one by one to find the weakest link |
 
 **Debugging workflow:**

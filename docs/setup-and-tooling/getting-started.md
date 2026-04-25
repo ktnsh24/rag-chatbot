@@ -29,13 +29,13 @@
 | Tool | Version | Why you need it | 🫏 Donkey |
 | --- | --- | --- | --- |
 | **Python** | 3.12+ | The app is written in Python | Donkey-side view of Python — affects how the donkey loads, reads, or delivers the cargo |
-| **Poetry** | 1.8+ | Package manager (manages dependencies + virtual environment) | Supply manifest 📜 |
+| **Poetry** | 1.8+ | Package manager (manages dependencies + virtual environment) | Supply shed manifest — Poetry: 1.8+ · Package manager (manages dependencies + virtual environment) |
 | **Git** | 2.40+ | Version control | Donkey-side view of Git — affects how the donkey loads, reads, or delivers the cargo |
-| **AWS CLI** | 2.x | Connect to AWS services | AWS depot 🏭 |
+| **AWS CLI** | 2.x | Connect to AWS services | AWS-side stable yard — AWS CLI: 2.x · Connect to AWS services |
 | **Azure CLI** | 2.x | Connect to Azure services | Command-line key the developer uses to unlock the Azure hub gates from their laptop. |
-| **Docker** | 24+ | Build container images (optional, for deployment) | Robot hand 🤖 |
-| **Terraform** | 1.5+ | Deploy infrastructure (optional, for deployment) | Robot hand 🤖 |
-| **VS Code** or **PyCharm** | Latest | IDE with debugger | Test delivery 🧪 |
+| **Docker** | 24+ | Build container images (optional, for deployment) | Mechanical groom — Docker: 24+ · Build container images (optional, for deployment) |
+| **Terraform** | 1.5+ | Deploy infrastructure (optional, for deployment) | Mechanical groom — Terraform: 1.5+ · Deploy infrastructure (optional, for deployment) |
+| **VS Code** or **PyCharm** | Latest | IDE with debugger | Trial delivery — VS Code or PyCharm: Latest · IDE with debugger |
 
 ### Check what is already installed
 
@@ -424,7 +424,7 @@ poetry run uvicorn src.main:app --reload --port 8000
 | Component | Minimum | Recommended | 🫏 Donkey |
 | --- | --- | --- | --- |
 | **RAM** | 8 GB | 16 GB | Donkey-side view of RAM — affects how the donkey loads, reads, or delivers the cargo |
-| **Disk** | 5 GB (for models) | 10 GB | Manifest template 📋 |
+| **Disk** | 5 GB (for models) | 10 GB | Blank cargo manifest — Disk: 5 GB (for models) · 10 GB |
 | **GPU** | Not required (CPU works) | NVIDIA GPU (faster inference) | Donkey-side view of GPU — affects how the donkey loads, reads, or delivers the cargo |
 
 > **Tip:** `llama3.2` is an 8B parameter model and runs well on CPU. For faster
@@ -689,7 +689,7 @@ curl -X POST "https://your-resource.openai.azure.com/openai/deployments/gpt-4o/c
 | Error | Cause | Fix | 🫏 Donkey |
 | --- | --- | --- | --- |
 | `DeploymentNotFound` (404) | Embedding model not deployed on the same Azure OpenAI resource as the LLM | Deploy `text-embedding-3-small` on the **same** resource as `gpt-4o`. Both must share one `AZURE_OPENAI_ENDPOINT`. | Donkey can't find the embedding stall — it's at a different Azure stable than the writing stall |
-| `content_filter` (400) | Azure blocking prompt injection test prompts | Expected in Phase 4 guardrails labs. Azure's built-in content filter blocks jailbreak attempts. | Delivery note 📋 |
+| `content_filter` (400) | Azure blocking prompt injection test prompts | Expected in Phase 4 guardrails labs. Azure's built-in content filter blocks jailbreak attempts. | Delivery note pinned to the saddle — content_filter (400): Azure blocking prompt injection test prompts · Expected in Phase 4 guardrails labs. Azure's built-in content |
 | `RAG chain not initialized` | `.env` still has `<your-resource>` placeholder values | Check all `AZURE_*` values in `.env` — replace every `<your-resource>` with real values. | Label on the original mail item the backpack was sliced from |
 | `Port already in use` | Old server process still running | Run `pkill -f uvicorn` then retry. | Stable manager — receives requests at the front door and dispatches the donkey |
 | `Region not supported` | Model not available in chosen Azure region | Use **East US**, **East US 2**, or **Sweden Central** for both `gpt-4o` and `text-embedding-3-small`. | The chosen Azure region doesn't stable that model — relocate the donkey to a region that does |
@@ -1052,7 +1052,7 @@ The response includes the answer AND quality scores:
 |---|---|---| --- |
 | `retrieval` | Did vector search find relevant chunks? | ≥ 0.7 | Did the donkey's vector search actually grab the right backpack pockets? Pass mark is 0.7. |
 | `faithfulness` | Does the answer stick to the context? | ≥ 0.8 | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
-| `answer_relevance` | Does the answer address the question? | ≥ 0.6 | Right address 🎯 |
+| `answer_relevance` | Does the answer address the question? | ≥ 0.6 | Routing tag on the saddlebag — answer_relevance: Does the answer address the question? · ≥ 0.6 |
 | `overall` | Weighted average (retrieval 30% + faithfulness 40% + relevance 30%) | ≥ 0.7 | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
 | `passed` | Overall ≥ 0.7 | `true` | Donkey's report card — share of test deliveries that scored above the bar |
 
@@ -1103,9 +1103,9 @@ a specific competency:
 | Phase | What it teaches | AI engineering skill | 🫏 Donkey |
 | --- | --- | --- | --- |
 | **Phase 1** — Foundation (Labs 1–2) | Retrieval quality, faithfulness scoring, hallucination detection, top_k tuning | You learn to **measure** AI system quality — the foundation of every production AI system. Without evaluation, you're deploying blind. | Foundation labs that measure whether the donkey is fetching the right backpack pockets without hallucinating. |
-| **Phase 2** — Bridge (Labs 3–5) | Business metrics, prompt injection guardrails, AI observability dashboards | You learn to **translate** technical scores into business language, **protect** against adversarial inputs, and **monitor** AI systems in production. | Delivery note 📋 |
-| **Phase 3** — Production (Labs 6–8) | Data flywheel, RLHF feedback loops, infrastructure scaling | You learn the **continuous improvement loop** that separates production AI from demos — detect bad answers, fix them, lock the fix with golden datasets, repeat. | Feed bill 🌾 |
-| **Phase 4** — Advanced RAG (Labs 9–13) | Guardrails, re-ranking, hybrid search, bulk operations | You learn to **harden** a RAG system — block prompt injection, improve retrieval with re-ranking and hybrid search, and manage documents at scale. | Delivery note 📋 |
+| **Phase 2** — Bridge (Labs 3–5) | Business metrics, prompt injection guardrails, AI observability dashboards | You learn to **translate** technical scores into business language, **protect** against adversarial inputs, and **monitor** AI systems in production. | Note the donkey carries — Phase 2 — Bridge (Labs 3–5): Business metrics, prompt injection guardrails, AI observability dashboards · You learn to translate technical |
+| **Phase 3** — Production (Labs 6–8) | Data flywheel, RLHF feedback loops, infrastructure scaling | You learn the **continuous improvement loop** that separates production AI from demos — detect bad answers, fix them, lock the fix with golden datasets, repeat. | Hay-and-oats invoice — Phase 3 — Production (Labs 6–8): Data flywheel, RLHF feedback loops, infrastructure scaling · You learn the continuous improvement loop that separates… |
+| **Phase 4** — Advanced RAG (Labs 9–13) | Guardrails, re-ranking, hybrid search, bulk operations | You learn to **harden** a RAG system — block prompt injection, improve retrieval with re-ranking and hybrid search, and manage documents at scale. | Instructions tucked in the pannier — Phase 4 — Advanced RAG (Labs 9–13): Guardrails, re-ranking, hybrid search, bulk operations · You learn to harden a |
 | **Phase 5** — Observability (Labs 14–16) | Query logs, failure analysis, Prometheus metrics, golden dataset regression | You learn to **operate** a RAG system in production — structured logging, failure categorisation, metrics dashboards, and automated regression testing. | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 
 **How this helps you in practice:**
@@ -1201,9 +1201,9 @@ python scripts/run_all_labs.py --timeout 1200
 | **Phase 2** — Bridge | 3a (x2), 4a (3 injections + 1 eval), 5a, 5b (x5) | 12 evaluate + 3 chat calls | Twelve report cards plus three live chat trips covering business metrics and guardrails |
 | **Phase 3** — Production | 6a, 6b (upload), 6c, 6d (suite) | 2 evaluate + 1 upload + 1 suite call | Two report cards plus an upload and a full golden-suite run covering production readiness |
 | **Phase 4** — Advanced RAG | 9a (injection ×3), 9b (PII ×3), 9c, 10a (×3), 10b (×3), 11a-c (×8), 12a-b, 13a-d (×6) | 7 chat + 22 evaluate + 1 upload-batch | Donkey's report card — automated grading of test deliveries |
-| **Phase 5** — Observability | 14a (query stats), 14b (failures), 15a (metrics), 16a (golden suite) | 1 stats + 1 failures + 1 metrics + 1 suite call | Tachograph 📊 |
+| **Phase 5** — Observability | 14a (query stats), 14b (failures), 15a (metrics), 16a (golden suite) | 1 stats + 1 failures + 1 metrics + 1 suite call | Stopwatch on the donkey's harness — Phase 5 — Observability: 14a (query stats), 14b (failures), 15a (metrics), 16a (golden suite) · 1 stats + 1 |
 | **Thinking exercises** | 3b, 4b, 5c, 7a, 7b, 8a, 8b | 0 (skipped — these are design exercises) | Donkey-side view of Thinking exercises — affects how the donkey loads, reads, or delivers the cargo |
-| **Total** | 50 API experiments + 7 thinking | 47 API calls + 7 skipped | Feed bill 🌾 |
+| **Total** | 50 API experiments + 7 thinking | 47 API calls + 7 skipped | Stable's monthly feed bill — Total: 50 API experiments + 7 thinking · 47 API calls + 7 skipped |
 
 ### Output
 
@@ -1283,14 +1283,14 @@ reference — for full code walkthroughs, see
 | `/api/health` | GET | Checks if the RAG chain is initialised. No AI calls. | Stable's front door — the URL customers use to drop off a question |
 | `/api/chat` | POST | Send a question, get an AI answer with sources and token usage (the full RAG pipeline). | Send a question, get the donkey's answer plus cited backpack pockets and a hay tally for this delivery. |
 | `/api/documents/upload` | POST | Upload a single document — the app chunks, embeds, and stores it. | Upload one document and the post office immediately chunks, embeds, and files its backpack pockets. |
-| `/api/documents/upload-batch` | POST | Upload multiple documents in one request. | Stable door 🚪 |
+| `/api/documents/upload-batch` | POST | Upload multiple documents in one request. | Where parcels are dropped at the stable — /api/documents/upload-batch: POST · Upload multiple documents in one request. |
 | `/api/documents` | GET | List all uploaded documents and their chunk counts. | Lists every uploaded document along with how many backpack pockets each was sliced into. |
-| `/api/documents/{id}` | DELETE | Remove a document and its vector embeddings. | Stable door 🚪 |
+| `/api/documents/{id}` | DELETE | Remove a document and its vector embeddings. | Door the customer knocks on — /api/documents/{id}: DELETE · Remove a document and its vector embeddings. |
 | `/api/evaluate` | POST | Run a question through the RAG pipeline AND score the answer quality (RAGAS metrics). | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
 | `/api/evaluate/suite` | POST | Run the full golden dataset — like `dbt test` for your AI system. | Sends the donkey on all 25 standard test deliveries and returns one combined report card |
-| `/api/queries/stats` | GET | Aggregate pass rate and failure breakdown from query logs. | Stable door 🚪 |
+| `/api/queries/stats` | GET | Aggregate pass rate and failure breakdown from query logs. | Stable's front door — /api/queries/stats: GET · Aggregate pass rate and failure breakdown from query logs. |
 | `/api/queries/failures` | GET | Recent failed queries with failure categories (bad_retrieval, hallucination, etc.). | Recent deliveries where the donkey strayed — categorised as bad retrieval, hallucination, and friends. |
-| `/api/metrics` | GET | Prometheus-compatible counters and gauges for monitoring dashboards. | Tachograph 📊 |
+| `/api/metrics` | GET | Prometheus-compatible counters and gauges for monitoring dashboards. | Tachograph reading — /api/metrics: GET · Prometheus-compatible counters and gauges for monitoring dashboards. |
 
 > 📖 **Deep dive:** [API Routes Explained](../architecture-and-design/api-routes-explained.md) —
 > overview of how routes are wired, middleware, `app.state` pattern, and links to
@@ -1318,14 +1318,14 @@ These parts are **document-agnostic** — they work with any uploaded document:
 
 | Component | Why it just works | 🫏 Donkey |
 | --- | --- | --- |
-| `POST /api/chat` | Asks questions against whatever is in the vector store | Stable door 🚪 |
-| `POST /api/documents/upload` | Accepts any PDF, TXT, MD, CSV, or DOCX | Stable door 🚪 |
-| `GET /api/documents` | Lists whatever you've uploaded | Stable door 🚪 |
+| `POST /api/chat` | Asks questions against whatever is in the vector store | Where parcels are dropped at the stable — POST /api/chat: Asks questions against whatever is in the vector store |
+| `POST /api/documents/upload` | Accepts any PDF, TXT, MD, CSV, or DOCX | Entry gate to the stable — POST /api/documents/upload: Accepts any PDF, TXT, MD, CSV, or DOCX |
+| `GET /api/documents` | Lists whatever you've uploaded | Where parcels are dropped at the stable — GET /api/documents: Lists whatever you've uploaded |
 | `POST /api/evaluate` (with your own questions) | Scores any question/answer pair | Generates a report card for any question/answer pair you hand in |
-| `src/rag/` (chain, ingestion, prompts) | Generic RAG pipeline — not tied to any document | Delivery note 📋 |
+| `src/rag/` (chain, ingestion, prompts) | Generic RAG pipeline — not tied to any document | Delivery note pinned to the saddle — src/rag/ (chain, ingestion, prompts): Generic RAG pipeline — not tied to any document |
 | `src/llm/`, `src/vectorstore/`, `src/storage/` | Provider implementations — fully generic | Swappable donkey, warehouse, and depot implementations chosen at runtime by config |
 | `src/config.py`, `src/main.py` | App configuration — no document references | Donkey-side view of src/config.py`, `src/main.py — affects how the donkey loads, reads, or delivers the cargo |
-| `Dockerfile`, `.github/workflows/` | Build and deploy — no document references | Robot hand 🤖 |
+| `Dockerfile`, `.github/workflows/` | Build and deploy — no document references | Mechanical groom — Dockerfile, .github/workflows/: Build and deploy — no document references |
 | `tests/test_ingestion.py` | Tests chunking mechanics — not content-specific | Tests the chunking machinery itself — overlap, sizes, edges — independent of any specific document content. |
 
 ### How to switch documents (3 steps)
@@ -1344,9 +1344,9 @@ Edit `my-document.yaml` and update these sections:
 | `document.name` | Your document's filename (e.g., `employee-handbook.pdf`) | The label on the package — what the customer originally named the file |
 | `golden_dataset` | Rewrite the 25 Q&A test cases to match your document (questions, expected keywords, context chunks) | Rewrite the 25 standard test deliveries — questions, expected keywords, and reference backpack pockets — for your docs. |
 | `lab_questions.phase1` | Baseline + retrieval questions about your document | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
-| `lab_questions.phase2` | Business questions, injection prompts, dashboard queries | Delivery note 📋 |
+| `lab_questions.phase2` | Business questions, injection prompts, dashboard queries | Customer's written brief — lab_questions.phase2: Business questions, injection prompts, dashboard queries |
 | `lab_questions.phase3` | Gap question + a "gap document" your knowledge base does NOT have | Donkey-side view of lab_questions.phase3 — affects how the donkey loads, reads, or delivers the cargo |
-| `lab_questions.phase4` | Safe questions, reranker questions, ambiguous queries | Quality sort 📊 |
+| `lab_questions.phase4` | Safe questions, reranker questions, ambiguous queries | Re-stacking parcels by importance — lab_questions.phase4: Safe questions, reranker questions, ambiguous queries |
 
 #### 2. Place your document in the test data folder
 
@@ -1402,7 +1402,7 @@ These are **not** covered by the YAML config and need manual editing if you swit
 | File | What to change | Impact if skipped | 🫏 Donkey |
 | --- | --- | --- | --- |
 | `tests/test_evaluation.py` | Mock fixtures reference hardcoded golden dataset entries (questions, answers, chunks) | Unit tests will fail | Mock fixtures hardcode questions, answers, and backpack pockets; swapping the dataset will break unit tests. |
-| `tests/test_chat.py` | Mock answers and source filenames reference `test-policy.txt` | Unit tests will fail | Test delivery 🧪 |
+| `tests/test_chat.py` | Mock answers and source filenames reference `test-policy.txt` | Unit tests will fail | Dry-run trip to check the harness — tests/test_chat.py: Mock answers and source filenames reference test-policy.txt · Unit tests will fail |
 | `scripts/run_all_labs.py` (Phase 4 Labs 11–13) | A few hardcoded structural questions remain — mostly generic but review if your doc is very different | May produce odd results | Practice run — readers play stable hand and put the donkey through its paces |
 
 ### Files you SHOULD update (but won't break anything)
@@ -1413,7 +1413,7 @@ These are **not** covered by the YAML config and need manual editing if you swit
 | `docs/hands-on-labs/hands-on-labs-phase-2.md` | Dashboard questions reference refunds | Cosmetic only | Dashboard the stable owner watches — flags slow or failing donkey trips |
 | `docs/hands-on-labs/hands-on-labs-phase-3.md` | Data flywheel uses remote-work-policy as gap doc | Scenario won't make sense | Stable keys — only authorised callers may ask the donkey to deliver |
 | `src/evaluation/evaluator.py` (docstrings) | Examples use `"What is the refund policy?"` | Swagger examples show refund text | Docstring examples on the report-card module reference the default refund-policy questions |
-| `src/api/models.py` (field examples) | `example="What is the refund policy?"` | Swagger UI placeholder | Stable door 🚪 |
+| `src/api/models.py` (field examples) | `example="What is the refund policy?"` | Swagger UI placeholder | Stable's front door — src/api/models.py (field examples): example="What is the refund policy?" · Swagger UI placeholder |
 
 ### Quick-start checklist
 

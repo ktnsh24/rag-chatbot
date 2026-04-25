@@ -124,12 +124,12 @@ CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 | Line | Pattern | DE familiarity | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `python:3.12-slim` | Slim base image | ✅ Standard practice | Stable stall 🐎 |
-| `poetry install --without dev` | Prod deps only | ✅ Standard — skip test/lint deps | Test delivery 🧪 |
-| `virtualenvs.create false` | No venv inside container | ✅ Standard — container IS the isolation | Stable stall 🐎 |
+| `python:3.12-slim` | Slim base image | ✅ Standard practice | Hay-lined stall — python:3.12-slim: Slim base image · ✅ Standard practice |
+| `poetry install --without dev` | Prod deps only | ✅ Standard — skip test/lint deps | Dry-run trip to check the harness — poetry install --without dev: Prod deps only · ✅ Standard — skip test/lint deps |
+| `virtualenvs.create false` | No venv inside container | ✅ Standard — container IS the isolation | Stall that houses the worker — virtualenvs.create false: No venv inside container · ✅ Standard — container IS the isolation |
 | Layer ordering (deps → code) | Cache optimization | ✅ Standard — deps change rarely, code changes often | Donkey-side view of Layer ordering (deps → code) — affects how the donkey loads, reads, or delivers the cargo |
-| `HEALTHCHECK` | Container health endpoint | ✅ Standard — ECS/Container Apps use this | Stable stall 🐎 |
-| `uvicorn` CMD | ASGI server | ✅ Standard FastAPI deployment | Stable door 🚪 |
+| `HEALTHCHECK` | Container health endpoint | ✅ Standard — ECS/Container Apps use this | Donkey's stall — HEALTHCHECK: Container health endpoint · ✅ Standard — ECS/Container Apps use this |
+| `uvicorn` CMD | ASGI server | ✅ Standard FastAPI deployment | Door the customer knocks on — uvicorn CMD: ASGI server · ✅ Standard FastAPI deployment |
 
 ### What to notice for an AI app
 
@@ -244,10 +244,10 @@ Manual trigger → Login to AWS → Build + Push to ECR → Terraform apply → 
 
 | Step | DE familiarity | 🫏 Donkey |
 | --- | --- | --- |
-| OIDC auth (`role-to-assume`) | ✅ Standard GitHub Actions pattern | Robot hand 🤖 |
+| OIDC auth (`role-to-assume`) | ✅ Standard GitHub Actions pattern | Automated harness rig — OIDC auth (role-to-assume): ✅ Standard GitHub Actions pattern |
 | ECR login + push | ✅ Standard container deployment | Robot stable-hand logs into the ECR address and pushes the freshly built donkey image. |
 | Terraform apply in CI | ✅ Standard — same pattern everywhere | Robot stable-hand re-applies the Terraform stable blueprint on every merge — same pattern across providers. |
-| ECS force-new-deployment | ✅ Standard — triggers rolling update | Robot hand 🤖 |
+| ECS force-new-deployment | ✅ Standard — triggers rolling update | Mechanical groom — ECS force-new-deployment: ✅ Standard — triggers rolling update |
 
 ### Manual dispatch with environment choice
 
@@ -307,7 +307,7 @@ Manual trigger → Login to Azure → Login to ACR → Build + Push → Terrafor
 | Auth | `role-to-assume` (1 secret) | `client-id` + `tenant-id` + `subscription-id` (3 secrets) | AWS unlocks the stable address with a single role; Azure needs three IDs to reach the same door. |
 | Registry login | `amazon-ecr-login` action | `az acr login` CLI | Action versus CLI — both authenticate the robot stable-hand against the registry address before pushing. |
 | Image URL | `$ECR_REGISTRY/$ECR_REPOSITORY:$TAG` | `$ACR_NAME.azurecr.io/rag-chatbot:$TAG` | Full registry address where the donkey's Docker image is tagged — ECR path on AWS, ACR FQDN on Azure. |
-| Deploy | `aws ecs update-service --force-new-deployment` | `az containerapp update --image` | Robot hand 🤖 |
+| Deploy | `aws ecs update-service --force-new-deployment` | `az containerapp update --image` | Robot stable hand — Deploy: aws ecs update-service --force-new-deployment · az containerapp update --image |
 
 - 🫏 **Donkey:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for donkeys on the Azure route.
 
@@ -317,14 +317,14 @@ Manual trigger → Login to Azure → Login to ACR → Build + Push → Terrafor
 
 | Aspect | AWS (ECS Fargate) | Azure (Container Apps) | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Container hosting** | ECS Fargate | Azure Container Apps | Stable stall 🐎 |
+| **Container hosting** | ECS Fargate | Azure Container Apps | Donkey's stall — Container hosting: ECS Fargate · Azure Container Apps |
 | **Registry** | ECR | ACR | ECR or ACR — the cloud-specific address where the built donkey image is stored. |
 | **Auth method** | OIDC → IAM role | OIDC → service principal | Stable keys — only authorised callers may ask the donkey to deliver |
 | **Secrets needed** | 1 (`AWS_ROLE_ARN`) | 4 (`CLIENT_ID`, `TENANT_ID`, `SUBSCRIPTION_ID`, `ACR_NAME`) | AWS reaches the registry with one ARN; Azure needs four secrets to authenticate to the same address. |
-| **Deploy command** | `aws ecs update-service` | `az containerapp update` | Robot hand 🤖 |
+| **Deploy command** | `aws ecs update-service` | `az containerapp update` | Automated harness rig — Deploy command: aws ecs update-service · az containerapp update |
 | **Scaling** | ECS auto-scaling (configured in task def) | Built-in scaling rules | Always-on donkey stall — container that keeps the stable up 24/7 |
-| **Cost (idle)** | Fargate charges per vCPU-hour | Container Apps can scale to zero | Stable stall 🐎 |
-| **Cost (1 vCPU, 2GB)** | ~$30/month (always running) | ~$0/month (scale to zero) | Feed bill 🌾 |
+| **Cost (idle)** | Fargate charges per vCPU-hour | Container Apps can scale to zero | Donkey's stall — Cost (idle): Fargate charges per vCPU-hour · Container Apps can scale to zero |
+| **Cost (1 vCPU, 2GB)** | ~$30/month (always running) | ~$0/month (scale to zero) | Stable's monthly feed bill — Cost (1 vCPU, 2GB): ~$30/month (always running) · ~$0/month (scale to zero) |
 
 ### Cost insight for AI apps
 
@@ -392,7 +392,7 @@ Health check passes → /api/health returns 200
 | CI lint + test | Standard quality gates | Tests mock AI services — real LLM calls would cost money per CI run | Robot stable hand uses a fake donkey during tests so every CI run doesn't burn real hay |
 | Deploy Terraform | Standard infra-as-code | Creates AI-specific resources (Bedrock IAM, OpenSearch if added) | Blueprints raise the stable plus AI-only fittings — Bedrock permissions for the donkey, an OpenSearch warehouse if needed |
 | Manual deploy | Safety measure | Essential for AI — deploying a broken prompt to production can cause embarrassing LLM outputs | A human opens the gate before a new delivery note ships — one bad prompt can spoil every customer reply |
-| Image tag = git SHA | Traceability | Rollback is critical — a bad prompt change can degrade all AI responses | Delivery note 📋 |
+| Image tag = git SHA | Traceability | Rollback is critical — a bad prompt change can degrade all AI responses | Instructions tucked in the pannier — Image tag = git SHA: Traceability · Rollback is critical — a bad prompt change can degrade all AI |
 
 ### Why manual deploy matters more for AI
 

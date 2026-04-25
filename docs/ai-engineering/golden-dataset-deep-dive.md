@@ -34,11 +34,11 @@ Without a golden dataset, you'd have to manually test every change — ask quest
 
 | What you'll learn | DE parallel | 🫏 Donkey |
 |---|---| --- |
-| Fixed test inputs with expected outputs | Seed data / test fixtures | Test delivery 🧪 |
-| Categories of test cases (happy path, edge case) | Test pyramid: happy path → edge cases → error cases | Test delivery 🧪 |
-| Score thresholds per test case | SLA definitions per data pipeline | Test delivery 🧪 |
+| Fixed test inputs with expected outputs | Seed data / test fixtures | Dry-run trip to check the harness — Fixed test inputs with expected outputs: Seed data / test fixtures |
+| Categories of test cases (happy path, edge case) | Test pyramid: happy path → edge cases → error cases | Dry-run trip to check the harness — Categories of test cases (happy path, edge case): Test pyramid: happy path → edge cases → error cases |
+| Score thresholds per test case | SLA definitions per data pipeline | Practice run for the donkey — Score thresholds per test case: SLA definitions per data pipeline |
 | Context chunks pre-loaded (no search needed) | Mock data for integration tests | Test case pre-loads three known backpacks so evaluation doesn't depend on warehouse GPS search |
-| Negative test cases | `expected_not_in_answer` = forbidden values | Test delivery 🧪 |
+| Negative test cases | `expected_not_in_answer` = forbidden values | Trial delivery — Negative test cases: expected_not_in_answer = forbidden values |
 
 - 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
@@ -113,8 +113,8 @@ User question → [Embed] → [Search] → [Context] → [LLM] → [Evaluate]
 | `contact` | 3 | Support channels, hours, escalation | Donkey-side view of contact — affects how the donkey loads, reads, or delivers the cargo |
 | `product` | 2 | Compatibility, specifications | Donkey-side view of product — affects how the donkey loads, reads, or delivers the cargo |
 | `multi_turn` | 3 | Follow-up questions needing context | Donkey-side view of multi_turn — affects how the donkey loads, reads, or delivers the cargo |
-| `edge_case` | 6 | Ambiguous, out-of-scope, prompt injection, negation, multi-topic | Delivery note 📋 |
-| `pii` | 4 | PII in input, PII request, phone number, GDPR deletion | Gate rule 🚧 |
+| `edge_case` | 6 | Ambiguous, out-of-scope, prompt injection, negation, multi-topic | Instructions tucked in the pannier — edge_case: 6 · Ambiguous, out-of-scope, prompt injection, negation, multi-topic |
+| `pii` | 4 | PII in input, PII request, phone number, GDPR deletion | Rule the gate guard enforces — pii: 4 · PII in input, PII request, phone number, GDPR deletion |
 
 The cases below are representative examples. See [`golden_dataset.py`](../../src/evaluation/golden_dataset.py) for all 25.
 
@@ -329,12 +329,12 @@ for case in GOLDEN_DATASET:
 
 | Trigger | Why | 🫏 Donkey |
 |---|---| --- |
-| Changed a prompt template | Prompts affect every answer — regression test ALL cases | Delivery note 📋 |
+| Changed a prompt template | Prompts affect every answer — regression test ALL cases | Instructions tucked in the pannier — Changed a prompt template: Prompts affect every answer — regression test ALL cases |
 | Switched LLM model | Different models behave differently — baseline them | Re-run the 25 standard test deliveries with the new donkey breed to see how its writing differs |
 | Changed chunking strategy | Affects retrieval quality — test #1, #2, #3 | Backpack size changes (chunk_size) affect which cargo pieces the warehouse robot fetches |
 | Changed `top_k` or `chunk_size` | Affects context quality — test all cases | Top_k controls backpack count; chunk_size controls cargo size — both impact donkey's reading material |
-| Before deploying to production | Final sanity check | Robot hand 🤖 |
-| In CI/CD pipeline | Automated regression on every PR | Robot hand 🤖 |
+| Before deploying to production | Final sanity check | Automated harness rig — Before deploying to production: Final sanity check |
+| In CI/CD pipeline | Automated regression on every PR | Robot stable hand — In CI/CD pipeline: Automated regression on every PR |
 
 ### Running the Golden Dataset via the API
 
@@ -425,8 +425,8 @@ When you encounter a bug in production (e.g., the LLM gives a wrong answer), add
 | At least 1 happy path per category | Baseline behaviour | Donkey-side view of At least 1 happy path per category — affects how the donkey loads, reads, or delivers the cargo |
 | At least 1 edge case | Boundary behaviour | Donkey-side view of At least 1 edge case — affects how the donkey loads, reads, or delivers the cargo |
 | Put previous hallucinations in `expected_not_in_answer` | Regression-proof the fix | List forbidden words the donkey invented last time — catch memory drift before it happens again |
-| Use realistic similarity scores (0.4–0.95) | Don't use 1.0 — real search is never perfect | Compass bearing 🧭 |
-| Set thresholds based on cloud model performance | Don't set to 0.99 — allow natural variation | Manifest template 📋 |
+| Use realistic similarity scores (0.4–0.95) | Don't use 1.0 — real search is never perfect | Direction the donkey is pointed — Use realistic similarity scores (0.4–0.95): Don't use 1.0 — real search is never perfect |
+| Set thresholds based on cloud model performance | Don't set to 0.99 — allow natural variation | Pre-printed waybill — Set thresholds based on cloud model performance: Don't set to 0.99 — allow natural variation |
 
 - 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 

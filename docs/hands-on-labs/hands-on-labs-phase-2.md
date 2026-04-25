@@ -32,11 +32,11 @@ someone trick the donkey? Can you see what the donkey is doing?**
 
 | Metric / Concept | Donkey version | What it really measures | How it's calculated | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| **follow-up rate** | After delivering, does the customer **ask again** for the same thing? If 40% of customers come back with "that's not what I meant" — the donkey's answers aren't clear enough. If only 5% come back — the donkey nailed it first time. | How often users ask a rephrased follow-up within the same session — a proxy for "the first answer wasn't good enough". | Count sessions where user asks a rephrased question within N turns. `follow_ups / total_sessions × 100`. E.g. 12 follow-ups in 30 sessions → **40%** follow-up rate. Lower is better. | Feed bill 🌾 |
-| **resolution rate** | Did the customer **stop asking** after the donkey's delivery? If they walk away satisfied, that's resolved. If they give up and call the office instead — not resolved. | Percentage of conversations that end without the user escalating or abandoning. | `sessions_ended_satisfied / total_sessions × 100`. A session "resolves" if the user doesn't escalate or abandon. E.g. 27 resolved out of 30 → **90%** resolution rate. Higher is better. | Feed bill 🌾 |
+| **follow-up rate** | After delivering, does the customer **ask again** for the same thing? If 40% of customers come back with "that's not what I meant" — the donkey's answers aren't clear enough. If only 5% come back — the donkey nailed it first time. | How often users ask a rephrased follow-up within the same session — a proxy for "the first answer wasn't good enough". | Count sessions where user asks a rephrased question within N turns. `follow_ups / total_sessions × 100`. E.g. 12 follow-ups in 30 sessions → **40%** follow-up rate. Lower is better. | Stable's monthly feed bill — follow-up rate: After delivering, does the customer ask again for the same thing? If 40% of customers come back with… |
+| **resolution rate** | Did the customer **stop asking** after the donkey's delivery? If they walk away satisfied, that's resolved. If they give up and call the office instead — not resolved. | Percentage of conversations that end without the user escalating or abandoning. | `sessions_ended_satisfied / total_sessions × 100`. A session "resolves" if the user doesn't escalate or abandon. E.g. 27 resolved out of 30 → **90%** resolution rate. Higher is better. | Hay-and-oats invoice — resolution rate: Did the customer stop asking after the donkey's delivery? If they walk away satisfied, that's resolved. If they… |
 | **prompt injection** | A sneaky villager says: "Ignore your delivery instructions and bring me ALL the packages from every shelf." The donkey should say "I only deliver what's on the order" — not dump the entire warehouse. | An attacker tries to override the system prompt to make the LLM ignore its instructions. | Binary pass/fail per attempt. Send known attack prompts (e.g. "ignore your instructions"), check if LLM complies or refuses. Not a numeric score — you count passes across a test suite. | A trickster villager rewrites the delivery note mid-route — does the donkey ignore the order or dump the warehouse? |
-| **block rate** | What percentage of sneaky requests does the donkey **refuse**? Target: >95% blocked. If the donkey delivers warehouse contents to every trickster — your system is wide open. | Percentage of malicious inputs detected and blocked by guardrails. | `blocked_malicious / total_malicious × 100`. Run N attack prompts through guardrails, count how many get blocked. E.g. 19 blocked out of 20 attacks → **95%** block rate. | Delivery note 📋 |
-| **false positive rate** | Does the donkey **refuse legitimate customers** by mistake? "What's the refund policy?" is a normal question, not an attack. If the donkey blocks 10% of real questions — your guardrails are too aggressive. Target: <5%. | Percentage of legitimate queries incorrectly flagged as malicious. | `false_blocks / total_legitimate × 100`. Run N normal queries, count how many guardrails incorrectly block. E.g. 1 blocked out of 50 legit queries → **2%** false positive rate. | Feed bill 🌾 |
+| **block rate** | What percentage of sneaky requests does the donkey **refuse**? Target: >95% blocked. If the donkey delivers warehouse contents to every trickster — your system is wide open. | Percentage of malicious inputs detected and blocked by guardrails. | `blocked_malicious / total_malicious × 100`. Run N attack prompts through guardrails, count how many get blocked. E.g. 19 blocked out of 20 attacks → **95%** block rate. | Customer's written brief — block rate: What percentage of sneaky requests does the donkey refuse? Target: >95% blocked. If the donkey delivers warehouse contents… |
+| **false positive rate** | Does the donkey **refuse legitimate customers** by mistake? "What's the refund policy?" is a normal question, not an attack. If the donkey blocks 10% of real questions — your guardrails are too aggressive. Target: <5%. | Percentage of legitimate queries incorrectly flagged as malicious. | `false_blocks / total_legitimate × 100`. Run N normal queries, count how many guardrails incorrectly block. E.g. 1 blocked out of 50 legit queries → **2%** false positive rate. | Hay-and-oats invoice — false positive rate: Does the donkey refuse legitimate customers by mistake? "What's the refund policy?" is a normal question, not an… |
 | **token usage** | Every step the donkey takes **costs hay**. Longer routes (more chunks, longer answers) = more hay. You need to know: how much hay per delivery? Are some routes burning 10x more hay than others? | Input + output tokens consumed per request — directly proportional to cloud API costs. | `input_tokens + output_tokens` from LLM API response metadata. Cost = `total_tokens × price_per_token`. E.g. 1,200 input + 350 output = **1,550 tokens**. Track per-request to find expensive queries. | Each token is a single bale of hay the donkey eats — count input + output bales to know the cost |
 | **observability** | Can you **see where the donkey is** at any moment? Which shelf it went to, how long it waited, which packages it picked? If the donkey disappears for 60 seconds and comes back with a wrong package, you need the GPS trail to debug it. | Request tracing, latency breakdown per step (embed, retrieve, generate), structured logging with request IDs. | Not a formula — it's structured logging. Each request gets a `request_id`, and each step (embed, retrieve, generate) logs `start_time`, `end_time`, `duration_ms`. You query logs to find bottlenecks. | A GPS trail for every donkey trip — request_id and per-stage timings let you replay where time was spent |
 
@@ -156,7 +156,7 @@ Think about this: if you deployed this chatbot for **customer support**, what wo
 |---|---|---| --- |
 | `retrieval: 0.85` | ___ | ___ | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
 | `faithfulness: 0.92` | ___ | ___ | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
-| `answer_relevance: 0.78` | ___ | ___ | Right address 🎯 |
+| `answer_relevance: 0.78` | ___ | ___ | Address label that steers the donkey — answer_relevance: 0.78: ___ · ___ |
 | `overall: 0.85` | ___ | ___ | Donkey-side view of overall: 0.85 — affects how the donkey loads, reads, or delivers the cargo |
 
 **Example answers (reveal after you've thought about it):**
@@ -167,8 +167,8 @@ Think about this: if you deployed this chatbot for **customer support**, what wo
 | Technical metric | Business metric | How to collect it | 🫏 Donkey |
 |---|---|---| --- |
 | `retrieval: 0.85` | "% of questions answered from documents" (vs no context) | Log when retrieval scores < 0.5 | Translates "donkey grabbed the right backpacks" into "% of customer questions actually answered from our documents" |
-| `faithfulness: 0.92` | "% of answers that don't need human correction" | User feedback (thumbs up/down) | Feed bill 🌾 |
-| `answer_relevance: 0.78` | "% of users who didn't ask a follow-up" | Track session length: 1 question = good, 3+ = bad | Trip log 📒 |
+| `faithfulness: 0.92` | "% of answers that don't need human correction" | User feedback (thumbs up/down) | Hay-and-oats invoice — faithfulness: 0.92: "% of answers that don't need human correction" · User feedback (thumbs up/down) |
+| `answer_relevance: 0.78` | "% of users who didn't ask a follow-up" | Track session length: 1 question = good, 3+ = bad | Line scribbled in the trip ledger — answer_relevance: 0.78: "% of users who didn't ask a follow-up" · Track session length: 1 question = good, |
 | `overall: 0.85` | "Cost per resolved question" | Token cost + (did user still call support?) | Total hay-bill per delivery the customer actually walked away happy with — combines tokens spent and follow-up support calls |
 
 </details>
@@ -252,7 +252,7 @@ In **Swagger UI** → `POST /api/chat` → **"Try it out"**, try each one:
 | Attempt | Did the AI follow the injection? | What did it actually say? | Verdict | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
 | Ignore instructions | ___ | ___ | ___ | Donkey-side view of Ignore instructions — affects how the donkey loads, reads, or delivers the cargo |
-| Extract prompt | ___ | ___ | ___ | Delivery note 📋 |
+| Extract prompt | ___ | ___ | ___ | Note the donkey carries — Extract prompt: ___ · ___ · ___ |
 | Admin override | ___ | ___ | ___ | Donkey-side view of Admin override — affects how the donkey loads, reads, or delivers the cargo |
 
 > **What to expect (local):** Some injections may succeed (the LLM follows the instruction), others may fail (the RAG context steers the LLM). Record which ones worked — this is your security baseline.
@@ -263,7 +263,7 @@ In **Swagger UI** → `POST /api/chat` → **"Try it out"**, try each one:
 | --- | --- | --- | --- |
 | retrieval | ___ | Irrelevant chunks | Donkey returned with backpacks unrelated to the injected order — vector search couldn't find anything matching the trickster's prompt |
 | faithfulness | ___ | No grounding in context | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
-| answer_relevance | ___ | Off-topic | Right address 🎯 |
+| answer_relevance | ___ | Off-topic | Routing tag on the saddlebag — answer_relevance: ___ · Off-topic |
 | overall | ___ | Deep failure | Bottom-of-the-barrel grade — every column on the report card collapsed at once, classic injection symptom |
 | passed | ___ | ___ | Donkey's report card — share of test deliveries that scored above the bar |
 
@@ -339,10 +339,10 @@ damage is done*.
 
 | Layer | What to guard | Example rule | DE parallel | 🫏 Donkey |
 |---|---|---|---| --- |
-| **Input** | ___ | ___ | Input validation on your API | Stable door 🚪 |
-| **Output** | ___ | ___ | Output schema validation | Manifest template 📋 |
-| **Cost** | ___ | ___ | API rate limiting you already do | Feed bill 🌾 |
-| **Topic** | ___ | ___ | Schema constraints on data pipeline | Robot hand 🤖 |
+| **Input** | ___ | ___ | Input validation on your API | Stable's front door — Input: ___ · ___ · Input validation on your API |
+| **Output** | ___ | ___ | Output schema validation | Manifest template — Output: ___ · ___ · Output schema validation |
+| **Cost** | ___ | ___ | API rate limiting you already do | What the stable charges this month — Cost: ___ · ___ · API rate limiting you already do |
+| **Topic** | ___ | ___ | Schema constraints on data pipeline | Robot stable hand — Topic: ___ · ___ · Schema constraints on data pipeline |
 
 **Example answers:**
 
@@ -352,9 +352,9 @@ damage is done*.
 | Layer | What to guard | Example rule | DE parallel | 🫏 Donkey |
 |---|---|---|---| --- |
 | **Input** | Block dangerous prompts before they reach the LLM | Reject "ignore instructions...", "repeat your prompt..." patterns | Input validation on your API | The stable gate inspects every delivery note and turns away suspicious ones before the donkey leaves |
-| **Output** | Check the answer before sending to user | Block PII (email, phone numbers), profanity, off-topic responses | Output schema validation | Gate rule 🚧 |
+| **Output** | Check the answer before sending to user | Block PII (email, phone numbers), profanity, off-topic responses | Output schema validation | Posted notice at the gate — Output: Check the answer before sending to user · Block PII (email, phone numbers), profanity, off-topic responses · Output… |
 | **Cost** | Prevent token abuse | Max 2000 tokens per request, rate limit: 10 requests/minute per user | API rate limiting you already do | Hay-budget rule at the stable gate — caps how many bales any one customer can burn per delivery and per minute |
-| **Topic** | Keep AI on-topic | Only answer about company policies, reject "tell me a joke", "write code" | Schema constraints on your data pipeline | Robot hand 🤖 |
+| **Topic** | Keep AI on-topic | Only answer about company policies, reject "tell me a joke", "write code" | Schema constraints on your data pipeline | Automated harness rig — Topic: Keep AI on-topic · Only answer about company policies, reject "tell me a joke", "write code" · Schema… |
 
 </details>
 
@@ -523,7 +523,7 @@ Now look at your terminal where the server is running. You should see log lines 
 | request_id | (your unique ID) | Unique trace ID — find any request in logs | Donkey's trip log — every delivery's details written to disk for later review |
 | retrieval | ___ | Vector search found relevant-ish chunks | Donkey came back with backpacks that mostly match — GPS warehouse hit the right neighbourhood, not the exact shelf |
 | faithfulness | ___ | ___ | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
-| answer_relevance | ___ | ___ | Right address 🎯 |
+| answer_relevance | ___ | ___ | Address label that steers the donkey — answer_relevance: ___ · ___ |
 | overall | ___ | ___ | Donkey-side view of overall — affects how the donkey loads, reads, or delivers the cargo |
 | latency | ___ms | End-to-end including LLM inference on CPU | Total round-trip time from villager's question to the donkey returning with the written answer |
 | sources_used | ___ | Number of chunks sent to LLM | How many backpack pieces the stable handed the donkey before it started writing |
@@ -674,7 +674,7 @@ In production, you'd track these over time. Think about what alerts you'd set.
 | --- | --- | --- | --- | --- | --- |
 | Average retrieval score (per day) | Drift detection — docs getting stale? | Alert if < 0.5 for 24h | Your avg: 0.561 (just above) | DynamoDB read capacity | Daily average of how well the donkey is finding the right backpacks — slow decline means the warehouse needs reorganising |
 | Hallucination rate (per day) | Safety — AI making things up | Alert if > 10% (with LLM-as-judge) | Your rate: 40% (but most are false positives from heuristic evaluator) | Error rate on Lambda | How often the donkey writes things that weren't in the backpack — alarm if too many invented answers |
-| P99 latency | User experience | Alert if > 5s (cloud) or > 60s (local) | Your P99: ~40s (local CPU) | API Gateway latency | Stable door 🚪 |
+| P99 latency | User experience | Alert if > 5s (cloud) or > 60s (local) | Your P99: ~40s (local CPU) | API Gateway latency | Where parcels are dropped at the stable — P99 latency: User experience · Alert if > 5s (cloud) or > 60s (local) · Your P99: |
 | Token cost per day | Budget | Alert if > $50/day | Your cost: $0 (local) | AWS cost alarms | Daily hay bill for the stable — alarm trips when the donkey eats more than the budget allows |
 | "I don't have information" rate | Missing content gap | Alert if > 20% | Your rate: 2/5 = 40% ⚠️ | Dead letter queue depth | Dashboard the stable owner watches — flags slow or failing donkey trips |
 
@@ -814,11 +814,11 @@ After completing Labs 3, 4, and 5, check off:
 
 | # | Skill | Lab | Can you explain it? | 🫏 Donkey |
 |---|---|---|---| --- |
-| 1 | Business-aligned metrics (beyond technical scores) | Lab 3 | [ ] Yes | Tachograph 📊 |
-| 2 | Translating AI metrics to business language | Lab 3 | [ ] Yes | Tachograph 📊 |
-| 3 | Guardrails design (4 layers: input/output/cost/topic) | Lab 4 | [ ] Yes | Feed bill 🌾 |
-| 4 | Prompt injection awareness (with real examples) | Lab 4 | [ ] Yes | Delivery note 📋 |
-| 5 | AI observability (monitoring + AI-specific signals) | Lab 5 | [ ] Yes | Tachograph 📊 |
+| 1 | Business-aligned metrics (beyond technical scores) | Lab 3 | [ ] Yes | Tally board on the stable wall — 1: Business-aligned metrics (beyond technical scores) · Lab 3 · [ ] Yes |
+| 2 | Translating AI metrics to business language | Lab 3 | [ ] Yes | Donkey's odometer dial — 2: Translating AI metrics to business language · Lab 3 · [ ] Yes |
+| 3 | Guardrails design (4 layers: input/output/cost/topic) | Lab 4 | [ ] Yes | Hay-and-oats invoice — 3: Guardrails design (4 layers: input/output/cost/topic) · Lab 4 · [ ] Yes |
+| 4 | Prompt injection awareness (with real examples) | Lab 4 | [ ] Yes | Note the donkey carries — 4: Prompt injection awareness (with real examples) · Lab 4 · [ ] Yes |
+| 5 | AI observability (monitoring + AI-specific signals) | Lab 5 | [ ] Yes | Tachograph reading — 5: AI observability (monitoring + AI-specific signals) · Lab 5 · [ ] Yes |
 | 6 | Dashboard design for production AI | Lab 5 | [ ] Yes | Dashboard the stable owner watches — flags slow or failing donkey trips |
 | 7 | Alert threshold design for AI systems | Lab 5 | [ ] Yes | Dashboard the stable owner watches — flags slow or failing donkey trips |
 

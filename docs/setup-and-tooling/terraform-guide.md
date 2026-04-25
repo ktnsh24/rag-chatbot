@@ -63,11 +63,11 @@ az account set --subscription "your-subscription-id"
 
 | Resource | Purpose | Free Tier? | 🫏 Donkey |
 |---|---|---| --- |
-| `aws_s3_bucket` | Store uploaded documents | ✅ 5 GB | AWS depot 🏭 |
-| `aws_dynamodb_table` | Conversation history | ✅ 25 GB | AWS depot 🏭 |
+| `aws_s3_bucket` | Store uploaded documents | ✅ 5 GB | Amazon's loading dock — aws_s3_bucket: Store uploaded documents · ✅ 5 GB |
+| `aws_dynamodb_table` | Conversation history | ✅ 25 GB | AWS-side stable yard — aws_dynamodb_table: Conversation history · ✅ 25 GB |
 | `aws_ecr_repository` | Docker image registry | ✅ 500 MB | Permanent ECR address where the donkey's Docker image lives — free under 500 MB stored. |
-| `aws_iam_role` | ECS task execution role | ✅ Free | Free hay 🌿 |
-| `aws_iam_role_policy` | Least-privilege policy | ✅ Free | Free hay 🌿 |
+| `aws_iam_role` | ECS task execution role | ✅ Free | Stable throws in free fodder — aws_iam_role: ECS task execution role · ✅ Free |
+| `aws_iam_role_policy` | Least-privilege policy | ✅ Free | No-charge bale from the stable — aws_iam_role_policy: Least-privilege policy · ✅ Free |
 
 ### Variables
 
@@ -75,7 +75,7 @@ az account set --subscription "your-subscription-id"
 |---|---|---| --- |
 | `project_name` | `"rag-chatbot"` | Prefix for all resource names | The donkey's name tag — every AWS resource is tagged as belonging to this donkey |
 | `environment` | `"dev"` | Environment tag | Which stable the donkey lives in — dev (training), staging (rehearsal), prod (real deliveries) |
-| `aws_region` | `"eu-west-1"` | AWS region | AWS depot 🏭 |
+| `aws_region` | `"eu-west-1"` | AWS region | AWS depot — aws_region: "eu-west-1" · AWS region |
 
 ### S3 Bucket
 
@@ -143,13 +143,13 @@ The ECS task role grants least-privilege access:
 
 | Resource | Purpose | Free Tier? | 🫏 Donkey |
 |---|---|---| --- |
-| `azurerm_resource_group` | Resource container | ✅ Free | Stable stall 🐎 |
+| `azurerm_resource_group` | Resource container | ✅ Free | Donkey's stall — azurerm_resource_group: Resource container · ✅ Free |
 | `azurerm_storage_account` | Document storage | ✅ 5 GB LRS | Azure's document warehouse where the donkey picks up source files for ingestion |
 | `azurerm_storage_container` | Blob container | ✅ Included | The labelled bin inside the warehouse where uploaded documents are sorted |
-| `azurerm_cosmosdb_account` | Conversation history | ✅ 1000 RU/s free | Azure trip-log 📒 |
-| `azurerm_cosmosdb_sql_database` | Database | ✅ Included | Azure trip-log 📒 |
-| `azurerm_cosmosdb_sql_container` | Container | ✅ Included | Azure trip-log 📒 |
-| `azurerm_container_registry` | Docker images | Basic SKU ~€4.20/mo | Stable stall 🐎 |
+| `azurerm_cosmosdb_account` | Conversation history | ✅ 1000 RU/s free | Azure trip-log — azurerm_cosmosdb_account: Conversation history · ✅ 1000 RU/s free |
+| `azurerm_cosmosdb_sql_database` | Database | ✅ Included | Azure trip-log — azurerm_cosmosdb_sql_database: Database · ✅ Included |
+| `azurerm_cosmosdb_sql_container` | Container | ✅ Included | Azure trip-log — azurerm_cosmosdb_sql_container: Container · ✅ Included |
+| `azurerm_container_registry` | Docker images | Basic SKU ~€4.20/mo | Donkey's stall — azurerm_container_registry: Docker images · Basic SKU ~€4.20/mo |
 
 ### Variables
 
@@ -301,21 +301,21 @@ terraform destroy -var="environment=dev"
 
 | Resource | Monthly Cost | 🫏 Donkey |
 |---|---| --- |
-| S3 (5 GB) | $0.00 | Free hay 🌿 |
-| DynamoDB (on-demand) | $0.00 | AWS depot 🏭 |
+| S3 (5 GB) | $0.00 | No-charge bale from the stable — S3 (5 GB): $0.00 |
+| DynamoDB (on-demand) | $0.00 | AWS depot — DynamoDB (on-demand): $0.00 |
 | ECR (500 MB) | $0.00 | ECR registry address costs nothing while the donkey image stays under the 500 MB free tier. |
-| IAM | $0.00 | Free hay 🌿 |
-| **Total** | **$0.00** | Feed bill 🌾 |
+| IAM | $0.00 | Complimentary feed allowance — IAM: $0.00 |
+| **Total** | **$0.00** | Hay-and-oats invoice — Total: $0.00 |
 
 ### Azure
 
 | Resource | Monthly Cost | 🫏 Donkey |
 |---|---| --- |
 | Storage Account (5 GB LRS) | ~$0.10 | Cheap warehouse rent — pennies per month to store the donkey's source documents |
-| Cosmos DB (serverless, free tier) | $0.00 | Azure trip-log 📒 |
+| Cosmos DB (serverless, free tier) | $0.00 | Azure trip-log — Cosmos DB (serverless, free tier): $0.00 |
 | Container Registry (Basic) | ~$4.20 | Azure Container Registry Basic SKU — a fixed ~$4.20/month address for the donkey's Docker image. |
-| Resource Group | $0.00 | Free hay 🌿 |
-| **Total** | **~$4.30** | Feed bill 🌾 |
+| Resource Group | $0.00 | Complimentary feed allowance — Resource Group: $0.00 |
+| **Total** | **~$4.30** | Donkey-hire fee — Total: ~$4.30 |
 
 > 💡 The Azure Container Registry is the only resource with a meaningful
 > cost. You can skip it during development and push images directly to
