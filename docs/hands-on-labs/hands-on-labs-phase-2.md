@@ -155,7 +155,7 @@ Think about this: if you deployed this chatbot for **customer support**, what wo
 | Technical metric (what we have) | Business metric (what matters) | How to collect it | 🫏 Donkey |
 |---|---|---| --- |
 | `retrieval: 0.85` | ___ | ___ | 🫏 On the route |
-| `faithfulness: 0.92` | ___ | ___ | Saddlebag match 🫏 |
+| `faithfulness: 0.92` | ___ | ___ | backpack match 🫏 |
 | `answer_relevance: 0.78` | ___ | ___ | Right address 🎯 |
 | `overall: 0.85` | ___ | ___ | 🫏 On the route |
 
@@ -166,7 +166,7 @@ Think about this: if you deployed this chatbot for **customer support**, what wo
 
 | Technical metric | Business metric | How to collect it | 🫏 Donkey |
 |---|---|---| --- |
-| `retrieval: 0.85` | "% of questions answered from documents" (vs no context) | Log when retrieval scores < 0.5 | Saddlebag fetch 🎒 |
+| `retrieval: 0.85` | "% of questions answered from documents" (vs no context) | Log when retrieval scores < 0.5 | backpack fetch 🎒 |
 | `faithfulness: 0.92` | "% of answers that don't need human correction" | User feedback (thumbs up/down) | Feed bill 🌾 |
 | `answer_relevance: 0.78` | "% of users who didn't ask a follow-up" | Track session length: 1 question = good, 3+ = bad | Trip log 📒 |
 | `overall: 0.85` | "Cost per resolved question" | Token cost + (did user still call support?) | Cargo unit ⚖️ |
@@ -261,8 +261,8 @@ In **Swagger UI** → `POST /api/chat` → **"Try it out"**, try each one:
 
 | Metric | Value | Interpretation | 🫏 Donkey |
 | --- | --- | --- | --- |
-| retrieval | ___ | Irrelevant chunks | Saddlebag piece 📦 |
-| faithfulness | ___ | No grounding in context | Saddlebag match 🫏 |
+| retrieval | ___ | Irrelevant chunks | backpack piece 📦 |
+| faithfulness | ___ | No grounding in context | backpack match 🫏 |
 | answer_relevance | ___ | Off-topic | Right address 🎯 |
 | overall | ___ | Deep failure | Hoof check 🔧 |
 | passed | ___ | ___ | 🫏 On the route |
@@ -521,8 +521,8 @@ Now look at your terminal where the server is running. You should see log lines 
 | Metric | Value | What the log tells you | 🫏 Donkey |
 | --- | --- | --- | --- |
 | request_id | (your unique ID) | Unique trace ID — find any request in logs | 🫏 On the route |
-| retrieval | ___ | Vector search found relevant-ish chunks | Saddlebag piece 📦 |
-| faithfulness | ___ | ___ | Saddlebag match 🫏 |
+| retrieval | ___ | Vector search found relevant-ish chunks | backpack piece 📦 |
+| faithfulness | ___ | ___ | backpack match 🫏 |
 | answer_relevance | ___ | ___ | Right address 🎯 |
 | overall | ___ | ___ | 🫏 On the route |
 | latency | ___ms | End-to-end including LLM inference on CPU | The donkey 🐴 |
@@ -589,8 +589,8 @@ In **Swagger UI** → `POST /api/evaluate`, run each question one at a time:
 | # | Question | Retrieval | Faithfulness | Overall | Passed | Latency | What happened? | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | Refund policy? | 0.581 | 0.625 | 0.724 | ✅ | 40.4s | Comprehensive answer, 3 sentences flagged (paraphrasing) | 🫏 On the route |
-| 2 | Digital products? | 0.620 | 1.0 | 0.786 | ✅ | 4.4s | Short, precise answer → perfect faithfulness | Saddlebag match 🫏 |
-| 3 | Return shipping? | 0.556 | 1.0 | 0.767 | ✅ | 3.0s | Short, precise answer → perfect faithfulness | Saddlebag match 🫏 |
+| 2 | Digital products? | 0.620 | 1.0 | 0.786 | ✅ | 4.4s | Short, precise answer → perfect faithfulness | backpack match 🫏 |
+| 3 | Return shipping? | 0.556 | 1.0 | 0.767 | ✅ | 3.0s | Short, precise answer → perfect faithfulness | backpack match 🫏 |
 | 4 | Remote work policy? | 0.542 | 0.286 | 0.477 | ❌ | 37.5s | Out-of-scope → LLM rambled about PRs → 5 sentences flagged | The donkey 🐴 |
 | 5 | How long? | 0.504 | 1.0 | 0.851 | ✅ | 7.4s | Ambiguous → LLM correctly refused → high score | The donkey 🐴 |
 
@@ -672,7 +672,7 @@ In production, you'd track these over time. Think about what alerts you'd set.
 
 | What to monitor | Why | Alert threshold | Your 5b baseline | DE parallel | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
-| Average retrieval score (per day) | Drift detection — docs getting stale? | Alert if < 0.5 for 24h | Your avg: 0.561 (just above) | DynamoDB read capacity | Saddlebag fetch 🎒 |
+| Average retrieval score (per day) | Drift detection — docs getting stale? | Alert if < 0.5 for 24h | Your avg: 0.561 (just above) | DynamoDB read capacity | backpack fetch 🎒 |
 | Hallucination rate (per day) | Safety — AI making things up | Alert if > 10% (with LLM-as-judge) | Your rate: 40% (but most are false positives from heuristic evaluator) | Error rate on Lambda | The donkey 🐴 |
 | P99 latency | User experience | Alert if > 5s (cloud) or > 60s (local) | Your P99: ~40s (local CPU) | API Gateway latency | Stable door 🚪 |
 | Token cost per day | Budget | Alert if > $50/day | Your cost: $0 (local) | AWS cost alarms | Cargo unit ⚖️ |

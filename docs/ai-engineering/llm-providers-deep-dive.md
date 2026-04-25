@@ -39,7 +39,7 @@ In file #7 (`base.py`) you learned the **interface** — the abstract contract. 
 | What you'll learn | DE parallel | 🫏 Donkey |
 |---|---| --- |
 | How to call an LLM via boto3 (AWS), openai SDK (Azure), and httpx (Local) | How to call DynamoDB vs CosmosDB vs SQLite | The donkey 🐴 |
-| Three different API shapes for the same operation | Three different SDKs for the same storage pattern | Saddlebag check 🫏 |
+| Three different API shapes for the same operation | Three different SDKs for the same storage pattern | backpack check 🫏 |
 | How embedding models are called on each platform | How secondary indexes work on each platform | GPS stamp 📍 |
 | Cost differences between providers (including $0 local) | Cost differences between AWS, Azure, and local services | Feed bill 🌾 |
 
@@ -557,7 +557,7 @@ async def get_embeddings_batch(self, texts: list[str]) -> list[list[float]]:
 
 | | AWS Bedrock | Azure OpenAI | **Local Ollama** | 🫏 Donkey |
 |---|---|---|---| --- |
-| **42 chunks** | 42 API calls (42 network round trips) | **1 API call** (1 network round trip) | **1 API call** (localhost) | Saddlebag piece 📦 |
+| **42 chunks** | 42 API calls (42 network round trips) | **1 API call** (1 network round trip) | **1 API call** (localhost) | backpack piece 📦 |
 | **Latency** | 42 × ~50ms = ~2.1 seconds | ~200ms total | ~300ms total | Feed bill 🌾 |
 | **Why?** | Titan has no batch endpoint | OpenAI SDK accepts a list natively | Ollama `/api/embed` accepts a list natively | The donkey 🐴 |
 
@@ -671,7 +671,7 @@ USER: "What is the refund policy?"
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-- 🫏 **Donkey:** The donkey checks its saddlebag full of retrieved document chunks before answering — no guessing from memory.
+- 🫏 **Donkey:** The donkey checks its backpack full of retrieved document chunks before answering — no guessing from memory.
 
 ---
 

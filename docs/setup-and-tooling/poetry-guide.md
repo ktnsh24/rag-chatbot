@@ -35,7 +35,7 @@ Think of it as npm/yarn for Python.
 | Task | pip (old way) | Poetry (this project) | 🫏 Donkey |
 | --- | --- | --- | --- |
 | Define dependencies | `requirements.txt` (manual) | `pyproject.toml` (structured) | 🫏 On the route |
-| Lock exact versions | `pip freeze > requirements.txt` (fragile) | `poetry.lock` (automatic) | Saddlebag check 🫏 |
+| Lock exact versions | `pip freeze > requirements.txt` (fragile) | `poetry.lock` (automatic) | backpack check 🫏 |
 | Install dependencies | `pip install -r requirements.txt` | `poetry install` | Supply manifest 📜 |
 | Add a package | Edit requirements.txt + `pip install` | `poetry add <package>` | Supply manifest 📜 |
 | Remove a package | Edit requirements.txt + `pip uninstall` | `poetry remove <package>` | Supply manifest 📜 |
@@ -336,4 +336,4 @@ poetry cache clear --all pypi
 poetry install
 ```
 
-- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and saddle inspection checklist to find what went wrong.
+- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.

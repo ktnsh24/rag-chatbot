@@ -164,7 +164,7 @@ Bedrock has two APIs:
 We use `Converse` for chat (universal format) and `InvokeModel` for embeddings
 (because Converse doesn't support embedding models yet).
 
-- 🫏 **Donkey:** The donkey itself — it carries the question in, consults the saddlebag, and writes the answer on the way back.
+- 🫏 **Donkey:** The donkey itself — it carries the question in, consults the backpack, and writes the answer on the way back.
 
 ---
 
@@ -400,7 +400,7 @@ response = self._client.search(index=self.index_name, body=body)
 | Python method | OpenSearch action | When it happens | 🫏 Donkey |
 | --- | --- | --- | --- |
 | `client.indices.create()` | `PUT /index-name` | Once, at startup (creates the index) | 🫏 On the route |
-| `client.index()` | `PUT /index-name/_doc/id` | For each chunk during document ingestion | Saddlebag piece 📦 |
+| `client.index()` | `PUT /index-name/_doc/id` | For each chunk during document ingestion | backpack piece 📦 |
 | `client.indices.refresh()` | `POST /index-name/_refresh` | After ingestion (makes new docs searchable) | Pre-sort 📮 |
 | `client.search()` | `POST /index-name/_search` | Every chat query (vector similarity search) | GPS warehouse 🗺️ |
 | `client.delete_by_query()` | `POST /index-name/_delete_by_query` | When deleting a document | 🫏 On the route |

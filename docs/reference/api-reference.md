@@ -63,7 +63,7 @@ Returns the health status of the application and its connected services.
 }
 ```
 
-- 🫏 **Donkey:** Checking whether the donkey is awake, saddled, and ready to run before dispatching it.
+- 🫏 **Donkey:** Checking whether the donkey is awake, loaded up, and ready to run before dispatching it.
 
 ---
 
@@ -79,7 +79,7 @@ Send a question and get an answer grounded in your uploaded documents.
 |---|---|---|---|---| --- |
 | `message` | string | ✅ | — | The user's question | 🫏 On the route |
 | `session_id` | string | ❌ | auto-generated UUID | Conversation session ID for history | Trip log 📒 |
-| `max_sources` | integer | ❌ | `5` | Max source chunks to retrieve | Saddlebag piece 📦 |
+| `max_sources` | integer | ❌ | `5` | Max source chunks to retrieve | backpack piece 📦 |
 
 **Example Request:**
 
@@ -205,7 +205,7 @@ async with httpx.AsyncClient() as client:
 }
 ```
 
-- 🫏 **Donkey:** The parcels being ingested — split into saddlebag-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.
+- 🫏 **Donkey:** The parcels being ingested — split into backpack-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.
 
 ---
 
@@ -281,7 +281,7 @@ AND quality scores (retrieval, faithfulness, answer relevance, overall).
 |---|---|---|---|---| --- |
 | `question` | string | ✅ | — | The question to evaluate | Report card 📝 |
 | `expected_answer` | string | ❌ | `null` | Optional ground truth for comparison | 🫏 On the route |
-| `top_k` | integer | ❌ | `5` | Number of chunks to retrieve | Saddlebag piece 📦 |
+| `top_k` | integer | ❌ | `5` | Number of chunks to retrieve | backpack piece 📦 |
 
 **Example Request:**
 
@@ -316,7 +316,7 @@ AND quality scores (retrieval, faithfulness, answer relevance, overall).
 }
 ```
 
-- 🫏 **Donkey:** The donkey's report card — did it grab the right saddlebags and write an accurate answer?
+- 🫏 **Donkey:** The donkey's report card — did it grab the right backpacks and write an accurate answer?
 
 ---
 
@@ -422,7 +422,7 @@ GET /api/queries/failures?category=hallucination&limit=5&days=3
 
 **Response `503`** — Query logger not initialised (check `QUERY_LOG_ENABLED`).
 
-- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -507,21 +507,21 @@ rag_queries_failure_hallucination 5
 
 | Metric | Type | Description | 🫏 Donkey |
 |---|---|---| --- |
-| `rag_chat_requests_total` | counter | Total chat requests | Saddlebag check 🫏 |
-| `rag_chat_errors_total` | counter | Total chat errors | Saddlebag check 🫏 |
-| `rag_chat_error_rate_percent` | gauge | Current error rate % | Saddlebag check 🫏 |
-| `rag_chat_latency_p50/p95/p99_ms` | gauge | Latency percentiles | Saddlebag check 🫏 |
+| `rag_chat_requests_total` | counter | Total chat requests | backpack check 🫏 |
+| `rag_chat_errors_total` | counter | Total chat errors | backpack check 🫏 |
+| `rag_chat_error_rate_percent` | gauge | Current error rate % | backpack check 🫏 |
+| `rag_chat_latency_p50/p95/p99_ms` | gauge | Latency percentiles | backpack check 🫏 |
 | `rag_tokens_input_total` | counter | Total input tokens | Cargo unit ⚖️ |
 | `rag_tokens_output_total` | counter | Total output tokens | Cargo unit ⚖️ |
 | `rag_tokens_cost_usd_total` | counter | Estimated cost in USD | Cargo unit ⚖️ |
-| `rag_documents_ingested_total` | counter | Documents ingested | Saddlebag check 🫏 |
-| `rag_chunks_created_total` | counter | Chunks created | Saddlebag piece 📦 |
-| `rag_uptime_seconds` | gauge | App uptime | Saddlebag check 🫏 |
-| `rag_queries_total` | gauge | Queries logged today | Saddlebag check 🫏 |
-| `rag_queries_pass_rate_percent` | gauge | Pass rate today | Saddlebag check 🫏 |
-| `rag_queries_avg_retrieval` | gauge | Avg retrieval score | Saddlebag fetch 🎒 |
-| `rag_queries_avg_faithfulness` | gauge | Avg faithfulness score | Saddlebag check 🫏 |
-| `rag_queries_failure_{category}` | gauge | Failures by category | Saddlebag check 🫏 |
+| `rag_documents_ingested_total` | counter | Documents ingested | backpack check 🫏 |
+| `rag_chunks_created_total` | counter | Chunks created | backpack piece 📦 |
+| `rag_uptime_seconds` | gauge | App uptime | backpack check 🫏 |
+| `rag_queries_total` | gauge | Queries logged today | backpack check 🫏 |
+| `rag_queries_pass_rate_percent` | gauge | Pass rate today | backpack check 🫏 |
+| `rag_queries_avg_retrieval` | gauge | Avg retrieval score | backpack fetch 🎒 |
+| `rag_queries_avg_faithfulness` | gauge | Avg faithfulness score | backpack check 🫏 |
+| `rag_queries_failure_{category}` | gauge | Failures by category | backpack check 🫏 |
 
 - 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
 
@@ -559,7 +559,7 @@ All error responses follow a consistent format:
 | `500` | Internal server error | Hoof check 🔧 |
 | `503` | Service unavailable — a dependency is down | 🫏 On the route |
 
-- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and saddle inspection checklist to find what went wrong.
+- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
 
 ---
 

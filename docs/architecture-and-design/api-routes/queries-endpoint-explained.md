@@ -201,7 +201,7 @@ This is the same pattern as categorising pipeline failures:
 - `both_bad` → "cascade_failure" (bad data + bad logic)
 - `off_topic` → "schema_mismatch" (correct processing, wrong target)
 
-- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and saddle inspection checklist to find what went wrong.
+- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
 
 ---
 
@@ -227,7 +227,7 @@ Log files are stored as JSONL (one JSON record per line) in `data/query_logs/`,
 rotated daily. This is the same pattern as structured application logs — no
 database needed, just append-only files.
 
-- 🫏 **Donkey:** The warehouse robot dispatched to find the right saddlebag shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+- 🫏 **Donkey:** The warehouse robot dispatched to find the right backpack shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -256,7 +256,7 @@ database needed, just append-only files.
 
 This is the **data flywheel** in action: detect failure → diagnose → fix → verify.
 
-- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 

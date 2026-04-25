@@ -68,7 +68,7 @@ You may have used OpenSearch for log aggregation in your DE work. Here both plat
 | **Search operation** | `knn` query in JSON body | Query all + numpy cosine | `VectorizedQuery` object | GPS warehouse 🗺️ |
 | **Delete operation** | `delete_by_query()` (native) | GSI query + `batch_writer()` | Search + `delete_documents()` (two-step) | 🫏 On the route |
 | **Minimum cost** | **~$350/month** | **~$0/month** (free tier) | **~$75/month** (Basic), Free tier available | Feed bill 🌾 |
-| **Best for** | Production (>10K chunks) | Portfolio / dev (<10K chunks) | Production + dev | Saddlebag piece 📦 |
+| **Best for** | Production (>10K chunks) | Portfolio / dev (<10K chunks) | Production + dev | backpack piece 📦 |
 
 - 🫏 **Donkey:** Choosing which stable to work with — AWS Bedrock, Azure OpenAI, or a local Ollama barn each offer different donkeys at different prices.
 
@@ -424,9 +424,9 @@ The factory in `chain.py` creates the DynamoDB vector store instead of OpenSearc
 | | OpenSearch Serverless | DynamoDB Vector Store | 🫏 Donkey |
 | --- | --- | --- | --- |
 | Monthly cost | ~$350 | ~$0 (free tier) | Feed bill 🌾 |
-| Search speed | ~5ms (HNSW) | ~50ms (brute-force, 1K chunks) | Saddlebag piece 📦 |
+| Search speed | ~5ms (HNSW) | ~50ms (brute-force, 1K chunks) | backpack piece 📦 |
 | Search accuracy | Approximate (HNSW) | **Exact** (checks every vector) | GPS warehouse 🗺️ |
-| Max practical size | Millions of chunks | ~10,000 chunks | Saddlebag piece 📦 |
+| Max practical size | Millions of chunks | ~10,000 chunks | backpack piece 📦 |
 | New dependency | `opensearch-py` | **None** (boto3 already installed) | AWS search hub 🔍 |
 | Best for | Production at scale | Portfolio, development, testing | Test delivery 🧪 |
 
@@ -524,7 +524,7 @@ async def store_vectors(self, document_id, document_name, texts, embeddings, met
 | --- | --- | --- | --- |
 | **Approach** | Index one at a time in a loop | Build a list, then upload in batches | 🫏 On the route |
 | **API call** | `client.index()` per document | `upload_documents(batch)` per 1000 docs | Stable door 🚪 |
-| **23 chunks** | 23 API calls + 1 refresh | 1 API call (all 23 in one batch) | Saddlebag piece 📦 |
+| **23 chunks** | 23 API calls + 1 refresh | 1 API call (all 23 in one batch) | backpack piece 📦 |
 | **Refresh** | Manual `indices.refresh()` needed | Automatic (no refresh call) | 🫏 On the route |
 
 **DE parallel:** AWS OpenSearch's `index()` in a loop is like DynamoDB's `put_item()` in a loop. Azure's `upload_documents(batch)` is like DynamoDB's `batch_write_item()` but with a 1000-item limit instead of 25.
@@ -796,7 +796,7 @@ self._collection.upsert(
 | Aspect | AWS OpenSearch | Azure AI Search | **Local ChromaDB** | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
 | **Method** | `client.index()` per doc | `upload_documents(batch)` | `collection.upsert()` | 🫏 On the route |
-| **23 chunks** | 23 API calls + refresh | 1 API call (batch 1000) | **1 Python call** | Saddlebag piece 📦 |
+| **23 chunks** | 23 API calls + refresh | 1 API call (batch 1000) | **1 Python call** | backpack piece 📦 |
 | **Upsert** | Manual (index with same ID) | Manual (upload overwrites) | **Native** — `upsert()` | 🫏 On the route |
 | **Refresh** | Manual `indices.refresh()` | Automatic | **Instant** (in-memory) | Trip log 📒 |
 | **Network** | 23 HTTP requests | 1 HTTP request | **0 HTTP requests** | Stable door 🚪 |
@@ -854,7 +854,7 @@ results = self._collection.query(
 
 **ChromaDB is the most Pythonic** — no JSON to build, no typed query objects. Just pass the embedding and number of results.
 
-- 🫏 **Donkey:** The warehouse robot dispatched to find the right saddlebag shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+- 🫏 **Donkey:** The warehouse robot dispatched to find the right backpack shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -882,7 +882,7 @@ if results["ids"]:
 
 ChromaDB follows the same two-step pattern as Azure AI Search: find the IDs first, then delete by ID.
 
-- 🫏 **Donkey:** The parcels being ingested — split into saddlebag-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.
+- 🫏 **Donkey:** The parcels being ingested — split into backpack-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.
 
 ---
 
@@ -906,7 +906,7 @@ QUERY:
   All three return the same VectorSearchResult → sent to LLM as context
 ```
 
-- 🫏 **Donkey:** The donkey checks its saddlebag full of retrieved document chunks before answering — no guessing from memory.
+- 🫏 **Donkey:** The donkey checks its backpack full of retrieved document chunks before answering — no guessing from memory.
 
 ---
 

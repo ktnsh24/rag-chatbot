@@ -121,7 +121,7 @@ async def generate(
 | Parameter | What it is | What goes in | DE parallel | 🫏 Donkey |
 |---|---|---|---| --- |
 | `prompt` | The user's question + system instructions | `"What is the refund policy?"` | The SQL query | Delivery note 📋 |
-| `context` | Document chunks retrieved by vector search | `["Our refund policy allows...", "Returns must be..."]` | The tables the query runs against | Saddlebag piece 📦 |
+| `context` | Document chunks retrieved by vector search | `["Our refund policy allows...", "Returns must be..."]` | The tables the query runs against | backpack piece 📦 |
 | `temperature` | Randomness control (0.0 = deterministic, 1.0 = creative) | `0.1` | ❌ No DE parallel — pure AI concept | 🫏 On the route |
 
 ### How generation works end-to-end
@@ -172,7 +172,7 @@ Next word probabilities for "The refund policy ___":
 | Temperature | Behaviour | Use case | 🫏 Donkey |
 |---|---|---| --- |
 | 0.0 | Always picks the highest-probability word | Math, code generation | 🫏 On the route |
-| **0.1** | **Almost always the highest, tiny variation** | **RAG chatbots (this repo) — accuracy matters** | Saddlebag check 🫏 |
+| **0.1** | **Almost always the highest, tiny variation** | **RAG chatbots (this repo) — accuracy matters** | backpack check 🫏 |
 | 0.7 | Distributes across likely words | Creative writing, brainstorming | Stable address 🏷️ |
 | 1.0 | Nearly uniform distribution — anything goes | Experimental, often unusable | 🫏 On the route |
 
@@ -224,8 +224,8 @@ Think of a hash function — it takes any input and produces a fixed-size output
 | Property | Value | Why it matters | 🫏 Donkey |
 |---|---|---| --- |
 | Output size | Always 1024 floats (Titan) or 1536 (Azure) | Vector store must match this dimension | GPS warehouse 🗺️ |
-| Input can be any length | `"Hi"` or a 2000-char paragraph → same 1024 floats | The model compresses meaning into fixed-size | Saddlebag check 🫏 |
-| Runs at two different times | Ingestion (embed every chunk) AND query (embed the question) | Both must use the **same** model — mixing models = garbage results | Saddlebag piece 📦 |
+| Input can be any length | `"Hi"` or a 2000-char paragraph → same 1024 floats | The model compresses meaning into fixed-size | backpack check 🫏 |
+| Runs at two different times | Ingestion (embed every chunk) AND query (embed the question) | Both must use the **same** model — mixing models = garbage results | backpack piece 📦 |
 | Not reversible | Cannot convert [0.12, -0.45, ...] back to text | Like a hash — one-way function | 🫏 On the route |
 
 ### When `get_embedding()` runs in the RAG pipeline
@@ -303,7 +303,7 @@ USER: "What is the refund policy?"
 
 **Notice:** `base.py` is used in steps 1 AND 3. The same `BaseLLM` interface handles both embedding and generation — but they use **different underlying models** (Titan for embeddings, Claude for generation). You'll see this in `aws_bedrock.py` (file #8).
 
-- 🫏 **Donkey:** The donkey checks its saddlebag full of retrieved document chunks before answering — no guessing from memory.
+- 🫏 **Donkey:** The donkey checks its backpack full of retrieved document chunks before answering — no guessing from memory.
 
 ---
 

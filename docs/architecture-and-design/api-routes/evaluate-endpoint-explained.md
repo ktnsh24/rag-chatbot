@@ -102,14 +102,14 @@ Only `question` is required. `expected_answer` and `top_k` are optional.
 |---|---|---| --- |
 | `question` | string | The question you asked | 🫏 On the route |
 | `answer` | string | The LLM's generated answer | The donkey 🐴 |
-| `scores.retrieval` | float | Did vector search find relevant chunks? (0.0–1.0) | Saddlebag piece 📦 |
+| `scores.retrieval` | float | Did vector search find relevant chunks? (0.0–1.0) | backpack piece 📦 |
 | `scores.faithfulness` | float | Did the LLM stick to context? (0.0–1.0) | The donkey 🐴 |
 | `scores.answer_relevance` | float | Did the LLM answer the question? (0.0–1.0) | The donkey 🐴 |
-| `scores.overall` | float | Weighted average (ret 30% + faith 40% + rel 30%) | Saddlebag check 🫏 |
+| `scores.overall` | float | Weighted average (ret 30% + faith 40% + rel 30%) | backpack check 🫏 |
 | `scores.passed` | bool | Overall ≥ 0.7 | 🫏 On the route |
 | `scores.has_hallucination` | bool | True = answer has claims not in context | Memory drift ⚠️ |
-| `evaluation_notes` | list | Warnings (e.g. "⚠️ RETRIEVAL: Chunks have low relevance") | Saddlebag piece 📦 |
-| `sources_used` | int | How many chunks were retrieved | Saddlebag piece 📦 |
+| `evaluation_notes` | list | Warnings (e.g. "⚠️ RETRIEVAL: Chunks have low relevance") | backpack piece 📦 |
+| `sources_used` | int | How many chunks were retrieved | backpack piece 📦 |
 
 - 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
 
@@ -162,7 +162,7 @@ Aggregate: total, passed, failed, pass_rate, average_score
 | Score | Excellent | Good | Needs work | Broken | 🫏 Donkey |
 |---|---|---|---|---| --- |
 | **Retrieval** | ≥ 0.85 | ≥ 0.70 | ≥ 0.50 | < 0.50 | 🫏 On the route |
-| **Faithfulness** | ≥ 0.95 | ≥ 0.80 | ≥ 0.60 | < 0.60 | Saddlebag match 🫏 |
+| **Faithfulness** | ≥ 0.95 | ≥ 0.80 | ≥ 0.60 | < 0.60 | backpack match 🫏 |
 | **Answer Relevance** | ≥ 0.80 | ≥ 0.60 | ≥ 0.40 | < 0.40 | Right address 🎯 |
 | **Overall** | ≥ 0.85 | ≥ 0.70 | ≥ 0.50 | < 0.50 | 🫏 On the route |
 

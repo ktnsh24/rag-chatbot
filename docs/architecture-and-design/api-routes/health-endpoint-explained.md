@@ -150,7 +150,7 @@ async def health_check(request: Request) -> HealthResponse:
 | `@router.get("/health")` | Registers as GET, combined with `prefix="/api"` in main.py → becomes `GET /api/health` | Donkey check ✅ |
 | `response_model=HealthResponse` | Tells FastAPI to serialise the return value as this model, and to show it in Swagger | Donkey check ✅ |
 | `summary` and `description` | Shown in Swagger UI (`/docs`) — human-readable documentation | 🫏 On the route |
-| `request: Request` | Gives access to `request.app.state` where the RAG chain lives | Saddlebag check 🫏 |
+| `request: Request` | Gives access to `request.app.state` where the RAG chain lives | backpack check 🫏 |
 | `-> HealthResponse` | Type hint for your IDE — autocompletion on the response object | Donkey check ✅ |
 
 #### Step 1 — Check if the RAG chain is initialised
@@ -336,7 +336,7 @@ See [Pydantic Models Guide](../reference/pydantic-models.md) for full field deta
 | **Status values** | Usually `"ok"` / `"error"` | `healthy` / `degraded` / `unhealthy` | Donkey check ✅ |
 | **Pattern** | Check deps → worst status wins → return | Check deps → worst status wins → return | 🫏 On the route |
 | **Used by** | Kubernetes liveness/readiness probes | Same | Alternative stable 🏗️ |
-| **AI concepts** | None | None — it only checks if rag_chain is not None | Saddlebag check 🫏 |
+| **AI concepts** | None | None — it only checks if rag_chain is not None | backpack check 🫏 |
 
 **Bottom line:** If you can write a health check in shared-proxy, you can write this
 one. There's nothing new to learn here.

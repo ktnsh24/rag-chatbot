@@ -73,7 +73,7 @@ az account set --subscription "your-subscription-id"
 
 | Variable | Default | Description | 🫏 Donkey |
 |---|---|---| --- |
-| `project_name` | `"rag-chatbot"` | Prefix for all resource names | Saddlebag check 🫏 |
+| `project_name` | `"rag-chatbot"` | Prefix for all resource names | backpack check 🫏 |
 | `environment` | `"dev"` | Environment tag | 🫏 On the route |
 | `aws_region` | `"eu-west-1"` | AWS region | AWS depot 🏭 |
 
@@ -144,8 +144,8 @@ The ECS task role grants least-privilege access:
 | Resource | Purpose | Free Tier? | 🫏 Donkey |
 |---|---|---| --- |
 | `azurerm_resource_group` | Resource container | ✅ Free | Stable stall 🐎 |
-| `azurerm_storage_account` | Document storage | ✅ 5 GB LRS | Saddlebag check 🫏 |
-| `azurerm_storage_container` | Blob container | ✅ Included | Saddlebag check 🫏 |
+| `azurerm_storage_account` | Document storage | ✅ 5 GB LRS | backpack check 🫏 |
+| `azurerm_storage_container` | Blob container | ✅ Included | backpack check 🫏 |
 | `azurerm_cosmosdb_account` | Conversation history | ✅ 1000 RU/s free | Azure trip-log 📒 |
 | `azurerm_cosmosdb_sql_database` | Database | ✅ Included | Azure trip-log 📒 |
 | `azurerm_cosmosdb_sql_container` | Container | ✅ Included | Azure trip-log 📒 |
@@ -155,7 +155,7 @@ The ECS task role grants least-privilege access:
 
 | Variable | Default | Description | 🫏 Donkey |
 |---|---|---| --- |
-| `project_name` | `"ragchatbot"` | Prefix for resource names | Saddlebag check 🫏 |
+| `project_name` | `"ragchatbot"` | Prefix for resource names | backpack check 🫏 |
 | `environment` | `"dev"` | Environment tag | 🫏 On the route |
 | `location` | `"westeurope"` | Azure region | Azure hub ☁️ |
 
@@ -311,7 +311,7 @@ terraform destroy -var="environment=dev"
 
 | Resource | Monthly Cost | 🫏 Donkey |
 |---|---| --- |
-| Storage Account (5 GB LRS) | ~$0.10 | Saddlebag check 🫏 |
+| Storage Account (5 GB LRS) | ~$0.10 | backpack check 🫏 |
 | Cosmos DB (serverless, free tier) | $0.00 | Azure trip-log 📒 |
 | Container Registry (Basic) | ~$4.20 | Stable address 🏷️ |
 | Resource Group | $0.00 | Free hay 🌿 |
@@ -350,4 +350,4 @@ If a previous `terraform apply` was interrupted:
 terraform force-unlock <LOCK_ID>
 ```
 
-- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and saddle inspection checklist to find what went wrong.
+- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.

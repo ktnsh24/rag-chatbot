@@ -33,10 +33,10 @@ Every `/api/chat` request is logged as a structured JSONL record in `logs/querie
 |---|---| --- |
 | `request_id` | Unique request identifier | 🫏 On the route |
 | `question` | What the user asked | 🫏 On the route |
-| `chunks` | Retrieved documents with relevance scores | Saddlebag piece 📦 |
+| `chunks` | Retrieved documents with relevance scores | backpack piece 📦 |
 | `answer` | LLM response | The donkey 🐴 |
-| `retrieval_score` | How relevant the chunks were (0–1) | Saddlebag piece 📦 |
-| `faithfulness_score` | Did the answer stick to the chunks? (0–1) | Saddlebag piece 📦 |
+| `retrieval_score` | How relevant the chunks were (0–1) | backpack piece 📦 |
+| `faithfulness_score` | Did the answer stick to the chunks? (0–1) | backpack piece 📦 |
 | `answer_relevance_score` | Did the answer address the question? (0–1) | Right address 🎯 |
 | `failure_category` | Triage: `none`, `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`, `marginal` | Memory drift ⚠️ |
 | `latency_ms` | Total response time | Feed bill 🌾 |
@@ -45,9 +45,9 @@ Every `/api/chat` request is logged as a structured JSONL record in `logs/querie
 
 | Category | Root Cause | Fix | 🫏 Donkey |
 |---|---|---| --- |
-| `bad_retrieval` | Wrong chunks returned | Better chunking, more documents, tune top_k | Saddlebag piece 📦 |
+| `bad_retrieval` | Wrong chunks returned | Better chunking, more documents, tune top_k | backpack piece 📦 |
 | `hallucination` | Good chunks, LLM fabricated | Better system prompt, lower temperature | The donkey 🐴 |
-| `both_bad` | Wrong chunks AND fabrication | Both fixes above | Saddlebag piece 📦 |
+| `both_bad` | Wrong chunks AND fabrication | Both fixes above | backpack piece 📦 |
 | `off_topic` | Question outside document scope | Add documents or refuse gracefully | 🫏 On the route |
 | `marginal` | Borderline scores | Monitor, may need prompt tuning | Delivery note 📋 |
 
@@ -60,7 +60,7 @@ Every `/api/chat` request is logged as a structured JSONL record in `logs/querie
 
 **Files:** `src/monitoring/query_logger.py`, `src/api/routes/queries.py`
 
-- 🫏 **Donkey:** The warehouse robot dispatched to find the right saddlebag shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+- 🫏 **Donkey:** The warehouse robot dispatched to find the right backpack shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -72,26 +72,26 @@ Every `/api/chat` request is logged as a structured JSONL record in `logs/querie
 
 | Metric | Type | Description | 🫏 Donkey |
 |---|---|---| --- |
-| `rag_chat_requests_total` | counter | Total chat requests | Saddlebag check 🫏 |
-| `rag_chat_errors_total` | counter | Total errors | Saddlebag check 🫏 |
-| `rag_chat_error_rate_percent` | gauge | Current error rate | Saddlebag check 🫏 |
-| `rag_chat_latency_p50/p95/p99_ms` | gauge | Latency percentiles | Saddlebag check 🫏 |
+| `rag_chat_requests_total` | counter | Total chat requests | backpack check 🫏 |
+| `rag_chat_errors_total` | counter | Total errors | backpack check 🫏 |
+| `rag_chat_error_rate_percent` | gauge | Current error rate | backpack check 🫏 |
+| `rag_chat_latency_p50/p95/p99_ms` | gauge | Latency percentiles | backpack check 🫏 |
 | `rag_tokens_input_total` | counter | Input tokens consumed | Cargo unit ⚖️ |
 | `rag_tokens_output_total` | counter | Output tokens generated | Cargo unit ⚖️ |
 | `rag_tokens_cost_usd_total` | counter | Estimated cost | Cargo unit ⚖️ |
-| `rag_documents_ingested_total` | counter | Documents ingested | Saddlebag check 🫏 |
-| `rag_chunks_created_total` | counter | Chunks created | Saddlebag piece 📦 |
-| `rag_uptime_seconds` | gauge | Application uptime | Saddlebag check 🫏 |
+| `rag_documents_ingested_total` | counter | Documents ingested | backpack check 🫏 |
+| `rag_chunks_created_total` | counter | Chunks created | backpack piece 📦 |
+| `rag_uptime_seconds` | gauge | Application uptime | backpack check 🫏 |
 
 **Query quality metrics (from QueryLogger):**
 
 | Metric | Type | Description | 🫏 Donkey |
 |---|---|---| --- |
-| `rag_queries_total` | gauge | Queries logged today | Saddlebag check 🫏 |
-| `rag_queries_pass_rate_percent` | gauge | Evaluation pass rate | Saddlebag check 🫏 |
-| `rag_queries_avg_retrieval` | gauge | Avg retrieval score | Saddlebag fetch 🎒 |
-| `rag_queries_avg_faithfulness` | gauge | Avg faithfulness score | Saddlebag check 🫏 |
-| `rag_queries_failure_{category}` | gauge | Failures by category | Saddlebag check 🫏 |
+| `rag_queries_total` | gauge | Queries logged today | backpack check 🫏 |
+| `rag_queries_pass_rate_percent` | gauge | Evaluation pass rate | backpack check 🫏 |
+| `rag_queries_avg_retrieval` | gauge | Avg retrieval score | backpack fetch 🎒 |
+| `rag_queries_avg_faithfulness` | gauge | Avg faithfulness score | backpack check 🫏 |
+| `rag_queries_failure_{category}` | gauge | Failures by category | backpack check 🫏 |
 
 **Prometheus scrape config:**
 
@@ -119,7 +119,7 @@ OpenTelemetry is wired up in `src/monitoring/tracing.py`. When enabled, every HT
 |---|---|---| --- |
 | `OTEL_ENABLED` | `false` | Enable OpenTelemetry tracing | 🫏 On the route |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | — | OTLP collector endpoint | Stable door 🚪 |
-| `OTEL_SERVICE_NAME` | `rag-chatbot` | Service name in traces | Saddlebag check 🫏 |
+| `OTEL_SERVICE_NAME` | `rag-chatbot` | Service name in traces | backpack check 🫏 |
 
 **What's traced:**
 - FastAPI request/response (via FastAPIInstrumentor)
@@ -137,10 +137,10 @@ OpenTelemetry is wired up in `src/monitoring/tracing.py`. When enabled, every HT
 
 | Scenario | Metric | Threshold | 🫏 Donkey |
 |---|---|---| --- |
-| System errors | `rag_chat_error_rate_percent` | > 50% for 5 min | Saddlebag check 🫏 |
-| Slow responses | `rag_chat_latency_p95_ms` | > 10,000ms for 5 min | Saddlebag check 🫏 |
-| Quality drop | `rag_queries_pass_rate_percent` | < 60% for 1 hour | Saddlebag check 🫏 |
-| Hallucination spike | `rag_queries_failure_hallucination` | > 10 in 1 hour | Saddlebag check 🫏 |
+| System errors | `rag_chat_error_rate_percent` | > 50% for 5 min | backpack check 🫏 |
+| Slow responses | `rag_chat_latency_p95_ms` | > 10,000ms for 5 min | backpack check 🫏 |
+| Quality drop | `rag_queries_pass_rate_percent` | < 60% for 1 hour | backpack check 🫏 |
+| Hallucination spike | `rag_queries_failure_hallucination` | > 10 in 1 hour | backpack check 🫏 |
 | Cost runaway | `rag_tokens_cost_usd_total` | > daily budget | Cargo unit ⚖️ |
 
 - 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
@@ -167,4 +167,4 @@ OpenTelemetry is wired up in `src/monitoring/tracing.py`. When enabled, every HT
 | **Dashboard** | Azure Portal → Monitor → Workbooks | Azure hub ☁️ |
 | **Alerts** | Azure Monitor → Alerts → create rule | Azure hub ☁️ |
 
-- 🫏 **Donkey:** Loading up the donkey for the first time — installing the saddle, attaching the saddlebags, and confirming the GPS coordinates before the first run.
+- 🫏 **Donkey:** Loading up the donkey for the first time — installing the bag, attaching the backpacks, and confirming the GPS coordinates before the first run.

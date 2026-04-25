@@ -184,8 +184,8 @@ yourself — Pydantic does it.
 | `settings = get_settings()` | Load config (for default `top_k`, cloud provider, etc.) | 🫏 On the route |
 | `request_id = uuid4()` | Generate unique ID for this request (for log tracing) | 🫏 On the route |
 | `body.question[:100]` | Log only first 100 chars of question (privacy + log size) | 🫏 On the route |
-| `getattr(..., None)` | Safely get rag_chain — returns None if it failed to init | Saddlebag check 🫏 |
-| `raise HTTPException(500)` | If rag_chain is None, tell the user the system is broken | Saddlebag check 🫏 |
+| `getattr(..., None)` | Safely get rag_chain — returns None if it failed to init | backpack check 🫏 |
+| `raise HTTPException(500)` | If rag_chain is None, tell the user the system is broken | backpack check 🫏 |
 
 #### 4. Determine session_id and top_k
 
@@ -500,7 +500,7 @@ class VectorSearchResult:
 | --- | --- | --- |
 | `WHERE title = 'refund policy'` | Find vectors similar to embed("refund policy") | GPS warehouse 🗺️ |
 | Exact string match | Meaning match | 🫏 On the route |
-| Returns rows where title equals exactly | Returns chunks that are *about* refunds | Saddlebag piece 📦 |
+| Returns rows where title equals exactly | Returns chunks that are *about* refunds | backpack piece 📦 |
 | Misses "return procedure" (different words) | Finds "return procedure" (same meaning!) | 🫏 On the route |
 
 **This is the key breakthrough of RAG:** It finds relevant documents by meaning, not
@@ -874,7 +874,7 @@ sources = [
 | --- | --- | --- | --- |
 | `document_name` | `"refund-policy.pdf"` | User can verify *which* document was used | 🫏 On the route |
 | `chunk_text` | `"Refunds are processed within 14 days..."` | User can verify the LLM didn't hallucinate | The donkey 🐴 |
-| `relevance_score` | `0.95` | How confident we are this chunk is relevant | Saddlebag piece 📦 |
+| `relevance_score` | `0.95` | How confident we are this chunk is relevant | backpack piece 📦 |
 | `page_number` | `3` | User can go find the original in the PDF | 🫏 On the route |
 
 **Why sources matter — the anti-hallucination pattern:**
@@ -1053,7 +1053,7 @@ What does each role see when they look at this endpoint?
 | Error scenario | What happens | HTTP status | 🫏 Donkey |
 | --- | --- | --- | --- |
 | Invalid question (empty or >5000 chars) | Pydantic rejects it before the route runs | `422` | Stable door 🚪 |
-| RAG chain not initialised | Route returns error immediately (no AI call) | `500` | Saddlebag check 🫏 |
+| RAG chain not initialised | Route returns error immediately (no AI call) | `500` | backpack check 🫏 |
 | Embedding API fails (Bedrock / Azure OpenAI / Ollama down) | Exception in Step 1 → caught by try/except | `500` | The donkey 🐴 |
 | Vector store empty (no documents) | Step 2 returns [] → friendly "upload docs first" message | `200` (not an error) | GPS warehouse 🗺️ |
 | LLM API fails (Bedrock / Azure OpenAI / Ollama down) | Exception in Step 4 → caught by try/except | `500` | The donkey 🐴 |

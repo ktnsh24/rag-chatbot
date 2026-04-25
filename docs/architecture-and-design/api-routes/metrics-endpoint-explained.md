@@ -113,27 +113,27 @@ async def prometheus_metrics(request: Request) -> Response:
 
 | Metric | Type | What it measures | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `rag_chat_requests_total` | counter | Total chat requests processed | Saddlebag check 🫏 |
-| `rag_chat_errors_total` | counter | Total chat request errors | Saddlebag check 🫏 |
+| `rag_chat_requests_total` | counter | Total chat requests processed | backpack check 🫏 |
+| `rag_chat_errors_total` | counter | Total chat request errors | backpack check 🫏 |
 | `rag_tokens_input_total` | counter | Total input tokens consumed | Cargo unit ⚖️ |
 | `rag_tokens_output_total` | counter | Total output tokens generated | Cargo unit ⚖️ |
-| `rag_documents_uploaded_total` | counter | Total documents ingested | Saddlebag check 🫏 |
-| `rag_queries_total` | counter | Total evaluated queries (from query logs) | Saddlebag check 🫏 |
-| `rag_queries_passed_total` | counter | Queries that passed evaluation | Saddlebag check 🫏 |
-| `rag_queries_failed_total` | counter | Queries that failed evaluation | Saddlebag check 🫏 |
+| `rag_documents_uploaded_total` | counter | Total documents ingested | backpack check 🫏 |
+| `rag_queries_total` | counter | Total evaluated queries (from query logs) | backpack check 🫏 |
+| `rag_queries_passed_total` | counter | Queries that passed evaluation | backpack check 🫏 |
+| `rag_queries_failed_total` | counter | Queries that failed evaluation | backpack check 🫏 |
 
 ### Gauges (point-in-time values)
 
 | Metric | Type | What it measures | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `rag_chat_latency_p50_ms` | gauge | Median chat response time | Saddlebag check 🫏 |
-| `rag_chat_latency_p95_ms` | gauge | 95th percentile chat response time | Saddlebag check 🫏 |
-| `rag_chat_latency_p99_ms` | gauge | 99th percentile chat response time | Saddlebag check 🫏 |
-| `rag_query_pass_rate` | gauge | Current pass rate (0.0–1.0) | Saddlebag check 🫏 |
-| `rag_query_avg_retrieval` | gauge | Average retrieval score | Saddlebag fetch 🎒 |
-| `rag_query_avg_faithfulness` | gauge | Average faithfulness score | Saddlebag check 🫏 |
-| `rag_failures_bad_retrieval` | gauge | Count of bad_retrieval failures (last 24h) | Saddlebag check 🫏 |
-| `rag_failures_hallucination` | gauge | Count of hallucination failures (last 24h) | Saddlebag check 🫏 |
+| `rag_chat_latency_p50_ms` | gauge | Median chat response time | backpack check 🫏 |
+| `rag_chat_latency_p95_ms` | gauge | 95th percentile chat response time | backpack check 🫏 |
+| `rag_chat_latency_p99_ms` | gauge | 99th percentile chat response time | backpack check 🫏 |
+| `rag_query_pass_rate` | gauge | Current pass rate (0.0–1.0) | backpack check 🫏 |
+| `rag_query_avg_retrieval` | gauge | Average retrieval score | backpack fetch 🎒 |
+| `rag_query_avg_faithfulness` | gauge | Average faithfulness score | backpack check 🫏 |
+| `rag_failures_bad_retrieval` | gauge | Count of bad_retrieval failures (last 24h) | backpack check 🫏 |
+| `rag_failures_hallucination` | gauge | Count of hallucination failures (last 24h) | backpack check 🫏 |
 
 ### Why counters vs gauges?
 
@@ -160,7 +160,7 @@ scrape_configs:
 For AWS ECS or Azure Container Apps, replace `localhost:8000` with the service
 discovery target.
 
-- 🫏 **Donkey:** Adjusting the saddle fit and route preferences so the donkey delivers to the right address every time.
+- 🫏 **Donkey:** Adjusting the bag fit and route preferences so the donkey delivers to the right address every time.
 
 ---
 
@@ -170,12 +170,12 @@ With the metrics above, you can build panels for:
 
 | Panel | PromQL query | What it shows | 🫏 Donkey |
 | --- | --- | --- | --- |
-| Request rate | `rate(rag_chat_requests_total[5m])` | Requests per second | Saddlebag check 🫏 |
-| Error rate | `rate(rag_chat_errors_total[5m]) / rate(rag_chat_requests_total[5m])` | Percentage of errors | Saddlebag check 🫏 |
-| Latency (p95) | `rag_chat_latency_p95_ms` | Response time for slow requests | Saddlebag check 🫏 |
-| Pass rate | `rag_query_pass_rate` | AI quality over time | Saddlebag check 🫏 |
+| Request rate | `rate(rag_chat_requests_total[5m])` | Requests per second | backpack check 🫏 |
+| Error rate | `rate(rag_chat_errors_total[5m]) / rate(rag_chat_requests_total[5m])` | Percentage of errors | backpack check 🫏 |
+| Latency (p95) | `rag_chat_latency_p95_ms` | Response time for slow requests | backpack check 🫏 |
+| Pass rate | `rag_query_pass_rate` | AI quality over time | backpack check 🫏 |
 | Token burn | `rate(rag_tokens_output_total[1h])` | Output tokens per hour (cost proxy) | Cargo unit ⚖️ |
-| Failure breakdown | `rag_failures_bad_retrieval` / `rag_failures_hallucination` | Which failure types dominate | Saddlebag check 🫏 |
+| Failure breakdown | `rag_failures_bad_retrieval` / `rag_failures_hallucination` | Which failure types dominate | backpack check 🫏 |
 
 ### Alert rules
 

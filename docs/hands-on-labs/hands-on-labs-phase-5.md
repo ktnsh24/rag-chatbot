@@ -32,7 +32,7 @@ production** — because you can't fix what you can't see.
 
 | Metric / Concept | Donkey version | What it really measures | How it's calculated | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| **query log** | A **delivery diary** that records every trip: what the customer asked, which shelf the donkey visited, which packages it picked, what it delivered, and whether the customer was happy. One line per delivery. You read the diary to find patterns. | JSONL file where each line is a structured record: question, retrieved chunks, answer, scores, failure category, timestamp. | Not calculated — it's a structured append. Each request writes one JSON line: `{"question": ..., "answer": ..., "scores": {"retrieval": 0.62, "faithfulness": 0.75, ...}, "failure_category": "none", "timestamp": ...}`. Query with `jq` or load into pandas. | Saddlebag piece 📦 |
+| **query log** | A **delivery diary** that records every trip: what the customer asked, which shelf the donkey visited, which packages it picked, what it delivered, and whether the customer was happy. One line per delivery. You read the diary to find patterns. | JSONL file where each line is a structured record: question, retrieved chunks, answer, scores, failure category, timestamp. | Not calculated — it's a structured append. Each request writes one JSON line: `{"question": ..., "answer": ..., "scores": {"retrieval": 0.62, "faithfulness": 0.75, ...}, "failure_category": "none", "timestamp": ...}`. Query with `jq` or load into pandas. | backpack piece 📦 |
 | **failure triage** | The diary flags bad deliveries with a **reason code**: `bad_retrieval` = donkey went to the wrong shelf. `hallucination` = donkey added things from its pocket. `both_bad` = wrong shelf AND added extras. `off_topic` = right shelf, honest delivery, but not what the customer wanted. `marginal` = borderline — no single thing was terrible. | Automatic categorisation of failed queries based on which score dimensions fell below threshold. | Rule-based classification on failed queries (overall < 0.70): if retrieval < 0.50 → `bad_retrieval`. If faithfulness < 0.50 → `hallucination`. If both → `both_bad`. If answer_relevance < 0.50 → `off_topic`. Else → `marginal`. Count per category to prioritize fixes. | Memory drift ⚠️ |
 | **pass rate** | Out of 100 deliveries today, how many were **satisfactory** (overall >= 0.70)? If 87 passed — 87% pass rate. If it was 92% yesterday and 75% today — something broke. | Percentage of evaluated queries that meet the quality threshold. The single most important production health metric. | `queries_with_overall_≥_0.70 / total_queries × 100`. E.g. 87 pass out of 100 → **87% pass rate**. Track daily. If it drops >5% day-over-day → investigate immediately. | Feed bill 🌾 |
 | **Prometheus counter** | A tally board on the warehouse wall: "Total deliveries: 142. Total errors: 3. Total hay consumed: 4,500 bales." Counters only go UP — you never un-deliver a package. Prometheus calculates the *rate* for you. | Monotonically increasing metrics: total requests, total errors, total tokens. Prometheus computes `rate()` from the delta. | `counter.inc()` on each event. Prometheus scrapes the value periodically. Rate = `delta(counter_value) / delta(time)`. E.g. counter goes from 100 to 142 in 60s → `rate = 42/60 = 0.7 req/s`. Use `rate()` in PromQL, never raw counter values. | Cargo unit ⚖️ |
@@ -110,10 +110,10 @@ cat logs/queries/$(date +%Y-%m-%d).jsonl | python -m json.tool
 | Field | What it tells you | 🫏 Donkey |
 |---|---| --- |
 | `question` | What the user asked | 🫏 On the route |
-| `chunks` | Which documents were retrieved + relevance scores | Saddlebag piece 📦 |
+| `chunks` | Which documents were retrieved + relevance scores | backpack piece 📦 |
 | `answer` | What the LLM responded | The donkey 🐴 |
-| `retrieval_score` | How relevant the retrieved chunks were (0–1) | Saddlebag piece 📦 |
-| `faithfulness_score` | Did the answer stick to the chunks? (0–1) | Saddlebag piece 📦 |
+| `retrieval_score` | How relevant the retrieved chunks were (0–1) | backpack piece 📦 |
+| `faithfulness_score` | Did the answer stick to the chunks? (0–1) | backpack piece 📦 |
 | `answer_relevance_score` | Did the answer address the question? (0–1) | Right address 🎯 |
 | `failure_category` | `none`, `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`, `marginal` | Memory drift ⚠️ |
 | `latency_ms` | How long the full pipeline took | Robot hand 🤖 |
@@ -123,7 +123,7 @@ cat logs/queries/$(date +%Y-%m-%d).jsonl | python -m json.tool
 | Question | Expected failure_category | 🫏 Donkey |
 |---|---| --- |
 | "What is the refund policy?" | `none` (scores all high) | 🫏 On the route |
-| "What is the capital of Mongolia?" | `bad_retrieval` or `off_topic` (no relevant chunks) | Saddlebag piece 📦 |
+| "What is the capital of Mongolia?" | `bad_retrieval` or `off_topic` (no relevant chunks) | backpack piece 📦 |
 | "How long?" | `marginal` (ambiguous, low retrieval) | 🫏 On the route |
 
 ### Experiment 14b — Query the failure API

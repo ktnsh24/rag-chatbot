@@ -16,7 +16,7 @@
 | 3 | Claude Sonnet 4.6 | ❌ Off | ✅ On (crashing) | 13 | 45 | 58 | 22% | The donkey 🐴 |
 | **4** | **Claude Sonnet 4.6** | **✅ On** | **❌ Off** | **25** | **33** | **58** | **43%** | The donkey 🐴 |
 
-- 🫏 **Donkey:** The head groom's final checklist — all trade-offs weighed, best saddle chosen, donkey ready to dispatch.
+- 🫏 **Donkey:** The head groom's final checklist — all trade-offs weighed, best bag chosen, donkey ready to dispatch.
 
 ## 🐴 The Donkey Analogy
 
@@ -159,19 +159,19 @@ Most remaining failures fall into these categories:
 | Category | Examples | Root Cause | 🫏 Donkey |
 |----------|---------|-----------| --- |
 | **Guardrails** | lab-4a (all), lab-9a/b/c | Guardrail tests need AWS Comprehend subscription | Test delivery 🧪 |
-| **Low faithfulness** | lab-2c, lab-5b_q3/q5 | Model hallucinates or adds context not in chunks | Saddlebag piece 📦 |
+| **Low faithfulness** | lab-2c, lab-5b_q3/q5 | Model hallucinates or adds context not in chunks | backpack piece 📦 |
 | **Data mismatch** | lab-1c, lab-6a | Golden dataset expects "14 days" but document says "5-7 days" | Test delivery 🧪 |
 | **Reranker labs** | lab-9, lab-10 (some) | Reranker was disabled for this run | Quality sort 📊 |
 | **Bulk ops** | lab-14, lab-15, lab-16 | Multi-document operations with timing issues | 🫏 On the route |
 
-- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and saddle inspection checklist to find what went wrong.
+- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
 
 ## Code Changes Summary
 
 | File | Change | Impact | 🫏 Donkey |
 |------|--------|--------| --- |
 | `src/vectorstore/aws_dynamodb.py` | Min-max score normalization | ret: 0.03 → 0.33+ | AWS depot 🏭 |
-| `src/rag/reranker.py` | `safe_top_k = min(top_k, len(sources))` | Prevents reranker crash | Saddlebag check 🫏 |
+| `src/rag/reranker.py` | `safe_top_k = min(top_k, len(sources))` | Prevents reranker crash | backpack check 🫏 |
 | `src/llm/aws_bedrock.py` | Removed `topP` from inferenceConfig | Fixes Sonnet 4.6 error | The donkey 🐴 |
 | `infra/aws/iam.tf` | Fixed IAM tag values (removed em-dashes) | Terraform apply succeeds | Stable blueprint 🏗️ |
 | `infra/aws/s3.tf` | Added account ID to bucket name | S3 global uniqueness | Stable blueprint 🏗️ |
@@ -179,7 +179,7 @@ Most remaining failures fall into these categories:
 | `src/rag/chain.py` | Skip OpenSearch when DynamoDB selected | Prevents empty endpoint error | AWS search hub 🔍 |
 | `scripts/run_cloud_labs_personal.sh` | Credential isolation + PYTHONDONTWRITEBYTECODE | Safe AWS usage | AWS depot 🏭 |
 
-- 🫏 **Donkey:** The head groom's final checklist — all trade-offs weighed, best saddle chosen, donkey ready to dispatch.
+- 🫏 **Donkey:** The head groom's final checklist — all trade-offs weighed, best bag chosen, donkey ready to dispatch.
 
 ## Cost Estimate
 

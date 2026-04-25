@@ -145,7 +145,7 @@ Creates:
 | --- | --- | --- | --- | --- |
 | 1 | Resource Group | `azurerm_resource_group` | Logical container for all resources | Stable stall 🐎 |
 | 2 | Storage Account | `azurerm_storage_account` | Blob storage for documents | Parcel shelf 📦 |
-| 3 | Storage Container | `azurerm_storage_container` | Container within the storage account | Saddlebag check 🫏 |
+| 3 | Storage Container | `azurerm_storage_container` | Container within the storage account | backpack check 🫏 |
 | 4 | Cosmos DB Account | `azurerm_cosmosdb_account` | NoSQL database (serverless) | Azure trip-log 📒 |
 | 5 | Cosmos DB Database | `azurerm_cosmosdb_sql_database` | Database within the account | Azure trip-log 📒 |
 | 6 | Cosmos DB Container | `azurerm_cosmosdb_sql_container` | Table with partition key + TTL | Azure trip-log 📒 |

@@ -61,7 +61,7 @@ The DAG doesn't do the work —              The chain doesn't do the work —
 
 **Key insight:** Just as an Airflow DAG is useless without operators, `RAGChain` is useless without its components. It coordinates the workflow — it doesn't implement any AI logic itself.
 
-- 🫏 **Donkey:** The donkey checks its saddlebag full of retrieved document chunks before answering — no guessing from memory.
+- 🫏 **Donkey:** The donkey checks its backpack full of retrieved document chunks before answering — no guessing from memory.
 
 ---
 
@@ -90,7 +90,7 @@ The class takes three dependencies:
 - **`vector_store`** — any class implementing `BaseVectorStore` (store + search)
 - **`settings`** — the Pydantic Settings object with all configuration
 
-- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the saddlebags are loaded, and which route it takes to the customer.
+- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the backpacks are loaded, and which route it takes to the customer.
 
 ---
 
@@ -264,13 +264,13 @@ CSV file → [Extract] → raw rows → [Transform] → cleaned rows → [Load] 
 | Ingestion step | DE parallel | What it does | 🫏 Donkey |
 |---|---|---| --- |
 | `read_document()` | `pandas.read_csv()` | Extracts raw text from PDF/TXT | 🫏 On the route |
-| `chunk_document()` | Data partitioning / windowing | Splits text into 500-char windows with 50-char overlap | Saddlebag piece 📦 |
-| `get_embeddings_batch()` | `df.apply(transform_fn)` | Converts each chunk to a 1536-dim vector | Saddlebag piece 📦 |
+| `chunk_document()` | Data partitioning / windowing | Splits text into 500-char windows with 50-char overlap | backpack piece 📦 |
+| `get_embeddings_batch()` | `df.apply(transform_fn)` | Converts each chunk to a 1536-dim vector | backpack piece 📦 |
 | `store_vectors()` | `df.to_sql(warehouse)` | Indexes vectors for similarity search | GPS warehouse 🗺️ |
 
 **Why batch embeddings?** One API call for 50 chunks is faster and cheaper than 50 separate calls. This is the same principle as batch `INSERT` vs row-by-row `INSERT`.
 
-- 🫏 **Donkey:** Post office pre-sorting: mail is split into saddlebag-sized chunks, stamped with GPS coordinates (embeddings), and shelved in the warehouse before the donkey ever arrives.
+- 🫏 **Donkey:** Post office pre-sorting: mail is split into backpack-sized chunks, stamped with GPS coordinates (embeddings), and shelved in the warehouse before the donkey ever arrives.
 
 ---
 
@@ -353,7 +353,7 @@ async def query(
 | LLM generate | Apply business logic / stored procedure | Transform data into answer | The donkey 🐴 |
 | Build response | Format as API response | Package result for caller | Stable door 🚪 |
 
-- 🫏 **Donkey:** The warehouse robot dispatched to find the right saddlebag shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+- 🫏 **Donkey:** The warehouse robot dispatched to find the right backpack shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -474,7 +474,7 @@ CHROMA_PERSIST_DIRECTORY=./data/chromadb
 # 3. pip install chromadb
 ```
 
-- 🫏 **Donkey:** Adjusting the saddle fit and route preferences so the donkey delivers to the right address every time.
+- 🫏 **Donkey:** Adjusting the bag fit and route preferences so the donkey delivers to the right address every time.
 
 ---
 
@@ -490,7 +490,7 @@ CHROMA_PERSIST_DIRECTORY=./data/chromadb
 | Zero cost in metrics | Metrics show $0.000 | Using local provider | Expected — local is free | Feed bill 🌾 |
 | Stale embeddings | Old documents still returned | Vectors not deleted after re-upload | Implement delete + re-ingest flow | Pre-sort 📮 |
 
-- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and saddle inspection checklist to find what went wrong.
+- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
 
 ---
 

@@ -38,7 +38,7 @@
 | LLM (pay-per-use) | ~$2–5 | ~$2–5 | Based on ~100 queries/day | The donkey 🐴 |
 | Embeddings | ~$0.10 | ~$0.10 | Very cheap | Free hay 🌿 |
 | Vector Store | **$0 (local)** | **$0 (Free tier)** | Use ChromaDB locally / Free AI Search | Local barn 🏚️ |
-| Document Storage | $0 (Free tier) | $0 (Free tier) | S3: 5 GB free, Blob: 5 GB free | Saddlebag check 🫏 |
+| Document Storage | $0 (Free tier) | $0 (Free tier) | S3: 5 GB free, Blob: 5 GB free | backpack check 🫏 |
 | Database | $0 (Free tier) | $0 (Free tier) | DynamoDB: 25 GB free, Cosmos: Free tier | AWS depot 🏭 |
 | Container Hosting | $0 (local) | $0 (local) | Run locally during development | Stable stall 🐎 |
 | **Total** | **~$2–5/month** | **~$2–5/month** | Mostly LLM token costs | The donkey 🐴 |
@@ -50,7 +50,7 @@
 | LLM | ~$50–100 | ~$40–80 | The donkey 🐴 |
 | Embeddings | ~$1–2 | ~$1–2 | GPS warehouse 🗺️ |
 | Vector Store | ~$350 (OpenSearch) | ~$75 (AI Search Basic) | AWS search hub 🔍 |
-| Document Storage | ~$1 | ~$1 | Saddlebag check 🫏 |
+| Document Storage | ~$1 | ~$1 | backpack check 🫏 |
 | Database | ~$5 (DynamoDB) | ~$5 (Cosmos) | AWS depot 🏭 |
 | Container Hosting | ~$30 (Fargate) | ~$20 (Container Apps) | Stable stall 🐎 |
 | Container Registry | ~$1 (ECR) | ~$5 (ACR Basic) | Stable address 🏷️ |
@@ -126,7 +126,7 @@ DynamoDB stores each chunk with its embedding as a JSON string. On search, all v
 
 | | AWS S3 | Azure Blob Storage | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Storage** | $0.023/GB/month | $0.02/GB/month (LRS) | Saddlebag check 🫏 |
+| **Storage** | $0.023/GB/month | $0.02/GB/month (LRS) | backpack check 🫏 |
 | **Free tier** | 5 GB (12 months) | 5 GB (12 months) | Free hay 🌿 |
 | **PUT requests** | $0.005/1K | $0.005/1K | Free hay 🌿 |
 | **GET requests** | $0.0004/1K | $0.0004/1K | Free hay 🌿 |
@@ -159,7 +159,7 @@ DynamoDB stores each chunk with its embedding as a JSON string. On search, all v
 
 | | AWS ECR | Azure ACR | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Storage** | $0.10/GB/month | $0.167/GB/month (Basic) | Saddlebag check 🫏 |
+| **Storage** | $0.10/GB/month | $0.167/GB/month (Basic) | backpack check 🫏 |
 | **Free tier** | 500 MB (private, 12 months) | None | Free hay 🌿 |
 | **Tier** | Pay per GB | $5/month (Basic) | 🫏 On the route |
 
@@ -183,7 +183,7 @@ DynamoDB stores each chunk with its embedding as a JSON string. On search, all v
 
 | Service | Free amount | 🫏 Donkey |
 | --- | --- | --- |
-| S3 | 5 GB storage, 20K GET, 2K PUT | Saddlebag check 🫏 |
+| S3 | 5 GB storage, 20K GET, 2K PUT | backpack check 🫏 |
 | DynamoDB | 25 GB, 25 RCU, 25 WCU | AWS depot 🏭 |
 | Lambda | 1M invocations, 400K GB-seconds | 🫏 On the route |
 | CloudWatch | 10 metrics, 5 GB logs, 3 dashboards | Tachograph 📊 |
@@ -218,7 +218,7 @@ Since you want to save money, here's the cheapest way to run this project:
 | LLM | Bedrock (Claude) OR Azure OpenAI (GPT-4o) | ~$2–5/month | The donkey 🐴 |
 | Embeddings | Same provider as LLM | ~$0.10/month | The donkey 🐴 |
 | Vector Store | **ChromaDB (local)** or Azure AI Search **Free** | **$0** | Local barn 🏚️ |
-| Document Storage | S3 Free or Blob Free | **$0** | Saddlebag check 🫏 |
+| Document Storage | S3 Free or Blob Free | **$0** | backpack check 🫏 |
 | Database | DynamoDB Free or Cosmos Free | **$0** | AWS depot 🏭 |
 | Hosting | **Run locally** (no cloud hosting) | **$0** | Free hay 🌿 |
 | **Total** | | **~$2–5/month** | Feed bill 🌾 |
@@ -258,10 +258,10 @@ SageMaker makes sense when you need a custom-trained model, not for off-the-shel
 
 | | OpenSearch Serverless (our choice) | Kendra | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Type** | General vector search | Enterprise search (RAG-focused) | Saddlebag check 🫏 |
+| **Type** | General vector search | Enterprise search (RAG-focused) | backpack check 🫏 |
 | **Min cost** | ~$350/month | ~$810/month (Developer Edition) | Feed bill 🌾 |
 | **Features** | Raw vector similarity | Semantic search, connectors | GPS warehouse 🗺️ |
-| **RAG integration** | Manual (you build the pipeline) | Built-in RAG features | Saddlebag check 🫏 |
+| **RAG integration** | Manual (you build the pipeline) | Built-in RAG features | backpack check 🫏 |
 
 **Why OpenSearch is better here:**
 Kendra is more powerful but starts at $810/month. For a portfolio project, OpenSearch (or ChromaDB) gives you more control and costs less.
@@ -272,7 +272,7 @@ Kendra is more powerful but starts at $810/month. For a portfolio project, OpenS
 | --- | --- | --- | --- |
 | **LLM quality** | GPT-4o (state-of-the-art) | No LLM capability | The donkey 🐴 |
 | **Text analysis** | Via LLM prompts | Pre-built NLP models | The donkey 🐴 |
-| **RAG support** | Full RAG pipeline | Not designed for RAG | Saddlebag check 🫏 |
+| **RAG support** | Full RAG pipeline | Not designed for RAG | backpack check 🫏 |
 
 **Why Azure OpenAI is better:**
 Cognitive Services doesn't have a conversational LLM. It does text analytics (sentiment, entities) but can't generate answers from context.
@@ -355,7 +355,7 @@ Glue spins up a full Spark cluster for each job. A single document ingestion tak
 | Document pipeline | Lambda / Azure Functions | Glue / Data Factory | Faster startup, cheaper | Alternative stable 🏗️ |
 | Embeddings | Managed (Titan / OpenAI) / **nomic-embed-text (dev)** | Self-hosted (Sentence-BERT) | No GPU needed | The donkey 🐴 |
 
-- 🫏 **Donkey:** The head groom's final checklist — all trade-offs weighed, best saddle chosen, donkey ready to dispatch.
+- 🫏 **Donkey:** The head groom's final checklist — all trade-offs weighed, best bag chosen, donkey ready to dispatch.
 
 ---
 
@@ -418,7 +418,7 @@ Running the full lab suite (`poetry run python scripts/run_all_labs.py`) makes r
 | **Lab 9 (Guardrails)** | 7 chat calls (3 injection, 3 PII, 1 baseline) | Blocked requests = $0 (no LLM invoked). Only the baseline and unblocked requests cost tokens. | The donkey 🐴 |
 | **Lab 10 (Re-ranking)** | 6 evaluate calls | Standard LLM + embedding cost. Cross-encoder re-ranking runs locally (no extra cloud cost). | The donkey 🐴 |
 | **Lab 11 (Hybrid Search)** | 8 evaluate calls | Standard LLM + embedding cost. BM25 runs locally or in the vector store (no extra cost). | The donkey 🐴 |
-| **Lab 12 (Bulk Upload)** | 1 batch upload + 1 evaluate | Embedding cost for 5 test docs (~25 chunks). Negligible. | Saddlebag piece 📦 |
+| **Lab 12 (Bulk Upload)** | 1 batch upload + 1 evaluate | Embedding cost for 5 test docs (~25 chunks). Negligible. | backpack piece 📦 |
 | **Lab 13 (HNSW)** | 6 evaluate calls | Standard LLM + embedding cost. HNSW settings don't change per-query cost. | The donkey 🐴 |
 
 ### Running labs 10× (for tuning)

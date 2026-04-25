@@ -34,7 +34,7 @@ This file implements a rule-based evaluation framework that scores every RAG res
 
 | What you'll learn | DE parallel | 🫏 Donkey |
 |---|---| --- |
-| Retrieval quality scoring | Data freshness and completeness checks | Saddlebag fetch 🎒 |
+| Retrieval quality scoring | Data freshness and completeness checks | backpack fetch 🎒 |
 | Faithfulness scoring (anti-hallucination) | Referential integrity validation | Memory drift ⚠️ |
 | Answer relevance scoring | Output schema validation | Report card 📝 |
 | Weighted composite scores | Data quality dashboards (Great Expectations) | 🫏 On the route |
@@ -64,7 +64,7 @@ dbt test:                                  Golden dataset test:
 
 **The key difference:** In DE, you check *data* against *rules*. In AI, you check *generated text* against *reference text*. Both answer the same question: **"Is the output good enough?"**
 
-- 🫏 **Donkey:** The donkey's report card — did it grab the right saddlebags and write an accurate answer?
+- 🫏 **Donkey:** The donkey's report card — did it grab the right backpacks and write an accurate answer?
 
 ---
 
@@ -117,7 +117,7 @@ class EvaluationResult:      # Combined result
                     └─────────────────────────────┘
 ```
 
-- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the saddlebags are loaded, and which route it takes to the customer.
+- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the backpacks are loaded, and which route it takes to the customer.
 
 ---
 
@@ -176,7 +176,7 @@ Output: RetrievalScore(
 
 **Why this matters:** If retrieval quality is poor, it doesn't matter how good the LLM is — it's working with irrelevant context. **Fix retrieval before fixing prompts.**
 
-- 🫏 **Donkey:** The warehouse robot dispatched to find the right saddlebag shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+- 🫏 **Donkey:** The warehouse robot dispatched to find the right backpack shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -276,7 +276,7 @@ WHERE c.id IS NULL;
 
 **Why the 0.5 keyword overlap threshold?** A sentence doesn't need to be a word-for-word copy — it just needs to be *about the same thing*. "Refunds are processed within 14 days" and "Refunds take 14 business days" share enough keywords to be considered grounded.
 
-- 🫏 **Donkey:** Checking whether the donkey's answer matches the cargo in its saddlebag — if it drifts from the documents, it's hallucinating.
+- 🫏 **Donkey:** Checking whether the donkey's answer matches the cargo in its backpack — if it drifts from the documents, it's hallucinating.
 
 ---
 
@@ -513,7 +513,7 @@ Or use Swagger UI at `http://localhost:8000/docs` → find the **Evaluation** se
 | Component | Uses cloud? | Why | 🫏 Donkey |
 |---|---|---| --- |
 | `_evaluate_retrieval()` | ❌ | Just math on similarity scores | Report card 📝 |
-| `_evaluate_faithfulness()` | ❌ | Keyword overlap — pure string comparison | Saddlebag piece 📦 |
+| `_evaluate_faithfulness()` | ❌ | Keyword overlap — pure string comparison | backpack piece 📦 |
 | `_evaluate_answer_relevance()` | ❌ | Keyword presence check | Report card 📝 |
 | `_split_sentences()` | ❌ | Regex splitting | 🫏 On the route |
 | `_extract_keywords()` | ❌ | Stop word removal | 🫏 On the route |
@@ -534,10 +534,10 @@ Or use Swagger UI at `http://localhost:8000/docs` → find the **Evaluation** se
 
 | Score too low? | Likely cause | How to debug | 🫏 Donkey |
 |---|---|---| --- |
-| **Retrieval < 0.5** | Chunks are irrelevant | Check chunk content — is the right document ingested? | Saddlebag piece 📦 |
+| **Retrieval < 0.5** | Chunks are irrelevant | Check chunk content — is the right document ingested? | backpack piece 📦 |
 | **Retrieval < 0.5** | Embedding quality poor | Try different embedding model (local: `nomic-embed-text` → `all-minilm`) | GPS stamp 📍 |
 | **Faithfulness < 0.8** | LLM is hallucinating | Tighten prompt rules, lower temperature | The donkey 🐴 |
-| **Faithfulness < 0.8** | Keyword extraction too strict | Check if answer uses synonyms not in context | Saddlebag match 🫏 |
+| **Faithfulness < 0.8** | Keyword extraction too strict | Check if answer uses synonyms not in context | backpack match 🫏 |
 | **Relevance < 0.6** | LLM answered different question | Check if question is ambiguous | The donkey 🐴 |
 | **Relevance < 0.6** | Answer is a refusal | Check if context was empty (correct behaviour) | Right address 🎯 |
 | **Overall < 0.7** | Multiple issues | Debug each score individually | Hoof check 🔧 |
@@ -563,7 +563,7 @@ print(result.to_dict())
 # If relevance is low → fix prompt / chunking
 ```
 
-- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 

@@ -11,7 +11,7 @@ Read these first to understand what this project is and how it works.
 | # | Document | What you'll learn | 🫏 Donkey |
 |---|----------|-------------------|-----------|
 | 1 | [README.md](../README.md) | Project overview, features, tech stack, quick start | The stable notice board — what the donkey does, what tools it carries, how to get it started in 60 seconds |
-| 2 | [RAG Concepts](ai-engineering/rag-concepts.md) | What is RAG? Embeddings, vector search, retrieval — explained simply | The donkey's training manual — why it checks the saddlebag instead of answering from memory |
+| 2 | [RAG Concepts](ai-engineering/rag-concepts.md) | What is RAG? Embeddings, vector search, retrieval — explained simply | The donkey's training manual — why it checks the backpack instead of answering from memory |
 | 3 | [Architecture Overview](architecture-and-design/architecture.md) | System diagram, component relationships, data flow | The delivery route map — all roads, stops, and handoffs from question to answer |
 
 ---
@@ -22,7 +22,7 @@ Now get the project running on your machine.
 
 | # | Document | What you'll learn | 🫏 Donkey |
 |---|----------|-------------------|-----------|
-| 4 | [Getting Started](setup-and-tooling/getting-started.md) | Install dependencies, configure .env, run locally | Saddle up the donkey — install the gear, fill the saddlebag, send it on the first test run |
+| 4 | [Getting Started](setup-and-tooling/getting-started.md) | Install dependencies, configure .env, run locally | load up the donkey — install the gear, fill the backpack, send it on the first test run |
 | 5 | [Poetry Guide](setup-and-tooling/poetry-guide.md) | Python dependency management with Poetry | How to stock the supply shed — every tool and library the donkey needs, pinned and reproducible |
 | 6 | [Debugging Guide](setup-and-tooling/debugging-guide.md) | Common errors and how to fix them | What to do when the donkey trips — common falls and how to get it back on the road |
 
@@ -37,7 +37,7 @@ Deep dives into each component of the RAG pipeline, in data-flow order.
 | 7 | [Ingestion Pipeline](ai-engineering/ingestion-pipeline-deep-dive.md) | How documents are chunked, embedded, and stored | The post office pre-sorting the mail — cut into bags, GPS-labelled, shelved before the donkey arrives |
 | 8 | [Vector Store Interface](ai-engineering/vectorstore-interface-deep-dive.md) | The abstract vector store contract | The warehouse door rules — any warehouse that follows this contract can work with the donkey |
 | 9 | [Vector Store Providers](ai-engineering/vectorstore-providers-deep-dive.md) | ChromaDB (local), DynamoDB (AWS), Azure AI Search — how each works | Three warehouses the donkey can use — local barn (ChromaDB), AWS depot (DynamoDB), Azure hub (AI Search) |
-| 10 | [RAG Chain](ai-engineering/rag-chain-deep-dive.md) | The orchestrator: retrieval → reranking → LLM → response | The donkey's full delivery run — retrieve bags → rerank by relevance → load saddlebag → write the answer |
+| 10 | [RAG Chain](ai-engineering/rag-chain-deep-dive.md) | The orchestrator: retrieval → reranking → LLM → response | The donkey's full delivery run — retrieve bags → rerank by relevance → load backpack → write the answer |
 | 11 | [LLM Interface](ai-engineering/llm-interface-deep-dive.md) | The abstract LLM contract | The writing desk rules — any LLM that follows this contract can sit at the donkey's desk |
 | 12 | [LLM Providers](ai-engineering/llm-providers-deep-dive.md) | Ollama (local), Bedrock (AWS), Azure OpenAI — how each works | Three writers at the desk — local llama, AWS Claude, Azure GPT — same contract, different handwriting |
 | 13 | [Prompts](ai-engineering/prompts-deep-dive.md) | System prompts, RAG prompt templates, prompt engineering | The delivery note template — standing orders + cargo manifest + customer request, formatted perfectly |
@@ -54,7 +54,7 @@ How the FastAPI server exposes the RAG pipeline.
 | 15 | [Chat Endpoint](architecture-and-design/api-routes/chat-endpoint-explained.md) | The main RAG endpoint — query → answer | The main delivery window — hand in a question, the donkey brings back a grounded answer |
 | 16 | [Documents Endpoint](architecture-and-design/api-routes/documents-endpoint-explained.md) | Upload, list, delete documents | The intake desk — drop off new documents, check what's in stock, remove old ones |
 | 17 | [Evaluate Endpoint](architecture-and-design/api-routes/evaluate-endpoint-explained.md) | Run evaluation suites via API | The quality inspector's window — trigger scoring runs without touching the code |
-| 18 | [Health Endpoint](architecture-and-design/api-routes/health-endpoint-explained.md) | Health checks and readiness | The stable health check — is the donkey awake, saddled, and ready to run? |
+| 18 | [Health Endpoint](architecture-and-design/api-routes/health-endpoint-explained.md) | Health checks and readiness | The stable health check — is the donkey awake, loaded up, and ready to run? |
 | 19 | [Metrics Endpoint](architecture-and-design/api-routes/metrics-endpoint-explained.md) | Prometheus metrics | The donkey's logbook — Prometheus reads delivery counts, latencies, and costs |
 | 20 | [Queries Endpoint](architecture-and-design/api-routes/queries-endpoint-explained.md) | Query history and stats | The trip history board — every question the donkey has answered, with scores |
 | 21 | [Pydantic Models](reference/pydantic-models.md) | Request/response schemas | The parcel size rules — the exact shape every request and response must fit before the donkey touches it |
@@ -99,7 +99,7 @@ Run all 58 experiments yourself — follow Phase 1 → 5 in order.
 
 | # | Document | What you'll learn | 🫏 Donkey |
 |---|----------|-------------------|-----------|
-| 36 | [Phase 1 — Foundation](hands-on-labs/hands-on-labs-phase-1.md) | Basic queries, top_k tuning, first evaluation | First solo trips — basic deliveries, tune the saddlebag size, read the first report card |
+| 36 | [Phase 1 — Foundation](hands-on-labs/hands-on-labs-phase-1.md) | Basic queries, top_k tuning, first evaluation | First solo trips — basic deliveries, tune the backpack size, read the first report card |
 | 37 | [Phase 2 — Bridge Skills](hands-on-labs/hands-on-labs-phase-2.md) | Multi-turn, injection tests, tracing, dashboards | Advanced trips — multi-leg journeys, injection attack tests, live GPS tracking on the dashboard |
 | 38 | [Phase 3 — Production AI](hands-on-labs/hands-on-labs-phase-3.md) | Document upload, golden dataset, guardrails | Real-world runs — upload your own docs, run the 25-question benchmark, add safety guardrails |
 | 39 | [Phase 4 — Advanced RAG](hands-on-labs/hands-on-labs-phase-4.md) | Query types, reranking, multi-doc, HNSW indexing | Expert tricks — rerank packages by quality, handle multi-doc loads, tune the HNSW stadium signs |

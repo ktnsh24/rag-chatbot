@@ -36,7 +36,7 @@ poetry run pytest tests/ --cov=src --cov-report=term-missing
 poetry run pytest tests/test_integration_api.py::TestChatIntegration -v
 ```
 
-- 🫏 **Donkey:** Loading up the donkey for the first time — installing the saddle, attaching the saddlebags, and confirming the GPS coordinates before the first run.
+- 🫏 **Donkey:** Loading up the donkey for the first time — installing the bag, attaching the backpacks, and confirming the GPS coordinates before the first run.
 
 ---
 
@@ -89,13 +89,13 @@ All integration/E2E/feature tests share fixtures defined in `tests/conftest.py`:
 
 | Fixture | What it provides | 🫏 Donkey |
 |---|---| --- |
-| `mock_rag_chain` | `AsyncMock` with `.query()`, `.ingest_document()`, `.ingest_documents()`, `._vector_store` | Saddlebag check 🫏 |
-| `app_with_rag` | `create_app()` with mocked RAG chain on `app.state` | Saddlebag check 🫏 |
-| `client_with_rag` | `httpx.AsyncClient` using `ASGITransport` — full async HTTP testing | Saddlebag check 🫏 |
-| `app_no_rag` | App where `app.state.rag_chain = None` (simulates init failure) | Saddlebag check 🫏 |
-| `client_no_rag` | Client for testing error paths when RAG chain is unavailable | Saddlebag check 🫏 |
+| `mock_rag_chain` | `AsyncMock` with `.query()`, `.ingest_document()`, `.ingest_documents()`, `._vector_store` | backpack check 🫏 |
+| `app_with_rag` | `create_app()` with mocked RAG chain on `app.state` | backpack check 🫏 |
+| `client_with_rag` | `httpx.AsyncClient` using `ASGITransport` — full async HTTP testing | backpack check 🫏 |
+| `app_no_rag` | App where `app.state.rag_chain = None` (simulates init failure) | backpack check 🫏 |
+| `client_no_rag` | Client for testing error paths when RAG chain is unavailable | backpack check 🫏 |
 | `mock_guardrails` | Real `LocalGuardrails()` instance (pattern-based, no network) | Gate rule 🚧 |
-| `app_with_guardrails` | App with both RAG chain and guardrails enabled | Saddlebag check 🫏 |
+| `app_with_guardrails` | App with both RAG chain and guardrails enabled | backpack check 🫏 |
 | `client_with_guardrails` | Client for testing guardrail behavior end-to-end | Test delivery 🧪 |
 
 **Mock response constant:**
@@ -120,7 +120,7 @@ Existing unit tests cover individual components in isolation:
 |---|---|---| --- |
 | `test_chat.py` | 7 | Chat route logic, request validation, error handling | Test delivery 🧪 |
 | `test_evaluate_route.py` | 16 | Evaluate route logic, response format, error handling | Report card 📝 |
-| `test_ingestion.py` | 9 | Document chunking, ingestion pipeline, deduplication | Saddlebag piece 📦 |
+| `test_ingestion.py` | 9 | Document chunking, ingestion pipeline, deduplication | backpack piece 📦 |
 | `test_evaluation.py` | 14 | Evaluation framework, metrics computation, golden dataset | Tachograph 📊 |
 | `test_guardrails.py` | 20 | Guardrail pattern matching, PII regex, injection detection | Test delivery 🧪 |
 | `test_reranker.py` | 7 | Cross-encoder scoring, re-ranking logic | Report card 📝 |
@@ -140,9 +140,9 @@ Tests every API endpoint through the full FastAPI stack (middleware, routing, se
 
 | Class | Tests | What it validates | 🫏 Donkey |
 |---|---|---| --- |
-| `TestHealthIntegration` | 2 | `GET /health` returns status + services; degrades when RAG chain is missing | Saddlebag check 🫏 |
-| `TestChatIntegration` | 6 | `POST /api/chat` — success, session IDs, custom `top_k`, validation (empty/missing question), 500 without RAG | Saddlebag check 🫏 |
-| `TestEvaluateIntegration` | 3 | `POST /api/evaluate` — single question, expected answer comparison, 500 without RAG | Saddlebag check 🫏 |
+| `TestHealthIntegration` | 2 | `GET /health` returns status + services; degrades when RAG chain is missing | backpack check 🫏 |
+| `TestChatIntegration` | 6 | `POST /api/chat` — success, session IDs, custom `top_k`, validation (empty/missing question), 500 without RAG | backpack check 🫏 |
+| `TestEvaluateIntegration` | 3 | `POST /api/evaluate` — single question, expected answer comparison, 500 without RAG | backpack check 🫏 |
 | `TestDocumentsIntegration` | 4 | `GET /api/documents`, `POST /api/documents/upload`, `POST /api/documents/upload/batch`, `DELETE /api/documents/{id}` | Test delivery 🧪 |
 | `TestQueryAnalysisIntegration` | 4 | `GET /api/queries/stats`, `/api/queries/slow`, `/api/queries/patterns`, `/api/queries/recent` — returns 503 when query logger not configured | Test delivery 🧪 |
 | `TestMetricsIntegration` | 1 | `GET /metrics` returns Prometheus format | Tachograph 📊 |
@@ -214,7 +214,7 @@ Tests the guardrails feature flag (`GUARDRAILS_ENABLED`) by comparing behavior w
 | `test_hybrid_search.py` | 17 | Unit | ⚠️ 9 errors (missing `rank_bm25` package) | Test delivery 🧪 |
 | `test_dynamodb_vectorstore.py` | 13 | Unit | ✅ Passing | AWS depot 🏭 |
 | `test_integration_api.py` | 23 | Integration | ✅ All 23 passing | Test delivery 🧪 |
-| `test_e2e_rag_pipeline.py` | 8 | E2E | ✅ All 8 passing | Saddlebag check 🫏 |
+| `test_e2e_rag_pipeline.py` | 8 | E2E | ✅ All 8 passing | backpack check 🫏 |
 | `test_integration_features.py` | 12 | Feature flags | ✅ All 12 passing | Test delivery 🧪 |
 | **Total** | **146** | | **130 passing, 7 failing, 9 errors** | Feed bill 🌾 |
 
@@ -232,7 +232,7 @@ Tests the guardrails feature flag (`GUARDRAILS_ENABLED`) by comparing behavior w
 
 These are **pre-existing issues** unrelated to the integration/E2E tests.
 
-- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and saddle inspection checklist to find what went wrong.
+- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
 
 ---
 

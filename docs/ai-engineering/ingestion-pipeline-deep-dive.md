@@ -30,9 +30,9 @@ This is the file where **your DE skills apply most directly.** The ingestion pip
 | What you'll learn | DE parallel | 🫏 Donkey |
 |---|---| --- |
 | Reading multiple file formats | Reading CSV, JSON, Parquet | 🫏 On the route |
-| Chunking text into pieces | Partitioning data into batches | Saddlebag piece 📦 |
-| Why chunk size matters | Why partition size matters | Saddlebag piece 📦 |
-| Why overlap exists | Why you keep boundary records in adjacent partitions | Saddlebag piece 📦 |
+| Chunking text into pieces | Partitioning data into batches | backpack piece 📦 |
+| Why chunk size matters | Why partition size matters | backpack piece 📦 |
+| Why overlap exists | Why you keep boundary records in adjacent partitions | backpack piece 📦 |
 | The full ingest pipeline | The full ETL pipeline | Pre-sort 📮 |
 
 - 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
@@ -81,7 +81,7 @@ LOAD                                         LOAD
   (this file)             (this file)             (llm provider)           (vectorstore/)
 ```
 
-- 🫏 **Donkey:** Saddlebag-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
+- 🫏 **Donkey:** backpack-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
 
 ---
 
@@ -110,7 +110,7 @@ Takes raw file bytes and extracts plain text. That's it.
 |---|---|---| --- |
 | `.pdf` | `pypdf` library → extracts text per page | Like reading Parquet → extract columns | 🫏 On the route |
 | `.txt`, `.md`, `.csv` | `content.decode("utf-8")` | Like reading a CSV as text | 🫏 On the route |
-| `.docx` | `python-docx` library → extracts paragraphs | Like reading Excel → extract cells | Saddlebag check 🫏 |
+| `.docx` | `python-docx` library → extracts paragraphs | Like reading Excel → extract cells | backpack check 🫏 |
 
 **DE parallel:** This is your "source connector." In DE work, you have connectors for Kinesis, DynamoDB, S3. Here, you have connectors for PDF, Word, text. Same pattern — abstract away the source format, output a standard format (plain text / rows).
 
@@ -129,7 +129,7 @@ def _read_pdf(content: bytes) -> str:
 
 **Key detail:** It adds `[Page N]` markers. This means chunks will carry page references — so the LLM can cite "according to Page 3" in its answer.
 
-- 🫏 **Donkey:** The parcels being ingested — split into saddlebag-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.
+- 🫏 **Donkey:** The parcels being ingested — split into backpack-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.
 
 ---
 
@@ -175,7 +175,7 @@ OUTPUT: List of smaller strings (e.g., 18 chunks of ~1000 characters each)
  Chunk 18: "...for international orders, processing may take longer."    (~600 chars)
 ```
 
-- 🫏 **Donkey:** Saddlebag-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
+- 🫏 **Donkey:** backpack-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
 
 ---
 
@@ -211,15 +211,15 @@ Reason 3: COST
 
 | chunk_size | Effect on retrieval | Effect on answers | Effect on cost | 🫏 Donkey |
 |---|---|---|---| --- |
-| 200 | Very precise — finds exact sentences | May lose context (split between chunks) | Cheapest per query | Saddlebag piece 📦 |
-| 500 | Precise — paragraph-level | Usually enough context | Cheap | Saddlebag check 🫏 |
-| **1000** | **Good balance (this repo's default)** | **Full paragraphs with context** | **Moderate** | Saddlebag check 🫏 |
+| 200 | Very precise — finds exact sentences | May lose context (split between chunks) | Cheapest per query | backpack piece 📦 |
+| 500 | Precise — paragraph-level | Usually enough context | Cheap | backpack check 🫏 |
+| **1000** | **Good balance (this repo's default)** | **Full paragraphs with context** | **Moderate** | backpack check 🫏 |
 | 2000 | Less precise — section-level | Always has full context | More expensive | 🫏 On the route |
 | 5000 | Imprecise — chapter-level | Too much noise | Expensive | 🫏 On the route |
 
 **There is no universally correct chunk_size.** An AI engineer experiments with different values and measures the impact using the [Evaluation Framework](evaluation-framework-deep-dive.md).
 
-- 🫏 **Donkey:** Saddlebag-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
+- 🫏 **Donkey:** backpack-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
 
 ---
 
@@ -254,7 +254,7 @@ The overlap means the last 200 characters of chunk N appear again at the start o
 
 **DE parallel:** This is like partition overlap in streaming systems. When processing time windows, you often include events from the edge of the previous window to avoid missing events that span the boundary.
 
-- 🫏 **Donkey:** Saddlebag-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
+- 🫏 **Donkey:** backpack-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
 
 ---
 
@@ -335,10 +335,10 @@ Later, when user asks "What is the refund policy?":
 | Metric | Value | 🫏 Donkey |
 |---|---| --- |
 | Document size | 15,000 characters (5 pages) | 🫏 On the route |
-| Chunks created | 18 (chunk_size=1000, overlap=200) | Saddlebag piece 📦 |
+| Chunks created | 18 (chunk_size=1000, overlap=200) | backpack piece 📦 |
 | Vectors stored | 18 × 1024 floats = 18,432 numbers | GPS warehouse 🗺️ |
 | Embedding cost | $0.00009 | Feed bill 🌾 |
-| Storage size | ~74 KB (18 × 4096 bytes per vector) | Saddlebag check 🫏 |
+| Storage size | ~74 KB (18 × 4096 bytes per vector) | backpack check 🫏 |
 | Ingestion time | ~3 seconds | Pre-sort 📮 |
 | If 500 documents | 500 × 18 = 9,000 vectors, ~$0.045 total, ~25 minutes | Feed bill 🌾 |
 
@@ -350,11 +350,11 @@ Later, when user asks "What is the refund policy?":
 
 | Question | Answer | Concept it tests | 🫏 Donkey |
 |---|---|---| --- |
-| "Why chunk_size=1000 and not 500 or 2000?" | Trade-off: 500 is more precise but loses context. 2000 has more context but less precise retrieval. 1000 is the default balance — but you should TEST with your data. | Chunk size tuning | Saddlebag piece 📦 |
+| "Why chunk_size=1000 and not 500 or 2000?" | Trade-off: 500 is more precise but loses context. 2000 has more context but less precise retrieval. 1000 is the default balance — but you should TEST with your data. | Chunk size tuning | backpack piece 📦 |
 | "What happens if chunk_overlap=0?" | Sentences at chunk boundaries get cut in half. The LLM gets incomplete information. Answers degrade at boundary points. | Overlap purpose | The donkey 🐴 |
-| "Why use RecursiveCharacterTextSplitter instead of just slicing every 1000 chars?" | Blind slicing cuts words and sentences in half. Recursive splitter finds natural boundaries (paragraphs → sentences → words). | Smart splitting | Saddlebag check 🫏 |
+| "Why use RecursiveCharacterTextSplitter instead of just slicing every 1000 chars?" | Blind slicing cuts words and sentences in half. Recursive splitter finds natural boundaries (paragraphs → sentences → words). | Smart splitting | backpack check 🫏 |
 | "What happens if a PDF has tables?" | `pypdf` extracts table text as plain text — rows become lines, columns become spaces. Structure is mostly lost. This is a known limitation. | Document parsing | 🫏 On the route |
-| "How is this different from an ETL pipeline?" | It's NOT different in structure. Extract (read file) → Transform (chunk + embed) → Load (store vectors). Only the transform step is AI-specific. | DE → AI bridge | Saddlebag piece 📦 |
+| "How is this different from an ETL pipeline?" | It's NOT different in structure. Extract (read file) → Transform (chunk + embed) → Load (store vectors). Only the transform step is AI-specific. | DE → AI bridge | backpack piece 📦 |
 | "What's the most expensive step?" | Embedding is cheap ($0.00002/1K tokens). The expensive part is storing in OpenSearch (~$350/month minimum) and later sending chunks to the LLM for generation. | Cost awareness | The donkey 🐴 |
 
 - 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.

@@ -30,7 +30,7 @@ Simple analogy:
 - **Without RAG**: You ask someone a question and they answer from memory (might be wrong or outdated)
 - **With RAG**: You ask someone a question, they first look up relevant pages in a book, then answer based on what they found (grounded in facts)
 
-> 🫏 **Donkey analogy:** The LLM is the donkey — it carries your question to an answer. Without RAG, the donkey answers from memory — sometimes confidently wrong. With RAG, the donkey checks the saddlebag full of your documents before speaking. The saddlebag is the retrieval system. No saddlebag = guessing. Full saddlebag = grounded answers.
+> 🫏 **Donkey analogy:** The LLM is the donkey — it carries your question to an answer. Without RAG, the donkey answers from memory — sometimes confidently wrong. With RAG, the donkey checks the backpack full of your documents before speaking. The backpack is the retrieval system. No backpack = guessing. Full backpack = grounded answers.
 
 ---
 
@@ -491,7 +491,7 @@ WITH OVERLAP (good):
 - Semantic: use an LLM to identify topic boundaries
 - Sliding window: fixed size with variable overlap
 
-> 🫏 **Donkey analogy:** Your document is a long cargo train — too heavy for one donkey trip. You cut it into saddlebag-sized loads (chunks). The trick: each bag shares the last few items with the next bag (overlap). Why? Because the important clue might be "the refund window is..." at the end of bag 4 and "...14 days from purchase" at the start of bag 5. Without overlap, you'd retrieve one bag and miss the answer. With overlap, both bags contain the full sentence, so whichever one the donkey retrieves has the complete thought.
+> 🫏 **Donkey analogy:** Your document is a long cargo train — too heavy for one donkey trip. You cut it into backpack-sized loads (chunks). The trick: each bag shares the last few items with the next bag (overlap). Why? Because the important clue might be "the refund window is..." at the end of bag 4 and "...14 days from purchase" at the start of bag 5. Without overlap, you'd retrieve one bag and miss the answer. With overlap, both bags contain the full sentence, so whichever one the donkey retrieves has the complete thought.
 
 ---
 
@@ -515,7 +515,7 @@ They are independent:
 | **Can you change it?** | Yes — config parameter | No — fixed by model architecture |
 | **Typical values** | 200–2000 characters | 768, 1024, 1536, 3072 |
 | **Affects** | How many chunks you get | How "detailed" the meaning representation is |
-| **🫏 Donkey** | Size of each saddlebag — you pack it bigger or smaller before the trip | The GPS label format printed on every bag — always 1024 numbers, the model decides, you can't change it |
+| **🫏 Donkey** | Size of each backpack — you pack it bigger or smaller before the trip | The GPS label format printed on every bag — always 1024 numbers, the model decides, you can't change it |
 
 ### The relationship
 
@@ -582,7 +582,7 @@ What is the refund policy?
 
 The quality of the prompt directly affects the quality of the answer. This is called **prompt engineering**.
 
-> 🫏 **Donkey analogy:** The prompt is the delivery note the donkey reads before each trip. It has three sections: (1) standing instructions tattooed on the stable wall ("only answer from your saddlebag, never make things up"), (2) today's cargo manifest — the retrieved document chunks, and (3) the customer's specific request. If the delivery note is unclear, the donkey delivers to the wrong address. A precise, well-structured prompt = the donkey delivers to exactly the right door every time.
+> 🫏 **Donkey analogy:** The prompt is the delivery note the donkey reads before each trip. It has three sections: (1) standing instructions tattooed on the stable wall ("only answer from your backpack, never make things up"), (2) today's cargo manifest — the retrieved document chunks, and (3) the customer's specific request. If the delivery note is unclear, the donkey delivers to the wrong address. A precise, well-structured prompt = the donkey delivers to exactly the right door every time.
 
 ---
 
@@ -662,7 +662,7 @@ Your code just reads these numbers and passes them through to the `TokenUsage` m
 | **Azure GPT-4o** | $0.0025 / 1K tokens | $0.01 / 1K tokens |
 | **Local Ollama** | **$0** (runs on your machine) | **$0** |
 | **Ratio** | 1x | ~4-5x more expensive |
-| **🫏 Donkey** | Cargo the donkey picks up and loads into its saddlebag — reading is easy | Words the donkey writes on the delivery receipt — writing from scratch is harder work, so it costs more |
+| **🫏 Donkey** | Cargo the donkey picks up and loads into its backpack — reading is easy | Words the donkey writes on the delivery receipt — writing from scratch is harder work, so it costs more |
 
 ### Quick cost math for a RAG query
 
@@ -681,7 +681,7 @@ Tokens matter because:
 - You pay per token (input and output separately)
 - More context chunks = more input tokens = higher cost
 
-> 🫏 **Donkey analogy:** A token is the smallest load the donkey can carry — not a whole package, not a letter, but a word-chunk. Common words are one carry ("the", "and"). Long or rare words get split ("authentication" → "auth" + "ent" + "ication" = 3 carries). The donkey has a maximum saddlebag size (context window) — it can only carry so many tokens per trip. Fill the bag with too many chunks and the last ones fall off. Each token costs a fraction of a cent: how many the donkey picks up (input) plus how many the LLM writes (output).
+> 🫏 **Donkey analogy:** A token is the smallest load the donkey can carry — not a whole package, not a letter, but a word-chunk. Common words are one carry ("the", "and"). Long or rare words get split ("authentication" → "auth" + "ent" + "ication" = 3 carries). The donkey has a maximum backpack size (context window) — it can only carry so many tokens per trip. Fill the bag with too many chunks and the last ones fall off. Each token costs a fraction of a cent: how many the donkey picks up (input) plus how many the LLM writes (output).
 
 ---
 
@@ -689,7 +689,7 @@ Tokens matter because:
 
 | | RAG (what we build) | Fine-tuning | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **How** | Add documents at runtime | Retrain the model on your data | Pack today's map in the saddlebag vs. teach the donkey a new route permanently |
+| **How** | Add documents at runtime | Retrain the model on your data | Pack today's map in the backpack vs. teach the donkey a new route permanently |
 | **Data updates** | Upload new documents instantly | Retrain the model (hours/days) | Swap the map tonight vs. send the donkey back to school for months |
 | **Cost** | Per-query (token costs) | Upfront training cost ($100–$10K+) | Pay a small fee per delivery vs. pay a large school fee upfront |
 | **Accuracy** | Good with good retrieval | Better for specialized domains | Good if the map is accurate vs. donkey memorised every back alley |
@@ -706,9 +706,9 @@ Tokens matter because:
 
 | Problem | Cause | Solution | 🫏 Donkey |
 | --- | --- | --- | --- |
-| Wrong answer | Irrelevant chunks retrieved | Increase `top_k`, improve chunking | Donkey grabbed the wrong saddlebags — they looked similar but were from the wrong shelf |
+| Wrong answer | Irrelevant chunks retrieved | Increase `top_k`, improve chunking | Donkey grabbed the wrong backpacks — they looked similar but were from the wrong shelf |
 | "I don't know" when answer exists | Chunk too small, question too vague | Increase chunk size, rephrase question | The answer was cut in half between two bags — neither bag had the full sentence |
-| Hallucination | LLM ignores context | Stronger system prompt ("ONLY use context") | Donkey ignored the saddlebag entirely and answered from memory — wrong, but confident |
+| Hallucination | LLM ignores context | Stronger system prompt ("ONLY use context") | Donkey ignored the backpack entirely and answered from memory — wrong, but confident |
 | Slow responses | Too many chunks sent to LLM | Reduce `top_k`, use faster model | Donkey is carrying 20 heavy bags when 3 would do — overloaded and slow |
 | High cost | Too many tokens per query | Reduce chunk size, reduce `top_k` | Same overloading problem, but measured in money instead of sweat |
 | Duplicate information | Overlapping chunks | Reduce `chunk_overlap` | Bag edges overlap too much — donkey delivers the same letter twice in different bags |

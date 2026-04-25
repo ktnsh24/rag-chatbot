@@ -89,7 +89,7 @@ In **Swagger UI** → `POST /api/evaluate`, enter:
 | Score | Value | 🫏 Donkey |
 |---|---| --- |
 | retrieval | ___ | 🫏 On the route |
-| faithfulness | ___ | Saddlebag match 🫏 |
+| faithfulness | ___ | backpack match 🫏 |
 | overall | ___ | 🫏 On the route |
 | passed | ___ | 🫏 On the route |
 
@@ -146,7 +146,7 @@ In **Swagger UI** → `POST /api/evaluate`, enter the same question again:
 | Score | Before (6a) | After (6c) | Improved? | 🫏 Donkey |
 |---|---|---|---| --- |
 | retrieval | ___ | ___ | ___ | 🫏 On the route |
-| faithfulness | ___ | ___ | ___ | Saddlebag match 🫏 |
+| faithfulness | ___ | ___ | ___ | backpack match 🫏 |
 | overall | ___ | ___ | ___ | 🫏 On the route |
 | passed | ___ | ___ | ___ | 🫏 On the route |
 
@@ -528,7 +528,7 @@ After completing Labs 6, 7, and 8, check off:
 |---|---|---|---| --- |
 | 1 | Data flywheel (detect → fix → evaluate → lock → repeat) | Lab 6 | [ ] Yes | Report card 📝 |
 | 2 | Golden dataset growth from real usage | Lab 6 | [ ] Yes | Test delivery 🧪 |
-| 3 | RLHF in RAG context (user feedback loops) | Lab 7 | [ ] Yes | Saddlebag check 🫏 |
+| 3 | RLHF in RAG context (user feedback loops) | Lab 7 | [ ] Yes | backpack check 🫏 |
 | 4 | Feedback system design | Lab 7 | [ ] Yes | Feed bill 🌾 |
 | 5 | Connection between feedback and data flywheel | Lab 7 | [ ] Yes | Feed bill 🌾 |
 | 6 | Infrastructure scaling for AI (your DE superpower) | Lab 8 | [ ] Yes | Stable blueprint 🏗️ |
@@ -542,8 +542,8 @@ After completing Labs 6, 7, and 8, check off:
 
 | # | Skill | Phase | Lab | 🫏 Donkey |
 |---|---|---|---| --- |
-| 1 | Retrieval quality measurement | Phase 1 | Lab 1 | Saddlebag fetch 🎒 |
-| 2 | Retrieval-faithfulness trade-off | Phase 1 | Lab 1 | Saddlebag match 🫏 |
+| 1 | Retrieval quality measurement | Phase 1 | Lab 1 | backpack fetch 🎒 |
+| 2 | Retrieval-faithfulness trade-off | Phase 1 | Lab 1 | backpack match 🫏 |
 | 3 | top_k tuning and its impact | Phase 1 | Lab 1 | 🫏 On the route |
 | 4 | Hallucination detection | Phase 1 | Lab 2 | Memory drift ⚠️ |
 | 5 | Faithfulness scoring and weight | Phase 1 | Lab 2 | Report card 📝 |
@@ -556,7 +556,7 @@ After completing Labs 6, 7, and 8, check off:
 | 12 | Dashboard and alert design for AI | Phase 2 | Lab 5 | 🫏 On the route |
 | 13 | Data flywheel | Phase 3 | Lab 6 | 🫏 On the route |
 | 14 | Golden dataset growth from real usage | Phase 3 | Lab 6 | Test delivery 🧪 |
-| 15 | RLHF in RAG context | Phase 3 | Lab 7 | Saddlebag check 🫏 |
+| 15 | RLHF in RAG context | Phase 3 | Lab 7 | backpack check 🫏 |
 | 16 | Feedback system design | Phase 3 | Lab 7 | Feed bill 🌾 |
 | 17 | Infrastructure scaling for AI | Phase 3 | Lab 8 | Stable blueprint 🏗️ |
 | 18 | AI-specific scaling concerns | Phase 3 | Lab 8 | 🫏 On the route |
@@ -566,8 +566,8 @@ After completing Labs 6, 7, and 8, check off:
 | # | Skill | What it is | Covered in future projects? | Where to learn it | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
 | 19 | **A/B testing for AI** | Deploy two prompt versions, measure which performs better | ✅ Yes — when deploying to AWS/Azure, you'll set up traffic splitting with API Gateway / Azure Front Door | Same as A/B testing in web — split traffic, compare metrics | Delivery note 📋 |
-| 20 | **Model versioning** | Track which model version produced which answers | ✅ Yes — V2 of rag-chatbot will add MLflow integration for experiment tracking | MLflow, Weights & Biases, or simple git tags | Saddlebag check 🫏 |
-| 21 | **Embedding drift detection** | New documents change the vector space — old embeddings may become stale | ✅ Partially — Lab 5's retrieval monitoring concept extends directly to drift alerts. Full implementation in V2 with scheduled re-evaluation | Monitor average retrieval scores over time (Lab 5 concept) | Saddlebag fetch 🎒 |
+| 20 | **Model versioning** | Track which model version produced which answers | ✅ Yes — V2 of rag-chatbot will add MLflow integration for experiment tracking | MLflow, Weights & Biases, or simple git tags | backpack check 🫏 |
+| 21 | **Embedding drift detection** | New documents change the vector space — old embeddings may become stale | ✅ Partially — Lab 5's retrieval monitoring concept extends directly to drift alerts. Full implementation in V2 with scheduled re-evaluation | Monitor average retrieval scores over time (Lab 5 concept) | backpack fetch 🎒 |
 | 22 | **Cost optimisation** | Prompt compression, caching, model routing (cheap model for easy questions, expensive for hard) | ✅ Yes — when deploying to AWS Bedrock or Azure OpenAI, cost tracking becomes real (see [Cost Estimation](hands-on-labs-phase-1.md#cost-estimation--local-vs-cloud)) | Extend `src/rag/chain.py` with model routing logic | The donkey 🐴 |
 | 23 | **Multi-modal RAG** | Images, tables, PDFs with charts — not just text | ⬜ Future project — requires a separate repo with vision models (GPT-4o, Claude 3.5 Sonnet) | Not in current rag-chatbot scope | The donkey 🐴 |
 | 24 | **Compliance & audit logging** | Log every AI decision for regulatory compliance | ✅ Partially — the logging middleware already captures request/response. Full audit trail (immutable, tamper-proof) is a V2 feature | Extend `src/api/middleware/` to log full request/response | Stable door 🚪 |

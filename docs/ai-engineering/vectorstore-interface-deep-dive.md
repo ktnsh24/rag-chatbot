@@ -83,9 +83,9 @@ class VectorSearchResult:
 |---|---|---| --- |
 | `text` | The actual chunk text — what the LLM will read | The row data | The donkey 🐴 |
 | `document_name` | Source document (e.g., "refund-policy.pdf") | The table or source name | 🫏 On the route |
-| `score` | How similar this chunk is to the query (0.0–1.0) | ❌ **No DE parallel** — this is new | Saddlebag piece 📦 |
+| `score` | How similar this chunk is to the query (0.0–1.0) | ❌ **No DE parallel** — this is new | backpack piece 📦 |
 | `page_number` | Where in the original document | Like a row number or partition | 🫏 On the route |
-| `metadata` | Anything extra (document_id, chunk_index) | Additional attributes | Saddlebag piece 📦 |
+| `metadata` | Anything extra (document_id, chunk_index) | Additional attributes | backpack piece 📦 |
 
 ### The `score` field — the new concept
 
@@ -255,7 +255,7 @@ if results[0].score < 0.5:
     return "I don't have relevant information about that"  # Low confidence
 ```
 
-- 🫏 **Donkey:** The warehouse robot dispatched to find the right saddlebag shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+- 🫏 **Donkey:** The warehouse robot dispatched to find the right backpack shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -279,7 +279,7 @@ QUERY (every user question):                    │
                            Top K chunks → generate() → Answer
 ```
 
-- 🫏 **Donkey:** The donkey checks its saddlebag full of retrieved document chunks before answering — no guessing from memory.
+- 🫏 **Donkey:** The donkey checks its backpack full of retrieved document chunks before answering — no guessing from memory.
 
 ---
 
@@ -287,7 +287,7 @@ QUERY (every user question):                    │
 
 | Question | Answer | Concept it tests | 🫏 Donkey |
 |---|---|---| --- |
-| "What does a score of 0.3 mean?" | The chunk is semantically far from the query — probably not relevant. It's like a SQL query returning a row that doesn't match your intent. | Similarity scores | Saddlebag piece 📦 |
+| "What does a score of 0.3 mean?" | The chunk is semantically far from the query — probably not relevant. It's like a SQL query returning a row that doesn't match your intent. | Similarity scores | backpack piece 📦 |
 | "Why does `search()` always return K results even when nothing is relevant?" | Vector search finds the K **nearest** vectors regardless. "Nearest" doesn't mean "relevant" — just closest in the vector space. | Semantic search vs exact match | Stable door 🚪 |
 | "Why store the original `text` alongside the `embedding`?" | Embeddings are one-way (can't reverse vector → text). You need the original text to send as context to the LLM. | Embedding properties | The donkey 🐴 |
 | "What happens if `texts` and `embeddings` have different lengths?" | Bug — they must be paired by index. text[i] matches embedding[i]. | Store contract | GPS warehouse 🗺️ |

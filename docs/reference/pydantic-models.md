@@ -101,13 +101,13 @@ class Settings(BaseSettings):
 | Field | Type | Default | Env Variable | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
 | `cloud_provider` | `CloudProvider` | `local` | `CLOUD_PROVIDER` | Controls which cloud backends to use | Local barn 🏚️ |
-| `app_name` | `str` | `rag-chatbot` | `APP_NAME` | Service name in logs | Saddlebag check 🫏 |
+| `app_name` | `str` | `rag-chatbot` | `APP_NAME` | Service name in logs | backpack check 🫏 |
 | `app_env` | `AppEnvironment` | `dev` | `APP_ENV` | Environment (affects logging) | Gate guard 🔐 |
 | `app_port` | `int` | `8000` | `APP_PORT` | Server port | 🫏 On the route |
 | `log_level` | `str` | `INFO` | `LOG_LEVEL` | Logging verbosity | Gate guard 🔐 |
-| `rag_top_k` | `int` | `5` | `RAG_TOP_K` | Chunks retrieved per query | Saddlebag piece 📦 |
-| `rag_chunk_size` | `int` | `1000` | `RAG_CHUNK_SIZE` | Max characters per chunk | Saddlebag piece 📦 |
-| `rag_chunk_overlap` | `int` | `200` | `RAG_CHUNK_OVERLAP` | Overlap between chunks | Saddlebag piece 📦 |
+| `rag_top_k` | `int` | `5` | `RAG_TOP_K` | Chunks retrieved per query | backpack piece 📦 |
+| `rag_chunk_size` | `int` | `1000` | `RAG_CHUNK_SIZE` | Max characters per chunk | backpack piece 📦 |
+| `rag_chunk_overlap` | `int` | `200` | `RAG_CHUNK_OVERLAP` | Overlap between chunks | backpack piece 📦 |
 | `aws_region` | `str` | `eu-central-1` | `AWS_REGION` | AWS region | AWS depot 🏭 |
 | `aws_bedrock_model_id` | `str` | Claude 3.5 Sonnet | `AWS_BEDROCK_MODEL_ID` | Bedrock model | The donkey 🐴 |
 | `aws_opensearch_endpoint` | `str` | `""` | `AWS_OPENSEARCH_ENDPOINT` | OpenSearch URL | AWS search hub 🔍 |
@@ -143,7 +143,7 @@ settings.app_port        # → 8000
 settings.rag_top_k       # → 5
 ```
 
-- 🫏 **Donkey:** Adjusting the saddle fit and route preferences so the donkey delivers to the right address every time.
+- 🫏 **Donkey:** Adjusting the bag fit and route preferences so the donkey delivers to the right address every time.
 
 ---
 
@@ -164,7 +164,7 @@ class ChatRequest(BaseModel):
 | --- | --- | --- | --- | --- | --- |
 | `question` | `str` | **Yes** | 1–5000 chars | The user's question | 🫏 On the route |
 | `session_id` | `str` or `None` | No | None | Links follow-up questions together | Trip log 📒 |
-| `top_k` | `int` or `None` | No | 1–20 if provided | Override default chunk count | Saddlebag piece 📦 |
+| `top_k` | `int` or `None` | No | 1–20 if provided | Override default chunk count | backpack piece 📦 |
 
 **What happens on invalid input:**
 
@@ -207,7 +207,7 @@ class ChatResponse(BaseModel):
 | Field | Type | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- |
 | `answer` | `str` | The AI-generated answer | 🫏 On the route |
-| `sources` | `list[SourceChunk]` | Which document chunks were used (citations) | Saddlebag piece 📦 |
+| `sources` | `list[SourceChunk]` | Which document chunks were used (citations) | backpack piece 📦 |
 | `session_id` | `str` | Session ID for follow-up questions | Trip log 📒 |
 | `request_id` | `UUID` | Unique ID for debugging/tracing | Hoof check 🔧 |
 | `cloud_provider` | `CloudProvider` | Which cloud processed this request | 🫏 On the route |
@@ -224,12 +224,12 @@ class ChatResponse(BaseModel):
 
 | Field | Type | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `document_name` | `str` | Which file this chunk came from | Saddlebag piece 📦 |
-| `chunk_text` | `str` | The actual text content | Saddlebag piece 📦 |
+| `document_name` | `str` | Which file this chunk came from | backpack piece 📦 |
+| `chunk_text` | `str` | The actual text content | backpack piece 📦 |
 | `relevance_score` | `float` (0.0–1.0) | How similar to the question (1.0 = perfect) | Right address 🎯 |
 | `page_number` | `int` or `None` | Page in original PDF | 🫏 On the route |
 
-- 🫏 **Donkey:** Saddlebag-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
+- 🫏 **Donkey:** backpack-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
 
 ---
 
@@ -267,10 +267,10 @@ Example cost calculation (Claude 3.5 Sonnet):
 | `document_id` | `str` | Unique ID for this document | 🫏 On the route |
 | `filename` | `str` | Original filename | 🫏 On the route |
 | `status` | `DocumentStatus` | pending / processing / ready / failed | Hoof check 🔧 |
-| `chunk_count` | `int` | How many searchable chunks were created | Saddlebag piece 📦 |
+| `chunk_count` | `int` | How many searchable chunks were created | backpack piece 📦 |
 | `message` | `str` | Human-readable status | 🫏 On the route |
 
-- 🫏 **Donkey:** The parcels being ingested — split into saddlebag-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.
+- 🫏 **Donkey:** The parcels being ingested — split into backpack-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.
 
 ---
 

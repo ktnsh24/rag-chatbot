@@ -121,7 +121,7 @@ resource "azurerm_storage_account" "documents" {
 
 For a personal project, LRS is the cheapest option. Your documents are also on your local machine, so you can re-upload if anything happens.
 
-- 🫏 **Donkey:** Choosing between the local barn (ChromaDB), the AWS depot (DynamoDB/OpenSearch), or the Azure hub (Azure AI Search) to store the GPS-indexed saddlebags.
+- 🫏 **Donkey:** Choosing between the local barn (ChromaDB), the AWS depot (DynamoDB/OpenSearch), or the Azure hub (Azure AI Search) to store the GPS-indexed backpacks.
 
 ---
 

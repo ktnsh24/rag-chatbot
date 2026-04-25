@@ -132,12 +132,12 @@ customer. Phase 1 metrics measure **how well the donkey does its job:**
 
 | Metric | Donkey version | What it really measures | How it's calculated | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| **retrieval** | Did the donkey grab the **right packages** from the shelf? If you asked for "refund policy" and it brought back 3 refund-related packages out of 5 total, that's decent retrieval. If it brought back 5 packages about office furniture — terrible retrieval. | How relevant are the chunks the vector store returned for your question. | `avg(cosine_similarity)` of all retrieved chunks. Each chunk gets a 0.0–1.0 similarity score from the vector store. E.g. 5 chunks scoring [0.92, 0.85, 0.71, 0.45, 0.19] → retrieval = 3.12/5 = **0.624**. That's why top_k=1 scores higher (only the best chunk counts). | Saddlebag piece 📦 |
+| **retrieval** | Did the donkey grab the **right packages** from the shelf? If you asked for "refund policy" and it brought back 3 refund-related packages out of 5 total, that's decent retrieval. If it brought back 5 packages about office furniture — terrible retrieval. | How relevant are the chunks the vector store returned for your question. | `avg(cosine_similarity)` of all retrieved chunks. Each chunk gets a 0.0–1.0 similarity score from the vector store. E.g. 5 chunks scoring [0.92, 0.85, 0.71, 0.45, 0.19] → retrieval = 3.12/5 = **0.624**. That's why top_k=1 scores higher (only the best chunk counts). | backpack piece 📦 |
 | **faithfulness** | Did the donkey **only deliver what it picked up**, or did it add random items from its own pocket? If the customer opens the delivery and finds exactly what was on the shelf — faithful. If the donkey added a sandwich it found on the road — hallucination. | Does the LLM answer contain ONLY information from the retrieved chunks, or did it make things up? | Split answer into sentences → extract keywords per sentence (skip stop words) → check if ≥50% of keywords exist in the retrieved chunks. `grounded_sentences / total_sentences`. E.g. 3 of 4 sentences have keywords in context → **0.750**. Score of 0.000 = every sentence was hallucinated. | The donkey 🐴 |
 | **answer_relevance** | Did the customer **get what they actually asked for?** The donkey might faithfully deliver the right packages from the shelf, but if the customer asked "what's the return window?" and the answer talks about shipping costs — irrelevant. | Does the answer actually address the question that was asked? | Extract keywords from the question → count how many appear in the answer. `found_keywords / total_keywords`. E.g. question "What is the refund policy?" has keywords [refund, policy], both found in answer → **1.000**. | Feed bill 🌾 |
-| **overall** | The donkey's **performance review** — a weighted average: 30% right packages (retrieval) + 40% didn't add extras (faithfulness) + 30% customer got what they asked for (relevance). A score of 0.70+ means the donkey gets to keep its job. | Weighted combination: retrieval x 0.3 + faithfulness x 0.4 + relevance x 0.3. | `(retrieval × 0.3) + (faithfulness × 0.4) + (relevance × 0.3)`. Faithfulness gets highest weight because hallucinated answers LOOK correct but are WRONG — most dangerous. E.g. (0.624×0.3)+(0.750×0.4)+(1.0×0.3) = **0.787** ✅ PASS (≥0.70). | Saddlebag check 🫏 |
+| **overall** | The donkey's **performance review** — a weighted average: 30% right packages (retrieval) + 40% didn't add extras (faithfulness) + 30% customer got what they asked for (relevance). A score of 0.70+ means the donkey gets to keep its job. | Weighted combination: retrieval x 0.3 + faithfulness x 0.4 + relevance x 0.3. | `(retrieval × 0.3) + (faithfulness × 0.4) + (relevance × 0.3)`. Faithfulness gets highest weight because hallucinated answers LOOK correct but are WRONG — most dangerous. E.g. (0.624×0.3)+(0.750×0.4)+(1.0×0.3) = **0.787** ✅ PASS (≥0.70). | backpack check 🫏 |
 | **latency** | **How long** did the donkey take to walk to the shelf, pick packages, and deliver? A village donkey (local Ollama) takes 10–60 seconds. A racing donkey (cloud GPU) takes 1–3 seconds. | Total time from question to answer, including embedding, retrieval, and LLM generation. | Wall-clock time in milliseconds: `time_end - time_start`. Includes embedding (~50ms local, ~200ms cloud), vector search (~10ms), and LLM generation (dominates — local Ollama 10-60s, cloud GPU 1-3s). | The donkey 🐴 |
-| **top_k** | How many packages you **told the donkey to grab** from the shelf. `top_k=1` means "bring me only the single best match" (fast, precise, but risky if the answer spans multiple sections). `top_k=10` means "bring 10 packages" (slower, noisier, but the right one is probably in there somewhere). | Number of document chunks retrieved from the vector store per query. | Config parameter (not calculated). Passed to vector store: `vectorstore.similarity_search(query, k=top_k)`. Directly affects retrieval score — higher top_k pulls in lower-relevance chunks, dragging the average down. | Saddlebag fetch 🎒 |
+| **top_k** | How many packages you **told the donkey to grab** from the shelf. `top_k=1` means "bring me only the single best match" (fast, precise, but risky if the answer spans multiple sections). `top_k=10` means "bring 10 packages" (slower, noisier, but the right one is probably in there somewhere). | Number of document chunks retrieved from the vector store per query. | Config parameter (not calculated). Passed to vector store: `vectorstore.similarity_search(query, k=top_k)`. Directly affects retrieval score — higher top_k pulls in lower-relevance chunks, dragging the average down. | backpack fetch 🎒 |
 
 **The key trade-off you'll discover in Lab 1:**
 
@@ -184,7 +184,7 @@ Click **"Execute"**.
 | Score | Your value | Quality label | 🫏 Donkey |
 |---|---|---| --- |
 | retrieval | ___ | ___ | 🫏 On the route |
-| faithfulness | ___ | ___ | Saddlebag match 🫏 |
+| faithfulness | ___ | ___ | backpack match 🫏 |
 | answer_relevance | ___ | ___ | Right address 🎯 |
 | overall | ___ | ___ | 🫏 On the route |
 | latency | ___s | ___ | 🫏 On the route |
@@ -260,9 +260,9 @@ In **Swagger UI** → `POST /api/evaluate` → **"Try it out"**:
 
 | top_k | Expected retrieval | Your result | Expected faithfulness | Your result | Why | 🫏 Donkey |
 |---|---|---|---|---|---| --- |
-| 1 | Higher (only best chunk) | ___ | May drop (missing context) | ___ | Only 1 chunk → focused answer, no filler sentences | Saddlebag piece 📦 |
+| 1 | Higher (only best chunk) | ___ | May drop (missing context) | ___ | Only 1 chunk → focused answer, no filler sentences | backpack piece 📦 |
 | 5 | Balanced | ___ | Balanced | ___ | Middle ground — LLM may add disclaimer | The donkey 🐴 |
-| 10 | Lower (diluted by weak chunks) | ___ | May improve (more context) | ___ | All context available → confident answer | Saddlebag piece 📦 |
+| 10 | Lower (diluted by weak chunks) | ___ | May improve (more context) | ___ | All context available → confident answer | backpack piece 📦 |
 
 > ### 📊 What These Results Reveal — The Three Trade-offs
 >
@@ -397,7 +397,7 @@ This trade-off is the first thing an AI engineer checks when debugging a bad ans
 > new documents. Fine-tuning is for when you need the model to behave differently (tone, format).
 > Your Lab 1 experience: upload `test-policy.txt` → instantly answerable. No training needed.
 
-- 🫏 **Donkey:** Saddlebag-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
+- 🫏 **Donkey:** backpack-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
 
 ---
 
@@ -436,7 +436,7 @@ In **Swagger UI** → `POST /api/evaluate`, enter:
 | Metric | Value | Interpretation | 🫏 Donkey |
 | --- | --- | --- | --- |
 | retrieval | ___ | ___ | 🫏 On the route |
-| faithfulness | ___ | ___ | Saddlebag match 🫏 |
+| faithfulness | ___ | ___ | backpack match 🫏 |
 | has_hallucination | ___ | ___ | Memory drift ⚠️ |
 | answer_relevance | ___ | ___ | Right address 🎯 |
 | overall | ___ | ___ | 🫏 On the route |
@@ -469,7 +469,7 @@ In **Swagger UI** → `POST /api/evaluate`, enter:
 | Metric | Value | Interpretation | 🫏 Donkey |
 | --- | --- | --- | --- |
 | retrieval | ___ | ___ | 🫏 On the route |
-| faithfulness | ___ | ___ | Saddlebag match 🫏 |
+| faithfulness | ___ | ___ | backpack match 🫏 |
 | has_hallucination | ___ | ___ | Memory drift ⚠️ |
 | answer_relevance | ___ | ___ | Right address 🎯 |
 | overall | ___ | ___ | 🫏 On the route |
@@ -503,7 +503,7 @@ In **Swagger UI** → `POST /api/evaluate`, enter:
 | Metric | Value | Interpretation | 🫏 Donkey |
 | --- | --- | --- | --- |
 | retrieval | ___ | Lowest retrieval — "how long?" is too vague for precise vector search | GPS warehouse 🗺️ |
-| faithfulness | ___ | ___ | Saddlebag match 🫏 |
+| faithfulness | ___ | ___ | backpack match 🫏 |
 | has_hallucination | ___ | ___ | Memory drift ⚠️ |
 | answer_relevance | ___ | ___ | Right address 🎯 |
 | overall | ___ | ___ | 🫏 On the route |
@@ -576,7 +576,7 @@ The evaluator catches hallucination by: splitting the answer into sentences → 
 > In production, you'd use LLM-as-judge (a second model evaluating the first) or Bedrock Guardrails
 > grounding checks — both understand context better than keyword overlap.
 
-- 🫏 **Donkey:** When the donkey ignores the saddlebag and invents an answer from memory — RAG is the cure.
+- 🫏 **Donkey:** When the donkey ignores the backpack and invents an answer from memory — RAG is the cure.
 
 ---
 
@@ -586,8 +586,8 @@ After completing Labs 1 and 2, check off:
 
 | # | Skill | Lab | Can you explain it? | 🫏 Donkey |
 |---|---|---|---| --- |
-| 1 | Retrieval quality measurement | Lab 1 | [ ] Yes | Saddlebag fetch 🎒 |
-| 2 | Retrieval-faithfulness trade-off | Lab 1 | [ ] Yes | Saddlebag match 🫏 |
+| 1 | Retrieval quality measurement | Lab 1 | [ ] Yes | backpack fetch 🎒 |
+| 2 | Retrieval-faithfulness trade-off | Lab 1 | [ ] Yes | backpack match 🫏 |
 | 3 | top_k tuning and its impact | Lab 1 | [ ] Yes | 🫏 On the route |
 | 4 | Hallucination detection | Lab 2 | [ ] Yes | Memory drift ⚠️ |
 | 5 | Faithfulness scoring and weight | Lab 2 | [ ] Yes | Report card 📝 |

@@ -172,7 +172,7 @@ When you replay history in the prompt, each message must say who sent it:
 messages. More history = more input tokens = more cost. This is a trade-off between
 context quality and cost (explained in detail in [The Token Cost of History](#the-token-cost-of-history)).
 
-- 🫏 **Donkey:** The universal saddle fitting — any donkey (AWS, Azure, local) accepts the same harness so you can swap providers without re-training the rider.
+- 🫏 **Donkey:** The universal bag fitting — any donkey (AWS, Azure, local) accepts the same harness so you can swap providers without re-training the rider.
 
 ---
 

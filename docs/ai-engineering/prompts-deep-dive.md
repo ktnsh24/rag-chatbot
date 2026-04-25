@@ -107,7 +107,7 @@ USER QUESTION: {question}"""
 
 **Every single line serves a purpose.** Let's break it down.
 
-- 🫏 **Donkey:** The donkey checks its saddlebag full of retrieved document chunks before answering — no guessing from memory.
+- 🫏 **Donkey:** The donkey checks its backpack full of retrieved document chunks before answering — no guessing from memory.
 
 ---
 
@@ -135,7 +135,7 @@ The role definition doesn't enforce anything technically — but it shifts the m
 | Grounded in YOUR documents | Grounded in internet training data | 🫏 On the route |
 | Trustworthy for business use | Dangerous for business use | 🫏 On the route |
 
-- 🫏 **Donkey:** The donkey itself — it carries the question in, consults the saddlebag, and writes the answer on the way back.
+- 🫏 **Donkey:** The donkey itself — it carries the question in, consults the backpack, and writes the answer on the way back.
 
 ---
 
@@ -155,7 +155,7 @@ Each rule targets a specific failure mode:
 
 **Why Rule 7 repeats Rule 1:** LLMs respond to emphasis. Saying "only use context" (Rule 1) and "never make up information" (Rule 7) at the top AND bottom of the rules creates a "sandwich" effect — the model is less likely to hallucinate.
 
-- 🫏 **Donkey:** When the donkey ignores the saddlebag and invents an answer from memory — RAG is the cure.
+- 🫏 **Donkey:** When the donkey ignores the backpack and invents an answer from memory — RAG is the cure.
 
 ---
 
@@ -234,7 +234,7 @@ Without history, the LLM would say *"I don't know what you're referring to"* —
 
 📖 **Related:** [Conversation History Deep Dive](../architecture-and-design/history-explained.md)
 
-- 🫏 **Donkey:** The donkey checks its saddlebag full of retrieved document chunks before answering — no guessing from memory.
+- 🫏 **Donkey:** The donkey checks its backpack full of retrieved document chunks before answering — no guessing from memory.
 
 ---
 
@@ -315,9 +315,9 @@ RAG_SYSTEM_PROMPT                   query():
 |---|---|---|---| --- |
 | Hallucination | Rules too weak or model ignores them | Stronger constraints, lower temperature | Faithfulness score < 0.8 in evaluator | Memory drift ⚠️ |
 | Verbose answers | No length constraint | Add "Keep answers under 200 words" | Token count > 500 output tokens | Cargo unit ⚖️ |
-| Ignores citations | Model doesn't see "[Document chunk N]" pattern | Add example output in prompt | Missing `[Document chunk` in answer | Saddlebag piece 📦 |
+| Ignores citations | Model doesn't see "[Document chunk N]" pattern | Add example output in prompt | Missing `[Document chunk` in answer | backpack piece 📦 |
 | Wrong language | User asks in Dutch, prompt is English | Add "Answer in the same language as the question" | Manual review | Delivery note 📋 |
-| Off-topic | Context chunks are irrelevant | Better chunking/retrieval, not a prompt fix | Answer relevance score < 0.5 | Saddlebag piece 📦 |
+| Off-topic | Context chunks are irrelevant | Better chunking/retrieval, not a prompt fix | Answer relevance score < 0.5 | backpack piece 📦 |
 
 - 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
 

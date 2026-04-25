@@ -94,7 +94,7 @@ src/monitoring/metrics.py
       └── get_summary()            ← Called by GET /health
 ```
 
-- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the saddlebags are loaded, and which route it takes to the customer.
+- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the backpacks are loaded, and which route it takes to the customer.
 
 ---
 
@@ -226,7 +226,7 @@ error_rate = _chat_errors / _chat_requests
 
 **DE parallel:** Same as pipeline failure rate. If more than 5% of Airflow DAG runs fail, something is wrong.
 
-- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and saddle inspection checklist to find what went wrong.
+- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
 
 ---
 
@@ -249,7 +249,7 @@ metrics.record_document_ingestion(chunk_count=200)
 
 **Why track chunk count?** Because it directly correlates to vector store size and search performance. 10,000 chunks search faster than 1,000,000 chunks.
 
-- 🫏 **Donkey:** Post office pre-sorting: mail is split into saddlebag-sized chunks, stamped with GPS coordinates (embeddings), and shelved in the warehouse before the donkey ever arrives.
+- 🫏 **Donkey:** Post office pre-sorting: mail is split into backpack-sized chunks, stamped with GPS coordinates (embeddings), and shelved in the warehouse before the donkey ever arrives.
 
 ---
 
@@ -473,7 +473,7 @@ These are metrics that **don't exist in traditional software** but are critical 
 | **Input/output ratio** | Input tokens ÷ output tokens | > 10:1 means verbose context | Over-retrieval | Cargo unit ⚖️ |
 | **Latency P99** | Worst-case response time | > 10s | UX degradation | 🫏 On the route |
 | **Error rate** | Failures / total requests | > 5% | System reliability | Feed bill 🌾 |
-| **Chunks per document** | Average chunk count | > 500/doc | Storage bloat | Saddlebag piece 📦 |
+| **Chunks per document** | Average chunk count | > 500/doc | Storage bloat | backpack piece 📦 |
 
 ### Cost monitoring formula
 

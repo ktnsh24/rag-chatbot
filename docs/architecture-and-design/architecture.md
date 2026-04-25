@@ -77,7 +77,7 @@
 > Queries (I30 — failure debugging) ·
 > Metrics (I31 — Prometheus endpoint).
 
-- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the saddlebags are loaded, and which route it takes to the customer.
+- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the backpacks are loaded, and which route it takes to the customer.
 
 ---
 
@@ -122,7 +122,7 @@ User asks: "What is the refund policy?"
 5. Return JSON response to client
 ```
 
-- 🫏 **Donkey:** The warehouse robot dispatched to find the right saddlebag shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+- 🫏 **Donkey:** The warehouse robot dispatched to find the right backpack shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -161,7 +161,7 @@ User uploads: "refund-policy.pdf" (12 pages)
 3. Return: { document_id: "abc-123", chunk_count: 45, status: "ready" }
 ```
 
-- 🫏 **Donkey:** Post office pre-sorting: mail is split into saddlebag-sized chunks, stamped with GPS coordinates (embeddings), and shelved in the warehouse before the donkey ever arrives.
+- 🫏 **Donkey:** Post office pre-sorting: mail is split into backpack-sized chunks, stamped with GPS coordinates (embeddings), and shelved in the warehouse before the donkey ever arrives.
 
 ---
 
@@ -219,7 +219,7 @@ This demonstrates that you can design systems that aren't locked into one cloud 
 | **RAG** | `src/rag/` | RAG pipeline (chain, ingestion, prompts) | Delivery note 📋 |
 | **LLM** | `src/llm/` | LLM abstraction + implementations | The donkey 🐴 |
 | **Vector Store** | `src/vectorstore/` | Vector DB abstraction + implementations | GPS warehouse 🗺️ |
-| **Storage** | `src/storage/` | Document storage abstraction | Saddlebag check 🫏 |
+| **Storage** | `src/storage/` | Document storage abstraction | backpack check 🫏 |
 | **History** | `src/history/` | Conversation history abstraction | Trip log 📒 |
 | **Monitoring** | `src/monitoring/` | Metrics, query logging (JSONL), OpenTelemetry tracing | Tachograph 📊 |
 | **Config** | `src/config.py` | Pydantic Settings (env vars) | Manifest template 📋 |
@@ -244,4 +244,4 @@ This demonstrates that you can design systems that aren't locked into one cloud 
 | **Poetry** | Better dependency management than pip. Lock files prevent "works on my machine" issues. | Supply manifest 📜 |
 | **FastAPI** | Async, fast, auto-generates API docs, native Pydantic support. | Stable door 🚪 |
 
-- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the saddlebags are loaded, and which route it takes to the customer.
+- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the backpacks are loaded, and which route it takes to the customer.

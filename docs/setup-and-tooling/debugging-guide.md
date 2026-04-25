@@ -41,7 +41,7 @@ When something goes wrong, `print()` statements won't cut it. You need to:
 - **Step through code line by line** (follow the exact flow)
 - **Evaluate expressions** (what would `result.score > 0.8` return?)
 
-- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -86,9 +86,9 @@ In the dropdown at the top, you'll see three options:
 
 | Configuration | What it does | 🫏 Donkey |
 | --- | --- | --- |
-| **RAG Chatbot — Debug Server** | Starts the FastAPI server with debugger attached. Use this for testing endpoints. | Saddlebag check 🫏 |
-| **RAG Chatbot — Debug Tests** | Runs all pytest tests with debugger. Use this when a test fails and you want to step through it. | Saddlebag check 🫏 |
-| **RAG Chatbot — Debug Single Test File** | Runs only the currently open test file. Fastest for debugging one test. | Saddlebag check 🫏 |
+| **RAG Chatbot — Debug Server** | Starts the FastAPI server with debugger attached. Use this for testing endpoints. | backpack check 🫏 |
+| **RAG Chatbot — Debug Tests** | Runs all pytest tests with debugger. Use this when a test fails and you want to step through it. | backpack check 🫏 |
+| **RAG Chatbot — Debug Single Test File** | Runs only the currently open test file. Fastest for debugging one test. | backpack check 🫏 |
 
 ### Step 6: Set breakpoints
 
@@ -100,11 +100,11 @@ Click in the **gutter** (the space to the left of line numbers) to set a red dot
 | --- | --- | --- | --- |
 | `src/main.py` | Line inside `lifespan()` | See what happens at startup | 🫏 On the route |
 | `src/api/routes/chat.py` | First line of `chat()` | See every incoming chat request | Stable door 🚪 |
-| `src/rag/chain.py` | Inside `query()` | See RAG retrieval + generation | Saddlebag check 🫏 |
+| `src/rag/chain.py` | Inside `query()` | See RAG retrieval + generation | backpack check 🫏 |
 | `src/llm/aws_bedrock.py` | Inside `generate()` | See the Bedrock API call | The donkey 🐴 |
 | `src/llm/azure_openai.py` | Inside `generate()` | See the Azure OpenAI API call | The donkey 🐴 |
 | `src/vectorstore/base.py` | Inside `search()` | See vector search results | GPS warehouse 🗺️ |
-| `src/rag/ingestion.py` | Inside `chunk_document()` | See how documents are split | Saddlebag piece 📦 |
+| `src/rag/ingestion.py` | Inside `chunk_document()` | See how documents are split | backpack piece 📦 |
 
 ### Step 7: Start debugging
 
@@ -152,7 +152,7 @@ When the debugger pauses, you can:
 | **Continue** | Press `F5` | Run until next breakpoint | 🫏 On the route |
 | **Stop** | Press `Shift+F5` | Stop the debugger | Hoof check 🔧 |
 
-- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -196,7 +196,7 @@ PyCharm's debugger has the same controls:
 - **Shift+F8** = Step Out
 - **F9** = Resume (Continue)
 
-- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -213,7 +213,7 @@ PyCharm's debugger has the same controls:
 | Stop | `Shift+F5` | `Ctrl+F2` | 🫏 On the route |
 | Evaluate expression | Debug Console | Alt+F8 | Report card 📝 |
 
-- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -231,7 +231,7 @@ This is the central AI orchestrator. Set breakpoints on all 5 steps:
 | Step | Line (approx) | Code | What to inspect | AI concept you're seeing | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
 | **1. Embed** | 188 | `query_embedding = await self._llm.get_embedding(question)` | Hover `query_embedding` → 768 floats representing your question's meaning | **Text → Vector embedding** | The donkey 🐴 |
-| **2. Search** | 191 | `search_results = await self._vector_store.search(` | Hover `search_results` → list of chunks with similarity scores (0.0–1.0) | **HNSW vector similarity search** | Saddlebag piece 📦 |
+| **2. Search** | 191 | `search_results = await self._vector_store.search(` | Hover `search_results` → list of chunks with similarity scores (0.0–1.0) | **HNSW vector similarity search** | backpack piece 📦 |
 | **3. Context** | 204 | `context_texts = [result.text for result in search_results]` | Hover `context_texts` → the actual text chunks the LLM will read | **RAG context building** | The donkey 🐴 |
 | **4. Generate** | 207 | `llm_response = await self._llm.generate(` | After step-over: hover `llm_response` → the LLM's answer + token count | **LLM text generation** | The donkey 🐴 |
 | **5. Cost** | 223 | `token_usage = {` | Hover to see input/output tokens + estimated $ cost | **Token counting & cost estimation** | Cargo unit ⚖️ |
@@ -262,14 +262,14 @@ Go deeper to see the raw HTTP communication with Ollama:
 | Method | Line (approx) | Code | What to inspect | AI concept | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
 | `search()` | ~116 | `results = self._collection.query(` | Step over → hover `results` → see `distances`, `documents`, `metadatas` | **ChromaDB HNSW k-NN search** | Local barn 🏚️ |
-| `store_vectors()` | ~104 | `self._collection.upsert(` | See the chunk IDs, texts, and embeddings being stored | **Vector indexing** | Saddlebag piece 📦 |
+| `store_vectors()` | ~104 | `self._collection.upsert(` | See the chunk IDs, texts, and embeddings being stored | **Vector indexing** | backpack piece 📦 |
 
 **What to look for:**
 - `results['distances']` — lower = more similar (ChromaDB uses distance, not similarity score)
 - `results['documents']` — the actual text chunks returned
 - `results['metadatas']` — document name, chunk index, etc.
 
-- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -282,7 +282,7 @@ Set these when uploading a document to see the full ETL-for-AI pipeline:
 | Step | Line (approx) | Code | What to inspect | AI concept | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
 | **1. Parse** | 140 | `text = read_document(filename, content)` | Hover `text` → raw text extracted from your PDF/DOCX/TXT | **Document parsing** | 🫏 On the route |
-| **2. Chunk** | 144 | `chunks = chunk_document(` | Hover `chunks` → list of overlapping text pieces (1000 chars each, 200 overlap) | **Text chunking (RecursiveCharacterTextSplitter)** | Saddlebag piece 📦 |
+| **2. Chunk** | 144 | `chunks = chunk_document(` | Hover `chunks` → list of overlapping text pieces (1000 chars each, 200 overlap) | **Text chunking (RecursiveCharacterTextSplitter)** | backpack piece 📦 |
 | **3. Embed** | ~152 | `embeddings = await self._llm.get_embeddings_batch(chunks)` | Hover `embeddings` → N×768 matrix (N chunks, each with 768-dim vector) | **Batch embedding generation** | The donkey 🐴 |
 | **4. Store** | ~156 | `stored = await self._vector_store.store_vectors(` | Step over → see how many vectors were indexed in ChromaDB | **Vector storage & HNSW indexing** | Local barn 🏚️ |
 
@@ -296,7 +296,7 @@ Set these when uploading a document to see the full ETL-for-AI pipeline:
 | Function | Line | What to inspect | AI concept | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
 | `read_document()` | Start of function | `filename` and `content` → see what format was uploaded | **Multi-format document parsing** | 🫏 On the route |
-| `chunk_document()` | After `text_splitter.split_text()` | The `chunks` list → see exactly where the text was split and how overlap works | **Chunking strategy** | Saddlebag piece 📦 |
+| `chunk_document()` | After `text_splitter.split_text()` | The `chunks` list → see exactly where the text was split and how overlap works | **Chunking strategy** | backpack piece 📦 |
 
 **Try in the Debug Console:**
 ```python
@@ -380,4 +380,4 @@ Set a breakpoint in `src/rag/ingestion.py` → `read_document()`:
 - Is the PDF readable?
 - How many chunks were created?
 
-- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.

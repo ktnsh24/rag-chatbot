@@ -447,8 +447,8 @@ boundaries so you don't lose context at the edges.
 
 | ETL Transform | RAG Transform (chunking) | 🫏 Donkey |
 | --- | --- | --- |
-| Split large CSV into 100 row batches | Split document into 1000 char chunks | Saddlebag piece 📦 |
-| Partitioning with no overlap | Partitioning WITH overlap (200 chars) | Saddlebag piece 📦 |
+| Split large CSV into 100 row batches | Split document into 1000 char chunks | backpack piece 📦 |
+| Partitioning with no overlap | Partitioning WITH overlap (200 chars) | backpack piece 📦 |
 | Purpose: parallel processing | Purpose: precise vector matching | GPS warehouse 🗺️ |
 
 **Cost of this step:** $0 — pure Python computation, no API calls.
@@ -522,7 +522,7 @@ it like:
 
 | ETL Transform | RAG Transform (embedding) | 🫏 Donkey |
 | --- | --- | --- |
-| Convert CSV strings to typed columns | Convert text chunks to number vectors | Saddlebag piece 📦 |
+| Convert CSV strings to typed columns | Convert text chunks to number vectors | backpack piece 📦 |
 | Parse dates, cast integers | Run through neural network to get floats | 🫏 On the route |
 | Output: structured rows | Output: vectors — 1024-dim (AWS Titan), 1536-dim (Azure), or 768-dim (Local Ollama) | The donkey 🐴 |
 | Purpose: make data queryable by SQL | Purpose: make text searchable by meaning | 🫏 On the route |
@@ -814,7 +814,7 @@ registry entry and returns the response.
 | `document_id` | `"a1b2c3d4-..."` | Unique identifier | 🫏 On the route |
 | `filename` | `"refund-policy.pdf"` | Original filename | 🫏 On the route |
 | `status` | `DocumentStatus.READY` | Lifecycle stage | 🫏 On the route |
-| `chunk_count` | `42` | How many searchable pieces it became | Saddlebag piece 📦 |
+| `chunk_count` | `42` | How many searchable pieces it became | backpack piece 📦 |
 | `uploaded_at` | `2026-04-07T10:30:00Z` | When it was uploaded | 🫏 On the route |
 | `file_size_bytes` | `1048576` | File size (1 MB) | 🫏 On the route |
 
@@ -1014,7 +1014,7 @@ For a 12-page PDF (~8000 words, ~42 chunks):
 | Step | What happens | AWS cost | Azure cost | AWS time | Azure time | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1. READ | Parse PDF → text | $0 | $0 | ~50ms | ~50ms | Free hay 🌿 |
-| 2. CHUNK | Split into 42 pieces | $0 | $0 | ~5ms | ~5ms | Saddlebag piece 📦 |
+| 2. CHUNK | Split into 42 pieces | $0 | $0 | ~5ms | ~5ms | backpack piece 📦 |
 | 3. EMBED | Convert chunks → vectors | $0.000168 (Titan, 42 calls) | $0.000168 (text-embedding-3-small, 1 call) | **~2100ms** | **~150ms** | GPS stamp 📍 |
 | 4. STORE | Write to vector database | ~$0 (OpenSearch) | ~$0 (AI Search) | **~420ms** | **~50ms** | AWS search hub 🔍 |
 | **Total per doc** | | **~$0.0002** | **~$0.0002** | **~2.6s** | **~0.25s** | Feed bill 🌾 |
@@ -1037,9 +1037,9 @@ the ingestion cost 1000x.
 | Error scenario | What happens | HTTP status | 🫏 Donkey |
 | --- | --- | --- | --- |
 | Unsupported file type (.exe, .xlsx) | Validation rejects before any AI call | `400` | 🫏 On the route |
-| RAG chain not initialised | Route returns error immediately | `500` | Saddlebag check 🫏 |
+| RAG chain not initialised | Route returns error immediately | `500` | backpack check 🫏 |
 | PDF is corrupted / unparseable | `read_document()` throws → caught by try/except | `500` | 🫏 On the route |
-| PDF is scanned images (no text) | `read_document()` returns empty string → 0 chunks | `200` (with chunk_count=0) | Saddlebag piece 📦 |
+| PDF is scanned images (no text) | `read_document()` returns empty string → 0 chunks | `200` (with chunk_count=0) | backpack piece 📦 |
 | Embedding API fails (Bedrock / Azure OpenAI down) | Exception in Step 3 → document saved as FAILED | `500` | The donkey 🐴 |
 | Vector store down (OpenSearch / Azure AI Search) | Exception in Step 4 → document saved as FAILED | `500` | AWS search hub 🔍 |
 | File is too large (out of memory) | `await file.read()` fails → exception | `500` | Trip log 📒 |
