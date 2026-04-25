@@ -143,13 +143,13 @@ The ECS task role grants least-privilege access:
 
 | Resource | Purpose | Free Tier? | 🫏 Donkey |
 |---|---|---| --- |
-| `azurerm_resource_group` | Resource container | ✅ Free | Donkey's stall — azurerm_resource_group: Resource container · ✅ Free |
+| `azurerm_resource_group` | Resource container | ✅ Free | The plot of land you fence off in Azure — free, but every stable building has to sit inside it. |
 | `azurerm_storage_account` | Document storage | ✅ 5 GB LRS | Azure's document warehouse where the donkey picks up source files for ingestion |
 | `azurerm_storage_container` | Blob container | ✅ Included | The labelled bin inside the warehouse where uploaded documents are sorted |
-| `azurerm_cosmosdb_account` | Conversation history | ✅ 1000 RU/s free | Azure trip-log — azurerm_cosmosdb_account: Conversation history · ✅ 1000 RU/s free |
-| `azurerm_cosmosdb_sql_database` | Database | ✅ Included | Azure trip-log — azurerm_cosmosdb_sql_database: Database · ✅ Included |
-| `azurerm_cosmosdb_sql_container` | Container | ✅ Included | Azure trip-log — azurerm_cosmosdb_sql_container: Container · ✅ Included |
-| `azurerm_container_registry` | Docker images | Basic SKU ~€4.20/mo | Donkey's stall — azurerm_container_registry: Docker images · Basic SKU ~€4.20/mo |
+| `azurerm_cosmosdb_account` | Conversation history | ✅ 1000 RU/s free | Cosmos trip-log cabinet: 1000 RU/s of free history pages where every donkey conversation gets jotted down. |
+| `azurerm_cosmosdb_sql_database` | Database | ✅ Included | The labelled folder inside the trip-log cabinet — free, just organises the conversation pages. |
+| `azurerm_cosmosdb_sql_container` | Container | ✅ Included | The shelf inside the folder where individual chat messages get filed — free, included with the cabinet. |
+| `azurerm_container_registry` | Docker images | Basic SKU ~€4.20/mo | The locker where Docker images of your donkey wait to be deployed — Basic SKU rents for ~€4.20/mo. |
 
 ### Variables
 

@@ -138,7 +138,7 @@ DynamoDB stores each chunk with its embedding as a JSON string. On search, all v
 | | AWS DynamoDB | Azure Cosmos DB | 🫏 Donkey |
 | --- | --- | --- | --- |
 | **Mode** | Pay-per-request | Serverless | Donkey-side view of Mode — affects how the donkey loads, reads, or delivers the cargo |
-| **Read cost** | $1.25/million reads | ~$0.25/million RU | Hay-and-oats invoice — Read cost: $1.25/million reads · ~$0.25/million RU |
+| **Read cost** | $1.25/million reads | ~$0.25/million RU | DynamoDB charges $1.25 per million peeks at the cargo manifest; Cosmos lets you peek roughly 5× cheaper per RU. |
 | **Write cost** | $1.25/million writes | ~$0.25/million RU | Cost of keeping the donkey fed — Write cost: $1.25/million writes · ~$0.25/million RU |
 | **Free tier** | 25 GB + 25 RCU + 25 WCU | 1000 RU/s + 25 GB | Free hay for the donkey — Free tier: 25 GB + 25 RCU + 25 WCU · 1000 RU/s + 25 GB |
 
@@ -243,7 +243,7 @@ Since you want to save money, here's the cheapest way to run this project:
 
 | | Bedrock (our choice) | SageMaker | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Model hosting** | Managed (no instances) | You manage instances | Pre-printed waybill — Model hosting: Managed (no instances) · You manage instances |
+| **Model hosting** | Managed (no instances) | You manage instances | Bedrock rents you a pre-fed, pre-groomed donkey; SageMaker hands you the stall, the brush, and the feed bucket. |
 | **Min cost** | $0 (pay per token) | ~$100/month (ml.g5.xlarge) | Bedrock charges per hay bale, SageMaker rents a full-time GPU donkey at $100+/month |
 | **Scaling** | Automatic | Manual or auto-scaling | How the stable adds or removes donkeys when delivery volume changes |
 | **GPU management** | None | You handle it | Donkey-side view of GPU management — affects how the donkey loads, reads, or delivers the cargo |
@@ -281,7 +281,7 @@ Cognitive Services doesn't have a conversational LLM. It does text analytics (se
 
 | | Bedrock/Azure OpenAI (our choice) | Self-hosted (Llama 3) | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **GPU cost** | $0 idle | ~$730/month (g5.xlarge) | Hay-and-oats invoice — GPU cost: $0 idle · ~$730/month (g5.xlarge) |
+| **GPU cost** | $0 idle | ~$730/month (g5.xlarge) | Pay-per-trip donkeys idle for free; owning your own Llama costs ~$730/month in hay whether it walks or naps. |
 | **Quality** | GPT-4o / Claude (best) | Good but not as strong | Cloud-managed donkeys are top-of-class writers; self-hosted Llama is decent but not as polished |
 | **Maintenance** | None | You manage everything | Donkey-side view of Maintenance — affects how the donkey loads, reads, or delivers the cargo |
 | **Latency** | ~1–3 seconds | ~2–5 seconds | Tachograph reading — how long the donkey took on the round trip |
@@ -296,7 +296,7 @@ Unless you need complete data isolation, managed APIs are cheaper and easier.
 | | FastAPI (our choice) | Step Functions + Lambda | 🫏 Donkey |
 | --- | --- | --- | --- |
 | **Architecture** | Monolith (simple) | Microservices (complex) | Donkey-side view of Architecture — affects how the donkey loads, reads, or delivers the cargo |
-| **Min cost** | $30/month (Fargate) | ~$5/month (Lambda free tier) | Donkey's stall — Min cost: $30/month (Fargate) · ~$5/month (Lambda free tier) |
+| **Min cost** | $30/month (Fargate) | ~$5/month (Lambda free tier) | Fargate keeps the stable manager on duty 24/7 ($30); Lambda only wakes the donkey when a delivery rings the bell. |
 | **Complexity** | Low | High (state machines, IAM, etc.) | Stable keys — only authorised callers may ask the donkey to deliver |
 | **Latency** | ~1s (in-memory) | ~3–5s (cold starts + state transitions) | Stable diary records — Latency: ~1s (in-memory) · ~3–5s (cold starts + state transitions) |
 
@@ -310,7 +310,7 @@ If you had a complex document ingestion pipeline with multiple stages (OCR → t
 
 | | Direct upload (our choice) | Data Factory | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Purpose** | Simple file upload → ingest | Complex ETL pipelines | Loading-bay pre-sort — Purpose: Simple file upload → ingest · Complex ETL pipelines |
+| **Purpose** | Simple file upload → ingest | Complex ETL pipelines | Direct upload is the customer dropping parcels at the stable door; Data Factory is a full pre-sort post office en route. |
 | **Min cost** | $0 | ~$50/month (pipeline runs) | What the stable charges this month — Min cost: $0 · ~$50/month (pipeline runs) |
 | **Use case** | Upload via API | Scheduled batch processing | Entry gate to the stable — Use case: Upload via API · Scheduled batch processing |
 
@@ -321,7 +321,7 @@ If documents came from 10 different sources (SharePoint, Salesforce, databases) 
 
 | | Fargate / Container Apps (our choice) | EKS / AKS (Kubernetes) | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Management** | Serverless containers | You manage the cluster | Donkey's stall — Management: Serverless containers · You manage the cluster |
+| **Management** | Serverless containers | You manage the cluster | Fargate stables come pre-built; with Kubernetes you're hammering together your own barn before any donkey moves in. |
 | **Min cost** | ~$20–30/month | ~$75/month (EKS) / ~$100/month (AKS) | Kubernetes stable costs $75–100/month minimum versus serverless containers at $20–30 |
 | **Scaling** | Automatic | Auto-scaling (more config) | How the stable adds or removes donkeys when delivery volume changes |
 | **Complexity** | Low | High (kubectl, helm, etc.) | Donkey-side view of Complexity — affects how the donkey loads, reads, or delivers the cargo |
@@ -349,7 +349,7 @@ Glue spins up a full Spark cluster for each job. A single document ingestion tak
 | Decision | Chosen | Alternative | Why chosen wins | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
 | LLM | Bedrock / Azure OpenAI / **Ollama (dev)** | SageMaker / Self-hosted | $0 idle vs $730/month GPU | Rent a managed donkey on demand instead of stabling a $730/month GPU donkey full-time |
-| Vector Store | OpenSearch / AI Search / **DynamoDB (cheap AWS)** / **ChromaDB (dev)** | Kendra / Pinecone | Cheaper, more control, DynamoDB is $0/month | OpenSearch sorting office — Vector Store: OpenSearch / AI Search / DynamoDB (cheap AWS) / ChromaDB (dev) · Kendra / Pinecone · Cheaper, more… |
+| Vector Store | OpenSearch / AI Search / **DynamoDB (cheap AWS)** / **ChromaDB (dev)** | Kendra / Pinecone | Cheaper, more control, DynamoDB is $0/month | Pick the cheapest GPS warehouse that still finds backpacks fast — DynamoDB is the free shed, ChromaDB the sandbox loft. |
 | Hosting | Fargate / Container Apps | EKS / AKS | Simpler, cheaper | Stall that houses the worker — Hosting: Fargate / Container Apps · EKS / AKS · Simpler, cheaper |
 | Orchestration | FastAPI (monolith) | Step Functions + Lambda | Lower latency, simpler | FastAPI monolith stable is simpler than microservice Step Functions coordination for one donkey |
 | Document pipeline | Lambda / Azure Functions | Glue / Data Factory | Faster startup, cheaper | Serverless Lambda or Functions stable wakes faster and costs less than managed ETL stables |

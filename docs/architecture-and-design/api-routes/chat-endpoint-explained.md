@@ -1015,7 +1015,7 @@ Here's a breakdown of what one question costs across all 5 steps:
 | 3. BUILD | Assemble prompt | $0 | $0 | $0 | <1ms | Note the donkey carries — 3. BUILD: Assemble prompt · $0 · $0 · $0 · <1ms |
 | 4. GENERATE | LLM generates answer | **$0.0065** (Claude) | **$0.005** (GPT-4o) | **$0** (llama3.2) | ~350ms | The donkey writes the answer — by far the slowest and most expensive step of every trip |
 | 5. BUILD | Format response | $0 | $0 | $0 | <1ms | Complimentary feed allowance — 5. BUILD: Format response · $0 · $0 · $0 · <1ms |
-| **Total per query** | | **~$0.0065** | **~$0.005** | **$0** | **~430ms** | Hay-and-oats invoice — Total per query: ~$0.0065 · ~$0.005 · $0 · ~430ms |
+| **Total per query** | | **~$0.0065** | **~$0.005** | **$0** | **~430ms** | End-to-end delivery: AWS donkey ~$0.0065, Azure ~$0.005, local llama3.2 free — all in about 430ms door to door. |
 | **Monthly infra** | | ~$350 (OpenSearch 2 OCU) | ~$75 (AI Search Basic) | **$0** | — | OpenSearch sorting office — Monthly infra: ~$350 (OpenSearch 2 OCU) · ~$75 (AI Search Basic) · $0 · — |
 
 **Key insight:** 99.9% of the cost is in Step 4 (the LLM call). The embedding is

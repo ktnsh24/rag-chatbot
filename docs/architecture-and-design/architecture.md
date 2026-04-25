@@ -222,11 +222,11 @@ This demonstrates that you can design systems that aren't locked into one cloud 
 | **Storage** | `src/storage/` | Document storage abstraction | Stable design — donkey doesn't care which warehouse brand it grabs from |
 | **History** | `src/history/` | Conversation history abstraction | Trip log entry — History: src/history/ · Conversation history abstraction |
 | **Monitoring** | `src/monitoring/` | Metrics, query logging (JSONL), OpenTelemetry tracing | Tally board on the stable wall — Monitoring: src/monitoring/ · Metrics, query logging (JSONL), OpenTelemetry tracing |
-| **Config** | `src/config.py` | Pydantic Settings (env vars) | Manifest template — Config: src/config.py · Pydantic Settings (env vars) |
+| **Config** | `src/config.py` | Pydantic Settings (env vars) | The stable's standing orders — Pydantic Settings read env vars once and tell every donkey which barn to work from. |
 | **Entry Point** | `src/main.py` | FastAPI app factory, lifespan | Where parcels are dropped at the stable — Entry Point: src/main.py · FastAPI app factory, lifespan |
 | **Infrastructure** | `infra/` | Terraform (AWS + Azure); Local needs no infra | Terraform stable blueprints for AWS and Azure; the local stable runs without any infra at all. |
-| **CI/CD** | `.github/workflows/` | GitHub Actions | Mechanical groom — CI/CD: .github/workflows/ · GitHub Actions |
-| **Tests** | `tests/` | Unit + integration tests | Trial delivery — Tests: tests/ · Unit + integration tests |
+| **CI/CD** | `.github/workflows/` | GitHub Actions | The robot stable hand in `.github/workflows/` — runs tests, builds the crate, and ships the donkey on every push. |
+| **Tests** | `tests/` | Unit + integration tests | The donkey's report card — unit checks every harness, integration runs full deliveries before any customer sees them. |
 | **Docs** | `docs/` | You are here | Donkey-side view of Docs — affects how the donkey loads, reads, or delivers the cargo |
 
 - 🫏 **Donkey:** The modular gear room — each layer (LLM, vector store, storage) handles one job, so you can swap any piece out without touching the rest.

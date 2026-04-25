@@ -124,11 +124,11 @@ CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 | Line | Pattern | DE familiarity | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `python:3.12-slim` | Slim base image | ✅ Standard practice | Hay-lined stall — python:3.12-slim: Slim base image · ✅ Standard practice |
+| `python:3.12-slim` | Slim base image | ✅ Standard practice | A featherweight stable kit — just enough planks to hold the Python donkey, no extra tack rooms slowing the build. |
 | `poetry install --without dev` | Prod deps only | ✅ Standard — skip test/lint deps | Dry-run trip to check the harness — poetry install --without dev: Prod deps only · ✅ Standard — skip test/lint deps |
 | `virtualenvs.create false` | No venv inside container | ✅ Standard — container IS the isolation | Stall that houses the worker — virtualenvs.create false: No venv inside container · ✅ Standard — container IS the isolation |
 | Layer ordering (deps → code) | Cache optimization | ✅ Standard — deps change rarely, code changes often | Donkey-side view of Layer ordering (deps → code) — affects how the donkey loads, reads, or delivers the cargo |
-| `HEALTHCHECK` | Container health endpoint | ✅ Standard — ECS/Container Apps use this | Donkey's stall — HEALTHCHECK: Container health endpoint · ✅ Standard — ECS/Container Apps use this |
+| `HEALTHCHECK` | Container health endpoint | ✅ Standard — ECS/Container Apps use this | The bell on the stable door — ECS or Container Apps ring it every few seconds to check the donkey is still breathing. |
 | `uvicorn` CMD | ASGI server | ✅ Standard FastAPI deployment | Door the customer knocks on — uvicorn CMD: ASGI server · ✅ Standard FastAPI deployment |
 
 ### What to notice for an AI app
@@ -317,13 +317,13 @@ Manual trigger → Login to Azure → Login to ACR → Build + Push → Terrafor
 
 | Aspect | AWS (ECS Fargate) | Azure (Container Apps) | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Container hosting** | ECS Fargate | Azure Container Apps | Donkey's stall — Container hosting: ECS Fargate · Azure Container Apps |
+| **Container hosting** | ECS Fargate | Azure Container Apps | Same idea, different barn brand — both run the donkey-shaped container without you owning the timber. |
 | **Registry** | ECR | ACR | ECR or ACR — the cloud-specific address where the built donkey image is stored. |
 | **Auth method** | OIDC → IAM role | OIDC → service principal | Stable keys — only authorised callers may ask the donkey to deliver |
 | **Secrets needed** | 1 (`AWS_ROLE_ARN`) | 4 (`CLIENT_ID`, `TENANT_ID`, `SUBSCRIPTION_ID`, `ACR_NAME`) | AWS reaches the registry with one ARN; Azure needs four secrets to authenticate to the same address. |
 | **Deploy command** | `aws ecs update-service` | `az containerapp update` | Automated harness rig — Deploy command: aws ecs update-service · az containerapp update |
 | **Scaling** | ECS auto-scaling (configured in task def) | Built-in scaling rules | Always-on donkey stall — container that keeps the stable up 24/7 |
-| **Cost (idle)** | Fargate charges per vCPU-hour | Container Apps can scale to zero | Donkey's stall — Cost (idle): Fargate charges per vCPU-hour · Container Apps can scale to zero |
+| **Cost (idle)** | Fargate charges per vCPU-hour | Container Apps can scale to zero | Fargate keeps the donkey saddled on the clock; Container Apps lets it nap for free until a customer rings. |
 | **Cost (1 vCPU, 2GB)** | ~$30/month (always running) | ~$0/month (scale to zero) | Stable's monthly feed bill — Cost (1 vCPU, 2GB): ~$30/month (always running) · ~$0/month (scale to zero) |
 
 ### Cost insight for AI apps

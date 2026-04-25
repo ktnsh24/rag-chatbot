@@ -21,7 +21,7 @@
 | **Blob Storage** | Store uploaded documents | Pay per GB stored | Azure's document warehouse — where the donkey picks up source files before pre-sorting them into chunks |
 | **Cosmos DB** | Conversation history | Pay per RU (serverless) | Azure's stable journal — Cosmos DB: Conversation history · Pay per RU (serverless) |
 | **AI Search** | Vector store for embeddings | Tier-based (Free available) | Azure hub's vector index where the donkey's embeddings live — billed by tier with a free option. |
-| **Container Apps** | Host the FastAPI container | Pay per vCPU/memory-second | Donkey's stall — Container Apps: Host the FastAPI container · Pay per vCPU/memory-second |
+| **Container Apps** | Host the FastAPI container | Pay per vCPU/memory-second | Azure's stable building for your FastAPI donkey — billed by the second the donkey is actually moving. |
 | **Container Registry** | Docker image registry | Tier-based ($5/month Basic) | Azure hub's Docker registry address for the donkey image — Basic SKU runs about $5/month. |
 | **Azure Functions** | Event-driven document ingestion | Pay per execution | Sorting bench before loading — Azure Functions: Event-driven document ingestion · Pay per execution |
 | **Azure Monitor** | Logs, metrics, dashboards, alerts | Free tier generous | Donkey's odometer dial — Azure Monitor: Logs, metrics, dashboards, alerts · Free tier generous |
@@ -241,7 +241,7 @@ Host the FastAPI application in production.
 | Scale to zero | **Yes** | No (min 1 instance) | No (min 1 node) | How the stable adds or removes donkeys when delivery volume changes |
 | Min cost | $0 (idle) | ~$13/month (B1) | ~$100/month | Cost of keeping the donkey fed — Min cost: $0 (idle) · ~$13/month (B1) · ~$100/month |
 | Complexity | Low | Low | High | Donkey-side view of Complexity — affects how the donkey loads, reads, or delivers the cargo |
-| Container support | Docker | Docker or code | Docker | Hay-lined stall — Container support: Docker · Docker or code · Docker |
+| Container support | Docker | Docker or code | Docker | All three Azure barns happily house Docker-shaped donkeys; App Service will also accept a raw donkey without the crate. |
 
 ### Cost advantage
 

@@ -33,9 +33,9 @@
 | **Git** | 2.40+ | Version control | Donkey-side view of Git — affects how the donkey loads, reads, or delivers the cargo |
 | **AWS CLI** | 2.x | Connect to AWS services | AWS-side stable yard — AWS CLI: 2.x · Connect to AWS services |
 | **Azure CLI** | 2.x | Connect to Azure services | Command-line key the developer uses to unlock the Azure hub gates from their laptop. |
-| **Docker** | 24+ | Build container images (optional, for deployment) | Mechanical groom — Docker: 24+ · Build container images (optional, for deployment) |
-| **Terraform** | 1.5+ | Deploy infrastructure (optional, for deployment) | Mechanical groom — Terraform: 1.5+ · Deploy infrastructure (optional, for deployment) |
-| **VS Code** or **PyCharm** | Latest | IDE with debugger | Trial delivery — VS Code or PyCharm: Latest · IDE with debugger |
+| **Docker** | 24+ | Build container images (optional, for deployment) | The shipping crate that lets the same donkey-and-stable run on any farm — laptop, AWS, Azure, all identical. |
+| **Terraform** | 1.5+ | Deploy infrastructure (optional, for deployment) | Stable blueprints — `terraform apply` and a fresh barn appears in AWS or Azure exactly as drawn. |
+| **VS Code** or **PyCharm** | Latest | IDE with debugger | Your saddle and reins — IDE plus debugger so you can stop the donkey mid-trip and inspect what it's carrying. |
 
 ### Check what is already installed
 
@@ -1104,7 +1104,7 @@ a specific competency:
 | --- | --- | --- | --- |
 | **Phase 1** — Foundation (Labs 1–2) | Retrieval quality, faithfulness scoring, hallucination detection, top_k tuning | You learn to **measure** AI system quality — the foundation of every production AI system. Without evaluation, you're deploying blind. | Foundation labs that measure whether the donkey is fetching the right backpack pockets without hallucinating. |
 | **Phase 2** — Bridge (Labs 3–5) | Business metrics, prompt injection guardrails, AI observability dashboards | You learn to **translate** technical scores into business language, **protect** against adversarial inputs, and **monitor** AI systems in production. | Note the donkey carries — Phase 2 — Bridge (Labs 3–5): Business metrics, prompt injection guardrails, AI observability dashboards · You learn to translate technical |
-| **Phase 3** — Production (Labs 6–8) | Data flywheel, RLHF feedback loops, infrastructure scaling | You learn the **continuous improvement loop** that separates production AI from demos — detect bad answers, fix them, lock the fix with golden datasets, repeat. | Hay-and-oats invoice — Phase 3 — Production (Labs 6–8): Data flywheel, RLHF feedback loops, infrastructure scaling · You learn the continuous improvement loop that separates… |
+| **Phase 3** — Production (Labs 6–8) | Data flywheel, RLHF feedback loops, infrastructure scaling | You learn the **continuous improvement loop** that separates production AI from demos — detect bad answers, fix them, lock the fix with golden datasets, repeat. | Graduating from one-off rides to a full fleet — feedback loops, golden datasets, robot stable hand keeping it tidy. |
 | **Phase 4** — Advanced RAG (Labs 9–13) | Guardrails, re-ranking, hybrid search, bulk operations | You learn to **harden** a RAG system — block prompt injection, improve retrieval with re-ranking and hybrid search, and manage documents at scale. | Instructions tucked in the pannier — Phase 4 — Advanced RAG (Labs 9–13): Guardrails, re-ranking, hybrid search, bulk operations · You learn to harden a |
 | **Phase 5** — Observability (Labs 14–16) | Query logs, failure analysis, Prometheus metrics, golden dataset regression | You learn to **operate** a RAG system in production — structured logging, failure categorisation, metrics dashboards, and automated regression testing. | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 

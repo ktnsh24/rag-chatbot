@@ -331,7 +331,7 @@ Same concept as DynamoDB TTL — conversations auto-expire.
 | **Query language** | `KeyConditionExpression` (DynamoDB-specific) | SQL-like syntax (`SELECT`, `WHERE`, `ORDER BY`) | Amazon's loading dock — Query language: KeyConditionExpression (DynamoDB-specific) · SQL-like syntax (SELECT, WHERE, ORDER BY) |
 | **Get latest N** | `ScanIndexForward=False, Limit=N` + reverse | `SELECT TOP N ... ORDER BY timestamp DESC` + reverse | Practice run for the donkey — Get latest N: ScanIndexForward=False, Limit=N + reverse · SELECT TOP N ... ORDER BY timestamp DESC + reverse |
 | **Batch delete** | `batch_writer()` + loop | `async for` + `delete_item()` one by one | Donkey can run other errands while waiting for the warehouse to respond |
-| **TTL** | `expires_at` attribute | `default_ttl` on container (seconds) | Donkey's stall — TTL: expires_at attribute · default_ttl on container (seconds) |
+| **TTL** | `expires_at` attribute | `default_ttl` on container (seconds) | Both trip-logs auto-shred old conversation pages — DynamoDB reads `expires_at`, Cosmos uses a container-wide timer in seconds. |
 | **Cost (serverless)** | ~$0 idle, $1.25/M writes, $0.25/M reads | ~$0 idle, ~$0.28/M RUs | Cost of keeping the donkey fed — Cost (serverless): ~$0 idle, $1.25/M writes, $0.25/M reads · ~$0 idle, ~$0.28/M RUs |
 | **Consistency** | Eventually consistent (default) | Session consistency (configured) | Stable diary records — Consistency: Eventually consistent (default) · Session consistency (configured) |
 

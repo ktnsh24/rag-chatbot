@@ -258,7 +258,7 @@ workaround. For high-traffic apps this matters; for this project, the difference
 | **Delete** | `delete_objects()` (batch) | Loop + `delete_blob()` (one by one) | AWS lets the donkey discard many parcels in one trip; Azure makes the donkey go back for each one |
 | **List** | Paginator pattern | `async for` iterator | Donkey can run other errands while waiting for the warehouse to respond |
 | **Encryption** | AES256 / KMS (server-side) | Azure Storage encryption (default on) | Donkey-side view of Encryption — affects how the donkey loads, reads, or delivers the cargo |
-| **Cost (10 GB)** | ~$0.23/month | ~$0.20/month | Donkey-hire fee — Cost (10 GB): ~$0.23/month · ~$0.20/month |
+| **Cost (10 GB)** | ~$0.23/month | ~$0.20/month | Both stables charge about 20¢/month to warehouse 10 GB of customer documents — roughly the price of one hay-bale. |
 
 ### The code patterns side by side
 

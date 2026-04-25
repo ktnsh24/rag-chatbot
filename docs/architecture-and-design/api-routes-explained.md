@@ -203,7 +203,7 @@ detailed deep-dive document:
 | --- | --- | --- | --- | --- |
 | `health.py` | `GET /api/health` | ★☆☆☆☆ — nothing new | 📖 [Health Endpoint Deep Dive](api-routes/health-endpoint-explained.md) | Stable manager peeks through the door to ask whether the donkey is awake and loaded — nothing fancy. |
 | `chat.py` | `POST /api/chat` | ★★★★★ — the RAG query pipeline | 📖 [Chat Endpoint Deep Dive](api-routes/chat-endpoint-explained.md) | Stable's front door — the URL customers use to drop off a question |
-| `documents.py` | `POST /api/documents/upload`, `GET /api/documents`, `DELETE /api/documents/{id}` | ★★★★☆ — the ingestion pipeline | 📖 [Documents Endpoint Deep Dive](api-routes/documents-endpoint-explained.md) | Loading-bay pre-sort — documents.py: POST /api/documents/upload, GET /api/documents, DELETE /api/documents/{id} · ★★★★☆ — the ingestion pipeline · 📖 [Documents Endpoint Deep Dive](api-routes/documents-endpoint-explained.md) |
+| `documents.py` | `POST /api/documents/upload`, `GET /api/documents`, `DELETE /api/documents/{id}` | ★★★★☆ — the ingestion pipeline | 📖 [Documents Endpoint Deep Dive](api-routes/documents-endpoint-explained.md) | Post office pre-sort counter — customers drop documents, the stable manager chunks them and stuffs the GPS warehouse. |
 | `evaluate.py` | `POST /api/evaluate`, `POST /api/evaluate/suite` | ★★★★★ — the AI quality pipeline | 📖 [Evaluate Endpoint Deep Dive](api-routes/evaluate-endpoint-explained.md) | Stable's grading window — submit a question and get back the donkey's report card with per-dimension scores |
 | `queries.py` | `GET /api/queries/stats`, `GET /api/queries/failures` | ★★★☆☆ — production debugging | 📖 [Queries Endpoint Deep Dive](api-routes/queries-endpoint-explained.md) | Door the customer knocks on — queries.py: GET /api/queries/stats, GET /api/queries/failures · ★★★☆☆ — production debugging · 📖 [Queries Endpoint Deep Dive](api-routes/queries-endpoint-explained.md) |
 | `metrics.py` | `GET /api/metrics` | ★★☆☆☆ — Prometheus metrics | 📖 [Metrics Endpoint Deep Dive](api-routes/metrics-endpoint-explained.md) | Tally board on the stable wall — metrics.py: GET /api/metrics · ★★☆☆☆ — Prometheus metrics · 📖 [Metrics Endpoint Deep Dive](api-routes/metrics-endpoint-explained.md) |
@@ -325,7 +325,7 @@ the same and what's different:
 | **Framework** | FastAPI | FastAPI | Where parcels are dropped at the stable — Framework: FastAPI · FastAPI |
 | **Router pattern** | `APIRouter()` + `include_router()` | `APIRouter()` + `include_router()` | Stable's front door — Router pattern: APIRouter() + include_router() · APIRouter() + include_router() |
 | **Middleware** | `BnaEventMiddleware` | `RequestLoggingMiddleware` | Bouncer at the stable door — Middleware: BnaEventMiddleware · RequestLoggingMiddleware |
-| **Request validation** | Pydantic models | Pydantic models | Pre-printed waybill — Request validation: Pydantic models · Pydantic models |
+| **Request validation** | Pydantic models | Pydantic models | Both stables check the delivery note with Pydantic before saddling the donkey — same gatekeeper, same form. |
 | **Dependency injection** | `app.state` or FastAPI `Depends()` | `app.state` (for rag_chain) | Stable manager — receives requests at the front door and dispatches the donkey |
 | **Error handling** | `HTTPException` | `HTTPException` | Stable's front door — Error handling: HTTPException · HTTPException |
 | **Logging** | Loguru | Loguru | Bouncer at the stable door — Logging: Loguru · Loguru |

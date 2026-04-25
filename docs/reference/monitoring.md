@@ -16,7 +16,7 @@ The RAG Chatbot implements all three pillars of observability:
 | Pillar | Implementation | Story | Endpoint | 🫏 Donkey |
 |---|---|---|---| --- |
 | **Logs** | JSONL per-query structured logs with failure categories | I30 | `GET /api/queries/failures`, `GET /api/queries/stats` | Door the customer knocks on — Logs: JSONL per-query structured logs with failure categories · I30 · GET /api/queries/failures, GET /api/queries/stats |
-| **Metrics** | Prometheus text format (counters, gauges) | I31 | `GET /api/metrics` | Tachograph reading — Metrics: Prometheus text format (counters, gauges) · I31 · GET /api/metrics |
+| **Metrics** | Prometheus text format (counters, gauges) | I31 | `GET /api/metrics` | The tachograph strapped to every donkey — counters and gauges, scraped by Prometheus at /api/metrics. |
 | **Traces** | OpenTelemetry TracerProvider + FastAPIInstrumentor | I31 | OTLP exporter (configurable) | Entry gate to the stable — Traces: OpenTelemetry TracerProvider + FastAPIInstrumentor · I31 · OTLP exporter (configurable) |
 
 - 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.

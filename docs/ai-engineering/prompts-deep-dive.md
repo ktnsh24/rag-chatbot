@@ -337,7 +337,7 @@ The same prompt produces different quality answers depending on the model:
 | **"I don't know" response** | Reliably says it when context is empty | Usually says it | Sometimes tries to answer anyway | What the donkey wrote and brought back to the customer |
 | **Temperature sensitivity** | Very responsive to 0.1 | Responsive | Less precise control | How predictable the donkey's writing is — low = same words every trip, high = the donkey gets creative |
 | **Recommended for** | Production (highest quality) | Production (good balance) | Development and testing | Practice run for the donkey — Recommended for: Production (highest quality) · Production (good balance) · Development and testing |
-| **Cost per query** | ~$0.0065 | ~$0.005 | **$0** | Hay-and-oats invoice — Cost per query: ~$0.0065 · ~$0.005 · $0 |
+| **Cost per query** | ~$0.0065 | ~$0.005 | **$0** | AWS hay costs $0.0065 a trip, Azure $0.005, your own llama3.2 grazes free in the back yard. |
 
 **Practical advice:**
 - **Develop and iterate** with `CLOUD_PROVIDER=local` — test prompt changes for free

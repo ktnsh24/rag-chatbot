@@ -163,10 +163,10 @@ Most remaining failures fall into these categories:
 
 | Category | Examples | Root Cause | 🫏 Donkey |
 |----------|---------|-----------| --- |
-| **Guardrails** | lab-4a (all), lab-9a/b/c | Guardrail tests need AWS Comprehend subscription | Sandbox delivery — Guardrails: lab-4a (all), lab-9a/b/c · Guardrail tests need AWS Comprehend subscription |
+| **Guardrails** | lab-4a (all), lab-9a/b/c | Guardrail tests need AWS Comprehend subscription | Muzzle tests fail because we never bought the AWS Comprehend muzzle subscription — buy it or skip those report-card lines. |
 | **Low faithfulness** | lab-2c, lab-5b_q3/q5 | Model hallucinates or adds context not in chunks | Donkey hallucinated extra hay not present in the backpack pockets — labs 2c, 5b_q3, 5b_q5 caught it. |
-| **Data mismatch** | lab-1c, lab-6a | Golden dataset expects "14 days" but document says "5-7 days" | Sandbox delivery — Data mismatch: lab-1c, lab-6a · Golden dataset expects "14 days" but document says "5-7 days" |
-| **Reranker labs** | lab-9, lab-10 (some) | Reranker was disabled for this run | Quality sort — Reranker labs: lab-9, lab-10 (some) · Reranker was disabled for this run |
+| **Data mismatch** | lab-1c, lab-6a | Golden dataset expects "14 days" but document says "5-7 days" | Donkey delivers '5-7 days' from the chunk; the 25 standard test deliveries expected '14 days' — the golden dataset is wrong, not the donkey. |
+| **Reranker labs** | lab-9, lab-10 (some) | Reranker was disabled for this run | Reranker is the second clerk who re-orders the backpack before the donkey leaves — we ran with that clerk off shift. |
 | **Bulk ops** | lab-14, lab-15, lab-16 | Multi-document operations with timing issues | Donkey-side view of Bulk ops — affects how the donkey loads, reads, or delivers the cargo |
 
 - 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.

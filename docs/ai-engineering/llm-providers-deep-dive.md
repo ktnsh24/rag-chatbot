@@ -238,7 +238,7 @@ class AzureOpenAILLM(BaseLLM):
 | SDK | `boto3` (AWS-specific) | `openai` (industry standard, Azure-configured) | AWS makes you learn boto3-speak; Azure speaks the OpenAI lingua franca everyone already knows |
 | Client | `boto3.client("bedrock-runtime")` | `AsyncAzureOpenAI(endpoint, key, version)` | boto3 hands you a generic AWS handle; Azure hands you a typed donkey-shaped client |
 | Auth | IAM roles / env vars (AWS credentials) | API key or Managed Identity (Azure RBAC) | Entry gate to the stable — Auth: IAM roles / env vars (AWS credentials) · API key or Managed Identity (Azure RBAC) |
-| Model reference | `model_id` (full ARN-like string) | `deployment_name` (you name it when deploying) | Mechanical groom — Model reference: model_id (full ARN-like string) · deployment_name (you name it when deploying) |
+| Model reference | `model_id` (full ARN-like string) | `deployment_name` (you name it when deploying) | Bedrock hands you a serial-numbered stallion; Azure lets you nickname your own donkey at the deployment desk. |
 | Async | Sync (boto3 doesn't support async) | **True async** (`AsyncAzureOpenAI`) | Azure's donkey juggles parallel trips natively; AWS's donkey runs trips one after another |
 
 **DE parallel:** This is like the difference between using `boto3` for DynamoDB vs using `psycopg2` for PostgreSQL. Different SDK, different connection pattern, but the operations are conceptually the same (query, insert, delete).
@@ -638,7 +638,7 @@ The class groups them by **provider** (who you're calling), not by **function** 
 |---|---|---|---| --- |
 | LLM cost | ~$160/month | ~$130/month | **$0/month** | Monthly hay bill — local donkey eats free, cloud donkeys cost $130–160 at this volume |
 | Vector store | ~$350/month (OpenSearch) | ~$75/month (AI Search) | **$0/month** (ChromaDB) | AWS search hub — Vector store: ~$350/month (OpenSearch) · ~$75/month (AI Search) · $0/month (ChromaDB) |
-| **Total** | **~$510/month** | **~$205/month** | **$0/month** | Donkey-hire fee — Total: ~$510/month · ~$205/month · $0/month |
+| **Total** | **~$510/month** | **~$205/month** | **$0/month** | Renting Bedrock's premium donkey: $510/month. Azure's GPT-4o: $205. Your own llama3.2 grazing in the yard: free. |
 
 **⚠️ The vector store is the biggest cost difference** — not the LLM. OpenSearch Serverless has a high minimum ($350/month). Azure AI Search Basic is much cheaper ($75/month). This often drives the cloud choice more than the LLM pricing.
 

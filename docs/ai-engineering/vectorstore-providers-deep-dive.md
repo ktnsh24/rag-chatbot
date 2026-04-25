@@ -65,8 +65,8 @@ You may have used OpenSearch for log aggregation in your DE work. Here both plat
 | **Index creation** | JSON mappings (OpenSearch native) | DynamoDB table (PK/SK) | Python objects (`SearchIndex`, `SearchField`) | OpenSearch sorting office — Index creation: JSON mappings (OpenSearch native) · DynamoDB table (PK/SK) · Python objects (SearchIndex, SearchField) |
 | **Vector field type** | `knn_vector` | JSON string (embedding) | `SearchFieldDataType.Collection(Edm.Single)` | Data type declaring this field stores GPS coordinates for the warehouse robot |
 | **Dimensions** | 1024 (matches Titan) | Any (auto, stored as JSON) | 1536 (matches text-embedding-3-small) | GPS stamp on the parcel — Dimensions: 1024 (matches Titan) · Any (auto, stored as JSON) · 1536 (matches text-embedding-3-small) |
-| **Algorithm** | HNSW via `nmslib` engine | **Brute-force cosine** (in Python) | HNSW via `HnswAlgorithmConfiguration` | Compass bearing — Algorithm: HNSW via nmslib engine · Brute-force cosine (in Python) · HNSW via HnswAlgorithmConfiguration |
-| **Distance metric** | `cosinesimil` | Cosine (numpy) | Cosine (default) | Tachograph reading — Distance metric: cosinesimil · Cosine (numpy) · Cosine (default) |
+| **Algorithm** | HNSW via `nmslib` engine | **Brute-force cosine** (in Python) | HNSW via `HnswAlgorithmConfiguration` | HNSW lets the donkey skim stadium signs; brute-force cosine makes it read every shelf label by hand. |
+| **Distance metric** | `cosinesimil` | Cosine (numpy) | Cosine (default) | All three GPS warehouses measure 'how close' the same way — cosine angle between the backpack's coordinates. |
 | **Store operation** | `index()` one at a time | `batch_writer()` | `upload_documents()` in batches of 1000 | Donkey-side view of Store operation — affects how the donkey loads, reads, or delivers the cargo |
 | **Search operation** | `knn` query in JSON body | Query all + numpy cosine | `VectorizedQuery` object | How the GPS warehouse robot finds the 5 nearest backpacks to the question's coordinates |
 | **Delete operation** | `delete_by_query()` (native) | GSI query + `batch_writer()` | Search + `delete_documents()` (two-step) | The customer's question that goes on the delivery note |
@@ -157,7 +157,7 @@ Both providers implement HNSW but configure it differently:
 | Algorithm | `"name": "hnsw"` in JSON | `HnswAlgorithmConfiguration()` object | How the warehouse measures which backpacks are nearest to the customer's question |
 | Engine | `nmslib` | Azure-managed (not configurable) | Azure's hub manages the HNSW engine — you can't pick nmslib like in AWS |
 | Search accuracy | `ef_search: 512` | Default (auto-tuned) | Stable broke down — donkey couldn't complete the trip, customer sees an error |
-| Distance metric | `"cosinesimil"` | Cosine (default, not specified) | Tachograph reading — Distance metric: "cosinesimil" · Cosine (default, not specified) |
+| Distance metric | `"cosinesimil"` | Cosine (default, not specified) | Both warehouses default to cosine — same compass bearing, just spelled differently in the config file. |
 
 - 🫏 **Donkey:** The compass bearing between two GPS coordinates — donkeys pointed the same direction are talking about the same topic.
 
@@ -431,7 +431,7 @@ The factory in `chain.py` creates the DynamoDB vector store instead of OpenSearc
 | Search accuracy | Approximate (HNSW) | **Exact** (checks every vector) | HNSW GPS shortcuts are approximate; brute-force checks every backpack's exact coordinates |
 | Max practical size | Millions of chunks | ~10,000 chunks | OpenSearch's warehouse handles millions of backpacks; DynamoDB slows down above 10,000 |
 | New dependency | `opensearch-py` | **None** (boto3 already installed) | AWS search hub — New dependency: opensearch-py · None (boto3 already installed) |
-| Best for | Production at scale | Portfolio, development, testing | Trial delivery — Best for: Production at scale · Portfolio, development, testing |
+| Best for | Production at scale | Portfolio, development, testing | OpenSearch is the busy city depot; DynamoDB is the cheap shed out back, perfect while you're still learning the routes. |
 
 - 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
@@ -702,7 +702,7 @@ auth = AWSV4SignerAuth(credentials, region, "aoss")
 | **Minimum cost** | **~$350/month** | **~$75/month** | **$0/month** | Stable's monthly feed bill — Minimum cost: ~$350/month · ~$75/month · $0/month |
 | **Free tier** | ❌ No | ✅ Yes (50 MB, 3 indexes) | ✅ Always free | No-charge bale from the stable — Free tier: ❌ No · ✅ Yes (50 MB, 3 indexes) · ✅ Always free |
 | **Scaling** | Auto (OCUs) | Manual (tier upgrade) | Single machine only | How the stable adds or removes donkeys when delivery volume changes |
-| **For learning/dev** | Expensive — paying for idle | Cheap — free tier works | **Best — zero cost, zero setup** | Donkey-hire fee — For learning/dev: Expensive — paying for idle · Cheap — free tier works · Best — zero cost, zero setup |
+| **For learning/dev** | Expensive — paying for idle | Cheap — free tier works | **Best — zero cost, zero setup** | Local ChromaDB is a free shelf in your own garage; cloud GPS warehouses charge rent even when no donkey visits. |
 | **For production** | Good if already on AWS | Good if already on Azure | Not suitable (no HA, no scaling) | AWS-side stable yard — For production: Good if already on AWS · Good if already on Azure · Not suitable (no HA, no scaling) |
 
 ### Why this matters more than LLM cost
@@ -764,7 +764,7 @@ class ChromaDBVectorStore(BaseVectorStore):
 | **Auth** | SigV4 (IAM roles) | API key | **None** | Stable's front door — Auth: SigV4 (IAM roles) · API key · None |
 | **Index creation** | JSON mappings, explicit dimensions | Python objects, explicit dimensions | **Auto-detect dimensions** | Length of the donkey's GPS coordinate — more digits = finer location, more storage |
 | **Algorithm** | HNSW (nmslib engine) | HNSW (Azure-managed) | HNSW (built-in) | All three warehouses use HNSW stadium signs, but Azure's engine is managed automatically |
-| **Distance** | `cosinesimil` | Cosine (default) | `cosine` (configured via metadata) | Compass bearing — Distance: cosinesimil · Cosine (default) · cosine (configured via metadata) |
+| **Distance** | `cosinesimil` | Cosine (default) | `cosine` (configured via metadata) | All three GPS warehouses pick backpacks by cosine angle — same bearing, three spellings of the word. |
 | **Persistence** | Always (cloud) | Always (cloud) | Optional (in-memory or SQLite) | Stable diary records — Persistence: Always (cloud) · Always (cloud) · Optional (in-memory or SQLite) |
 
 **DE parallel:** ChromaDB is like SQLite — in-memory for speed, persistent for durability. No server to install, no auth to configure. Just `chromadb.PersistentClient(path)` and go.

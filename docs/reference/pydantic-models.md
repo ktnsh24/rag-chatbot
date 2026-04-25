@@ -70,9 +70,9 @@ Pydantic models appear in **three roles**:
 
 | Role | Example | What it does | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Request model** | `ChatRequest` | Validates incoming JSON from the client | Pre-printed waybill — Request model: ChatRequest · Validates incoming JSON from the client |
-| **Response model** | `ChatResponse` | Defines the shape of the JSON we return | Pre-printed waybill — Response model: ChatResponse · Defines the shape of the JSON we return |
-| **Settings model** | `Settings` | Reads and validates environment variables | Manifest template — Settings model: Settings · Reads and validates environment variables |
+| **Request model** | `ChatRequest` | Validates incoming JSON from the client | ChatRequest is the delivery note the customer hands in — Pydantic checks it's filled out before any donkey leaves. |
+| **Response model** | `ChatResponse` | Defines the shape of the JSON we return | ChatResponse is the signed receipt the donkey hands back — same fields every time so customers know what to expect. |
+| **Settings model** | `Settings` | Reads and validates environment variables | Settings is the stable's standing orders — read once at boot, validated, then every donkey trots to the same rules. |
 
 When FastAPI sees `def chat(body: ChatRequest)`:
 1. It reads the raw JSON from the HTTP request body
@@ -242,7 +242,7 @@ class ChatResponse(BaseModel):
 | `input_tokens` | `int` | Tokens in the prompt (question + context) | Hay bales loaded into the donkey on the way in — the question plus retrieved context. |
 | `output_tokens` | `int` | Tokens in the generated answer | Hay bales the donkey produced on the way out — every token in the generated answer. |
 | `total_tokens` | `int` | Sum of input + output | Combined hay tally of input plus output, used to compute the trip's full delivery cost. |
-| `estimated_cost_usd` | `float` | Estimated cost based on model pricing | Donkey-hire fee — estimated_cost_usd: float · Estimated cost based on model pricing |
+| `estimated_cost_usd` | `float` | Estimated cost based on model pricing | How many hay-bales this trip cost — printed on the receipt so the stable owner can tally up the month later. |
 
 **Why this matters:**
 

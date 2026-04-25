@@ -210,7 +210,7 @@ def _create_local_backends(settings: Settings) -> tuple[BaseLLM, BaseVectorStore
 | **LLM class** | `BedrockLLM` | `BedrockLLM` | `AzureOpenAILLM` | `OllamaLLM` | Which donkey breed shows up at the stable's front door to do the writing |
 | **LLM model** | Claude 3.5 Sonnet | Claude 3.5 Sonnet | GPT-4o | llama3.2 | The specific donkey assigned — older, faster, or smarter — that actually writes the answer |
 | **Vector store** | `OpenSearchVectorStore` | `DynamoDBVectorStore` | `AzureAISearchVectorStore` | `ChromaDBVectorStore` | Amazon's index room — Vector store: OpenSearchVectorStore · DynamoDBVectorStore · AzureAISearchVectorStore · ChromaDBVectorStore |
-| **Vector cost** | ~$350/month | **~$0/month** | $0–75/month | $0 | Donkey-hire fee — Vector cost: ~$350/month · ~$0/month · $0–75/month · $0 |
+| **Vector cost** | ~$350/month | **~$0/month** | $0–75/month | $0 | OpenSearch warehouse costs ~$350 rent; the cheap DynamoDB shed and the local ChromaDB garage are both free. |
 | **Embedding source** | Amazon Titan | Amazon Titan | Azure text-embedding-3 | nomic-embed-text | GPS stamp on the parcel — Embedding source: Amazon Titan · Amazon Titan · Azure text-embedding-3 · nomic-embed-text |
 | **Auth** | IAM (SigV4) | IAM (SigV4) | API key | None | Door the customer knocks on — Auth: IAM (SigV4) · IAM (SigV4) · API key · None |
 | **Cost** | ~$0.0065/query | ~$0.0065/query | ~$0.005/query | **$0** | Cost of keeping the donkey fed — Cost: ~$0.0065/query · ~$0.0065/query · ~$0.005/query · $0 |
@@ -490,7 +490,7 @@ CHROMA_PERSIST_DIRECTORY=./data/chromadb
 | Empty search results | "I don't have enough information" | Documents not ingested yet | Upload documents first via `POST /documents` | Post office pre-sort — Empty search results: "I don't have enough information" · Documents not ingested yet · Upload documents first via POST /documents |
 | High latency (>5s) | Slow responses | LLM is slow (especially local) | Use a smaller model or increase hardware | The donkey is plodding — swap in a lighter breed or feed it stronger hardware |
 | Token limit exceeded | API error from LLM | Too many chunks in context (`top_k` too high) | Reduce `top_k` from 5 to 3 | Backpack overstuffed with hay — the donkey can't carry it; pack fewer chunks |
-| Zero cost in metrics | Metrics show $0.000 | Using local provider | Expected — local is free | Donkey-hire fee — Zero cost in metrics: Metrics show $0.000 · Using local provider · Expected — local is free |
+| Zero cost in metrics | Metrics show $0.000 | Using local provider | Expected — local is free | Tachograph reads $0 because the local llama3.2 grazes for free — no hay invoice to stamp. |
 | Stale embeddings | Old documents still returned | Vectors not deleted after re-upload | Implement delete + re-ingest flow | Post office pre-sort — Stale embeddings: Old documents still returned · Vectors not deleted after re-upload · Implement delete + re-ingest flow |
 
 - 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.

@@ -418,8 +418,8 @@ The `MetricsCollector` stores metrics in-memory. To make them persistent, you'd 
 
 | Provider | Export target | How | Cost | 🫏 Donkey |
 |---|---|---|---| --- |
-| **AWS** | CloudWatch Metrics | `boto3.client('cloudwatch').put_metric_data()` | ~$0.30/metric/month | Tachograph reading — AWS: CloudWatch Metrics · boto3.client('cloudwatch').put_metric_data() · ~$0.30/metric/month |
-| **Azure** | Application Insights | `opencensus` or `azure-monitor-opentelemetry` | ~$2.30/GB ingested | Loading-bay pre-sort — Azure: Application Insights · opencensus or azure-monitor-opentelemetry · ~$2.30/GB ingested |
+| **AWS** | CloudWatch Metrics | `boto3.client('cloudwatch').put_metric_data()` | ~$0.30/metric/month | Ship the tachograph readings to CloudWatch via boto3 — roughly 30¢ per metric per month. |
+| **Azure** | Application Insights | `opencensus` or `azure-monitor-opentelemetry` | ~$2.30/GB ingested | Ship tachograph readings to Application Insights via OpenTelemetry — billed by the gigabyte of trip logs ingested. |
 | **Local** | Console / Prometheus | `print()` or Prometheus client library | **$0** | Donkey's odometer dial — Local: Console / Prometheus · print() or Prometheus client library · $0 |
 
 ### 🏠 Local development — console export

@@ -118,7 +118,7 @@ Existing unit tests cover individual components in isolation:
 
 | File | Tests | What it covers | 🫏 Donkey |
 |---|---|---| --- |
-| `test_chat.py` | 7 | Chat route logic, request validation, error handling | Sandbox delivery — test_chat.py: 7 · Chat route logic, request validation, error handling |
+| `test_chat.py` | 7 | Chat route logic, request validation, error handling | Report card for the chat door — does the stable manager validate the delivery note before sending the donkey out? |
 | `test_evaluate_route.py` | 16 | Evaluate route logic, response format, error handling | Verifies the grading window hands back the report card in the right shape and fails gracefully on bad requests |
 | `test_ingestion.py` | 9 | Document chunking, ingestion pipeline, deduplication | Tests the post office pre-sorter: slicing mail into backpacks, GPS-stamping them, and shelving them |
 | `test_evaluation.py` | 14 | Evaluation framework, metrics computation, golden dataset | Donkey's odometer dial — test_evaluation.py: 14 · Evaluation framework, metrics computation, golden dataset |
@@ -161,7 +161,7 @@ Simulates complete user journeys through the system. Uses a **stateful mock** th
 | Class | Tests | What it validates | 🫏 Donkey |
 |---|---|---| --- |
 | `TestE2EFullPipeline` | 4 | Upload → chat (gets relevant answer), upload → evaluate (scores returned), chat without docs (empty answer), multiple uploads → chat | Full route: drop mail at the post office, then watch the donkey deliver from it, get graded, and stay silent when the warehouse is empty |
-| `TestE2EConversation` | 2 | Multi-turn conversation in same session, session isolation between users | Trial delivery — TestE2EConversation: 2 · Multi-turn conversation in same session, session isolation between users |
+| `TestE2EConversation` | 2 | Multi-turn conversation in same session, session isolation between users | Two full delivery rounds: same customer remembered across stops, and two customers' notes never get mixed up. |
 | `TestE2EObservability` | 2 | Metrics counter increments after chat, health endpoint remains up after activity | Checks the tachograph logs trips and health endpoint confirms the donkey is awake and ready |
 
 **Stateful mock pattern:**
@@ -193,8 +193,8 @@ Tests the guardrails feature flag (`GUARDRAILS_ENABLED`) by comparing behavior w
 | Class | Tests | What it validates | 🫏 Donkey |
 |---|---|---| --- |
 | `TestGuardrailsInjection` | 4 | Prompt injection blocked (400), jailbreak blocked (400), safe questions pass, multiple safe questions pass | Note the donkey carries — TestGuardrailsInjection: 4 · Prompt injection blocked (400), jailbreak blocked (400), safe questions pass, multiple safe questions pass |
-| `TestGuardrailsPII` | 3 | Email/SSN/credit card detected and flagged in responses | Sandbox delivery — TestGuardrailsPII: 3 · Email/SSN/credit card detected and flagged in responses |
-| `TestGuardrailsOff` | 2 | Same injection/PII queries pass through when guardrails disabled | Trial delivery — TestGuardrailsOff: 2 · Same injection/PII queries pass through when guardrails disabled |
+| `TestGuardrailsPII` | 3 | Email/SSN/credit card detected and flagged in responses | Checks the donkey isn't shouting customers' SSNs and credit-card numbers out loud while delivering. |
+| `TestGuardrailsOff` | 2 | Same injection/PII queries pass through when guardrails disabled | Take the muzzle off and confirm the donkey really would blurt that PII — proves the guardrails were doing the work. |
 | `TestFeatureFlagBehavior` | 3 | Evaluate works regardless of features, chat includes `cloud_provider`, health always available | Verifies the stable manager switches cloud donkeys correctly and health checks always work |
 
 - 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
@@ -207,16 +207,16 @@ Tests the guardrails feature flag (`GUARDRAILS_ENABLED`) by comparing behavior w
 |---|---|---|---| --- |
 | `test_chat.py` | 7 | Unit | ✅ Passing | Dry-run trip to check the harness — test_chat.py: 7 · Unit · ✅ Passing |
 | `test_evaluate_route.py` | 16 | Unit | ✅ Passing | Unit cover for the report-card route — request shapes, score response, and graceful errors |
-| `test_ingestion.py` | 9 | Unit | ✅ Passing | Loading-bay pre-sort — test_ingestion.py: 9 · Unit · ✅ Passing |
+| `test_ingestion.py` | 9 | Unit | ✅ Passing | Nine checks on the post office pre-sort — chunks the right size and every backpack label stuck on properly. |
 | `test_evaluation.py` | 14 | Unit | ✅ Passing | Unit cover for the grading framework — score maths, thresholds, and golden dataset loading |
 | `test_guardrails.py` | 20 | Unit | ⚠️ 4 failures (redaction tag naming) | Practice run for the donkey — test_guardrails.py: 20 · Unit · ⚠️ 4 failures (redaction tag naming) |
 | `test_reranker.py` | 7 | Unit | ⚠️ 3 failures (score mismatches) | Dry-run trip to check the harness — test_reranker.py: 7 · Unit · ⚠️ 3 failures (score mismatches) |
 | `test_hybrid_search.py` | 17 | Unit | ⚠️ 9 errors (missing `rank_bm25` package) | Practice run for the donkey — test_hybrid_search.py: 17 · Unit · ⚠️ 9 errors (missing rank_bm25 package) |
 | `test_dynamodb_vectorstore.py` | 13 | Unit | ✅ Passing | Amazon's loading dock — test_dynamodb_vectorstore.py: 13 · Unit · ✅ Passing |
-| `test_integration_api.py` | 23 | Integration | ✅ All 23 passing | Sandbox delivery — test_integration_api.py: 23 · Integration · ✅ All 23 passing |
+| `test_integration_api.py` | 23 | Integration | ✅ All 23 passing | 23 end-to-end deliveries through the stable's front door — request in, parcel out, full route exercised. |
 | `test_e2e_rag_pipeline.py` | 8 | E2E | ✅ All 8 passing | Robot stable hand — auto-tests the donkey and redeploys when code changes |
 | `test_integration_features.py` | 12 | Feature flags | ✅ All 12 passing | Practice run for the donkey — test_integration_features.py: 12 · Feature flags · ✅ All 12 passing |
-| **Total** | **146** | | **130 passing, 7 failing, 9 errors** | Donkey-hire fee — Total: 146 · 130 passing, 7 failing, 9 errors |
+| **Total** | **146** | | **130 passing, 7 failing, 9 errors** | 146 report-card entries — 130 pass, 7 fail, 9 error. Mostly trustworthy donkey, a handful of routes still wobble. |
 
 - 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 

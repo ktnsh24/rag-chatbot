@@ -431,7 +431,7 @@ This is what companies mean by "reinforcement learning loops" for RAG systems. Y
 | Repeated questions | Caching | ___ | Donkey-side view of Repeated questions — affects how the donkey loads, reads, or delivers the cargo |
 | Embedding 10,000 docs | Batch processing | ___ | Pre-sorting 10,000 parcels into GPS-stamped backpacks in one batched run, not one at a time |
 | Vector store overload | Read replicas | ___ | Spin up extra warehouse copies so simultaneous donkeys can browse shelves without bumping into each other |
-| Cost explosion | Rate limiting | ___ | Donkey-hire fee — Cost explosion: Rate limiting · ___ |
+| Cost explosion | Rate limiting | ___ | Without a turnstile every customer queues a donkey at once — rate limiting is the gate that stops the hay bill exploding. |
 | Multi-region | Low latency globally | ___ | Tachograph reading — how long the donkey took on the round trip |
 
 <details>
@@ -445,7 +445,7 @@ This is what companies mean by "reinforcement learning loops" for RAG systems. Y
 | Embedding 10,000 docs | Batch processing | Kinesis/SQS batching (you built Kinesis in proxy) | Stream batches of parcels through the pre-sorting line so the GPS-stamping happens in bulk, not one-by-one |
 | Vector store overload | Read replicas | OpenSearch replicas (same as RDS read replicas) | OpenSearch sorting office — Vector store overload: Read replicas · OpenSearch replicas (same as RDS read replicas) |
 | Cost explosion | Rate limiting | API Gateway throttling (you configured this) | Stable's monthly feed bill — Cost explosion: Rate limiting · API Gateway throttling (you configured this) |
-| Multi-region | Low latency globally | CloudFront + regional deployments (standard infra) | Mechanical groom — Multi-region: Low latency globally · CloudFront + regional deployments (standard infra) |
+| Multi-region | Low latency globally | CloudFront + regional deployments (standard infra) | Stables in every region so the nearest donkey takes the trip — CloudFront points each customer at the closest barn. |
 
 </details>
 
@@ -571,7 +571,7 @@ After completing Labs 6, 7, and 8, check off:
 | 21 | **Embedding drift detection** | New documents change the vector space — old embeddings may become stale | ✅ Partially — Lab 5's retrieval monitoring concept extends directly to drift alerts. Full implementation in V2 with scheduled re-evaluation | Monitor average retrieval scores over time (Lab 5 concept) | When new parcels arrive the GPS map shifts — old backpack coordinates go stale and the donkey starts missing the right shelf |
 | 22 | **Cost optimisation** | Prompt compression, caching, model routing (cheap model for easy questions, expensive for hard) | ✅ Yes — when deploying to AWS Bedrock or Azure OpenAI, cost tracking becomes real (see [Cost Estimation](hands-on-labs-phase-1.md#cost-estimation--local-vs-cloud)) | Extend `src/rag/chain.py` with model routing logic | Trimming the delivery note and sending easy orders to a cheaper donkey so the hay bill stays small |
 | 23 | **Multi-modal RAG** | Images, tables, PDFs with charts — not just text | ⬜ Future project — requires a separate repo with vision models (GPT-4o, Claude 3.5 Sonnet) | Not in current rag-chatbot scope | Teaching the donkey to also carry pictures, charts, and tables — not just plain text mail |
-| 24 | **Compliance & audit logging** | Log every AI decision for regulatory compliance | ✅ Partially — the logging middleware already captures request/response. Full audit trail (immutable, tamper-proof) is a V2 feature | Extend `src/api/middleware/` to log full request/response | Entry gate to the stable — 24: Compliance & audit logging · Log every AI decision for regulatory compliance · ✅ Partially — the logging… |
+| 24 | **Compliance & audit logging** | Log every AI decision for regulatory compliance | ✅ Partially — the logging middleware already captures request/response. Full audit trail (immutable, tamper-proof) is a V2 feature | Extend `src/api/middleware/` to log full request/response | Every donkey trip gets a stamped receipt in the trip-log — V1 records the journey, V2 will lock it tamper-proof for the auditor. |
 
 > ### 📋 Skills Coverage Summary
 >

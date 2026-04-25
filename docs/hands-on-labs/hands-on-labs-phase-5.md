@@ -263,7 +263,7 @@ failure_category_bad_retrieval 1
 
 | Metric | Type | What it means | When it goes up | 🫏 Donkey |
 |---|---|---|---| --- |
-| `chat_requests_total` | Counter | Total requests ever | Every chat request | Hay-and-oats invoice — chat_requests_total: Counter · Total requests ever · Every chat request |
+| `chat_requests_total` | Counter | Total requests ever | Every chat request | Tachograph counter that ticks +1 every time a customer rings the stable door — it only ever climbs. |
 | `chat_errors_total` | Counter | Total errors ever | Every failed request | Stable's monthly feed bill — chat_errors_total: Counter · Total errors ever · Every failed request |
 | `chat_latency_p95_ms` | Gauge | Current 95th percentile latency | When slow requests happen | Tachograph reading — how long the donkey took on the round trip |
 | `evaluation_pass_rate` | Gauge | Current pass rate | Recalculated from query logs | Latest mark on the donkey's report card — recomputed from the trip log so you see today's standing, not all-time |

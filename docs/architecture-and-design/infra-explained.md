@@ -162,10 +162,10 @@ Creates:
 | **Document storage** | S3 bucket | Storage Account + Container | ✅ Same — blob/object storage | Same warehouse concept on both clouds — the donkey fetches source files from either |
 | **Conversation history** | DynamoDB table | Cosmos DB account + database + container | ✅ Same — NoSQL key-value store | AWS depot — Conversation history: DynamoDB table · Cosmos DB account + database + container · ✅ Same — NoSQL key-value store |
 | **Docker registry** | ECR | ACR | ✅ Same — container registry | Same idea, different cloud — both provide a registry address where the donkey image is stored. |
-| **Container hosting** | ECS Fargate (referenced) | Container Apps (referenced) | ✅ Same — serverless containers | Hay-lined stall — Container hosting: ECS Fargate (referenced) · Container Apps (referenced) · ✅ Same — serverless containers |
+| **Container hosting** | ECS Fargate (referenced) | Container Apps (referenced) | ✅ Same — serverless containers | ECS Fargate and Container Apps are the same serverless stable — different barn brand, identical donkey housing. |
 | **AI model access** | Bedrock (IAM permission) | OpenAI (connection string) | ⚡ Different auth model | Same donkey-hiring idea, different paperwork — AWS uses an IAM role, Azure hands over a connection string |
 | **Resource grouping** | Tags only | Resource Group (explicit) | ↔ Different approach | Label on the original mail item the backpack was sliced from |
-| **IAM** | Role + inline policy | Managed identity (not shown) | ↔ Different auth model | Pre-printed waybill — IAM: Role + inline policy · Managed identity (not shown) · ↔ Different auth model |
+| **IAM** | Role + inline policy | Managed identity (not shown) | ↔ Different auth model | AWS hands the donkey a paper badge with inline rules; Azure clips on a managed identity — different keys, same gate. |
 
 ### Key observation
 

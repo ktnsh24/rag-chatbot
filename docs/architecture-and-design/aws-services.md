@@ -24,7 +24,7 @@
 | **ECS Fargate** | Host the FastAPI container | Pay per vCPU/memory-hour | Stall that houses the worker — ECS Fargate: Host the FastAPI container · Pay per vCPU/memory-hour |
 | **ECR** | Docker image registry | Pay per GB stored | AWS Docker registry address where the donkey image is parked — billed per gigabyte stored. |
 | **Lambda** | Event-driven document ingestion | Pay per invocation | Post office pre-sort — Lambda: Event-driven document ingestion · Pay per invocation |
-| **CloudWatch** | Logs, metrics, dashboards, alerts | Free tier generous | Tachograph reading — CloudWatch: Logs, metrics, dashboards, alerts · Free tier generous |
+| **CloudWatch** | Logs, metrics, dashboards, alerts | Free tier generous | The tachograph display for the whole stable — logs, metrics, dashboards, alerts, and the first 10 GB are free. |
 | **IAM** | Permissions and roles | Free | Complimentary feed allowance — IAM: Permissions and roles · Free |
 
 - 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
@@ -237,7 +237,7 @@ Host the FastAPI application in production.
 | --- | --- | --- | --- |
 | Server management | None | You manage instances | Donkey-side view of Server management — affects how the donkey loads, reads, or delivers the cargo |
 | Scaling | Automatic | Configure auto-scaling groups | How the stable adds or removes donkeys when delivery volume changes |
-| Cost | Pay per vCPU/memory-hour | Pay per instance-hour | Hay-and-oats invoice — Cost: Pay per vCPU/memory-hour · Pay per instance-hour |
+| Cost | Pay per vCPU/memory-hour | Pay per instance-hour | Fargate bills you per minute the donkey actually pulls; EC2 charges rent on the whole stall whether it works or not. |
 | Minimum | ~$30/month (0.25 vCPU) | ~$10/month (t3.micro) | Fuel-and-feed bill for keeping the donkey and stable running |
 
 ### Why Fargate
