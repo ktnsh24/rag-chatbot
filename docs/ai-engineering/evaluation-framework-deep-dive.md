@@ -34,8 +34,8 @@ This file implements a rule-based evaluation framework that scores every RAG res
 
 | What you'll learn | DE parallel | 🫏 Donkey |
 |---|---| --- |
-| Retrieval quality scoring | Data freshness and completeness checks | backpack fetch 🎒 |
-| Faithfulness scoring (anti-hallucination) | Referential integrity validation | Memory drift ⚠️ |
+| Retrieval quality scoring | Data freshness and completeness checks | Measures how good the GPS warehouse's backpack retrieval was — did it find the right chunks? |
+| Faithfulness scoring (anti-hallucination) | Referential integrity validation | Checks the donkey only wrote facts from its loaded backpacks — no memory drift or invention |
 | Answer relevance scoring | Output schema validation | A grade on whether the donkey actually answered the question asked, not a different one |
 | Weighted composite scores | Data quality dashboards (Great Expectations) | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
 | Rule-based evaluation (no LLM needed) | SQL-based data quality checks (no ML needed) | Grading the donkey with a stopwatch and checklist instead of hiring a second donkey to judge |
@@ -513,7 +513,7 @@ Or use Swagger UI at `http://localhost:8000/docs` → find the **Evaluation** se
 | Component | Uses cloud? | Why | 🫏 Donkey |
 |---|---|---| --- |
 | `_evaluate_retrieval()` | ❌ | Just math on similarity scores | The retrieval column on the report card — pure arithmetic on GPS-distance scores, no extra donkey needed |
-| `_evaluate_faithfulness()` | ❌ | Keyword overlap — pure string comparison | backpack piece 📦 |
+| `_evaluate_faithfulness()` | ❌ | Keyword overlap — pure string comparison | The faithfulness column on the report card — string overlap between cargo and answer, no cloud calls |
 | `_evaluate_answer_relevance()` | ❌ | Keyword presence check | The relevance column on the report card — checks the answer's keywords match the customer's question |
 | `_split_sentences()` | ❌ | Regex splitting | Donkey-side view of split_sentences() — affects how the donkey loads, reads, or delivers the cargo |
 | `_extract_keywords()` | ❌ | Stop word removal | Donkey-side view of extract_keywords() — affects how the donkey loads, reads, or delivers the cargo |
@@ -534,13 +534,13 @@ Or use Swagger UI at `http://localhost:8000/docs` → find the **Evaluation** se
 
 | Score too low? | Likely cause | How to debug | 🫏 Donkey |
 |---|---|---| --- |
-| **Retrieval < 0.5** | Chunks are irrelevant | Check chunk content — is the right document ingested? | backpack piece 📦 |
+| **Retrieval < 0.5** | Chunks are irrelevant | Check chunk content — is the right document ingested? | GPS warehouse fetched wrong backpacks — verify the source documents are ingested and chunks make sense |
 | **Retrieval < 0.5** | Embedding quality poor | Try different embedding model (local: `nomic-embed-text` → `all-minilm`) | GPS stamp 📍 |
 | **Faithfulness < 0.8** | LLM is hallucinating | Tighten prompt rules, lower temperature | The donkey is making things up — tighten the delivery note and make its writing more predictable |
 | **Faithfulness < 0.8** | Keyword extraction too strict | Check if answer uses synonyms not in context | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
 | **Relevance < 0.6** | LLM answered different question | Check if question is ambiguous | The donkey answered a different question than the one on the order — check if the customer was vague |
 | **Relevance < 0.6** | Answer is a refusal | Check if context was empty (correct behaviour) | Right address 🎯 |
-| **Overall < 0.7** | Multiple issues | Debug each score individually | Hoof check 🔧 |
+| **Overall < 0.7** | Multiple issues | Debug each score individually | Whole report card slipped — work through retrieval, faithfulness, and relevance one by one to find the weakest link |
 
 **Debugging workflow:**
 

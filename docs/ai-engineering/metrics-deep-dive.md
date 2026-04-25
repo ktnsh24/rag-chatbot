@@ -35,7 +35,7 @@ In data engineering, you monitor pipeline runs, row counts, and job durations. I
 |---|---| --- |
 | Request counting and error rates | Pipeline run counts and failure rates | Robot hand 🤖 |
 | Latency tracking (P50/P95/P99) | Job duration monitoring | Tachograph 📊 |
-| Token usage tracking | Row count / byte count tracking | Cargo unit ⚖️ |
+| Token usage tracking | Row count / byte count tracking | Tracks how many hay bales (tokens) the donkey ate per trip — key for cost monitoring |
 | Cost estimation per request | Cloud cost per pipeline run | Feed bill 🌾 |
 | In-memory metrics collection | StatsD / Prometheus client | Tachograph 📊 |
 
@@ -220,7 +220,7 @@ error_rate = _chat_errors / _chat_requests
 
 | Error rate | Status | Action | 🫏 Donkey |
 |---|---|---| --- |
-| < 1% | ✅ Healthy | Normal operation | Donkey check ✅ |
+| < 1% | ✅ Healthy | Normal operation | Under 1% failed deliveries means the donkey is healthy and completing almost every trip |
 | 1-5% | ⚠️ Warning | Investigate — LLM timeouts? | Donkey is stumbling on a few trips — check whether the LLM is timing out or the backpack is arriving empty |
 | > 5% | 🔴 Critical | Page on-call — system is degraded | Donkey-side view of > 5% — affects how the donkey loads, reads, or delivers the cargo |
 
@@ -468,12 +468,12 @@ These are metrics that **don't exist in traditional software** but are critical 
 
 | Metric | What it measures | Alert threshold | Why | 🫏 Donkey |
 |---|---|---|---| --- |
-| **Token usage / request** | How much context + answer per query | > 2000 tokens/request | Cost growth | Cargo unit ⚖️ |
+| **Token usage / request** | How much context + answer per query | > 2000 tokens/request | Cost growth | Over 2000 hay bales per trip means the donkey is eating too much — review backpack sizes |
 | **Cost per query** | $ per chat interaction | > $0.02/query | Budget overrun | Feed bill 🌾 |
-| **Input/output ratio** | Input tokens ÷ output tokens | > 10:1 means verbose context | Over-retrieval | Cargo unit ⚖️ |
+| **Input/output ratio** | Input tokens ÷ output tokens | > 10:1 means verbose context | Over-retrieval | Input-to-output ratio over 10:1 means backpacks are huge relative to the answer the donkey wrote |
 | **Latency P99** | Worst-case response time | > 10s | UX degradation | Tachograph reading — how long the donkey took on the round trip |
 | **Error rate** | Failures / total requests | > 5% | System reliability | Feed bill 🌾 |
-| **Chunks per document** | Average chunk count | > 500/doc | Storage bloat | backpack piece 📦 |
+| **Chunks per document** | Average chunk count | > 500/doc | Storage bloat | Over 500 backpack chunks per document means the post office is slicing cargo too finely |
 
 ### Cost monitoring formula
 

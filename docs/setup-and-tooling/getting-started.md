@@ -32,7 +32,7 @@
 | **Poetry** | 1.8+ | Package manager (manages dependencies + virtual environment) | Supply manifest 📜 |
 | **Git** | 2.40+ | Version control | Donkey-side view of Git — affects how the donkey loads, reads, or delivers the cargo |
 | **AWS CLI** | 2.x | Connect to AWS services | AWS depot 🏭 |
-| **Azure CLI** | 2.x | Connect to Azure services | Azure hub ☁️ |
+| **Azure CLI** | 2.x | Connect to Azure services | Command-line key the developer uses to unlock the Azure hub gates from their laptop. |
 | **Docker** | 24+ | Build container images (optional, for deployment) | Robot hand 🤖 |
 | **Terraform** | 1.5+ | Deploy infrastructure (optional, for deployment) | Robot hand 🤖 |
 | **VS Code** or **PyCharm** | Latest | IDE with debugger | Test delivery 🧪 |
@@ -892,9 +892,9 @@ tests/test_ingestion.py::TestChunkDocument::test_large_document_multiple_chunks 
 
 | Test file | Tests | What it verifies | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `test_chat.py` | 8 | API endpoints: health, chat validation, document list/delete | Donkey check ✅ |
+| `test_chat.py` | 8 | API endpoints: health, chat validation, document list/delete | Eight tests poking the donkey's stable door — health, chat validation, and document list/delete endpoints. |
 | `test_evaluation.py` | 12 | RAG evaluation: retrieval scoring, faithfulness, relevance, golden dataset | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
-| `test_ingestion.py` | 8 | Document parsing (TXT/MD/CSV), text chunking, overlap, edge cases | backpack piece 📦 |
+| `test_ingestion.py` | 8 | Document parsing (TXT/MD/CSV), text chunking, overlap, edge cases | Eight tests covering how the post office slices documents into overlapping backpack pockets. |
 
 > **Note:** These tests use mocks and don't require Ollama to be running.
 > They verify that the application logic is correct without making actual LLM calls.
@@ -1050,7 +1050,7 @@ The response includes the answer AND quality scores:
 
 | Score | What it means | Healthy range | 🫏 Donkey |
 |---|---|---| --- |
-| `retrieval` | Did vector search find relevant chunks? | ≥ 0.7 | backpack piece 📦 |
+| `retrieval` | Did vector search find relevant chunks? | ≥ 0.7 | Did the donkey's vector search actually grab the right backpack pockets? Pass mark is 0.7. |
 | `faithfulness` | Does the answer stick to the context? | ≥ 0.8 | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
 | `answer_relevance` | Does the answer address the question? | ≥ 0.6 | Right address 🎯 |
 | `overall` | Weighted average (retrieval 30% + faithfulness 40% + relevance 30%) | ≥ 0.7 | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
@@ -1102,7 +1102,7 @@ a specific competency:
 
 | Phase | What it teaches | AI engineering skill | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Phase 1** — Foundation (Labs 1–2) | Retrieval quality, faithfulness scoring, hallucination detection, top_k tuning | You learn to **measure** AI system quality — the foundation of every production AI system. Without evaluation, you're deploying blind. | backpack fetch 🎒 |
+| **Phase 1** — Foundation (Labs 1–2) | Retrieval quality, faithfulness scoring, hallucination detection, top_k tuning | You learn to **measure** AI system quality — the foundation of every production AI system. Without evaluation, you're deploying blind. | Foundation labs that measure whether the donkey is fetching the right backpack pockets without hallucinating. |
 | **Phase 2** — Bridge (Labs 3–5) | Business metrics, prompt injection guardrails, AI observability dashboards | You learn to **translate** technical scores into business language, **protect** against adversarial inputs, and **monitor** AI systems in production. | Delivery note 📋 |
 | **Phase 3** — Production (Labs 6–8) | Data flywheel, RLHF feedback loops, infrastructure scaling | You learn the **continuous improvement loop** that separates production AI from demos — detect bad answers, fix them, lock the fix with golden datasets, repeat. | Feed bill 🌾 |
 | **Phase 4** — Advanced RAG (Labs 9–13) | Guardrails, re-ranking, hybrid search, bulk operations | You learn to **harden** a RAG system — block prompt injection, improve retrieval with re-ranking and hybrid search, and manage documents at scale. | Delivery note 📋 |
@@ -1281,15 +1281,15 @@ reference — for full code walkthroughs, see
 | Endpoint | Method | What it does | 🫏 Donkey |
 | --- | --- | --- | --- |
 | `/api/health` | GET | Checks if the RAG chain is initialised. No AI calls. | Stable's front door — the URL customers use to drop off a question |
-| `/api/chat` | POST | Send a question, get an AI answer with sources and token usage (the full RAG pipeline). | Cargo unit ⚖️ |
-| `/api/documents/upload` | POST | Upload a single document — the app chunks, embeds, and stores it. | backpack piece 📦 |
+| `/api/chat` | POST | Send a question, get an AI answer with sources and token usage (the full RAG pipeline). | Send a question, get the donkey's answer plus cited backpack pockets and a hay tally for this delivery. |
+| `/api/documents/upload` | POST | Upload a single document — the app chunks, embeds, and stores it. | Upload one document and the post office immediately chunks, embeds, and files its backpack pockets. |
 | `/api/documents/upload-batch` | POST | Upload multiple documents in one request. | Stable door 🚪 |
-| `/api/documents` | GET | List all uploaded documents and their chunk counts. | backpack piece 📦 |
+| `/api/documents` | GET | List all uploaded documents and their chunk counts. | Lists every uploaded document along with how many backpack pockets each was sliced into. |
 | `/api/documents/{id}` | DELETE | Remove a document and its vector embeddings. | Stable door 🚪 |
 | `/api/evaluate` | POST | Run a question through the RAG pipeline AND score the answer quality (RAGAS metrics). | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
 | `/api/evaluate/suite` | POST | Run the full golden dataset — like `dbt test` for your AI system. | Sends the donkey on all 25 standard test deliveries and returns one combined report card |
 | `/api/queries/stats` | GET | Aggregate pass rate and failure breakdown from query logs. | Stable door 🚪 |
-| `/api/queries/failures` | GET | Recent failed queries with failure categories (bad_retrieval, hallucination, etc.). | Memory drift ⚠️ |
+| `/api/queries/failures` | GET | Recent failed queries with failure categories (bad_retrieval, hallucination, etc.). | Recent deliveries where the donkey strayed — categorised as bad retrieval, hallucination, and friends. |
 | `/api/metrics` | GET | Prometheus-compatible counters and gauges for monitoring dashboards. | Tachograph 📊 |
 
 > 📖 **Deep dive:** [API Routes Explained](../architecture-and-design/api-routes-explained.md) —
@@ -1326,7 +1326,7 @@ These parts are **document-agnostic** — they work with any uploaded document:
 | `src/llm/`, `src/vectorstore/`, `src/storage/` | Provider implementations — fully generic | Swappable donkey, warehouse, and depot implementations chosen at runtime by config |
 | `src/config.py`, `src/main.py` | App configuration — no document references | Donkey-side view of src/config.py`, `src/main.py — affects how the donkey loads, reads, or delivers the cargo |
 | `Dockerfile`, `.github/workflows/` | Build and deploy — no document references | Robot hand 🤖 |
-| `tests/test_ingestion.py` | Tests chunking mechanics — not content-specific | backpack piece 📦 |
+| `tests/test_ingestion.py` | Tests chunking mechanics — not content-specific | Tests the chunking machinery itself — overlap, sizes, edges — independent of any specific document content. |
 
 ### How to switch documents (3 steps)
 
@@ -1342,7 +1342,7 @@ Edit `my-document.yaml` and update these sections:
 | Section | What to change | 🫏 Donkey |
 | --- | --- | --- |
 | `document.name` | Your document's filename (e.g., `employee-handbook.pdf`) | The label on the package — what the customer originally named the file |
-| `golden_dataset` | Rewrite the 25 Q&A test cases to match your document (questions, expected keywords, context chunks) | backpack piece 📦 |
+| `golden_dataset` | Rewrite the 25 Q&A test cases to match your document (questions, expected keywords, context chunks) | Rewrite the 25 standard test deliveries — questions, expected keywords, and reference backpack pockets — for your docs. |
 | `lab_questions.phase1` | Baseline + retrieval questions about your document | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
 | `lab_questions.phase2` | Business questions, injection prompts, dashboard queries | Delivery note 📋 |
 | `lab_questions.phase3` | Gap question + a "gap document" your knowledge base does NOT have | Donkey-side view of lab_questions.phase3 — affects how the donkey loads, reads, or delivers the cargo |
@@ -1401,7 +1401,7 @@ These are **not** covered by the YAML config and need manual editing if you swit
 
 | File | What to change | Impact if skipped | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `tests/test_evaluation.py` | Mock fixtures reference hardcoded golden dataset entries (questions, answers, chunks) | Unit tests will fail | backpack piece 📦 |
+| `tests/test_evaluation.py` | Mock fixtures reference hardcoded golden dataset entries (questions, answers, chunks) | Unit tests will fail | Mock fixtures hardcode questions, answers, and backpack pockets; swapping the dataset will break unit tests. |
 | `tests/test_chat.py` | Mock answers and source filenames reference `test-policy.txt` | Unit tests will fail | Test delivery 🧪 |
 | `scripts/run_all_labs.py` (Phase 4 Labs 11–13) | A few hardcoded structural questions remain — mostly generic but review if your doc is very different | May produce odd results | Practice run — readers play stable hand and put the donkey through its paces |
 

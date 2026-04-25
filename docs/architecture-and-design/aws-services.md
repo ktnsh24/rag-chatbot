@@ -22,7 +22,7 @@
 | **DynamoDB** | Conversation history + **vector store** (cheap mode) | Pay per request | AWS depot 🏭 |
 | **OpenSearch Serverless** | Vector store for embeddings (production) | Pay per OCU-hour | AWS search hub 🔍 |
 | **ECS Fargate** | Host the FastAPI container | Pay per vCPU/memory-hour | Stable stall 🐎 |
-| **ECR** | Docker image registry | Pay per GB stored | Stable address 🏷️ |
+| **ECR** | Docker image registry | Pay per GB stored | AWS Docker registry address where the donkey image is parked — billed per gigabyte stored. |
 | **Lambda** | Event-driven document ingestion | Pay per invocation | Pre-sort 📮 |
 | **CloudWatch** | Logs, metrics, dashboards, alerts | Free tier generous | Tachograph 📊 |
 | **IAM** | Permissions and roles | Free | Free hay 🌿 |

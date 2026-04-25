@@ -104,7 +104,7 @@ Creates:
 | 3 | S3 encryption | `aws_s3_bucket_server_side_encryption_configuration` | Encrypt at rest | Stable door 🚪 |
 | 4 | S3 public block | `aws_s3_bucket_public_access_block` | Block all public access | AWS depot 🏭 |
 | 5 | DynamoDB table | `aws_dynamodb_table` | Conversation history | AWS depot 🏭 |
-| 6 | ECR repository | `aws_ecr_repository` | Docker image registry | Stable address 🏷️ |
+| 6 | ECR repository | `aws_ecr_repository` | Docker image registry | AWS Docker registry address where the donkey's container image lives, provisioned via `aws_ecr_repository`. |
 | 7 | IAM role + policy | `aws_iam_role` + `aws_iam_role_policy` | Permissions for ECS tasks | AWS depot 🏭 |
 
 - 🫏 **Donkey:** Blueprints for building the stable — run one command and the whole building appears, fences and all.
@@ -149,7 +149,7 @@ Creates:
 | 4 | Cosmos DB Account | `azurerm_cosmosdb_account` | NoSQL database (serverless) | Azure trip-log 📒 |
 | 5 | Cosmos DB Database | `azurerm_cosmosdb_sql_database` | Database within the account | Azure trip-log 📒 |
 | 6 | Cosmos DB Container | `azurerm_cosmosdb_sql_container` | Table with partition key + TTL | Azure trip-log 📒 |
-| 7 | Container Registry | `azurerm_container_registry` | Docker image registry | Stable address 🏷️ |
+| 7 | Container Registry | `azurerm_container_registry` | Docker image registry | Azure equivalent address — `azurerm_container_registry` provisions the door for the donkey image. |
 
 - 🫏 **Donkey:** Blueprints for building the stable — run one command and the whole building appears, fences and all.
 
@@ -161,7 +161,7 @@ Creates:
 | --- | --- | --- | --- | --- |
 | **Document storage** | S3 bucket | Storage Account + Container | ✅ Same — blob/object storage | Same warehouse concept on both clouds — the donkey fetches source files from either |
 | **Conversation history** | DynamoDB table | Cosmos DB account + database + container | ✅ Same — NoSQL key-value store | AWS depot 🏭 |
-| **Docker registry** | ECR | ACR | ✅ Same — container registry | Stable address 🏷️ |
+| **Docker registry** | ECR | ACR | ✅ Same — container registry | Same idea, different cloud — both provide a registry address where the donkey image is stored. |
 | **Container hosting** | ECS Fargate (referenced) | Container Apps (referenced) | ✅ Same — serverless containers | Stable stall 🐎 |
 | **AI model access** | Bedrock (IAM permission) | OpenAI (connection string) | ⚡ Different auth model | Same donkey-hiring idea, different paperwork — AWS uses an IAM role, Azure hands over a connection string |
 | **Resource grouping** | Tags only | Resource Group (explicit) | ↔ Different approach | Label on the original mail item the backpack was sliced from |
@@ -373,7 +373,7 @@ Pessimistic constraint (`~>`) — allows 5.x but not 6.0. Standard Terraform bes
 | Missing Resource | Why It's Not Here | In Production You'd Add | 🫏 Donkey |
 | --- | --- | --- | --- |
 | **OpenSearch Serverless** | $350/month minimum — too expensive for dev | `aws_opensearchserverless_collection` with HNSW index | AWS search hub 🔍 |
-| **Azure AI Search** | Free tier is manual setup | `azurerm_search_service` with vector index config | Azure hub ☁️ |
+| **Azure AI Search** | Free tier is manual setup | `azurerm_search_service` with vector index config | Azure hub search index — free tier needs manual setup; paid tiers can be provisioned with `azurerm_search_service`. |
 | **Bedrock model access** | No Terraform resource needed (just IAM) | Model access is enabled per-region in AWS console | No blueprint needed — you tick a box in the AWS console to let the donkey carry Claude in that region |
 | **Azure OpenAI deployment** | Requires manual provisioning | `azurerm_cognitive_deployment` for GPT-4o + embedding models | Blueprints can spin up the GPT-4o donkey and the embedding GPS stamper as cognitive deployments |
 | **ECS Fargate service** | Referenced but full config omitted for simplicity | Task definition, service, ALB, target group | Stable stall 🐎 |
@@ -395,7 +395,7 @@ too expensive for dev or require manual provisioning.
 | S3 bucket | Standard document storage | Raw file backup for re-ingestion when chunking strategy changes | The original parcel store — needed if you ever change how the donkey cuts chunks and need to re-pack |
 | DynamoDB table | Standard session store | Token budget storage — each row becomes input tokens | AWS depot 🏭 |
 | DynamoDB TTL | Standard data retention | Context window management — old conversations are worthless tokens | AWS depot 🏭 |
-| ECR repository | Standard container registry | Same — no AI difference | Stable address 🏷️ |
+| ECR repository | Standard container registry | Same — no AI difference | Standard container registry address — no AI specifics, just a place to park the donkey image. |
 | IAM `bedrock:InvokeModel` | New permission, never used before | The permission that enables the entire AI pipeline | First permission DEs ever grant the donkey — without it, the stable manager can't dispatch a single delivery |
 | Missing OpenSearch | "Why isn't the vector store here?" | Cost decision — $350/month for a portfolio project is wasteful | AWS search hub 🔍 |
 | `PAY_PER_REQUEST` | Standard dev billing mode | Essential for AI apps — query patterns are unpredictable and bursty | Fuel-and-feed bill for keeping the donkey and stable running |

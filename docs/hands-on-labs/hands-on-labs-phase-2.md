@@ -38,7 +38,7 @@ someone trick the donkey? Can you see what the donkey is doing?**
 | **block rate** | What percentage of sneaky requests does the donkey **refuse**? Target: >95% blocked. If the donkey delivers warehouse contents to every trickster — your system is wide open. | Percentage of malicious inputs detected and blocked by guardrails. | `blocked_malicious / total_malicious × 100`. Run N attack prompts through guardrails, count how many get blocked. E.g. 19 blocked out of 20 attacks → **95%** block rate. | Delivery note 📋 |
 | **false positive rate** | Does the donkey **refuse legitimate customers** by mistake? "What's the refund policy?" is a normal question, not an attack. If the donkey blocks 10% of real questions — your guardrails are too aggressive. Target: <5%. | Percentage of legitimate queries incorrectly flagged as malicious. | `false_blocks / total_legitimate × 100`. Run N normal queries, count how many guardrails incorrectly block. E.g. 1 blocked out of 50 legit queries → **2%** false positive rate. | Feed bill 🌾 |
 | **token usage** | Every step the donkey takes **costs hay**. Longer routes (more chunks, longer answers) = more hay. You need to know: how much hay per delivery? Are some routes burning 10x more hay than others? | Input + output tokens consumed per request — directly proportional to cloud API costs. | `input_tokens + output_tokens` from LLM API response metadata. Cost = `total_tokens × price_per_token`. E.g. 1,200 input + 350 output = **1,550 tokens**. Track per-request to find expensive queries. | Each token is a single bale of hay the donkey eats — count input + output bales to know the cost |
-| **observability** | Can you **see where the donkey is** at any moment? Which shelf it went to, how long it waited, which packages it picked? If the donkey disappears for 60 seconds and comes back with a wrong package, you need the GPS trail to debug it. | Request tracing, latency breakdown per step (embed, retrieve, generate), structured logging with request IDs. | Not a formula — it's structured logging. Each request gets a `request_id`, and each step (embed, retrieve, generate) logs `start_time`, `end_time`, `duration_ms`. You query logs to find bottlenecks. | Hoof check 🔧 |
+| **observability** | Can you **see where the donkey is** at any moment? Which shelf it went to, how long it waited, which packages it picked? If the donkey disappears for 60 seconds and comes back with a wrong package, you need the GPS trail to debug it. | Request tracing, latency breakdown per step (embed, retrieve, generate), structured logging with request IDs. | Not a formula — it's structured logging. Each request gets a `request_id`, and each step (embed, retrieve, generate) logs `start_time`, `end_time`, `duration_ms`. You query logs to find bottlenecks. | A GPS trail for every donkey trip — request_id and per-stage timings let you replay where time was spent |
 
 **The Phase 2 insight:** Technical scores (retrieval, faithfulness) are for engineers.
 Business metrics (follow-up rate, resolution rate, cost per query) are for stakeholders.
@@ -166,10 +166,10 @@ Think about this: if you deployed this chatbot for **customer support**, what wo
 
 | Technical metric | Business metric | How to collect it | 🫏 Donkey |
 |---|---|---| --- |
-| `retrieval: 0.85` | "% of questions answered from documents" (vs no context) | Log when retrieval scores < 0.5 | backpack fetch 🎒 |
+| `retrieval: 0.85` | "% of questions answered from documents" (vs no context) | Log when retrieval scores < 0.5 | Translates "donkey grabbed the right backpacks" into "% of customer questions actually answered from our documents" |
 | `faithfulness: 0.92` | "% of answers that don't need human correction" | User feedback (thumbs up/down) | Feed bill 🌾 |
 | `answer_relevance: 0.78` | "% of users who didn't ask a follow-up" | Track session length: 1 question = good, 3+ = bad | Trip log 📒 |
-| `overall: 0.85` | "Cost per resolved question" | Token cost + (did user still call support?) | Cargo unit ⚖️ |
+| `overall: 0.85` | "Cost per resolved question" | Token cost + (did user still call support?) | Total hay-bill per delivery the customer actually walked away happy with — combines tokens spent and follow-up support calls |
 
 </details>
 
@@ -261,10 +261,10 @@ In **Swagger UI** → `POST /api/chat` → **"Try it out"**, try each one:
 
 | Metric | Value | Interpretation | 🫏 Donkey |
 | --- | --- | --- | --- |
-| retrieval | ___ | Irrelevant chunks | backpack piece 📦 |
+| retrieval | ___ | Irrelevant chunks | Donkey returned with backpacks unrelated to the injected order — vector search couldn't find anything matching the trickster's prompt |
 | faithfulness | ___ | No grounding in context | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
 | answer_relevance | ___ | Off-topic | Right address 🎯 |
-| overall | ___ | Deep failure | Hoof check 🔧 |
+| overall | ___ | Deep failure | Bottom-of-the-barrel grade — every column on the report card collapsed at once, classic injection symptom |
 | passed | ___ | ___ | Donkey's report card — share of test deliveries that scored above the bar |
 
 > **What to expect:** A successful injection will have the lowest scores of any experiment — faithfulness near 0.0 (the injected response has no grounding in context), overall well below 0.5.
@@ -353,7 +353,7 @@ damage is done*.
 |---|---|---|---| --- |
 | **Input** | Block dangerous prompts before they reach the LLM | Reject "ignore instructions...", "repeat your prompt..." patterns | Input validation on your API | The stable gate inspects every delivery note and turns away suspicious ones before the donkey leaves |
 | **Output** | Check the answer before sending to user | Block PII (email, phone numbers), profanity, off-topic responses | Output schema validation | Gate rule 🚧 |
-| **Cost** | Prevent token abuse | Max 2000 tokens per request, rate limit: 10 requests/minute per user | API rate limiting you already do | Cargo unit ⚖️ |
+| **Cost** | Prevent token abuse | Max 2000 tokens per request, rate limit: 10 requests/minute per user | API rate limiting you already do | Hay-budget rule at the stable gate — caps how many bales any one customer can burn per delivery and per minute |
 | **Topic** | Keep AI on-topic | Only answer about company policies, reject "tell me a joke", "write code" | Schema constraints on your data pipeline | Robot hand 🤖 |
 
 </details>
@@ -521,7 +521,7 @@ Now look at your terminal where the server is running. You should see log lines 
 | Metric | Value | What the log tells you | 🫏 Donkey |
 | --- | --- | --- | --- |
 | request_id | (your unique ID) | Unique trace ID — find any request in logs | Donkey's trip log — every delivery's details written to disk for later review |
-| retrieval | ___ | Vector search found relevant-ish chunks | backpack piece 📦 |
+| retrieval | ___ | Vector search found relevant-ish chunks | Donkey came back with backpacks that mostly match — GPS warehouse hit the right neighbourhood, not the exact shelf |
 | faithfulness | ___ | ___ | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
 | answer_relevance | ___ | ___ | Right address 🎯 |
 | overall | ___ | ___ | Donkey-side view of overall — affects how the donkey loads, reads, or delivers the cargo |
@@ -601,7 +601,7 @@ In **Swagger UI** → `POST /api/evaluate`, run each question one at a time:
 | Refund policy? | High scores, pass | 0.724, passed ✅ | ✅ Yes | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
 | Digital products? | High scores, pass | 0.786, passed ✅ | ✅ Yes | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
 | Return shipping? | High scores, pass | 0.767, passed ✅ | ✅ Yes | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
-| Remote work policy? | LOW retrieval, fail | 0.477, failed ❌ | ✅ Yes | Hoof check 🔧 |
+| Remote work policy? | LOW retrieval, fail | 0.477, failed ❌ | ✅ Yes | No matching backpack on any shelf — donkey returned almost empty-hooved and the report card correctly flagged the trip |
 | How long? | Medium scores, borderline | 0.851, passed ✅ | ⚠️ Higher than expected (refusal = safe) | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
 
 > ### 📊 Mini Dashboard Analysis — 5 Patterns a Production Dashboard Would Show
@@ -672,10 +672,10 @@ In production, you'd track these over time. Think about what alerts you'd set.
 
 | What to monitor | Why | Alert threshold | Your 5b baseline | DE parallel | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
-| Average retrieval score (per day) | Drift detection — docs getting stale? | Alert if < 0.5 for 24h | Your avg: 0.561 (just above) | DynamoDB read capacity | backpack fetch 🎒 |
+| Average retrieval score (per day) | Drift detection — docs getting stale? | Alert if < 0.5 for 24h | Your avg: 0.561 (just above) | DynamoDB read capacity | Daily average of how well the donkey is finding the right backpacks — slow decline means the warehouse needs reorganising |
 | Hallucination rate (per day) | Safety — AI making things up | Alert if > 10% (with LLM-as-judge) | Your rate: 40% (but most are false positives from heuristic evaluator) | Error rate on Lambda | How often the donkey writes things that weren't in the backpack — alarm if too many invented answers |
 | P99 latency | User experience | Alert if > 5s (cloud) or > 60s (local) | Your P99: ~40s (local CPU) | API Gateway latency | Stable door 🚪 |
-| Token cost per day | Budget | Alert if > $50/day | Your cost: $0 (local) | AWS cost alarms | Cargo unit ⚖️ |
+| Token cost per day | Budget | Alert if > $50/day | Your cost: $0 (local) | AWS cost alarms | Daily hay bill for the stable — alarm trips when the donkey eats more than the budget allows |
 | "I don't have information" rate | Missing content gap | Alert if > 20% | Your rate: 2/5 = 40% ⚠️ | Dead letter queue depth | Dashboard the stable owner watches — flags slow or failing donkey trips |
 
 > ### 📊 Alert Analysis — Connecting Your 5b Dashboard to Production Thresholds

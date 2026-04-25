@@ -460,12 +460,12 @@ for most follow-up questions without excessive token costs.
 
 | Aspect | What a DE sees | What an AI Engineer sees | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `ConversationMessage` model | Standard message table schema | Token budget — each message costs tokens in the next prompt | Cargo unit ⚖️ |
+| `ConversationMessage` model | Standard message table schema | Token budget — each message costs tokens in the next prompt | Each stored message costs hay later — every prior turn gets re-loaded into the donkey's next prompt. |
 | `add_message()` | Insert row, done | Must save BOTH user and assistant messages for complete replay | Donkey-side view of add_message() — affects how the donkey loads, reads, or delivers the cargo |
-| `get_history(limit=10)` | Pagination, standard | Token cost control — limit = max tokens spent on history | Cargo unit ⚖️ |
+| `get_history(limit=10)` | Pagination, standard | Token cost control — limit = max tokens spent on history | Pagination doubles as a hay budget — the limit caps how much trip log the donkey re-chews per turn. |
 | `delete_session()` | Cleanup, standard | Privacy + cost — old sessions = wasted storage + prompt bloat | Delivery note 📋 |
 | TTL (7 days) | Standard data retention | Context window management — conversations older than 7 days aren't useful | Trip log 📒 |
-| `session_id` | Partition key for grouping | Session isolation — one user's history never leaks into another's prompt | Alternative stable 🏗️ |
+| `session_id` | Partition key for grouping | Session isolation — one user's history never leaks into another's prompt | Partition key keeps each user in their own stable so trip logs never leak into another donkey's prompt. |
 | Sort by timestamp | Standard ordering | Chronological replay is required — LLM needs messages in order | Donkey replays the trip log in order — out-of-order messages would confuse the next answer |
 
 - 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.

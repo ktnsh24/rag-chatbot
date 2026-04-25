@@ -65,7 +65,7 @@ az account set --subscription "your-subscription-id"
 |---|---|---| --- |
 | `aws_s3_bucket` | Store uploaded documents | ✅ 5 GB | AWS depot 🏭 |
 | `aws_dynamodb_table` | Conversation history | ✅ 25 GB | AWS depot 🏭 |
-| `aws_ecr_repository` | Docker image registry | ✅ 500 MB | Stable address 🏷️ |
+| `aws_ecr_repository` | Docker image registry | ✅ 500 MB | Permanent ECR address where the donkey's Docker image lives — free under 500 MB stored. |
 | `aws_iam_role` | ECS task execution role | ✅ Free | Free hay 🌿 |
 | `aws_iam_role_policy` | Least-privilege policy | ✅ Free | Free hay 🌿 |
 
@@ -157,7 +157,7 @@ The ECS task role grants least-privilege access:
 |---|---|---| --- |
 | `project_name` | `"ragchatbot"` | Prefix for resource names | The donkey's name tag for the Azure stable (no dashes — Azure naming rules) |
 | `environment` | `"dev"` | Environment tag | Which Azure stable the donkey lives in — dev, staging, or prod |
-| `location` | `"westeurope"` | Azure region | Azure hub ☁️ |
+| `location` | `"westeurope"` | Azure region | Region of the Azure hub where every Azure resource for this stable will be provisioned. |
 
 ### Cosmos DB (Serverless)
 
@@ -303,7 +303,7 @@ terraform destroy -var="environment=dev"
 |---|---| --- |
 | S3 (5 GB) | $0.00 | Free hay 🌿 |
 | DynamoDB (on-demand) | $0.00 | AWS depot 🏭 |
-| ECR (500 MB) | $0.00 | Stable address 🏷️ |
+| ECR (500 MB) | $0.00 | ECR registry address costs nothing while the donkey image stays under the 500 MB free tier. |
 | IAM | $0.00 | Free hay 🌿 |
 | **Total** | **$0.00** | Feed bill 🌾 |
 
@@ -313,7 +313,7 @@ terraform destroy -var="environment=dev"
 |---|---| --- |
 | Storage Account (5 GB LRS) | ~$0.10 | Cheap warehouse rent — pennies per month to store the donkey's source documents |
 | Cosmos DB (serverless, free tier) | $0.00 | Azure trip-log 📒 |
-| Container Registry (Basic) | ~$4.20 | Stable address 🏷️ |
+| Container Registry (Basic) | ~$4.20 | Azure Container Registry Basic SKU — a fixed ~$4.20/month address for the donkey's Docker image. |
 | Resource Group | $0.00 | Free hay 🌿 |
 | **Total** | **~$4.30** | Feed bill 🌾 |
 

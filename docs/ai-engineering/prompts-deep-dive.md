@@ -34,7 +34,7 @@ This 65-line file controls **100% of the LLM's behaviour**. Change one word in t
 | What you'll learn | DE parallel | 🫏 Donkey |
 |---|---| --- |
 | System prompts that set LLM behaviour | SQL query templates with bind variables | The standing-orders sheet pinned to the stable wall that every donkey reads before any trip |
-| Constraints that prevent hallucination | CHECK constraints that prevent bad data | Memory drift ⚠️ |
+| Constraints that prevent hallucination | CHECK constraints that prevent bad data | Guardrails that stop the donkey from inventing facts not found in its loaded backpack chunks |
 | Template variables (`{context}`, `{question}`) | Parameterised queries (`?`, `$1`) | Blank slots on the delivery note where the cargo manifest and question get pasted in |
 | Multi-turn conversation context | Session state management | Trip log 📒 |
 | The cost impact of prompt length | The cost of scanning too many rows | Delivery note 📋 |
@@ -145,7 +145,7 @@ Each rule targets a specific failure mode:
 
 | Rule | What it prevents | DE parallel | 🫏 Donkey |
 |---|---|---| --- |
-| **Rule 1:** ONLY use context | Hallucination — making up facts | Referential integrity — no orphaned foreign keys | Memory drift ⚠️ |
+| **Rule 1:** ONLY use context | Hallucination — making up facts | Referential integrity — no orphaned foreign keys | Forces donkey to cite only backpack cargo — no guessing when it can't find the answer |
 | **Rule 2:** Say "I don't know" | Confident wrong answers | `COALESCE(result, 'No data available')` | The donkey honestly admitting it has no matching backpack rather than guessing |
 | **Rule 3:** Cite sources | Untraceable claims | Audit trail — every row has a source system ID | Label on the original mail item the backpack was sliced from |
 | **Rule 4:** Be thorough | Incomplete answers | `SELECT *` vs `SELECT id` — return all relevant columns | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
@@ -313,11 +313,11 @@ RAG_SYSTEM_PROMPT                   query():
 
 | Problem | Cause | Fix | How to detect | 🫏 Donkey |
 |---|---|---|---| --- |
-| Hallucination | Rules too weak or model ignores them | Stronger constraints, lower temperature | Faithfulness score < 0.8 in evaluator | Memory drift ⚠️ |
-| Verbose answers | No length constraint | Add "Keep answers under 200 words" | Token count > 500 output tokens | Cargo unit ⚖️ |
-| Ignores citations | Model doesn't see "[Document chunk N]" pattern | Add example output in prompt | Missing `[Document chunk` in answer | backpack piece 📦 |
+| Hallucination | Rules too weak or model ignores them | Stronger constraints, lower temperature | Faithfulness score < 0.8 in evaluator | Donkey invents facts not in its backpack — tighten prompt rules or lower temperature |
+| Verbose answers | No length constraint | Add "Keep answers under 200 words" | Token count > 500 output tokens | Donkey rambles for 500+ tokens — add word limit to delivery note to control hay waste |
+| Ignores citations | Model doesn't see "[Document chunk N]" pattern | Add example output in prompt | Missing `[Document chunk` in answer | Donkey forgets to label which backpack it read — show citation example on the delivery note |
 | Wrong language | User asks in Dutch, prompt is English | Add "Answer in the same language as the question" | Manual review | Delivery note 📋 |
-| Off-topic | Context chunks are irrelevant | Better chunking/retrieval, not a prompt fix | Answer relevance score < 0.5 | backpack piece 📦 |
+| Off-topic | Context chunks are irrelevant | Better chunking/retrieval, not a prompt fix | Answer relevance score < 0.5 | Donkey got wrong backpacks from the warehouse — fix GPS search, not the delivery note |
 
 - 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
 

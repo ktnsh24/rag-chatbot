@@ -120,11 +120,11 @@ Existing unit tests cover individual components in isolation:
 |---|---|---| --- |
 | `test_chat.py` | 7 | Chat route logic, request validation, error handling | Test delivery 🧪 |
 | `test_evaluate_route.py` | 16 | Evaluate route logic, response format, error handling | Verifies the grading window hands back the report card in the right shape and fails gracefully on bad requests |
-| `test_ingestion.py` | 9 | Document chunking, ingestion pipeline, deduplication | backpack piece 📦 |
+| `test_ingestion.py` | 9 | Document chunking, ingestion pipeline, deduplication | Tests the post office pre-sorter: slicing mail into backpacks, GPS-stamping them, and shelving them |
 | `test_evaluation.py` | 14 | Evaluation framework, metrics computation, golden dataset | Tachograph 📊 |
 | `test_guardrails.py` | 20 | Guardrail pattern matching, PII regex, injection detection | Test delivery 🧪 |
 | `test_reranker.py` | 7 | Cross-encoder scoring, re-ranking logic | Confirms the quality inspector re-sorts backpack contents by score before the donkey heads out |
-| `test_hybrid_search.py` | 17 | BM25 tokenization, hybrid score fusion | Cargo unit ⚖️ |
+| `test_hybrid_search.py` | 17 | BM25 tokenization, hybrid score fusion | Verifies the donkey checks both the GPS warehouse and keyword index before loading backpacks |
 | `test_dynamodb_vectorstore.py` | 13 | DynamoDB CRUD, vector storage, batch operations | AWS depot 🏭 |
 | **Total** | **103** | | Feed bill 🌾 |
 
@@ -162,7 +162,7 @@ Simulates complete user journeys through the system. Uses a **stateful mock** th
 |---|---|---| --- |
 | `TestE2EFullPipeline` | 4 | Upload → chat (gets relevant answer), upload → evaluate (scores returned), chat without docs (empty answer), multiple uploads → chat | Full route: drop mail at the post office, then watch the donkey deliver from it, get graded, and stay silent when the warehouse is empty |
 | `TestE2EConversation` | 2 | Multi-turn conversation in same session, session isolation between users | Test delivery 🧪 |
-| `TestE2EObservability` | 2 | Metrics counter increments after chat, health endpoint remains up after activity | Donkey check ✅ |
+| `TestE2EObservability` | 2 | Metrics counter increments after chat, health endpoint remains up after activity | Checks the tachograph logs trips and health endpoint confirms the donkey is awake and ready |
 
 **Stateful mock pattern:**
 
@@ -195,7 +195,7 @@ Tests the guardrails feature flag (`GUARDRAILS_ENABLED`) by comparing behavior w
 | `TestGuardrailsInjection` | 4 | Prompt injection blocked (400), jailbreak blocked (400), safe questions pass, multiple safe questions pass | Delivery note 📋 |
 | `TestGuardrailsPII` | 3 | Email/SSN/credit card detected and flagged in responses | Test delivery 🧪 |
 | `TestGuardrailsOff` | 2 | Same injection/PII queries pass through when guardrails disabled | Test delivery 🧪 |
-| `TestFeatureFlagBehavior` | 3 | Evaluate works regardless of features, chat includes `cloud_provider`, health always available | Donkey check ✅ |
+| `TestFeatureFlagBehavior` | 3 | Evaluate works regardless of features, chat includes `cloud_provider`, health always available | Verifies the stable manager switches cloud donkeys correctly and health checks always work |
 
 - 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 

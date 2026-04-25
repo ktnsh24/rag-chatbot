@@ -428,8 +428,8 @@ This is what companies mean by "reinforcement learning loops" for RAG systems. Y
 | 1000 concurrent users | Horizontal scaling | ___ | How the stable adds or removes donkeys when delivery volume changes |
 | LLM calls are slow (2-5s) | Async processing | ___ | When the donkey is slow to write, hand the order to a queue and let workers pick it up |
 | Repeated questions | Caching | ___ | Donkey-side view of Repeated questions — affects how the donkey loads, reads, or delivers the cargo |
-| Embedding 10,000 docs | Batch processing | ___ | GPS warehouse 🗺️ |
-| Vector store overload | Read replicas | ___ | GPS warehouse 🗺️ |
+| Embedding 10,000 docs | Batch processing | ___ | Pre-sorting 10,000 parcels into GPS-stamped backpacks in one batched run, not one at a time |
+| Vector store overload | Read replicas | ___ | Spin up extra warehouse copies so simultaneous donkeys can browse shelves without bumping into each other |
 | Cost explosion | Rate limiting | ___ | Feed bill 🌾 |
 | Multi-region | Low latency globally | ___ | Tachograph reading — how long the donkey took on the round trip |
 
@@ -441,7 +441,7 @@ This is what companies mean by "reinforcement learning loops" for RAG systems. Y
 | 1000 concurrent users | Horizontal scaling | ECS auto-scaling (you configure this daily) | Always-on donkey stall — container that keeps the stable up 24/7 |
 | LLM calls are slow (2-5s) | Async processing | SQS queues + Lambda workers (you built this in proxy) | Orders queued at the stable so multiple donkeys can write answers in parallel instead of villagers waiting in line |
 | Repeated questions | Caching | DynamoDB/ElastiCache — cache answer by question hash | AWS depot 🏭 |
-| Embedding 10,000 docs | Batch processing | Kinesis/SQS batching (you built Kinesis in proxy) | GPS warehouse 🗺️ |
+| Embedding 10,000 docs | Batch processing | Kinesis/SQS batching (you built Kinesis in proxy) | Stream batches of parcels through the pre-sorting line so the GPS-stamping happens in bulk, not one-by-one |
 | Vector store overload | Read replicas | OpenSearch replicas (same as RDS read replicas) | AWS search hub 🔍 |
 | Cost explosion | Rate limiting | API Gateway throttling (you configured this) | Feed bill 🌾 |
 | Multi-region | Low latency globally | CloudFront + regional deployments (standard infra) | Robot hand 🤖 |
@@ -531,7 +531,7 @@ After completing Labs 6, 7, and 8, check off:
 | 3 | RLHF in RAG context (user feedback loops) | Lab 7 | [ ] Yes | Fuel-and-feed bill for keeping the donkey and stable running |
 | 4 | Feedback system design | Lab 7 | [ ] Yes | Feed bill 🌾 |
 | 5 | Connection between feedback and data flywheel | Lab 7 | [ ] Yes | Feed bill 🌾 |
-| 6 | Infrastructure scaling for AI (your DE superpower) | Lab 8 | [ ] Yes | Stable blueprint 🏗️ |
+| 6 | Infrastructure scaling for AI (your DE superpower) | Lab 8 | [ ] Yes | Skill: drawing the stable blueprints — autoscaling, queues, replicas — that let one donkey grow into a fleet |
 | 7 | AI-specific scaling concerns (embeddings, tokens, async LLM) | Lab 8 | [ ] Yes | New stable worries — GPS-stamping cargo, hay budgets, and queueing slow donkey writes |
 
 - 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
@@ -542,10 +542,10 @@ After completing Labs 6, 7, and 8, check off:
 
 | # | Skill | Phase | Lab | 🫏 Donkey |
 |---|---|---|---| --- |
-| 1 | Retrieval quality measurement | Phase 1 | Lab 1 | backpack fetch 🎒 |
+| 1 | Retrieval quality measurement | Phase 1 | Lab 1 | Skill: judging whether the donkey grabbed the right backpacks for the customer's question |
 | 2 | Retrieval-faithfulness trade-off | Phase 1 | Lab 1 | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
 | 3 | top_k tuning and its impact | Phase 1 | Lab 1 | How many backpacks the donkey grabs from the warehouse for one delivery |
-| 4 | Hallucination detection | Phase 1 | Lab 2 | Memory drift ⚠️ |
+| 4 | Hallucination detection | Phase 1 | Lab 2 | Skill: spotting when the donkey slipped extra items into the delivery that were never in any backpack |
 | 5 | Faithfulness scoring and weight | Phase 1 | Lab 2 | The biggest column on the report card — did the donkey use the backpack or invent things? |
 | 6 | Diagnosing retrieval vs generation problems | Phase 1 | Lab 2 | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
 | 7 | Business-aligned metrics | Phase 2 | Lab 3 | Tachograph 📊 |
@@ -558,7 +558,7 @@ After completing Labs 6, 7, and 8, check off:
 | 14 | Golden dataset growth from real usage | Phase 3 | Lab 6 | Test delivery 🧪 |
 | 15 | RLHF in RAG context | Phase 3 | Lab 7 | Practice run — readers play stable hand and put the donkey through its paces |
 | 16 | Feedback system design | Phase 3 | Lab 7 | Feed bill 🌾 |
-| 17 | Infrastructure scaling for AI | Phase 3 | Lab 8 | Stable blueprint 🏗️ |
+| 17 | Infrastructure scaling for AI | Phase 3 | Lab 8 | Skill: drawing the stable blueprints — autoscaling, queues, replicas — that let one donkey grow into a fleet |
 | 18 | AI-specific scaling concerns | Phase 3 | Lab 8 | How the stable adds or removes donkeys when delivery volume changes |
 
 **Additional skills not covered in the rag-chatbot but important to know about:**
@@ -567,7 +567,7 @@ After completing Labs 6, 7, and 8, check off:
 | --- | --- | --- | --- | --- | --- |
 | 19 | **A/B testing for AI** | Deploy two prompt versions, measure which performs better | ✅ Yes — when deploying to AWS/Azure, you'll set up traffic splitting with API Gateway / Azure Front Door | Same as A/B testing in web — split traffic, compare metrics | Delivery note 📋 |
 | 20 | **Model versioning** | Track which model version produced which answers | ✅ Yes — V2 of rag-chatbot will add MLflow integration for experiment tracking | MLflow, Weights & Biases, or simple git tags | Donkey-side view of 20 — affects how the donkey loads, reads, or delivers the cargo |
-| 21 | **Embedding drift detection** | New documents change the vector space — old embeddings may become stale | ✅ Partially — Lab 5's retrieval monitoring concept extends directly to drift alerts. Full implementation in V2 with scheduled re-evaluation | Monitor average retrieval scores over time (Lab 5 concept) | backpack fetch 🎒 |
+| 21 | **Embedding drift detection** | New documents change the vector space — old embeddings may become stale | ✅ Partially — Lab 5's retrieval monitoring concept extends directly to drift alerts. Full implementation in V2 with scheduled re-evaluation | Monitor average retrieval scores over time (Lab 5 concept) | When new parcels arrive the GPS map shifts — old backpack coordinates go stale and the donkey starts missing the right shelf |
 | 22 | **Cost optimisation** | Prompt compression, caching, model routing (cheap model for easy questions, expensive for hard) | ✅ Yes — when deploying to AWS Bedrock or Azure OpenAI, cost tracking becomes real (see [Cost Estimation](hands-on-labs-phase-1.md#cost-estimation--local-vs-cloud)) | Extend `src/rag/chain.py` with model routing logic | Trimming the delivery note and sending easy orders to a cheaper donkey so the hay bill stays small |
 | 23 | **Multi-modal RAG** | Images, tables, PDFs with charts — not just text | ⬜ Future project — requires a separate repo with vision models (GPT-4o, Claude 3.5 Sonnet) | Not in current rag-chatbot scope | Teaching the donkey to also carry pictures, charts, and tables — not just plain text mail |
 | 24 | **Compliance & audit logging** | Log every AI decision for regulatory compliance | ✅ Partially — the logging middleware already captures request/response. Full audit trail (immutable, tamper-proof) is a V2 feature | Extend `src/api/middleware/` to log full request/response | Stable door 🚪 |

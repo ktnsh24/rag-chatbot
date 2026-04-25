@@ -28,9 +28,9 @@ This is the **first AI file** you encounter after Phase 1. It defines the contra
 | # | Concept | Method / class | DE parallel | What's new | 🫏 Donkey |
 |---|---|---|---|---| --- |
 | 1 | **Tokens** | `LLMResponse` | RCU/WCU (DynamoDB capacity units) | The unit of cost — output tokens cost 5× more than input | Bales of hay the donkey eats — output bales cost 5× more than input bales |
-| 2 | **Generation** | `generate()` | `db.query(sql)` → rows | Send prompt + context → get text + token counts back | Cargo unit ⚖️ |
+| 2 | **Generation** | `generate()` | `db.query(sql)` → rows | Send prompt + context → get text + token counts back | Donkey reads delivery note and backpack, then writes answer and reports hay consumed |
 | 3 | **Temperature** | `temperature` param | ❌ No parallel — pure AI | Controls randomness: 0.0 = deterministic, 1.0 = creative | How predictable the donkey's writing is — low = same words every trip, high = the donkey gets creative |
-| 4 | **Embeddings** | `get_embedding()` | ❌ No parallel — brand new | Converts text → fixed-size vector that captures meaning | GPS warehouse 🗺️ |
+| 4 | **Embeddings** | `get_embedding()` | ❌ No parallel — brand new | Converts text → fixed-size vector that captures meaning | GPS-stamping cargo so the warehouse robot knows exactly where to shelve this backpack |
 | 5 | **Batch embeddings** | `get_embeddings_batch()` | Batch INSERT | One API call instead of N — same performance pattern | Stable door 🚪 |
 
 - 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
@@ -121,7 +121,7 @@ async def generate(
 | Parameter | What it is | What goes in | DE parallel | 🫏 Donkey |
 |---|---|---|---| --- |
 | `prompt` | The user's question + system instructions | `"What is the refund policy?"` | The SQL query | Delivery note 📋 |
-| `context` | Document chunks retrieved by vector search | `["Our refund policy allows...", "Returns must be..."]` | The tables the query runs against | backpack piece 📦 |
+| `context` | Document chunks retrieved by vector search | `["Our refund policy allows...", "Returns must be..."]` | The tables the query runs against | Retrieved backpack chunks the donkey reads before writing — the donkey can't answer without them |
 | `temperature` | Randomness control (0.0 = deterministic, 1.0 = creative) | `0.1` | ❌ No DE parallel — pure AI concept | How predictable the donkey's writing is — low = same words every trip, high = the donkey gets creative |
 
 ### How generation works end-to-end
@@ -173,7 +173,7 @@ Next word probabilities for "The refund policy ___":
 |---|---|---| --- |
 | 0.0 | Always picks the highest-probability word | Math, code generation | Donkey-side view of 0.0 — affects how the donkey loads, reads, or delivers the cargo |
 | **0.1** | **Almost always the highest, tiny variation** | **RAG chatbots (this repo) — accuracy matters** | Donkey-side view of 0.1 — affects how the donkey loads, reads, or delivers the cargo |
-| 0.7 | Distributes across likely words | Creative writing, brainstorming | Stable address 🏷️ |
+| 0.7 | Distributes across likely words | Creative writing, brainstorming | At 0.7 the donkey varies its phrasing considerably — good for creative trips, risky for facts |
 | 1.0 | Nearly uniform distribution — anything goes | Experimental, often unusable | Donkey-side view of 1.0 — affects how the donkey loads, reads, or delivers the cargo |
 
 ### Why 0.1 for this chatbot?
@@ -223,9 +223,9 @@ Think of a hash function — it takes any input and produces a fixed-size output
 
 | Property | Value | Why it matters | 🫏 Donkey |
 |---|---|---| --- |
-| Output size | Always 1024 floats (Titan) or 1536 (Azure) | Vector store must match this dimension | GPS warehouse 🗺️ |
+| Output size | Always 1024 floats (Titan) or 1536 (Azure) | Vector store must match this dimension | GPS coordinates always have 1024 or 1536 numbers — warehouse must match or indexing fails |
 | Input can be any length | `"Hi"` or a 2000-char paragraph → same 1024 floats | The model compresses meaning into fixed-size | How big each backpack-piece of cargo is — bigger = more context, fewer matches |
-| Runs at two different times | Ingestion (embed every chunk) AND query (embed the question) | Both must use the **same** model — mixing models = garbage results | backpack piece 📦 |
+| Runs at two different times | Ingestion (embed every chunk) AND query (embed the question) | Both must use the **same** model — mixing models = garbage results | GPS-stamping happens twice: pre-sorting backpacks at ingestion, then stamping each question at query time |
 | Not reversible | Cannot convert [0.12, -0.45, ...] back to text | Like a hash — one-way function | Donkey-side view of Not reversible — affects how the donkey loads, reads, or delivers the cargo |
 
 ### When `get_embedding()` runs in the RAG pipeline
@@ -311,12 +311,12 @@ USER: "What is the refund policy?"
 
 | Question | Answer | Concept it tests | 🫏 Donkey |
 |---|---|---| --- |
-| "What does `get_embedding()` return for a 2-word input vs a 2000-word input?" | The same: a list of exactly 1024 floats (Titan). Input length doesn't affect output size. | Embeddings | GPS warehouse 🗺️ |
+| "What does `get_embedding()` return for a 2-word input vs a 2000-word input?" | The same: a list of exactly 1024 floats (Titan). Input length doesn't affect output size. | Embeddings | GPS coordinates are always 1024 floats whether you stamp "hi" or a whole paragraph |
 | "Why does `LLMResponse` track `input_tokens` and `output_tokens` separately?" | Because output tokens cost 5× more. Tracking separately enables cost optimisation. | Tokens & cost | Counting reading-hay separately from writing-hay so you can see which trips burn the donkey's most expensive bales |
-| "What happens if you use temperature=0.8 instead of 0.1 for this chatbot?" | Answers become inconsistent and creative. The same question might get different answers. Hallucination risk increases. | Temperature | Memory drift ⚠️ |
+| "What happens if you use temperature=0.8 instead of 0.1 for this chatbot?" | Answers become inconsistent and creative. The same question might get different answers. Hallucination risk increases. | Temperature | At 0.8 the donkey improvises wildly — memory drift where repeated trips yield different answers |
 | "Why is `get_embedding()` on the same `BaseLLM` class as `generate()`?" | Because the LLM *provider* (Bedrock/Azure) handles both, even though they use different models internally. It's an interface grouping by provider, not by model. | Strategy pattern | One stable handles both writing donkeys and GPS-stamping workers — group by stable, not by job |
-| "What happens if you embed documents with Titan (1024-dim) but embed the question with Azure (1536-dim)?" | Vector search fails — you can't compare vectors of different dimensions. Both must use the same model. | Dimension matching | GPS warehouse 🗺️ |
-| "How much does one `get_embedding()` call cost vs one `generate()` call?" | Embedding: ~$0.00002 (30 tokens × $0.0001/1K). Generation: ~$0.005 (1430 input + 70 output). Generation is ~250× more expensive. | Cost awareness | Cargo unit ⚖️ |
+| "What happens if you embed documents with Titan (1024-dim) but embed the question with Azure (1536-dim)?" | Vector search fails — you can't compare vectors of different dimensions. Both must use the same model. | Dimension matching | Mixing 1024-digit GPS stamps with 1536-digit stamps breaks the warehouse — dimensions must match |
+| "How much does one `get_embedding()` call cost vs one `generate()` call?" | Embedding: ~$0.00002 (30 tokens × $0.0001/1K). Generation: ~$0.005 (1430 input + 70 output). Generation is ~250× more expensive. | Cost awareness | GPS-stamping costs pennies per backpack; delivery costs dollars — generation hay is 250× pricier |
 
 - 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.
 

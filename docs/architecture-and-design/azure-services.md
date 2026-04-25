@@ -20,9 +20,9 @@
 | **Azure OpenAI** | LLM inference (GPT-4o) + embeddings | Pay per token | Azure-hosted stable that rents the donkey by the hay bale — GPT-4o writes answers, embeddings turn text into GPS coordinates |
 | **Blob Storage** | Store uploaded documents | Pay per GB stored | Azure's document warehouse — where the donkey picks up source files before pre-sorting them into chunks |
 | **Cosmos DB** | Conversation history | Pay per RU (serverless) | Azure trip-log 📒 |
-| **AI Search** | Vector store for embeddings | Tier-based (Free available) | Azure hub ☁️ |
+| **AI Search** | Vector store for embeddings | Tier-based (Free available) | Azure hub's vector index where the donkey's embeddings live — billed by tier with a free option. |
 | **Container Apps** | Host the FastAPI container | Pay per vCPU/memory-second | Stable stall 🐎 |
-| **Container Registry** | Docker image registry | Tier-based ($5/month Basic) | Stable address 🏷️ |
+| **Container Registry** | Docker image registry | Tier-based ($5/month Basic) | Azure hub's Docker registry address for the donkey image — Basic SKU runs about $5/month. |
 | **Azure Functions** | Event-driven document ingestion | Pay per execution | Pre-sort 📮 |
 | **Azure Monitor** | Logs, metrics, dashboards, alerts | Free tier generous | Tachograph 📊 |
 | **Managed Identity** | Passwordless auth between services | Free | Free hay 🌿 |

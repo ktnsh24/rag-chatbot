@@ -376,7 +376,7 @@ vector store — the chunks + embeddings created during ingestion.
 | Aspect | What a DE sees | What an AI Engineer sees | 🫏 Donkey |
 | --- | --- | --- | --- |
 | `StoredDocument` model | Standard metadata DTO | Audit trail for data lineage | Manifest template 📋 |
-| `upload()` | S3 put_object, nothing new | Source-of-truth for re-ingestion if chunking strategy changes | backpack piece 📦 |
+| `upload()` | S3 put_object, nothing new | Source-of-truth for re-ingestion if chunking strategy changes | S3 keeps the original document so the post office can re-stitch backpack pockets if chunking changes. |
 | `list_documents()` | Paginated list, standard | Knowledge base inventory — what data has the LLM seen? | Roll-call of every backpack the donkey is allowed to read from when answering |
 | `delete()` | Prefix delete, standard | Must delete from BOTH storage AND vector store, or orphan vectors remain | How the warehouse measures which backpacks are nearest to the customer's question |
 | Strategy pattern | Clean architecture | Essential for multi-cloud — can't hardcode providers in AI apps | Stable design — donkey doesn't care which warehouse brand it grabs from |

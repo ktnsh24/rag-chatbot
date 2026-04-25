@@ -33,21 +33,21 @@ Every `/api/chat` request is logged as a structured JSONL record in `logs/querie
 |---|---| --- |
 | `request_id` | Unique request identifier | Tracking number stamped on the parcel so the donkey can find it again |
 | `question` | What the user asked | Donkey-side view of question — affects how the donkey loads, reads, or delivers the cargo |
-| `chunks` | Retrieved documents with relevance scores | backpack piece 📦 |
+| `chunks` | Retrieved documents with relevance scores | The backpack pockets the donkey pulled for this query, each tagged with a similarity score. |
 | `answer` | LLM response | What the donkey wrote on the delivery note after reading the backpack |
-| `retrieval_score` | How relevant the chunks were (0–1) | backpack piece 📦 |
-| `faithfulness_score` | Did the answer stick to the chunks? (0–1) | backpack piece 📦 |
+| `retrieval_score` | How relevant the chunks were (0–1) | Score from 0 to 1 grading how on-target the backpack pockets were for the user's question. |
+| `faithfulness_score` | Did the answer stick to the chunks? (0–1) | Did the donkey stick to what was inside the backpack pockets, or invent extra hay? Scored 0–1. |
 | `answer_relevance_score` | Did the answer address the question? (0–1) | Right address 🎯 |
-| `failure_category` | Triage: `none`, `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`, `marginal` | Memory drift ⚠️ |
+| `failure_category` | Triage: `none`, `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`, `marginal` | Triage tag explaining why the donkey wandered off — bad retrieval, hallucination, off-topic, or marginal delivery. |
 | `latency_ms` | Total response time | Feed bill 🌾 |
 
 **Failure triage table:**
 
 | Category | Root Cause | Fix | 🫏 Donkey |
 |---|---|---| --- |
-| `bad_retrieval` | Wrong chunks returned | Better chunking, more documents, tune top_k | backpack piece 📦 |
+| `bad_retrieval` | Wrong chunks returned | Better chunking, more documents, tune top_k | The donkey grabbed the wrong backpack pockets — fix chunking, add documents, or tune top_k. |
 | `hallucination` | Good chunks, LLM fabricated | Better system prompt, lower temperature | Backpack was fine, but the donkey embellished — tighten the standing orders and lower temperature so it sticks to the cargo |
-| `both_bad` | Wrong chunks AND fabrication | Both fixes above | backpack piece 📦 |
+| `both_bad` | Wrong chunks AND fabrication | Both fixes above | Wrong backpack pockets AND the donkey hallucinated on top — apply both retrieval and faithfulness fixes. |
 | `off_topic` | Question outside document scope | Add documents or refuse gracefully | Donkey-side view of off_topic — affects how the donkey loads, reads, or delivers the cargo |
 | `marginal` | Borderline scores | Monitor, may need prompt tuning | Delivery note 📋 |
 
@@ -76,11 +76,11 @@ Every `/api/chat` request is logged as a structured JSONL record in `logs/querie
 | `rag_chat_errors_total` | counter | Total errors | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 | `rag_chat_error_rate_percent` | gauge | Current error rate | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 | `rag_chat_latency_p50/p95/p99_ms` | gauge | Latency percentiles | Tachograph reading — how long the donkey took on the round trip |
-| `rag_tokens_input_total` | counter | Input tokens consumed | Cargo unit ⚖️ |
-| `rag_tokens_output_total` | counter | Output tokens generated | Cargo unit ⚖️ |
-| `rag_tokens_cost_usd_total` | counter | Estimated cost | Cargo unit ⚖️ |
+| `rag_tokens_input_total` | counter | Input tokens consumed | Tachograph counter tallying every hay bale fed into the donkey across all queries. |
+| `rag_tokens_output_total` | counter | Output tokens generated | Counter for every hay bale the donkey brayed back out as answer tokens. |
+| `rag_tokens_cost_usd_total` | counter | Estimated cost | Running dollar total for hay consumed — the trip's accumulated delivery bill. |
 | `rag_documents_ingested_total` | counter | Documents ingested | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
-| `rag_chunks_created_total` | counter | Chunks created | backpack piece 📦 |
+| `rag_chunks_created_total` | counter | Chunks created | Counter of backpack pockets the post office has stitched during all document ingestions. |
 | `rag_uptime_seconds` | gauge | Application uptime | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 
 **Query quality metrics (from QueryLogger):**
@@ -89,7 +89,7 @@ Every `/api/chat` request is logged as a structured JSONL record in `logs/querie
 |---|---|---| --- |
 | `rag_queries_total` | gauge | Queries logged today | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 | `rag_queries_pass_rate_percent` | gauge | Evaluation pass rate | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
-| `rag_queries_avg_retrieval` | gauge | Avg retrieval score | backpack fetch 🎒 |
+| `rag_queries_avg_retrieval` | gauge | Avg retrieval score | Average score grading how well the donkey is fetching the right backpack pockets lately. |
 | `rag_queries_avg_faithfulness` | gauge | Avg faithfulness score | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
 | `rag_queries_failure_{category}` | gauge | Failures by category | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 
@@ -141,7 +141,7 @@ OpenTelemetry is wired up in `src/monitoring/tracing.py`. When enabled, every HT
 | Slow responses | `rag_chat_latency_p95_ms` | > 10,000ms for 5 min | Tachograph reading — how long the donkey took on the round trip |
 | Quality drop | `rag_queries_pass_rate_percent` | < 60% for 1 hour | Donkey's report card — share of test deliveries that scored above the bar |
 | Hallucination spike | `rag_queries_failure_hallucination` | > 10 in 1 hour | Donkey's report card — share of test deliveries that scored above the bar |
-| Cost runaway | `rag_tokens_cost_usd_total` | > daily budget | Cargo unit ⚖️ |
+| Cost runaway | `rag_tokens_cost_usd_total` | > daily budget | Watch the hay bill climb past the daily budget — donkey is eating through cargo too fast. |
 
 - 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
@@ -164,7 +164,7 @@ OpenTelemetry is wired up in `src/monitoring/tracing.py`. When enabled, every HT
 |---|---| --- |
 | **Logs** | Container Apps → Log Analytics | Stable stall 🐎 |
 | **Metrics** | OpenTelemetry → Azure Monitor via OTLP exporter | Tachograph 📊 |
-| **Dashboard** | Azure Portal → Monitor → Workbooks | Azure hub ☁️ |
-| **Alerts** | Azure Monitor → Alerts → create rule | Azure hub ☁️ |
+| **Dashboard** | Azure Portal → Monitor → Workbooks | Workbook on the Azure hub where stable-hands view all the donkey's tachograph charts. |
+| **Alerts** | Azure Monitor → Alerts → create rule | Azure hub paging system that wakes stable-hands when donkey metrics breach thresholds. |
 
 - 🫏 **Donkey:** Loading up the donkey for the first time — installing the bag, attaching the backpacks, and confirming the GPS coordinates before the first run.

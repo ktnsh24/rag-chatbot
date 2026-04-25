@@ -57,7 +57,7 @@ No JSON. No HTML. Just the Prometheus text format that monitoring tools expect.
 | **What you expose** | DAG run count, task duration, queue depth | Chat requests, LLM latency, token usage | Tachograph entries — every chat trip's count, latency, and token usage published for scrapers |
 | **Format** | Prometheus text exposition | Prometheus text exposition | Tachograph 📊 |
 | **Scraper** | Prometheus → Grafana | Prometheus → Grafana | Tachograph 📊 |
-| **Alert on** | DAG failure rate > 5%, task duration > SLA | Pass rate < 80%, latency p95 > 2s | Hoof check 🔧 |
+| **Alert on** | DAG failure rate > 5%, task duration > SLA | Pass rate < 80%, latency p95 > 2s | Stable-owner alarms — wake someone if too few donkey trips pass or the round trips get too slow |
 | **Pattern** | `GET /metrics` on Airflow webserver | `GET /api/metrics` on FastAPI | Tachograph 📊 |
 
 **Bottom line:** Same infrastructure pattern, different business metrics.
@@ -115,8 +115,8 @@ async def prometheus_metrics(request: Request) -> Response:
 | --- | --- | --- | --- |
 | `rag_chat_requests_total` | counter | Total chat requests processed | Tachograph counter — how many deliveries the donkey completed |
 | `rag_chat_errors_total` | counter | Total chat request errors | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
-| `rag_tokens_input_total` | counter | Total input tokens consumed | Cargo unit ⚖️ |
-| `rag_tokens_output_total` | counter | Total output tokens generated | Cargo unit ⚖️ |
+| `rag_tokens_input_total` | counter | Total input tokens consumed | Tally of every hay bale the donkey chewed reading delivery notes — counts input tokens consumed across all chat trips. |
+| `rag_tokens_output_total` | counter | Total output tokens generated | Tally of hay bales burned writing answers — counts output tokens the donkey produced and acts as a generation-cost proxy. |
 | `rag_documents_uploaded_total` | counter | Total documents ingested | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
 | `rag_queries_total` | counter | Total evaluated queries (from query logs) | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 | `rag_queries_passed_total` | counter | Queries that passed evaluation | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
@@ -130,7 +130,7 @@ async def prometheus_metrics(request: Request) -> Response:
 | `rag_chat_latency_p95_ms` | gauge | 95th percentile chat response time | Tachograph reading — how long the donkey took on the round trip |
 | `rag_chat_latency_p99_ms` | gauge | 99th percentile chat response time | Tachograph reading — how long the donkey took on the round trip |
 | `rag_query_pass_rate` | gauge | Current pass rate (0.0–1.0) | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
-| `rag_query_avg_retrieval` | gauge | Average retrieval score | backpack fetch 🎒 |
+| `rag_query_avg_retrieval` | gauge | Average retrieval score | Live average of how cleanly the GPS warehouse handed the donkey the right backpacks across recent evaluated trips. |
 | `rag_query_avg_faithfulness` | gauge | Average faithfulness score | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
 | `rag_failures_bad_retrieval` | gauge | Count of bad_retrieval failures (last 24h) | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
 | `rag_failures_hallucination` | gauge | Count of hallucination failures (last 24h) | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
@@ -174,7 +174,7 @@ With the metrics above, you can build panels for:
 | Error rate | `rate(rag_chat_errors_total[5m]) / rate(rag_chat_requests_total[5m])` | Percentage of errors | Tachograph counter — how many deliveries the donkey completed |
 | Latency (p95) | `rag_chat_latency_p95_ms` | Response time for slow requests | Tachograph reading — how long the donkey took on the round trip |
 | Pass rate | `rag_query_pass_rate` | AI quality over time | Donkey's report card — share of test deliveries that scored above the bar |
-| Token burn | `rate(rag_tokens_output_total[1h])` | Output tokens per hour (cost proxy) | Cargo unit ⚖️ |
+| Token burn | `rate(rag_tokens_output_total[1h])` | Output tokens per hour (cost proxy) | Hay-burn rate per hour — output tokens the donkey is consuming, a live cost-per-trip proxy on the dashboard. |
 | Failure breakdown | `rag_failures_bad_retrieval` / `rag_failures_hallucination` | Which failure types dominate | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
 
 ### Alert rules

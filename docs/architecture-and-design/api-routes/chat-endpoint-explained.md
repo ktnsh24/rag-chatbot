@@ -287,9 +287,9 @@ An embedding turns text into a fixed-size vector for meaning comparison.
 | Concept | Hash function | Embedding function | 🫏 Donkey |
 | --- | --- | --- | --- |
 | **Input** | Any data | Text | Donkey-side view of Input — affects how the donkey loads, reads, or delivers the cargo |
-| **Output** | Fixed-size number | Fixed-size vector (1024 numbers) | GPS warehouse 🗺️ |
+| **Output** | Fixed-size number | Fixed-size vector (1024 numbers) | Embedding always emits the same-length GPS coordinate (1024 numbers) so every backpack lands at a comparable warehouse address. |
 | **Purpose** | Check if two things are identical | Check if two things mean the same | Donkey-side view of Purpose — affects how the donkey loads, reads, or delivers the cargo |
-| **Similar input** | Completely different hash | Similar vector | GPS warehouse 🗺️ |
+| **Similar input** | Completely different hash | Similar vector | Two questions with similar meaning land at neighbouring GPS coordinates, which is why the warehouse can find them by proximity. |
 | **Example** | `md5("hello") → 5d41...` | `embed("hello") → [0.1, 0.2, ...]` | Donkey-side view of Example — affects how the donkey loads, reads, or delivers the cargo |
 
 **Cost of this step:** Extremely cheap. Titan Embeddings costs $0.00002 per 1K tokens.
@@ -498,9 +498,9 @@ class VectorSearchResult:
 
 | SQL query | Vector search | 🫏 Donkey |
 | --- | --- | --- |
-| `WHERE title = 'refund policy'` | Find vectors similar to embed("refund policy") | GPS warehouse 🗺️ |
+| `WHERE title = 'refund policy'` | Find vectors similar to embed("refund policy") | The donkey asks the GPS warehouse for backpacks whose coordinates sit closest to embed('refund policy'), not for an exact title match. |
 | Exact string match | Meaning match | Donkey-side view of Exact string match — affects how the donkey loads, reads, or delivers the cargo |
-| Returns rows where title equals exactly | Returns chunks that are *about* refunds | backpack piece 📦 |
+| Returns rows where title equals exactly | Returns chunks that are *about* refunds | Returns backpacks whose contents are *about* refunds even when the wording differs — meaning-match instead of label-match. |
 | Misses "return procedure" (different words) | Finds "return procedure" (same meaning!) | Donkey-side view of Misses "return procedure" (different words) — affects how the donkey loads, reads, or delivers the cargo |
 
 **This is the key breakthrough of RAG:** It finds relevant documents by meaning, not
@@ -663,7 +663,7 @@ This is the actual AI call. You send the assembled prompt to a Large Language Mo
 | Parameter | Value | What it does | DE parallel | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
 | `modelId` | `anthropic.claude-3-5-sonnet-...` | Which AI model to use | Like choosing which database engine (Postgres vs MySQL) | Picks which donkey breed (Claude, Llama, GPT) actually carries the delivery |
-| `maxTokens` | `2048` | Maximum answer length (~1500 words) | Like `LIMIT` on output size | Cargo unit ⚖️ |
+| `maxTokens` | `2048` | Maximum answer length (~1500 words) | Like `LIMIT` on output size | Hard cap on hay the donkey may use writing the answer — 2048 tokens, then it stops mid-sentence. |
 | `temperature` | `0.1` | How deterministic vs creative (0.0–1.0) | No real parallel — unique to AI | How predictable the donkey's writing is — low = same words every trip, high = the donkey gets creative |
 | `topP` | `0.9` | Probability threshold for word choices | No real parallel — unique to AI | How wide a vocabulary the donkey can pick from when writing the answer |
 
@@ -874,7 +874,7 @@ sources = [
 | --- | --- | --- | --- |
 | `document_name` | `"refund-policy.pdf"` | User can verify *which* document was used | Stable keys — only authorised callers may ask the donkey to deliver |
 | `chunk_text` | `"Refunds are processed within 14 days..."` | User can verify the LLM didn't hallucinate | The exact backpack contents shown so customers can verify the donkey didn't invent the answer |
-| `relevance_score` | `0.95` | How confident we are this chunk is relevant | backpack piece 📦 |
+| `relevance_score` | `0.95` | How confident we are this chunk is relevant | How confidently the warehouse claims this backpack matches the question — 0.95 is a tight GPS hit on the customer's address. |
 | `page_number` | `3` | User can go find the original in the PDF | Which page of the original mail the backpack came from |
 
 **Why sources matter — the anti-hallucination pattern:**
@@ -994,9 +994,9 @@ except Exception:
 | Aspect | What it does | DE parallel | 🫏 Donkey |
 |---|---|---| --- |
 | **Inline evaluation** | Scores every answer in real-time (< 5ms, no LLM call) | DQ check after every pipeline run | Quick report card on every delivery without sending the donkey back out for a second opinion |
-| **Failure classification** | Categories: `bad_retrieval`, `hallucination`, `off_topic`, etc. | Error taxonomy in Airflow | Memory drift ⚠️ |
+| **Failure classification** | Categories: `bad_retrieval`, `hallucination`, `off_topic`, etc. | Error taxonomy in Airflow | Each failed delivery gets a reason code — bad_retrieval, hallucination, off_topic — so the stable knows which fix to apply. |
 | **JSONL logging** | One structured record per query in `logs/queries/YYYY-MM-DD.jsonl` | Structured task logs | Gate guard 🔐 |
-| **Non-fatal** | If logging fails, user still gets their answer | Airflow: logging fails ≠ task fails | Hoof check 🔧 |
+| **Non-fatal** | If logging fails, user still gets their answer | Airflow: logging fails ≠ task fails | If the trip log can't be written, the donkey still hands the customer their answer — logging failure never blocks delivery |
 
 📖 **See:** [Monitoring Reference](../../reference/monitoring.md) · [API Reference → Queries](../../reference/api-reference.md#query-debugging-i30)
 
@@ -1039,7 +1039,7 @@ What does each role see when they look at this endpoint?
 | `rag_chain.query()` | "Async service call" | "What embedding model? Is 1024 dimensions enough? Should I use cosine or dot product?" | GPS stamp 📍 |
 | `top_k=5` | "Like LIMIT 5" | "Is 5 optimal? Should I use 3 for simple questions and 10 for complex ones?" | How many backpacks the donkey grabs from the warehouse for one delivery |
 | `sources` | "List of dicts" | "Are low-scoring chunks diluting the context? Should I filter below 0.5 before sending to the LLM?" | AI engineer asks if low-score backpack items are diluting what the donkey actually reads |
-| `token_usage: 1250 input` | "A counter" | "That's 5 chunks × ~250 tokens each. Can I use 200-token chunks to save 20%?" | Cargo unit ⚖️ |
+| `token_usage: 1250 input` | "A counter" | "That's 5 chunks × ~250 tokens each. Can I use 200-token chunks to save 20%?" | 1250 input tokens of hay equals roughly 5 backpacks at 250 tokens each — shrink the pockets to cut the feed bill. |
 | `latency_ms: 450` | "Acceptable latency" | "350ms is the LLM. Can I use Claude Haiku ($0.00025/1K) for simple questions?" | AI engineer asks if a cheaper, faster donkey breed could handle simpler deliveries |
 | `temperature: 0.1` | "A config parameter" | "0.1 is good for factual. If we add summarisation, we'd want 0.3-0.5" | How predictable the donkey's writing is — low = same words every trip, high = the donkey gets creative |
 | Error handling | "Standard try/except" | "If the LLM hallucinates despite context, how do I detect and prevent that?" | AI engineer asks how to catch a donkey that invents content despite a good backpack |
@@ -1055,7 +1055,7 @@ What does each role see when they look at this endpoint?
 | Invalid question (empty or >5000 chars) | Pydantic rejects it before the route runs | `422` | Stable door 🚪 |
 | RAG chain not initialised | Route returns error immediately (no AI call) | `500` | Stable's front door — the URL customers use to drop off a question |
 | Embedding API fails (Bedrock / Azure OpenAI / Ollama down) | Exception in Step 1 → caught by try/except | `500` | Donkey can't convert the question into GPS coordinates because the embedding stable is down |
-| Vector store empty (no documents) | Step 2 returns [] → friendly "upload docs first" message | `200` (not an error) | GPS warehouse 🗺️ |
+| Vector store empty (no documents) | Step 2 returns [] → friendly "upload docs first" message | `200` (not an error) | GPS warehouse shelves are empty, so the donkey returns a polite 'upload some documents first' note instead of an error. |
 | LLM API fails (Bedrock / Azure OpenAI / Ollama down) | Exception in Step 4 → caught by try/except | `500` | The writing stable is unreachable — the donkey can't compose an answer at all |
 | LLM generates bad answer | Returns successfully — no way to detect this automatically | `200` | The donkey returns a confident-but-wrong answer — no automatic way to catch it at the gate |
 | LLM exceeds maxTokens | Answer is truncated (Claude stops at 2048 tokens) | `200` | The donkey writes until it hits its 2048-token cargo limit, then stops mid-sentence |

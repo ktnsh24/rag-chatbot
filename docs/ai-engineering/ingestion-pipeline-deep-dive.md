@@ -30,9 +30,9 @@ This is the file where **your DE skills apply most directly.** The ingestion pip
 | What you'll learn | DE parallel | 🫏 Donkey |
 |---|---| --- |
 | Reading multiple file formats | Reading CSV, JSON, Parquet | Stable inspector — checks the code is tidy before letting the donkey out |
-| Chunking text into pieces | Partitioning data into batches | backpack piece 📦 |
-| Why chunk size matters | Why partition size matters | backpack piece 📦 |
-| Why overlap exists | Why you keep boundary records in adjacent partitions | backpack piece 📦 |
+| Chunking text into pieces | Partitioning data into batches | Slicing mail into backpack-sized chunks so the donkey doesn't carry entire encyclopedia per trip |
+| Why chunk size matters | Why partition size matters | Too-small backpacks lose context; too-big backpacks flood the donkey with noise and cost hay |
+| Why overlap exists | Why you keep boundary records in adjacent partitions | Overlapping edges prevent sentences from being sliced mid-word across adjacent backpack chunks |
 | The full ingest pipeline | The full ETL pipeline | Pre-sort 📮 |
 
 - 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
@@ -211,7 +211,7 @@ Reason 3: COST
 
 | chunk_size | Effect on retrieval | Effect on answers | Effect on cost | 🫏 Donkey |
 |---|---|---|---| --- |
-| 200 | Very precise — finds exact sentences | May lose context (split between chunks) | Cheapest per query | backpack piece 📦 |
+| 200 | Very precise — finds exact sentences | May lose context (split between chunks) | Cheapest per query | Tiny 200-token backpacks pinpoint exact sentences but split paragraphs, losing donkey context |
 | 500 | Precise — paragraph-level | Usually enough context | Cheap | Stable broke down — donkey couldn't complete the trip, customer sees an error |
 | **1000** | **Good balance (this repo's default)** | **Full paragraphs with context** | **Moderate** | Donkey-side view of 1000 — affects how the donkey loads, reads, or delivers the cargo |
 | 2000 | Less precise — section-level | Always has full context | More expensive | How big each backpack-piece of cargo is — bigger = more context, fewer matches |
@@ -335,8 +335,8 @@ Later, when user asks "What is the refund policy?":
 | Metric | Value | 🫏 Donkey |
 |---|---| --- |
 | Document size | 15,000 characters (5 pages) | Donkey-side view of Document size — affects how the donkey loads, reads, or delivers the cargo |
-| Chunks created | 18 (chunk_size=1000, overlap=200) | backpack piece 📦 |
-| Vectors stored | 18 × 1024 floats = 18,432 numbers | GPS warehouse 🗺️ |
+| Chunks created | 18 (chunk_size=1000, overlap=200) | One 15K-char document becomes 18 backpack chunks at 1000-char size with 200-char overlap |
+| Vectors stored | 18 × 1024 floats = 18,432 numbers | Each of 18 backpack chunks gets a 1024-float GPS stamp stored in the warehouse |
 | Embedding cost | $0.00009 | Feed bill 🌾 |
 | Storage size | ~74 KB (18 × 4096 bytes per vector) | How the warehouse measures which backpacks are nearest to the customer's question |
 | Ingestion time | ~3 seconds | Pre-sort 📮 |
@@ -350,11 +350,11 @@ Later, when user asks "What is the refund policy?":
 
 | Question | Answer | Concept it tests | 🫏 Donkey |
 |---|---|---| --- |
-| "Why chunk_size=1000 and not 500 or 2000?" | Trade-off: 500 is more precise but loses context. 2000 has more context but less precise retrieval. 1000 is the default balance — but you should TEST with your data. | Chunk size tuning | backpack piece 📦 |
+| "Why chunk_size=1000 and not 500 or 2000?" | Trade-off: 500 is more precise but loses context. 2000 has more context but less precise retrieval. 1000 is the default balance — but you should TEST with your data. | Chunk size tuning | Size 1000 balances backpack detail versus context — test to find the right cargo size |
 | "What happens if chunk_overlap=0?" | Sentences at chunk boundaries get cut in half. The LLM gets incomplete information. Answers degrade at boundary points. | Overlap purpose | Without overlapping cargo edges, sentences get sliced in half and the donkey gets garbled backpacks |
 | "Why use RecursiveCharacterTextSplitter instead of just slicing every 1000 chars?" | Blind slicing cuts words and sentences in half. Recursive splitter finds natural boundaries (paragraphs → sentences → words). | Smart splitting | Donkey-side view of "Why use RecursiveCharacterTextSplitter instead of just slicing every 1000 chars?" — affects how the donkey loads, reads, or delivers the cargo |
 | "What happens if a PDF has tables?" | `pypdf` extracts table text as plain text — rows become lines, columns become spaces. Structure is mostly lost. This is a known limitation. | Document parsing | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
-| "How is this different from an ETL pipeline?" | It's NOT different in structure. Extract (read file) → Transform (chunk + embed) → Load (store vectors). Only the transform step is AI-specific. | DE → AI bridge | backpack piece 📦 |
+| "How is this different from an ETL pipeline?" | It's NOT different in structure. Extract (read file) → Transform (chunk + embed) → Load (store vectors). Only the transform step is AI-specific. | DE → AI bridge | Ingestion is post-office ETL: extract mail, transform into GPS-stamped backpacks, load to warehouse shelves |
 | "What's the most expensive step?" | Embedding is cheap ($0.00002/1K tokens). The expensive part is storing in OpenSearch (~$350/month minimum) and later sending chunks to the LLM for generation. | Cost awareness | GPS-stamping is cheap; the costly bits are warehouse rent (OpenSearch) and feeding the donkey hay |
 
 - 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.

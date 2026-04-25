@@ -100,14 +100,14 @@ class Settings(BaseSettings):
 
 | Field | Type | Default | Env Variable | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
-| `cloud_provider` | `CloudProvider` | `local` | `CLOUD_PROVIDER` | Controls which cloud backends to use | Local barn 🏚️ |
+| `cloud_provider` | `CloudProvider` | `local` | `CLOUD_PROVIDER` | Controls which cloud backends to use | Picks which barn — local hay shed or AWS/Azure depot — handles the donkey's deliveries. |
 | `app_name` | `str` | `rag-chatbot` | `APP_NAME` | Service name in logs | Donkey's trip log — every delivery's details written to disk for later review |
 | `app_env` | `AppEnvironment` | `dev` | `APP_ENV` | Environment (affects logging) | Gate guard 🔐 |
 | `app_port` | `int` | `8000` | `APP_PORT` | Server port | Donkey-side view of app_port — affects how the donkey loads, reads, or delivers the cargo |
 | `log_level` | `str` | `INFO` | `LOG_LEVEL` | Logging verbosity | Gate guard 🔐 |
-| `rag_top_k` | `int` | `5` | `RAG_TOP_K` | Chunks retrieved per query | backpack piece 📦 |
-| `rag_chunk_size` | `int` | `1000` | `RAG_CHUNK_SIZE` | Max characters per chunk | backpack piece 📦 |
-| `rag_chunk_overlap` | `int` | `200` | `RAG_CHUNK_OVERLAP` | Overlap between chunks | backpack piece 📦 |
+| `rag_top_k` | `int` | `5` | `RAG_TOP_K` | Chunks retrieved per query | Sets how many backpack pockets the donkey grabs per delivery — five chunks fetched each query. |
+| `rag_chunk_size` | `int` | `1000` | `RAG_CHUNK_SIZE` | Max characters per chunk | Caps each backpack pocket at 1000 characters so no single chunk overstuffs the donkey's load. |
+| `rag_chunk_overlap` | `int` | `200` | `RAG_CHUNK_OVERLAP` | Overlap between chunks | Sews 200 characters of overlap between adjacent backpack pockets so the donkey never loses context at the edges. |
 | `aws_region` | `str` | `eu-central-1` | `AWS_REGION` | AWS region | AWS depot 🏭 |
 | `aws_bedrock_model_id` | `str` | Claude 3.5 Sonnet | `AWS_BEDROCK_MODEL_ID` | Bedrock model | Which AWS-depot donkey breed shows up to write the answer |
 | `aws_opensearch_endpoint` | `str` | `""` | `AWS_OPENSEARCH_ENDPOINT` | OpenSearch URL | AWS search hub 🔍 |
@@ -118,13 +118,13 @@ class Settings(BaseSettings):
 | `azure_openai_endpoint` | `str` | `""` | `AZURE_OPENAI_ENDPOINT` | Azure OpenAI URL | The street address of the Azure-hub stable where the donkey reports for work |
 | `azure_openai_api_key` | `str` | `""` | `AZURE_OPENAI_API_KEY` | Azure OpenAI key | The stable-gate password that lets you summon the Azure-hub donkey |
 | `azure_openai_deployment_name` | `str` | `gpt-4o` | `AZURE_OPENAI_DEPLOYMENT_NAME` | Model deployment | Which specific Azure-hub donkey (by name) gets dispatched for each delivery |
-| `azure_search_endpoint` | `str` | `""` | `AZURE_SEARCH_ENDPOINT` | AI Search URL | Azure hub ☁️ |
-| `azure_search_api_key` | `str` | `""` | `AZURE_SEARCH_API_KEY` | AI Search key | Azure hub ☁️ |
+| `azure_search_endpoint` | `str` | `""` | `AZURE_SEARCH_ENDPOINT` | AI Search URL | URL of the Azure hub where the donkey looks up GPS coordinates during retrieval. |
+| `azure_search_api_key` | `str` | `""` | `AZURE_SEARCH_API_KEY` | AI Search key | Secret key the donkey shows at the Azure hub gate before it can run vector queries. |
 | `ollama_base_url` | `str` | `http://localhost:11434` | `OLLAMA_BASE_URL` | Ollama REST API URL | Front-door address of the local barn where the laptop donkey lives |
 | `ollama_model` | `str` | `llama3.2` | `OLLAMA_MODEL` | Ollama chat model | Which local barn donkey breed writes the answers on your laptop |
 | `ollama_embedding_model` | `str` | `nomic-embed-text` | `OLLAMA_EMBEDDING_MODEL` | Ollama embedding model | The local barn worker that converts text into GPS coordinates for warehouse storage |
-| `chroma_collection_name` | `str` | `rag-chatbot` | `CHROMA_COLLECTION_NAME` | ChromaDB collection | Local barn 🏚️ |
-| `chroma_persist_directory` | `str` | `""` | `CHROMA_PERSIST_DIRECTORY` | ChromaDB storage path (empty = in-memory) | Local barn 🏚️ |
+| `chroma_collection_name` | `str` | `rag-chatbot` | `CHROMA_COLLECTION_NAME` | ChromaDB collection | Name of the stall inside the local barn where ChromaDB keeps this project's chunk vectors. |
+| `chroma_persist_directory` | `str` | `""` | `CHROMA_PERSIST_DIRECTORY` | ChromaDB storage path (empty = in-memory) | Folder on disk where the local barn stores chunks; empty means the donkey forgets after restart. |
 | `enable_tracing` | `bool` | `False` | `ENABLE_TRACING` | OpenTelemetry tracing | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 | `query_log_enabled` | `bool` | `True` | `QUERY_LOG_ENABLED` | Structured per-query JSONL logging (I30) | Gate guard 🔐 |
 | `query_log_dir` | `str` | `logs/queries` | `QUERY_LOG_DIR` | Directory for daily JSONL log files | Donkey's trip log — every delivery's details written to disk for later review |
@@ -164,7 +164,7 @@ class ChatRequest(BaseModel):
 | --- | --- | --- | --- | --- | --- |
 | `question` | `str` | **Yes** | 1–5000 chars | The user's question | Stable broke down — donkey couldn't complete the trip, customer sees an error |
 | `session_id` | `str` or `None` | No | None | Links follow-up questions together | Trip log 📒 |
-| `top_k` | `int` or `None` | No | 1–20 if provided | Override default chunk count | backpack piece 📦 |
+| `top_k` | `int` or `None` | No | 1–20 if provided | Override default chunk count | Per-request override telling the donkey to grab between 1 and 20 backpack pockets instead of the default. |
 
 **What happens on invalid input:**
 
@@ -207,12 +207,12 @@ class ChatResponse(BaseModel):
 | Field | Type | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- |
 | `answer` | `str` | The AI-generated answer | What the donkey wrote and brought back to the customer |
-| `sources` | `list[SourceChunk]` | Which document chunks were used (citations) | backpack piece 📦 |
+| `sources` | `list[SourceChunk]` | Which document chunks were used (citations) | List of backpack pockets the donkey actually used as citations when writing the answer. |
 | `session_id` | `str` | Session ID for follow-up questions | Trip log 📒 |
-| `request_id` | `UUID` | Unique ID for debugging/tracing | Hoof check 🔧 |
+| `request_id` | `UUID` | Unique ID for debugging/tracing | Tracking number stamped on every donkey trip — quote it to find this exact delivery in the logs |
 | `cloud_provider` | `CloudProvider` | Which cloud processed this request | Donkey-side view of cloud_provider — affects how the donkey loads, reads, or delivers the cargo |
 | `latency_ms` | `int` | Total processing time | Feed bill 🌾 |
-| `token_usage` | `TokenUsage` or `None` | Token counts for cost tracking | Cargo unit ⚖️ |
+| `token_usage` | `TokenUsage` or `None` | Token counts for cost tracking | Tachograph reading of how much hay the donkey burned producing this answer, used for cost tracking. |
 
 - 🫏 **Donkey:** The cargo manifest template — every field is typed and validated before the donkey is loaded, preventing mispackaged deliveries.
 
@@ -224,8 +224,8 @@ class ChatResponse(BaseModel):
 
 | Field | Type | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `document_name` | `str` | Which file this chunk came from | backpack piece 📦 |
-| `chunk_text` | `str` | The actual text content | backpack piece 📦 |
+| `document_name` | `str` | Which file this chunk came from | Label on the backpack pocket showing which original document this chunk was torn from. |
+| `chunk_text` | `str` | The actual text content | The actual hay inside the backpack pocket — raw text the donkey reads when composing answers. |
 | `relevance_score` | `float` (0.0–1.0) | How similar to the question (1.0 = perfect) | Right address 🎯 |
 | `page_number` | `int` or `None` | Page in original PDF | Which page of the original mail the backpack came from |
 
@@ -239,9 +239,9 @@ class ChatResponse(BaseModel):
 
 | Field | Type | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `input_tokens` | `int` | Tokens in the prompt (question + context) | Cargo unit ⚖️ |
-| `output_tokens` | `int` | Tokens in the generated answer | Cargo unit ⚖️ |
-| `total_tokens` | `int` | Sum of input + output | Cargo unit ⚖️ |
+| `input_tokens` | `int` | Tokens in the prompt (question + context) | Hay bales loaded into the donkey on the way in — the question plus retrieved context. |
+| `output_tokens` | `int` | Tokens in the generated answer | Hay bales the donkey produced on the way out — every token in the generated answer. |
+| `total_tokens` | `int` | Sum of input + output | Combined hay tally of input plus output, used to compute the trip's full delivery cost. |
 | `estimated_cost_usd` | `float` | Estimated cost based on model pricing | Feed bill 🌾 |
 
 **Why this matters:**
@@ -266,8 +266,8 @@ Example cost calculation (Claude 3.5 Sonnet):
 | --- | --- | --- | --- |
 | `document_id` | `str` | Unique ID for this document | Donkey-side view of document_id — affects how the donkey loads, reads, or delivers the cargo |
 | `filename` | `str` | Original filename | Label on the original mail item the backpack was sliced from |
-| `status` | `DocumentStatus` | pending / processing / ready / failed | Hoof check 🔧 |
-| `chunk_count` | `int` | How many searchable chunks were created | backpack piece 📦 |
+| `status` | `DocumentStatus` | pending / processing / ready / failed | Where this parcel is in the post-office flow — queued, being sorted, shelved and ready, or rejected |
+| `chunk_count` | `int` | How many searchable chunks were created | Number of backpack pockets the post office sliced this document into during ingestion. |
 | `message` | `str` | Human-readable status | Donkey-side view of message — affects how the donkey loads, reads, or delivers the cargo |
 
 - 🫏 **Donkey:** The parcels being ingested — split into backpack-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.

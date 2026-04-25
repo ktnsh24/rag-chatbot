@@ -60,8 +60,8 @@ This is identical to building a pipeline monitoring API:
 | --- | --- | --- | --- |
 | **Log source** | Airflow task logs, DAG run metadata | JSONL query logs from QueryLogger | Donkey's trip log — every delivery's details written to disk for later review |
 | **Failure list** | `/pipeline/failures` — which DAGs failed and why | `/queries/failures` — which queries failed and why | Robot hand 🤖 |
-| **Aggregate stats** | DAG success rate, avg duration, failure reasons | Pass rate, avg scores, failure categories | Hoof check 🔧 |
-| **Triage** | "data_quality", "timeout", "permission_denied" | "bad_retrieval", "hallucination", "both_bad" | Memory drift ⚠️ |
+| **Aggregate stats** | DAG success rate, avg duration, failure reasons | Pass rate, avg scores, failure categories | Stable-wide summary of how many donkey trips passed, average scores, and which reason codes dominated failures |
+| **Triage** | "data_quality", "timeout", "permission_denied" | "bad_retrieval", "hallucination", "both_bad" | Reason codes stamped on failed deliveries so the stable hand knows which donkey-trip failure to investigate first. |
 | **Action** | Fix the DAG, re-run, verify | Fix retrieval/prompt, re-evaluate, verify | Delivery note 📋 |
 
 **Bottom line:** The route code is pure CRUD over structured logs. The AI
@@ -96,7 +96,7 @@ async def list_failures(
 | --- | --- | --- | --- |
 | `limit` | 20 | Max results to return (1–100) | Donkey-side view of limit — affects how the donkey loads, reads, or delivers the cargo |
 | `days` | 7 | How far back to search (1–30 days) | Donkey-side view of days — affects how the donkey loads, reads, or delivers the cargo |
-| `category` | None | Filter by failure type: `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`, `marginal` | Memory drift ⚠️ |
+| `category` | None | Filter by failure type: `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`, `marginal` | Filters the trip log to only show deliveries flagged with a chosen failure code such as hallucination or bad_retrieval. |
 
 ### Example response
 
@@ -190,7 +190,7 @@ category based on which dimensions failed:
 | `hallucination` | OK | Low | OK | Right chunks, but the LLM made things up instead of using them | Backpack was correct, but the donkey scribbled extras from memory instead of using what it was carrying |
 | `both_bad` | Low | Low | — | Wrong chunks AND the LLM improvised — worst case | Wrong backpack and the donkey made things up on top — worst possible delivery |
 | `off_topic` | OK | OK | Low | Chunks were relevant, LLM was faithful, but the answer missed the actual question | Right backpack, honest donkey, but the answer never reached the address the customer wrote on the question |
-| `marginal` | — | — | — | Failed overall but no single dimension is terrible — borderline case | Hoof check 🔧 |
+| `marginal` | — | — | — | Failed overall but no single dimension is terrible — borderline case | Borderline donkey trip — nothing was outright bad, but the report card's overall score still slipped under the bar |
 
 ### DE parallel for triage
 

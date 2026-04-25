@@ -37,7 +37,7 @@ Without a golden dataset, you'd have to manually test every change — ask quest
 | Fixed test inputs with expected outputs | Seed data / test fixtures | Test delivery 🧪 |
 | Categories of test cases (happy path, edge case) | Test pyramid: happy path → edge cases → error cases | Test delivery 🧪 |
 | Score thresholds per test case | SLA definitions per data pipeline | Test delivery 🧪 |
-| Context chunks pre-loaded (no search needed) | Mock data for integration tests | backpack piece 📦 |
+| Context chunks pre-loaded (no search needed) | Mock data for integration tests | Test case pre-loads three known backpacks so evaluation doesn't depend on warehouse GPS search |
 | Negative test cases | `expected_not_in_answer` = forbidden values | Test delivery 🧪 |
 
 - 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
@@ -153,8 +153,8 @@ The cases below are representative examples. See [`golden_dataset.py`](../../src
 |---|---|---| --- |
 | **Keywords present** | "14", "days", "refund", "email" | Core facts must appear in the answer | What the donkey wrote and brought back to the customer |
 | **Keywords absent** | "cryptocurrency", "bitcoin" | The LLM must not invent payment methods | The donkey must never write words that weren't in the backpack — no inventing payment methods |
-| **Retrieval scores** | 0.95, 0.88, 0.82 (avg 0.88) | All chunks are relevant — high quality retrieval | backpack fetch 🎒 |
-| **Faithfulness** | ≥ 0.8 | Answer must be grounded in the 3 chunks | backpack piece 📦 |
+| **Retrieval scores** | 0.95, 0.88, 0.82 (avg 0.88) | All chunks are relevant — high quality retrieval | GPS warehouse fetched three highly relevant backpacks — scores near 0.9 mean excellent match |
+| **Faithfulness** | ≥ 0.8 | Answer must be grounded in the 3 chunks | Donkey's answer must cite the three backpacks — 0.8 faithfulness means no invented facts |
 
 **A passing answer:** *"According to the documents, customers can request a full refund within 14 business days. Send an email to support@example.com with your order number. Refunds are returned to the original payment method within 3-5 business days. [Document chunk 1]"*
 
@@ -275,7 +275,7 @@ The cases below are representative examples. See [`golden_dataset.py`](../../src
 
 | Threshold | Value | Why | 🫏 Donkey |
 |---|---|---| --- |
-| `min_retrieval_score` | 0.3 | "How long?" is vague — chunks will have low relevance | backpack piece 📦 |
+| `min_retrieval_score` | 0.3 | "How long?" is vague — chunks will have low relevance | Vague question yields low GPS scores — don't expect the backpack to perfectly match ambiguity |
 | `min_faithfulness` | 0.6 | The LLM might mention both refunds AND shipping — hard to ground precisely | Lower the bar — when the question is vague, the donkey may legitimately weave together two backpacks |
 | `expected_keywords` | `[]` | Can't predict what the LLM will say for a vague question | No keyword checklist — for ambiguous orders nobody can predict which words the donkey will choose |
 
@@ -331,8 +331,8 @@ for case in GOLDEN_DATASET:
 |---|---| --- |
 | Changed a prompt template | Prompts affect every answer — regression test ALL cases | Delivery note 📋 |
 | Switched LLM model | Different models behave differently — baseline them | Re-run the 25 standard test deliveries with the new donkey breed to see how its writing differs |
-| Changed chunking strategy | Affects retrieval quality — test #1, #2, #3 | backpack fetch 🎒 |
-| Changed `top_k` or `chunk_size` | Affects context quality — test all cases | backpack piece 📦 |
+| Changed chunking strategy | Affects retrieval quality — test #1, #2, #3 | Backpack size changes (chunk_size) affect which cargo pieces the warehouse robot fetches |
+| Changed `top_k` or `chunk_size` | Affects context quality — test all cases | Top_k controls backpack count; chunk_size controls cargo size — both impact donkey's reading material |
 | Before deploying to production | Final sanity check | Robot hand 🤖 |
 | In CI/CD pipeline | Automated regression on every PR | Robot hand 🤖 |
 
@@ -424,7 +424,7 @@ When you encounter a bug in production (e.g., the LLM gives a wrong answer), add
 |---|---| --- |
 | At least 1 happy path per category | Baseline behaviour | Donkey-side view of At least 1 happy path per category — affects how the donkey loads, reads, or delivers the cargo |
 | At least 1 edge case | Boundary behaviour | Donkey-side view of At least 1 edge case — affects how the donkey loads, reads, or delivers the cargo |
-| Put previous hallucinations in `expected_not_in_answer` | Regression-proof the fix | Memory drift ⚠️ |
+| Put previous hallucinations in `expected_not_in_answer` | Regression-proof the fix | List forbidden words the donkey invented last time — catch memory drift before it happens again |
 | Use realistic similarity scores (0.4–0.95) | Don't use 1.0 — real search is never perfect | Compass bearing 🧭 |
 | Set thresholds based on cloud model performance | Don't set to 0.99 — allow natural variation | Manifest template 📋 |
 

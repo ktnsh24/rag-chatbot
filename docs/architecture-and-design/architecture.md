@@ -218,13 +218,13 @@ This demonstrates that you can design systems that aren't locked into one cloud 
 | **Guardrails** | `src/api/middleware/` | Input/output safety, PII redaction, prompt injection defense | Delivery note 📋 |
 | **RAG** | `src/rag/` | RAG pipeline (chain, ingestion, prompts) | Delivery note 📋 |
 | **LLM** | `src/llm/` | LLM abstraction + implementations | Where the donkey lives — swap stables (AWS / Azure / Ollama) without touching the rest of the code |
-| **Vector Store** | `src/vectorstore/` | Vector DB abstraction + implementations | GPS warehouse 🗺️ |
+| **Vector Store** | `src/vectorstore/` | Vector DB abstraction + implementations | Abstraction over the GPS warehouse plus concrete implementations for ChromaDB, OpenSearch, and Azure AI Search. |
 | **Storage** | `src/storage/` | Document storage abstraction | Stable design — donkey doesn't care which warehouse brand it grabs from |
 | **History** | `src/history/` | Conversation history abstraction | Trip log 📒 |
 | **Monitoring** | `src/monitoring/` | Metrics, query logging (JSONL), OpenTelemetry tracing | Tachograph 📊 |
 | **Config** | `src/config.py` | Pydantic Settings (env vars) | Manifest template 📋 |
 | **Entry Point** | `src/main.py` | FastAPI app factory, lifespan | Stable door 🚪 |
-| **Infrastructure** | `infra/` | Terraform (AWS + Azure); Local needs no infra | Stable blueprint 🏗️ |
+| **Infrastructure** | `infra/` | Terraform (AWS + Azure); Local needs no infra | Terraform stable blueprints for AWS and Azure; the local stable runs without any infra at all. |
 | **CI/CD** | `.github/workflows/` | GitHub Actions | Robot hand 🤖 |
 | **Tests** | `tests/` | Unit + integration tests | Test delivery 🧪 |
 | **Docs** | `docs/` | You are here | Donkey-side view of Docs — affects how the donkey loads, reads, or delivers the cargo |
@@ -238,7 +238,7 @@ This demonstrates that you can design systems that aren't locked into one cloud 
 | Decision | Reason | 🫏 Donkey |
 | --- | --- | --- |
 | **Monolith (single FastAPI app)** | Simpler than microservices for a 1-person project. Can always split later. | Stable door 🚪 |
-| **Abstract interfaces** | Cloud-agnostic. Can add GCP, local, or mock implementations without changing core logic. | Local barn 🏚️ |
+| **Abstract interfaces** | Cloud-agnostic. Can add GCP, local, or mock implementations without changing core logic. | Same interface lets the donkey switch between local barn, AWS depot, Azure hub, or a mock without code changes. |
 | **Factory pattern** | One env variable (`CLOUD_PROVIDER`) switches the entire backend — `aws`, `azure`, or `local`. | AWS depot 🏭 |
 | **Pydantic everywhere** | Type safety, validation, documentation — all from type hints. | Gate rule 🚧 |
 | **Poetry** | Better dependency management than pip. Lock files prevent "works on my machine" issues. | Supply manifest 📜 |

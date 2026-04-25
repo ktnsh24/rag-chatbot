@@ -159,7 +159,7 @@ Most remaining failures fall into these categories:
 | Category | Examples | Root Cause | 🫏 Donkey |
 |----------|---------|-----------| --- |
 | **Guardrails** | lab-4a (all), lab-9a/b/c | Guardrail tests need AWS Comprehend subscription | Test delivery 🧪 |
-| **Low faithfulness** | lab-2c, lab-5b_q3/q5 | Model hallucinates or adds context not in chunks | backpack piece 📦 |
+| **Low faithfulness** | lab-2c, lab-5b_q3/q5 | Model hallucinates or adds context not in chunks | Donkey hallucinated extra hay not present in the backpack pockets — labs 2c, 5b_q3, 5b_q5 caught it. |
 | **Data mismatch** | lab-1c, lab-6a | Golden dataset expects "14 days" but document says "5-7 days" | Test delivery 🧪 |
 | **Reranker labs** | lab-9, lab-10 (some) | Reranker was disabled for this run | Quality sort 📊 |
 | **Bulk ops** | lab-14, lab-15, lab-16 | Multi-document operations with timing issues | Donkey-side view of Bulk ops — affects how the donkey loads, reads, or delivers the cargo |
@@ -173,9 +173,9 @@ Most remaining failures fall into these categories:
 | `src/vectorstore/aws_dynamodb.py` | Min-max score normalization | ret: 0.03 → 0.33+ | AWS depot 🏭 |
 | `src/rag/reranker.py` | `safe_top_k = min(top_k, len(sources))` | Prevents reranker crash | How many backpacks the donkey grabs from the warehouse for one delivery |
 | `src/llm/aws_bedrock.py` | Removed `topP` from inferenceConfig | Fixes Sonnet 4.6 error | The AWS-depot donkey kept tripping on an unsupported parameter — removed it so it runs cleanly |
-| `infra/aws/iam.tf` | Fixed IAM tag values (removed em-dashes) | Terraform apply succeeds | Stable blueprint 🏗️ |
-| `infra/aws/s3.tf` | Added account ID to bucket name | S3 global uniqueness | Stable blueprint 🏗️ |
-| `infra/aws/locals.tf` | Added `data.aws_caller_identity.current` | Supports account ID lookup | Stable blueprint 🏗️ |
+| `infra/aws/iam.tf` | Fixed IAM tag values (removed em-dashes) | Terraform apply succeeds | Fixed IAM tag values (em-dashes removed) so the Terraform stable blueprint applies cleanly. |
+| `infra/aws/s3.tf` | Added account ID to bucket name | S3 global uniqueness | Added the AWS account ID into the bucket name so the S3 stable blueprint passes global uniqueness. |
+| `infra/aws/locals.tf` | Added `data.aws_caller_identity.current` | Supports account ID lookup | Added `data.aws_caller_identity.current` to the blueprint so other resources can read the account ID. |
 | `src/rag/chain.py` | Skip OpenSearch when DynamoDB selected | Prevents empty endpoint error | AWS search hub 🔍 |
 | `scripts/run_cloud_labs_personal.sh` | Credential isolation + PYTHONDONTWRITEBYTECODE | Safe AWS usage | AWS depot 🏭 |
 

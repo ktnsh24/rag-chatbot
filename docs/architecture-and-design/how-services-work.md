@@ -241,7 +241,7 @@ a complex combination of many linguistic features.
 
 | Model | Dimensions | Quality | Speed | Storage per chunk | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
-| Titan Embeddings v2 | 1024 | Good | Fast | 4 KB | GPS warehouse 🗺️ |
+| Titan Embeddings v2 | 1024 | Good | Fast | 4 KB | Bedrock's Titan v2 turns text into 1024-dimensional GPS coordinates that fit in 4 KB of warehouse shelf. |
 | OpenAI text-embedding-3-small | 1536 | Better | Fast | 6 KB | Slightly richer GPS coordinates (1536 dims) at modest extra storage per chunk |
 | OpenAI text-embedding-3-large | 3072 | Best | Slower | 12 KB | Highest-fidelity GPS coordinates (3072 dims) but slower to compute and triple the storage |
 
@@ -400,9 +400,9 @@ response = self._client.search(index=self.index_name, body=body)
 | Python method | OpenSearch action | When it happens | 🫏 Donkey |
 | --- | --- | --- | --- |
 | `client.indices.create()` | `PUT /index-name` | Once, at startup (creates the index) | Donkey-side view of client.indices.create() — affects how the donkey loads, reads, or delivers the cargo |
-| `client.index()` | `PUT /index-name/_doc/id` | For each chunk during document ingestion | backpack piece 📦 |
+| `client.index()` | `PUT /index-name/_doc/id` | For each chunk during document ingestion | Files each new backpack pocket into the OpenSearch GPS warehouse during document ingestion. |
 | `client.indices.refresh()` | `POST /index-name/_refresh` | After ingestion (makes new docs searchable) | Pre-sort 📮 |
-| `client.search()` | `POST /index-name/_search` | Every chat query (vector similarity search) | GPS warehouse 🗺️ |
+| `client.search()` | `POST /index-name/_search` | Every chat query (vector similarity search) | Every chat query asks the OpenSearch GPS warehouse for the nearest vector neighbours. |
 | `client.delete_by_query()` | `POST /index-name/_delete_by_query` | When deleting a document | Donkey-side view of client.delete_by_query() — affects how the donkey loads, reads, or delivers the cargo |
 
 ### How authentication works
@@ -588,13 +588,13 @@ for result in results:
 
 | Aspect | OpenSearch Serverless | Azure AI Search | 🫏 Donkey |
 | --- | --- | --- | --- |
-| Vector algorithm | HNSW (open-source) | Proprietary (HNSW-based) | GPS warehouse 🗺️ |
+| Vector algorithm | HNSW (open-source) | Proprietary (HNSW-based) | Both warehouses use HNSW stadium signs — OpenSearch open-source, Azure AI Search proprietary HNSW-based. |
 | Dimensions | 1024 (Titan) | 1536 (OpenAI) | Titan writes 1024 GPS coordinates per text, Azure 1536 — the warehouse index must match |
 | Auth | AWS SigV4 | API key or Managed Identity | Stable door 🚪 |
 | Min cost | ~$350/month ⚠️ | **Free tier available** ✅ | Feed bill 🌾 |
 | Refresh needed? | Yes (`_refresh` after indexing) | No (immediate) | How quickly newly-sorted mail shows up on the warehouse shelves |
 | Python SDK | `opensearch-py` | `azure-search-documents` | AWS search hub 🔍 |
-| Query format | JSON body with `knn` | `VectorizedQuery` object | GPS warehouse 🗺️ |
+| Query format | JSON body with `knn` | `VectorizedQuery` object | OpenSearch wants a JSON `knn` body; Azure hub wants a `VectorizedQuery` object — same warehouse lookup, different paperwork. |
 
 - 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 

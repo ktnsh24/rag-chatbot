@@ -447,9 +447,9 @@ boundaries so you don't lose context at the edges.
 
 | ETL Transform | RAG Transform (chunking) | 🫏 Donkey |
 | --- | --- | --- |
-| Split large CSV into 100 row batches | Split document into 1000 char chunks | backpack piece 📦 |
-| Partitioning with no overlap | Partitioning WITH overlap (200 chars) | backpack piece 📦 |
-| Purpose: parallel processing | Purpose: precise vector matching | GPS warehouse 🗺️ |
+| Split large CSV into 100 row batches | Split document into 1000 char chunks | Slice incoming mail into 1000-character backpack pockets the donkey can later carry one at a time. |
+| Partitioning with no overlap | Partitioning WITH overlap (200 chars) | Each backpack pocket shares 200 characters with its neighbour so a sentence cut at the seam isn't lost between trips. |
+| Purpose: parallel processing | Purpose: precise vector matching | Smaller backpack pockets get sharper GPS coordinate stamps so the warehouse can match a question to the right one. |
 
 **Cost of this step:** $0 — pure Python computation, no API calls.
 
@@ -522,7 +522,7 @@ it like:
 
 | ETL Transform | RAG Transform (embedding) | 🫏 Donkey |
 | --- | --- | --- |
-| Convert CSV strings to typed columns | Convert text chunks to number vectors | backpack piece 📦 |
+| Convert CSV strings to typed columns | Convert text chunks to number vectors | The post office stamps each backpack with GPS coordinates — text becomes a vector the warehouse can sort by meaning. |
 | Parse dates, cast integers | Run through neural network to get floats | Stable yard fencing — controls which routes traffic may take in and out |
 | Output: structured rows | Output: vectors — 1024-dim (AWS Titan), 1536-dim (Azure), or 768-dim (Local Ollama) | Each chunk leaves the post office stamped with GPS coordinates — the dimension count depends on which embedding stamper you use |
 | Purpose: make data queryable by SQL | Purpose: make text searchable by meaning | Closest SQL/DE concept — for engineers who think in tables not GPS coordinates |
@@ -709,10 +709,10 @@ you're storing vectors in OpenSearch.
 | ETL Load | RAG Load | 🫏 Donkey |
 | --- | --- | --- |
 | Write rows to Redshift | Write vectors to OpenSearch / Azure AI Search | AWS search hub 🔍 |
-| CREATE TABLE with columns | CREATE INDEX with knn_vector mapping (AWS) or SearchIndex (Azure) | GPS warehouse 🗺️ |
+| CREATE TABLE with columns | CREATE INDEX with knn_vector mapping (AWS) or SearchIndex (Azure) | Lay out the GPS warehouse aisles up front — declare the vector field and HNSW signs so the donkey can navigate. |
 | INSERT INTO table VALUES | `client.index(body=doc)` (AWS) or `upload_documents(batch)` (Azure) | AWS depot 🏭 |
-| Each row has typed columns | Each doc has text + vector + metadata | GPS warehouse 🗺️ |
-| Queried with SQL WHERE | Queried with k-NN vector search | GPS warehouse 🗺️ |
+| Each row has typed columns | Each doc has text + vector + metadata | Every backpack on the GPS warehouse shelf carries its text, its coordinate stamp, and a routing-label metadata tag. |
+| Queried with SQL WHERE | Queried with k-NN vector search | The donkey asks the GPS warehouse for the k nearest backpacks to the question's coordinate, not for an exact label match. |
 
 **Why `document_id` is stored with every chunk:**
 
@@ -814,7 +814,7 @@ registry entry and returns the response.
 | `document_id` | `"a1b2c3d4-..."` | Unique identifier | Tracking number stamped on the parcel so the donkey can find it again |
 | `filename` | `"refund-policy.pdf"` | Original filename | Stable keys — only authorised callers may ask the donkey to deliver |
 | `status` | `DocumentStatus.READY` | Lifecycle stage | Donkey-side view of status — affects how the donkey loads, reads, or delivers the cargo |
-| `chunk_count` | `42` | How many searchable pieces it became | backpack piece 📦 |
+| `chunk_count` | `42` | How many searchable pieces it became | Number of backpack pockets the document was split into — each pocket is one searchable piece on the warehouse shelf. |
 | `uploaded_at` | `2026-04-07T10:30:00Z` | When it was uploaded | Timestamp stamped on the trip log entry — when the donkey set off or returned |
 | `file_size_bytes` | `1048576` | File size (1 MB) | Donkey-side view of file_size_bytes — affects how the donkey loads, reads, or delivers the cargo |
 
@@ -1014,7 +1014,7 @@ For a 12-page PDF (~8000 words, ~42 chunks):
 | Step | What happens | AWS cost | Azure cost | AWS time | Azure time | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1. READ | Parse PDF → text | $0 | $0 | ~50ms | ~50ms | Free hay 🌿 |
-| 2. CHUNK | Split into 42 pieces | $0 | $0 | ~5ms | ~5ms | backpack piece 📦 |
+| 2. CHUNK | Split into 42 pieces | $0 | $0 | ~5ms | ~5ms | Slice the parsed document into 42 backpack pockets — pure local Python, no API calls, costs nothing. |
 | 3. EMBED | Convert chunks → vectors | $0.000168 (Titan, 42 calls) | $0.000168 (text-embedding-3-small, 1 call) | **~2100ms** | **~150ms** | GPS stamp 📍 |
 | 4. STORE | Write to vector database | ~$0 (OpenSearch) | ~$0 (AI Search) | **~420ms** | **~50ms** | AWS search hub 🔍 |
 | **Total per doc** | | **~$0.0002** | **~$0.0002** | **~2.6s** | **~0.25s** | Feed bill 🌾 |
@@ -1039,7 +1039,7 @@ the ingestion cost 1000x.
 | Unsupported file type (.exe, .xlsx) | Validation rejects before any AI call | `400` | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
 | RAG chain not initialised | Route returns error immediately | `500` | Stable's front door — the URL customers use to drop off a question |
 | PDF is corrupted / unparseable | `read_document()` throws → caught by try/except | `500` | Stable broke down — donkey couldn't complete the trip, customer sees an error |
-| PDF is scanned images (no text) | `read_document()` returns empty string → 0 chunks | `200` (with chunk_count=0) | backpack piece 📦 |
+| PDF is scanned images (no text) | `read_document()` returns empty string → 0 chunks | `200` (with chunk_count=0) | Scanned-image PDF yields no text, so the post office produces zero backpacks and the donkey has nothing to deliver. |
 | Embedding API fails (Bedrock / Azure OpenAI down) | Exception in Step 3 → document saved as FAILED | `500` | GPS stamper is offline — the post office can't label parcels for the warehouse, so the document is shelved as FAILED |
 | Vector store down (OpenSearch / Azure AI Search) | Exception in Step 4 → document saved as FAILED | `500` | AWS search hub 🔍 |
 | File is too large (out of memory) | `await file.read()` fails → exception | `500` | Trip log 📒 |

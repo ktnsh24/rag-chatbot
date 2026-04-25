@@ -83,9 +83,9 @@ class VectorSearchResult:
 |---|---|---| --- |
 | `text` | The actual chunk text — what the LLM will read | The row data | The cargo inside the backpack — what the donkey actually reads to write its answer |
 | `document_name` | Source document (e.g., "refund-policy.pdf") | The table or source name | Stable keys — only authorised callers may ask the donkey to deliver |
-| `score` | How similar this chunk is to the query (0.0–1.0) | ❌ **No DE parallel** — this is new | backpack piece 📦 |
+| `score` | How similar this chunk is to the query (0.0–1.0) | ❌ **No DE parallel** — this is new | GPS warehouse calculates score by measuring angle between question and backpack coordinates |
 | `page_number` | Where in the original document | Like a row number or partition | Which page of the original mail the backpack came from |
-| `metadata` | Anything extra (document_id, chunk_index) | Additional attributes | backpack piece 📦 |
+| `metadata` | Anything extra (document_id, chunk_index) | Additional attributes | Extra labels on the backpack — document ID and chunk position for tracking |
 
 ### The `score` field — the new concept
 
@@ -202,7 +202,7 @@ search(query_embedding=[0.12, -0.45, 0.78, ...], top_k=2)
 |---|---|---| --- |
 | 3 | Less noise, cheaper (fewer tokens to LLM) | Might miss relevant context | Donkey carries only three backpacks — light load, less hay, but might leave the right one behind |
 | **5** | **Good balance (this repo's default)** | **Some noise possible** | Donkey-side view of 5 — affects how the donkey loads, reads, or delivers the cargo |
-| 10 | More context, less likely to miss relevant info | More tokens = more cost + noise | Cargo unit ⚖️ |
+| 10 | More context, less likely to miss relevant info | More tokens = more cost + noise | Ten backpacks is heavy — the donkey might find the right one but wastes hay reading extras |
 
 - 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
@@ -287,10 +287,10 @@ QUERY (every user question):                    │
 
 | Question | Answer | Concept it tests | 🫏 Donkey |
 |---|---|---| --- |
-| "What does a score of 0.3 mean?" | The chunk is semantically far from the query — probably not relevant. It's like a SQL query returning a row that doesn't match your intent. | Similarity scores | backpack piece 📦 |
+| "What does a score of 0.3 mean?" | The chunk is semantically far from the query — probably not relevant. It's like a SQL query returning a row that doesn't match your intent. | Similarity scores | Score 0.3 means the backpack's GPS is far from the question — probably the wrong shelf |
 | "Why does `search()` always return K results even when nothing is relevant?" | Vector search finds the K **nearest** vectors regardless. "Nearest" doesn't mean "relevant" — just closest in the vector space. | Semantic search vs exact match | Stable door 🚪 |
 | "Why store the original `text` alongside the `embedding`?" | Embeddings are one-way (can't reverse vector → text). You need the original text to send as context to the LLM. | Embedding properties | GPS coordinates can't be unstamped back into cargo, so the warehouse keeps the original text on every shelf |
-| "What happens if `texts` and `embeddings` have different lengths?" | Bug — they must be paired by index. text[i] matches embedding[i]. | Store contract | GPS warehouse 🗺️ |
+| "What happens if `texts` and `embeddings` have different lengths?" | Bug — they must be paired by index. text[i] matches embedding[i]. | Store contract | Every backpack text must have its matching GPS stamp — misaligned lists break the warehouse |
 | "Why is `document_id` important?" | It lets you delete all vectors for a document when re-ingesting. Without it, you'd have orphaned old vectors. | Document management | Pre-sort 📮 |
 
 - 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.

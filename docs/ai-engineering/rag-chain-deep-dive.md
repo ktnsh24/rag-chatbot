@@ -264,9 +264,9 @@ CSV file → [Extract] → raw rows → [Transform] → cleaned rows → [Load] 
 | Ingestion step | DE parallel | What it does | 🫏 Donkey |
 |---|---|---| --- |
 | `read_document()` | `pandas.read_csv()` | Extracts raw text from PDF/TXT | Donkey-side view of read_document() — affects how the donkey loads, reads, or delivers the cargo |
-| `chunk_document()` | Data partitioning / windowing | Splits text into 500-char windows with 50-char overlap | backpack piece 📦 |
-| `get_embeddings_batch()` | `df.apply(transform_fn)` | Converts each chunk to a 1536-dim vector | backpack piece 📦 |
-| `store_vectors()` | `df.to_sql(warehouse)` | Indexes vectors for similarity search | GPS warehouse 🗺️ |
+| `chunk_document()` | Data partitioning / windowing | Splits text into 500-char windows with 50-char overlap | Slices raw mail into backpack-sized chunks with overlapping edges so sentences don't split mid-word |
+| `get_embeddings_batch()` | `df.apply(transform_fn)` | Converts each chunk to a 1536-dim vector | GPS-stamps each backpack chunk with coordinates so the warehouse knows where to shelve it |
+| `store_vectors()` | `df.to_sql(warehouse)` | Indexes vectors for similarity search | Shelves GPS-stamped backpacks in the warehouse so the robot can find them by coordinates later |
 
 **Why batch embeddings?** One API call for 50 chunks is faster and cheaper than 50 separate calls. This is the same principle as batch `INSERT` vs row-by-row `INSERT`.
 
@@ -348,7 +348,7 @@ async def query(
 | Query step | DE parallel | What it does | 🫏 Donkey |
 |---|---|---| --- |
 | Embed question | Build query parameters | Convert question to searchable format | Stable inspector — checks the code is tidy before letting the donkey out |
-| Vector search | `SELECT * WHERE similarity > threshold ORDER BY score LIMIT 5` | Find relevant data | GPS warehouse 🗺️ |
+| Vector search | `SELECT * WHERE similarity > threshold ORDER BY score LIMIT 5` | Find relevant data | GPS warehouse robot finds the 5 nearest backpack coordinates to the question in ~9 HNSW hops |
 | Build context | JOIN results into a single payload | Combine search results | Closest SQL/DE concept — for engineers who think in tables not GPS coordinates |
 | LLM generate | Apply business logic / stored procedure | Transform data into answer | The donkey reads the delivery note plus the backpack and writes the final reply |
 | Build response | Format as API response | Package result for caller | Stable door 🚪 |
@@ -482,7 +482,7 @@ CHROMA_PERSIST_DIRECTORY=./data/chromadb
 
 | Problem | Symptom | Cause | Fix | 🫏 Donkey |
 |---|---|---|---| --- |
-| `ValueError: Unsupported cloud provider` | App crashes on startup | `CLOUD_PROVIDER` not set or misspelled | Set `CLOUD_PROVIDER=local` in `.env` | Hoof check 🔧 |
+| `ValueError: Unsupported cloud provider` | App crashes on startup | `CLOUD_PROVIDER` not set or misspelled | Set `CLOUD_PROVIDER=local` in `.env` | Stable refuses to open because the donkey doesn't know which warehouse to deliver to — set the provider in `.env` |
 | `ConnectionRefusedError` (local) | Ingestion fails | Ollama not running | `ollama serve` in a separate terminal | The local barn donkey isn't awake yet — boot it before asking it to deliver |
 | Empty search results | "I don't have enough information" | Documents not ingested yet | Upload documents first via `POST /documents` | Pre-sort 📮 |
 | High latency (>5s) | Slow responses | LLM is slow (especially local) | Use a smaller model or increase hardware | The donkey is plodding — swap in a lighter breed or feed it stronger hardware |

@@ -83,10 +83,10 @@ Before diving into each, here's the big picture comparison:
 | **Generation API** | Converse API (Bedrock-specific) | ChatCompletion API (OpenAI standard) | `/api/chat` (Ollama REST) | Three different doorways for handing the donkey the question — same delivery, different door |
 | **Embedding API** | Invoke Model (raw, manual JSON) | Embeddings API (typed SDK) | `/api/embed` (Ollama REST) | Three different counters for getting cargo GPS-stamped — same address job, different counter |
 | **Auth** | IAM roles / AWS credentials | API key or Managed Identity | **None** — localhost | Stable door 🚪 |
-| **Batch embeddings** | ❌ Not native (loops one by one) | ✅ Native (send list, get list) | ✅ Native (send list, get list) | GPS warehouse 🗺️ |
+| **Batch embeddings** | ❌ Not native (loops one by one) | ✅ Native (send list, get list) | ✅ Native (send list, get list) | Azure and Ollama GPS-stamp whole batches; Bedrock's Titan stamps cargo one piece at a time |
 | **Async** | ❌ Sync boto3 (wrapped in async) | ✅ True async (`AsyncAzureOpenAI`) | ✅ True async (`httpx.AsyncClient`) | Can multiple deliveries run at once? Azure and Ollama yes; Bedrock pretends but actually queues |
-| **Input token price** | $0.003 / 1K | $0.0025 / 1K | **$0.00** | Cargo unit ⚖️ |
-| **Output token price** | $0.015 / 1K | $0.01 / 1K | **$0.00** | Cargo unit ⚖️ |
+| **Input token price** | $0.003 / 1K | $0.0025 / 1K | **$0.00** | Bedrock charges $3 per million input hay bales; Azure charges $2.50; Ollama is free |
+| **Output token price** | $0.015 / 1K | $0.01 / 1K | **$0.00** | Bedrock charges $15 per million output tokens; Azure charges $10; Ollama is free |
 | **Quality** | ★★★★★ | ★★★★★ | ★★★☆☆ | Donkey-side view of Quality — affects how the donkey loads, reads, or delivers the cargo |
 | **Offline** | ❌ | ❌ | ✅ | Donkey-side view of Offline — affects how the donkey loads, reads, or delivers the cargo |
 
@@ -113,7 +113,7 @@ class BedrockLLM(BaseLLM):
 |---|---|---| --- |
 | `boto3.client("bedrock-runtime")` | The service client | `boto3.client("dynamodb")` | Phone number to ring AWS's donkey-rental desk before any trip can be booked |
 | `model_id` (Claude) | Which LLM to call for generation | Which table to query | Naming which exact donkey (Claude) you want from the AWS stable's pen |
-| `_embedding_model_id` (Titan) | Which model to call for embeddings | Which GSI to query | GPS warehouse 🗺️ |
+| `_embedding_model_id` (Titan) | Which model to call for embeddings | Which GSI to query | Titan is the GPS stamper in AWS's stable — converts cargo text to coordinates |
 
 **Why `bedrock-runtime` not `bedrock`?** Two separate APIs:
 - `bedrock` = management (list models, manage permissions) — like `dynamodb` for creating tables
@@ -198,8 +198,8 @@ return result["embedding"]                   # [0.12, -0.45, ...] (1024 floats)
 |---|---| --- |
 | Model ID | `amazon.titan-embed-text-v2:0` | Manifest template 📋 |
 | Output dimensions | **1024** floats | Length of the donkey's GPS coordinate — more digits = finer location, more storage |
-| Max input | 8,192 tokens | Cargo unit ⚖️ |
-| Cost | $0.00002 / 1K tokens | Cargo unit ⚖️ |
+| Max input | 8,192 tokens | Titan accepts up to 8,192 hay bales of input text before it hits its limit |
+| Cost | $0.00002 / 1K tokens | Titan GPS-stamping costs only $0.02 per million tokens — 150× cheaper than generation |
 
 - 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
@@ -300,7 +300,7 @@ resp["usage"]["outputTokens"]                     resp.usage.completion_tokens
 |---|---|---| --- |
 | **System prompt** | Separate `system=[...]` parameter | Inside `messages` as `{"role": "system", ...}` | Delivery note 📋 |
 | **Response parsing** | Dict keys: `response["output"]["message"]...` | Typed objects: `response.choices[0].message.content` | The actual cargo text inside the backpack the donkey is carrying |
-| **Token naming** | `inputTokens` / `outputTokens` | `prompt_tokens` / `completion_tokens` | Cargo unit ⚖️ |
+| **Token naming** | `inputTokens` / `outputTokens` | `prompt_tokens` / `completion_tokens` | AWS calls hay bales "inputTokens"; Azure calls them "prompt_tokens" — same hay |
 | **Async** | Sync call (despite `async def`) | True `await` — non-blocking | Stable gate — refuses harmful or off-topic deliveries before the donkey leaves |
 | **Content format** | Nested: `[{"text": "..."}]` | Flat string: `"..."` | Stable inspector — checks the code is tidy before letting the donkey out |
 
@@ -340,8 +340,8 @@ return result["embedding"]
 |---|---| --- |
 | Deployment | `text-embedding-3-small` | GPS stamp 📍 |
 | Output dimensions | **1536** floats (not 1024!) | Length of the donkey's GPS coordinate — more digits = finer location, more storage |
-| Max input | 8,191 tokens | Cargo unit ⚖️ |
-| Cost | $0.00002 / 1K tokens | Cargo unit ⚖️ |
+| Max input | 8,191 tokens | Azure's embedding model accepts up to 8,191 tokens of cargo text per coordinate request |
+| Cost | $0.00002 / 1K tokens | Azure's GPS stamper charges $0.02 per million tokens — same pricing as AWS Titan |
 
 ### ⚠️ Critical: Dimension difference
 
@@ -557,7 +557,7 @@ async def get_embeddings_batch(self, texts: list[str]) -> list[list[float]]:
 
 | | AWS Bedrock | Azure OpenAI | **Local Ollama** | 🫏 Donkey |
 |---|---|---|---| --- |
-| **42 chunks** | 42 API calls (42 network round trips) | **1 API call** (1 network round trip) | **1 API call** (localhost) | backpack piece 📦 |
+| **42 chunks** | 42 API calls (42 network round trips) | **1 API call** (1 network round trip) | **1 API call** (localhost) | Bedrock GPS-stamps 42 backpack chunks in 42 trips; Azure and Ollama batch them all |
 | **Latency** | 42 × ~50ms = ~2.1 seconds | ~200ms total | ~300ms total | Feed bill 🌾 |
 | **Why?** | Titan has no batch endpoint | OpenAI SDK accepts a list natively | Ollama `/api/embed` accepts a list natively | Whether the GPS counter takes a whole sack of cargo at once or insists on one piece at a time |
 

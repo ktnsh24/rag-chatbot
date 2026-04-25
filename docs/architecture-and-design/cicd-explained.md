@@ -245,8 +245,8 @@ Manual trigger → Login to AWS → Build + Push to ECR → Terraform apply → 
 | Step | DE familiarity | 🫏 Donkey |
 | --- | --- | --- |
 | OIDC auth (`role-to-assume`) | ✅ Standard GitHub Actions pattern | Robot hand 🤖 |
-| ECR login + push | ✅ Standard container deployment | Stable address 🏷️ |
-| Terraform apply in CI | ✅ Standard — same pattern everywhere | Stable blueprint 🏗️ |
+| ECR login + push | ✅ Standard container deployment | Robot stable-hand logs into the ECR address and pushes the freshly built donkey image. |
+| Terraform apply in CI | ✅ Standard — same pattern everywhere | Robot stable-hand re-applies the Terraform stable blueprint on every merge — same pattern across providers. |
 | ECS force-new-deployment | ✅ Standard — triggers rolling update | Robot hand 🤖 |
 
 ### Manual dispatch with environment choice
@@ -304,9 +304,9 @@ Manual trigger → Login to Azure → Login to ACR → Build + Push → Terrafor
 
 | Step | AWS | Azure | 🫏 Donkey |
 | --- | --- | --- | --- |
-| Auth | `role-to-assume` (1 secret) | `client-id` + `tenant-id` + `subscription-id` (3 secrets) | Stable address 🏷️ |
-| Registry login | `amazon-ecr-login` action | `az acr login` CLI | Stable address 🏷️ |
-| Image URL | `$ECR_REGISTRY/$ECR_REPOSITORY:$TAG` | `$ACR_NAME.azurecr.io/rag-chatbot:$TAG` | Stable address 🏷️ |
+| Auth | `role-to-assume` (1 secret) | `client-id` + `tenant-id` + `subscription-id` (3 secrets) | AWS unlocks the stable address with a single role; Azure needs three IDs to reach the same door. |
+| Registry login | `amazon-ecr-login` action | `az acr login` CLI | Action versus CLI — both authenticate the robot stable-hand against the registry address before pushing. |
+| Image URL | `$ECR_REGISTRY/$ECR_REPOSITORY:$TAG` | `$ACR_NAME.azurecr.io/rag-chatbot:$TAG` | Full registry address where the donkey's Docker image is tagged — ECR path on AWS, ACR FQDN on Azure. |
 | Deploy | `aws ecs update-service --force-new-deployment` | `az containerapp update --image` | Robot hand 🤖 |
 
 - 🫏 **Donkey:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for donkeys on the Azure route.
@@ -318,9 +318,9 @@ Manual trigger → Login to Azure → Login to ACR → Build + Push → Terrafor
 | Aspect | AWS (ECS Fargate) | Azure (Container Apps) | 🫏 Donkey |
 | --- | --- | --- | --- |
 | **Container hosting** | ECS Fargate | Azure Container Apps | Stable stall 🐎 |
-| **Registry** | ECR | ACR | Stable address 🏷️ |
+| **Registry** | ECR | ACR | ECR or ACR — the cloud-specific address where the built donkey image is stored. |
 | **Auth method** | OIDC → IAM role | OIDC → service principal | Stable keys — only authorised callers may ask the donkey to deliver |
-| **Secrets needed** | 1 (`AWS_ROLE_ARN`) | 4 (`CLIENT_ID`, `TENANT_ID`, `SUBSCRIPTION_ID`, `ACR_NAME`) | Stable address 🏷️ |
+| **Secrets needed** | 1 (`AWS_ROLE_ARN`) | 4 (`CLIENT_ID`, `TENANT_ID`, `SUBSCRIPTION_ID`, `ACR_NAME`) | AWS reaches the registry with one ARN; Azure needs four secrets to authenticate to the same address. |
 | **Deploy command** | `aws ecs update-service` | `az containerapp update` | Robot hand 🤖 |
 | **Scaling** | ECS auto-scaling (configured in task def) | Built-in scaling rules | Always-on donkey stall — container that keeps the stable up 24/7 |
 | **Cost (idle)** | Fargate charges per vCPU-hour | Container Apps can scale to zero | Stable stall 🐎 |

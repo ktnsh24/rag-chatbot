@@ -201,7 +201,7 @@ detailed deep-dive document:
 
 | Route file | Endpoint(s) | AI complexity | Deep dive | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| `health.py` | `GET /api/health` | ★☆☆☆☆ — nothing new | 📖 [Health Endpoint Deep Dive](api-routes/health-endpoint-explained.md) | Donkey check ✅ |
+| `health.py` | `GET /api/health` | ★☆☆☆☆ — nothing new | 📖 [Health Endpoint Deep Dive](api-routes/health-endpoint-explained.md) | Stable manager peeks through the door to ask whether the donkey is awake and loaded — nothing fancy. |
 | `chat.py` | `POST /api/chat` | ★★★★★ — the RAG query pipeline | 📖 [Chat Endpoint Deep Dive](api-routes/chat-endpoint-explained.md) | Stable's front door — the URL customers use to drop off a question |
 | `documents.py` | `POST /api/documents/upload`, `GET /api/documents`, `DELETE /api/documents/{id}` | ★★★★☆ — the ingestion pipeline | 📖 [Documents Endpoint Deep Dive](api-routes/documents-endpoint-explained.md) | Pre-sort 📮 |
 | `evaluate.py` | `POST /api/evaluate`, `POST /api/evaluate/suite` | ★★★★★ — the AI quality pipeline | 📖 [Evaluate Endpoint Deep Dive](api-routes/evaluate-endpoint-explained.md) | Stable's grading window — submit a question and get back the donkey's report card with per-dimension scores |
@@ -330,8 +330,8 @@ the same and what's different:
 | **Error handling** | `HTTPException` | `HTTPException` | Stable door 🚪 |
 | **Logging** | Loguru | Loguru | Gate guard 🔐 |
 | **What routes call** | Service classes → DynamoDB/S3 | `rag_chain` → LLM + Vector Store + Storage | DE routes hit databases; AI routes wake the donkey, send it to the GPS warehouse, and pick up storage on the way back |
-| **Response contains** | Data records | Answer + sources + token usage | Cargo unit ⚖️ |
-| **New concepts** | None | Embeddings, semantic search, token costs | Cargo unit ⚖️ |
+| **Response contains** | Data records | Answer + sources + token usage | Chat response carries the donkey's answer, cited backpack pockets, and a tachograph of hay consumed. |
+| **New concepts** | None | Embeddings, semantic search, token costs | Brings in three new ideas: GPS coordinates, vector similarity search, and counting hay for cost. |
 
 **Bottom line:** The routes layer is 90% identical. The 10% difference is *what they
 call* and *what comes back*. The AI lives in `rag_chain`, not in the routes.
