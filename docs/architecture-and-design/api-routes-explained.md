@@ -190,7 +190,7 @@ RequestLoggingMiddleware
 Response sent to browser
 ```
 
-- 🫏 **Donkey:** The modular saddlery — each layer handles one job so you can swap saddles without touching the donkey.
+- 🫏 **Donkey:** The modular gear room — each layer (LLM, vector store, storage) handles one job, so you can swap any piece out without touching the rest.
 
 ---
 

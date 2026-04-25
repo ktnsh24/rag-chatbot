@@ -206,7 +206,7 @@ result = await rag_chain.query("What is the refund policy?")
 **Why this matters for your portfolio:**
 This demonstrates that you can design systems that aren't locked into one cloud provider — a key skill for enterprise architecture roles.
 
-- 🫏 **Donkey:** The modular saddlery — each layer handles one job so you can swap saddles without touching the donkey.
+- 🫏 **Donkey:** The modular gear room — each layer (LLM, vector store, storage) handles one job, so you can swap any piece out without touching the rest.
 
 ---
 
@@ -229,7 +229,7 @@ This demonstrates that you can design systems that aren't locked into one cloud 
 | **Tests** | `tests/` | Unit + integration tests | Test delivery 🧪 |
 | **Docs** | `docs/` | You are here | 🫏 On the route |
 
-- 🫏 **Donkey:** The modular saddlery — each layer handles one job so you can swap saddles without touching the donkey.
+- 🫏 **Donkey:** The modular gear room — each layer (LLM, vector store, storage) handles one job, so you can swap any piece out without touching the rest.
 
 ---
 
