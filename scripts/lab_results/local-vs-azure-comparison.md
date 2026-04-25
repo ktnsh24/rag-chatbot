@@ -1,8 +1,11 @@
 # 3-Way Lab Results Comparison: Local vs Azure vs AWS
 
-> **Local run:** 2026-04-21 | Ollama llama3.2 (3.2B Q4) + ChromaDB + nomic-embed-text + CrossEncoder reranker + local guardrails + hybrid search (BM25 + vector)
-> **Azure run:** 2026-04-20 | Azure OpenAI GPT-4o + Azure AI Search + text-embedding-3-small + Azure Content Safety guardrails + hybrid search
-> **AWS run:** 2026-04-22 | Claude Sonnet 4.6 + DynamoDB (brute-force cosine) + Titan Embed v2 + min-max normalization + no reranker + no guardrails
+> **Local run** (2026-04-21): Ollama llama3.2 (3.2B Q4) + ChromaDB + nomic-embed-text + CrossEncoder reranker + local guardrails + hybrid search (BM25 + vector).
+>
+> **Azure run** (2026-04-20): Azure OpenAI GPT-4o + Azure AI Search + text-embedding-3-small + Azure Content Safety guardrails + hybrid search.
+>
+> **AWS run** (2026-04-22): Claude Sonnet 4.6 + DynamoDB (brute-force cosine) + Titan Embed v2 + min-max normalization + no reranker + no guardrails.
+>
 > **Coverage:** All three runs executed all 58 API experiments across Labs 1–16 (Phases 1–5). 40 of them are comparable across all three providers (the rest are infra-only labs that don't produce a per-question score). Errors: Local 0 · Azure 2 · AWS 0.
 
 ---

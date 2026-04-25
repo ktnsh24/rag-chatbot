@@ -1,10 +1,15 @@
 # AWS Cloud Labs — Results & Findings
 
 > **Date**: 2026-04-22  
+>
 > **Account**: 211132580210 (personal)  
+>
 > **Region**: eu-central-1 (Frankfurt)  
+>
 > **Vector Store**: DynamoDB (brute-force cosine similarity)  
+>
 > **Embedding Model**: Amazon Titan Embed Text v2 (1024 dimensions)  
+>
 > **Budget**: €5 cap  
 
 ## Summary

@@ -1,8 +1,11 @@
 # Deep Dive: Metrics & Monitoring — `src/monitoring/metrics.py`
 
 > **Study order:** #16 · **Difficulty:** ★★★☆☆ (familiar patterns — the new concept is what AI-specific metrics to track)  
+>
 > **File:** [`src/monitoring/metrics.py`](../../src/monitoring/metrics.py)  
+>
 > **Prerequisite:** [#14 — Evaluation Framework](evaluation-framework-deep-dive.md) · [#13 — RAG Chain](rag-chain-deep-dive.md)  
+>
 > **Part of:** [Architecture Overview](../architecture-and-design/architecture.md)
 
 ---

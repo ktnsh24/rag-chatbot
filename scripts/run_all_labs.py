@@ -1472,7 +1472,9 @@ def generate_phase_1_report(results: list[ExperimentResult], env: str) -> str:
     return f"""# Phase 1 Results — {env_upper} Environment
 
 > **Auto-generated** by `scripts/run_all_labs.py` on {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+>
 > **Environment:** {env_desc}
+>
 > **Server:** {r1a.cloud_provider if r1a else "unknown"}
 
 ---
@@ -1754,6 +1756,7 @@ def generate_phase_2_report(results: list[ExperimentResult], env: str) -> str:
     return f"""# Phase 2 Results — {env_upper} Environment
 
 > **Auto-generated** by `scripts/run_all_labs.py` on {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+>
 > **Environment:** {env_upper}
 
 ---
@@ -1928,6 +1931,7 @@ def generate_phase_3_report(results: list[ExperimentResult], env: str) -> str:
     return f"""# Phase 3 Results — {env_upper} Environment
 
 > **Auto-generated** by `scripts/run_all_labs.py` on {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+>
 > **Environment:** {env_upper}
 
 ---
@@ -2121,6 +2125,7 @@ def generate_phase_4_report(results: list[ExperimentResult], env: str) -> str:
     return f"""# Phase 4 Results - {env_upper} Environment
 
 > **Auto-generated** by `scripts/run_all_labs.py` on {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+>
 > **Environment:** {env_upper}
 
 ---
@@ -2411,6 +2416,7 @@ def generate_phase_5_report(results: list[ExperimentResult], env: str) -> str:
     return f"""# Phase 5 Results - {env_upper} Environment
 
 > **Auto-generated** by `scripts/run_all_labs.py` on {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+>
 > **Environment:** {env_upper}
 
 ---
@@ -2571,7 +2577,9 @@ def generate_full_summary(summary: LabRunSummary) -> str:
         f"# Full Lab Results Summary — {env_upper}",
         "",
         f"> **Generated:** {summary.finished_at}",
+        ">",
         f"> **Environment:** {env_upper} | **Server:** {summary.base_url}",
+        ">",
         f"> **Duration:** {summary.started_at} → {summary.finished_at}",
         "",
         "## Quick Stats",
@@ -2854,7 +2862,9 @@ def generate_comparison_report(
         f"# Lab Results Comparison — {env.upper()}",
         "",
         f"> **Current run:** `{current_dir.name}`",
+        ">",
         f"> **Previous run:** `{previous_dir.name}`",
+        ">",
         f"> **Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
         "",
         "---",

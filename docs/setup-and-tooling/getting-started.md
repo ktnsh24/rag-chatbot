@@ -1115,6 +1115,7 @@ a specific competency:
 - **As a DE moving to AI:** These labs bridge your existing skills (ECS, Terraform, DynamoDB, SQS) to AI-specific concerns (embedding quality, token budgets, LLM latency, faithfulness scoring)
 
 > **The key insight:** Building a chatbot is the easy part (everyone can do it).
+>
 > **Evaluating, monitoring, and continuously improving** a chatbot is what makes
 > you an AI engineer. These labs teach exactly that.
 

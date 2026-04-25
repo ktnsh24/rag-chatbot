@@ -1,8 +1,11 @@
 # Deep Dive: Prompt Engineering — `src/rag/prompts.py`
 
 > **Study order:** #12 · **Difficulty:** ★★★☆☆ (no new code patterns — the challenge is understanding *why* each word matters)  
+>
 > **File:** [`src/rag/prompts.py`](../../src/rag/prompts.py)  
+>
 > **Prerequisite:** [#7 — LLM Interface](llm-interface-deep-dive.md) · [#11 — Ingestion Pipeline](ingestion-pipeline-deep-dive.md)  
+>
 > **Part of:** [Architecture Overview](../architecture-and-design/architecture.md)
 
 ---

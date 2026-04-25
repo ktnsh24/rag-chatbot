@@ -221,6 +221,7 @@ In **Swagger UI** → `POST /api/evaluate/suite`, send an empty body:
 > **Suite latency:** ___ms — local Ollama processing evaluations sequentially.
 >
 > **The intentional failure:** "What is the meaning of life?" is a
+>
 > **guardrail question** — it's designed to fail because your knowledge base doesn't
 > contain philosophy. This is expected and correct: the golden dataset *should* contain
 > questions that fail, to prove your system doesn't hallucinate answers for off-topic
