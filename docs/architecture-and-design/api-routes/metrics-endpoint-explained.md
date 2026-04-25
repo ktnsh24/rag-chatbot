@@ -54,7 +54,7 @@ No JSON. No HTML. Just the Prometheus text format that monitoring tools expect.
 
 | Concept | Data Engineering | RAG Chatbot | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **What you expose** | DAG run count, task duration, queue depth | Chat requests, LLM latency, token usage | The donkey 🐴 |
+| **What you expose** | DAG run count, task duration, queue depth | Chat requests, LLM latency, token usage | Tachograph entries — every chat trip's count, latency, and token usage published for scrapers |
 | **Format** | Prometheus text exposition | Prometheus text exposition | Tachograph 📊 |
 | **Scraper** | Prometheus → Grafana | Prometheus → Grafana | Tachograph 📊 |
 | **Alert on** | DAG failure rate > 5%, task duration > SLA | Pass rate < 80%, latency p95 > 2s | Hoof check 🔧 |
@@ -113,27 +113,27 @@ async def prometheus_metrics(request: Request) -> Response:
 
 | Metric | Type | What it measures | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `rag_chat_requests_total` | counter | Total chat requests processed | backpack check 🫏 |
-| `rag_chat_errors_total` | counter | Total chat request errors | backpack check 🫏 |
+| `rag_chat_requests_total` | counter | Total chat requests processed | Tachograph counter — how many deliveries the donkey completed |
+| `rag_chat_errors_total` | counter | Total chat request errors | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 | `rag_tokens_input_total` | counter | Total input tokens consumed | Cargo unit ⚖️ |
 | `rag_tokens_output_total` | counter | Total output tokens generated | Cargo unit ⚖️ |
-| `rag_documents_uploaded_total` | counter | Total documents ingested | backpack check 🫏 |
-| `rag_queries_total` | counter | Total evaluated queries (from query logs) | backpack check 🫏 |
-| `rag_queries_passed_total` | counter | Queries that passed evaluation | backpack check 🫏 |
-| `rag_queries_failed_total` | counter | Queries that failed evaluation | backpack check 🫏 |
+| `rag_documents_uploaded_total` | counter | Total documents ingested | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
+| `rag_queries_total` | counter | Total evaluated queries (from query logs) | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
+| `rag_queries_passed_total` | counter | Queries that passed evaluation | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
+| `rag_queries_failed_total` | counter | Queries that failed evaluation | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 
 ### Gauges (point-in-time values)
 
 | Metric | Type | What it measures | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `rag_chat_latency_p50_ms` | gauge | Median chat response time | backpack check 🫏 |
-| `rag_chat_latency_p95_ms` | gauge | 95th percentile chat response time | backpack check 🫏 |
-| `rag_chat_latency_p99_ms` | gauge | 99th percentile chat response time | backpack check 🫏 |
-| `rag_query_pass_rate` | gauge | Current pass rate (0.0–1.0) | backpack check 🫏 |
+| `rag_chat_latency_p50_ms` | gauge | Median chat response time | Tachograph reading — how long the donkey took on the round trip |
+| `rag_chat_latency_p95_ms` | gauge | 95th percentile chat response time | Tachograph reading — how long the donkey took on the round trip |
+| `rag_chat_latency_p99_ms` | gauge | 99th percentile chat response time | Tachograph reading — how long the donkey took on the round trip |
+| `rag_query_pass_rate` | gauge | Current pass rate (0.0–1.0) | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 | `rag_query_avg_retrieval` | gauge | Average retrieval score | backpack fetch 🎒 |
-| `rag_query_avg_faithfulness` | gauge | Average faithfulness score | backpack check 🫏 |
-| `rag_failures_bad_retrieval` | gauge | Count of bad_retrieval failures (last 24h) | backpack check 🫏 |
-| `rag_failures_hallucination` | gauge | Count of hallucination failures (last 24h) | backpack check 🫏 |
+| `rag_query_avg_faithfulness` | gauge | Average faithfulness score | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
+| `rag_failures_bad_retrieval` | gauge | Count of bad_retrieval failures (last 24h) | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
+| `rag_failures_hallucination` | gauge | Count of hallucination failures (last 24h) | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 
 ### Why counters vs gauges?
 
@@ -170,12 +170,12 @@ With the metrics above, you can build panels for:
 
 | Panel | PromQL query | What it shows | 🫏 Donkey |
 | --- | --- | --- | --- |
-| Request rate | `rate(rag_chat_requests_total[5m])` | Requests per second | backpack check 🫏 |
-| Error rate | `rate(rag_chat_errors_total[5m]) / rate(rag_chat_requests_total[5m])` | Percentage of errors | backpack check 🫏 |
-| Latency (p95) | `rag_chat_latency_p95_ms` | Response time for slow requests | backpack check 🫏 |
-| Pass rate | `rag_query_pass_rate` | AI quality over time | backpack check 🫏 |
+| Request rate | `rate(rag_chat_requests_total[5m])` | Requests per second | Tachograph counter — how many deliveries the donkey completed |
+| Error rate | `rate(rag_chat_errors_total[5m]) / rate(rag_chat_requests_total[5m])` | Percentage of errors | Tachograph counter — how many deliveries the donkey completed |
+| Latency (p95) | `rag_chat_latency_p95_ms` | Response time for slow requests | Tachograph reading — how long the donkey took on the round trip |
+| Pass rate | `rag_query_pass_rate` | AI quality over time | Donkey's report card — share of test deliveries that scored above the bar |
 | Token burn | `rate(rag_tokens_output_total[1h])` | Output tokens per hour (cost proxy) | Cargo unit ⚖️ |
-| Failure breakdown | `rag_failures_bad_retrieval` / `rag_failures_hallucination` | Which failure types dominate | backpack check 🫏 |
+| Failure breakdown | `rag_failures_bad_retrieval` / `rag_failures_hallucination` | Which failure types dominate | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
 
 ### Alert rules
 

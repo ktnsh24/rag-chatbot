@@ -35,22 +35,22 @@
 
 | Service | AWS Cost/month | Azure Cost/month | Notes | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| LLM (pay-per-use) | ~$2–5 | ~$2–5 | Based on ~100 queries/day | The donkey 🐴 |
+| LLM (pay-per-use) | ~$2–5 | ~$2–5 | Based on ~100 queries/day | Donkey-hire fee — paid per backpack carried (tokens in + tokens out), no flat charge |
 | Embeddings | ~$0.10 | ~$0.10 | Very cheap | Free hay 🌿 |
 | Vector Store | **$0 (local)** | **$0 (Free tier)** | Use ChromaDB locally / Free AI Search | Local barn 🏚️ |
-| Document Storage | $0 (Free tier) | $0 (Free tier) | S3: 5 GB free, Blob: 5 GB free | backpack check 🫏 |
+| Document Storage | $0 (Free tier) | $0 (Free tier) | S3: 5 GB free, Blob: 5 GB free | Fuel-and-feed bill for keeping the donkey and stable running |
 | Database | $0 (Free tier) | $0 (Free tier) | DynamoDB: 25 GB free, Cosmos: Free tier | AWS depot 🏭 |
 | Container Hosting | $0 (local) | $0 (local) | Run locally during development | Stable stall 🐎 |
-| **Total** | **~$2–5/month** | **~$2–5/month** | Mostly LLM token costs | The donkey 🐴 |
+| **Total** | **~$2–5/month** | **~$2–5/month** | Mostly LLM token costs | Whole stable bill — almost all of it is hay (tokens) for the donkey |
 
 ### Production (small scale: ~1000 queries/day)
 
 | Service | AWS Cost/month | Azure Cost/month | 🫏 Donkey |
 | --- | --- | --- | --- |
-| LLM | ~$50–100 | ~$40–80 | The donkey 🐴 |
+| LLM | ~$50–100 | ~$40–80 | Donkey wages scale with delivery volume — 10× queries means roughly 10× hay (tokens) consumed |
 | Embeddings | ~$1–2 | ~$1–2 | GPS warehouse 🗺️ |
 | Vector Store | ~$350 (OpenSearch) | ~$75 (AI Search Basic) | AWS search hub 🔍 |
-| Document Storage | ~$1 | ~$1 | backpack check 🫏 |
+| Document Storage | ~$1 | ~$1 | Fuel-and-feed bill for keeping the donkey and stable running |
 | Database | ~$5 (DynamoDB) | ~$5 (Cosmos) | AWS depot 🏭 |
 | Container Hosting | ~$30 (Fargate) | ~$20 (Container Apps) | Stable stall 🐎 |
 | Container Registry | ~$1 (ECR) | ~$5 (ACR Basic) | Stable address 🏷️ |
@@ -87,7 +87,7 @@
 | | AWS (Titan Embeddings v2) | Azure (text-embedding-3-small) | Local (Ollama - nomic-embed-text) | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
 | **Cost** | $0.00002 / 1K tokens | $0.00002 / 1K tokens | **$0** | Cargo unit ⚖️ |
-| **Dimensions** | 1024 | 1536 | 768 | 🫏 On the route |
+| **Dimensions** | 1024 | 1536 | 768 | Length of the donkey's GPS coordinate — more digits = finer location, more storage |
 | **Free tier** | None | None | Free forever | Free hay 🌿 |
 
 **Both are extremely cheap.** A 100-page PDF with 500 chunks costs ~$0.01 to embed.
@@ -126,7 +126,7 @@ DynamoDB stores each chunk with its embedding as a JSON string. On search, all v
 
 | | AWS S3 | Azure Blob Storage | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Storage** | $0.023/GB/month | $0.02/GB/month (LRS) | backpack check 🫏 |
+| **Storage** | $0.023/GB/month | $0.02/GB/month (LRS) | Fuel-and-feed bill for keeping the donkey and stable running |
 | **Free tier** | 5 GB (12 months) | 5 GB (12 months) | Free hay 🌿 |
 | **PUT requests** | $0.005/1K | $0.005/1K | Free hay 🌿 |
 | **GET requests** | $0.0004/1K | $0.0004/1K | Free hay 🌿 |
@@ -137,7 +137,7 @@ DynamoDB stores each chunk with its embedding as a JSON string. On search, all v
 
 | | AWS DynamoDB | Azure Cosmos DB | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Mode** | Pay-per-request | Serverless | 🫏 On the route |
+| **Mode** | Pay-per-request | Serverless | Donkey-side view of Mode — affects how the donkey loads, reads, or delivers the cargo |
 | **Read cost** | $1.25/million reads | ~$0.25/million RU | Feed bill 🌾 |
 | **Write cost** | $1.25/million writes | ~$0.25/million RU | Feed bill 🌾 |
 | **Free tier** | 25 GB + 25 RCU + 25 WCU | 1000 RU/s + 25 GB | Free hay 🌿 |
@@ -150,8 +150,8 @@ DynamoDB stores each chunk with its embedding as a JSON string. On search, all v
 | --- | --- | --- | --- |
 | **vCPU** | $0.04048/hr | $0.000024/sec (~$0.086/hr) | Free hay 🌿 |
 | **Memory** | $0.004445/GB/hr | $0.000003/GB/sec | Trip log 📒 |
-| **Minimum** | ~$30/month (0.25 vCPU, 0.5 GB) | ~$20/month (0.25 vCPU, 0.5 GB) | 🫏 On the route |
-| **Scales to zero?** | No (min 1 task) | **Yes** (0 replicas when idle) | 🫏 On the route |
+| **Minimum** | ~$30/month (0.25 vCPU, 0.5 GB) | ~$20/month (0.25 vCPU, 0.5 GB) | Fuel-and-feed bill for keeping the donkey and stable running |
+| **Scales to zero?** | No (min 1 task) | **Yes** (0 replicas when idle) | The GPS-indexed warehouse where backpacks live, sorted by coordinate |
 
 **Azure Container Apps is cheaper because it can scale to zero.**
 
@@ -159,16 +159,16 @@ DynamoDB stores each chunk with its embedding as a JSON string. On search, all v
 
 | | AWS ECR | Azure ACR | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Storage** | $0.10/GB/month | $0.167/GB/month (Basic) | backpack check 🫏 |
+| **Storage** | $0.10/GB/month | $0.167/GB/month (Basic) | Fuel-and-feed bill for keeping the donkey and stable running |
 | **Free tier** | 500 MB (private, 12 months) | None | Free hay 🌿 |
-| **Tier** | Pay per GB | $5/month (Basic) | 🫏 On the route |
+| **Tier** | Pay per GB | $5/month (Basic) | Fuel-and-feed bill for keeping the donkey and stable running |
 
 ### CI/CD Pipeline
 
 | GitHub Actions | Free tier | 🫏 Donkey |
 | --- | --- | --- |
-| **Public repos** | Unlimited minutes | 🫏 On the route |
-| **Private repos** | 2,000 minutes/month | 🫏 On the route |
+| **Public repos** | Unlimited minutes | Donkey-side view of Public repos — affects how the donkey loads, reads, or delivers the cargo |
+| **Private repos** | 2,000 minutes/month | Fuel-and-feed bill for keeping the donkey and stable running |
 | **Cost beyond free** | $0.008/minute (Linux) | Feed bill 🌾 |
 
 **Free for most personal projects.**
@@ -183,24 +183,24 @@ DynamoDB stores each chunk with its embedding as a JSON string. On search, all v
 
 | Service | Free amount | 🫏 Donkey |
 | --- | --- | --- |
-| S3 | 5 GB storage, 20K GET, 2K PUT | backpack check 🫏 |
+| S3 | 5 GB storage, 20K GET, 2K PUT | Cloud cupboard where raw mail is parked before the post office sorts it |
 | DynamoDB | 25 GB, 25 RCU, 25 WCU | AWS depot 🏭 |
-| Lambda | 1M invocations, 400K GB-seconds | 🫏 On the route |
+| Lambda | 1M invocations, 400K GB-seconds | On-demand donkey — wakes up only when a delivery is requested |
 | CloudWatch | 10 metrics, 5 GB logs, 3 dashboards | Tachograph 📊 |
 | ECR | 500 MB | Stable address 🏷️ |
-| Bedrock | **No free tier** (pay per token) | The donkey 🐴 |
+| Bedrock | **No free tier** (pay per token) | Renting an AWS donkey — every hay bale (token) is metered, no freebies |
 | OpenSearch Serverless | **No free tier** ($350+/month) | AWS search hub 🔍 |
 
 ### Azure Free Tier
 
 | Service | Free amount | 🫏 Donkey |
 | --- | --- | --- |
-| Blob Storage | 5 GB LRS | Parcel shelf 📦 |
+| Blob Storage | 5 GB LRS | Azure document warehouse — pennies per month for the donkey's source files |
 | Cosmos DB | 1000 RU/s + 25 GB | Azure trip-log 📒 |
 | AI Search | Free tier (50 MB, 3 indexes) | Azure hub ☁️ |
 | Azure Functions | 1M executions/month | Azure hub ☁️ |
 | App Insights | 5 GB logs/month | Tachograph 📊 |
-| Azure OpenAI | **No free tier** (pay per token) | The donkey 🐴 |
+| Azure OpenAI | **No free tier** (pay per token) | Renting an Azure donkey — every hay bale (token) is metered, no freebies |
 | Container Apps | First 180K vCPU-seconds free/month | Stable stall 🐎 |
 
 - 🫏 **Donkey:** Hay that comes at no charge — the local barn and free cloud tiers let you develop without spending a penny on feed.
@@ -215,10 +215,10 @@ Since you want to save money, here's the cheapest way to run this project:
 
 | Component | Choice | Cost | 🫏 Donkey |
 | --- | --- | --- | --- |
-| LLM | Bedrock (Claude) OR Azure OpenAI (GPT-4o) | ~$2–5/month | The donkey 🐴 |
-| Embeddings | Same provider as LLM | ~$0.10/month | The donkey 🐴 |
+| LLM | Bedrock (Claude) OR Azure OpenAI (GPT-4o) | ~$2–5/month | Pick one cloud donkey — Claude or GPT-4o eat about the same hay at small volumes |
+| Embeddings | Same provider as LLM | ~$0.10/month | GPS-stamping cargo at the same stable — pennies because address labels are cheaper than full deliveries |
 | Vector Store | **ChromaDB (local)** or Azure AI Search **Free** | **$0** | Local barn 🏚️ |
-| Document Storage | S3 Free or Blob Free | **$0** | backpack check 🫏 |
+| Document Storage | S3 Free or Blob Free | **$0** | Fuel-and-feed bill for keeping the donkey and stable running |
 | Database | DynamoDB Free or Cosmos Free | **$0** | AWS depot 🏭 |
 | Hosting | **Run locally** (no cloud hosting) | **$0** | Free hay 🌿 |
 | **Total** | | **~$2–5/month** | Feed bill 🌾 |
@@ -245,8 +245,8 @@ Since you want to save money, here's the cheapest way to run this project:
 | --- | --- | --- | --- |
 | **Model hosting** | Managed (no instances) | You manage instances | Manifest template 📋 |
 | **Min cost** | $0 (pay per token) | ~$100/month (ml.g5.xlarge) | Cargo unit ⚖️ |
-| **Scaling** | Automatic | Manual or auto-scaling | 🫏 On the route |
-| **GPU management** | None | You handle it | 🫏 On the route |
+| **Scaling** | Automatic | Manual or auto-scaling | How the stable adds or removes donkeys when delivery volume changes |
+| **GPU management** | None | You handle it | Donkey-side view of GPU management — affects how the donkey loads, reads, or delivers the cargo |
 | **When to use SageMaker** | Custom/fine-tuned models | | Alternative stable 🏗️ |
 
 **Why Bedrock is better here:**
@@ -258,10 +258,10 @@ SageMaker makes sense when you need a custom-trained model, not for off-the-shel
 
 | | OpenSearch Serverless (our choice) | Kendra | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Type** | General vector search | Enterprise search (RAG-focused) | backpack check 🫏 |
+| **Type** | General vector search | Enterprise search (RAG-focused) | How the warehouse measures which backpacks are nearest to the customer's question |
 | **Min cost** | ~$350/month | ~$810/month (Developer Edition) | Feed bill 🌾 |
 | **Features** | Raw vector similarity | Semantic search, connectors | GPS warehouse 🗺️ |
-| **RAG integration** | Manual (you build the pipeline) | Built-in RAG features | backpack check 🫏 |
+| **RAG integration** | Manual (you build the pipeline) | Built-in RAG features | Robot stable hand — auto-tests the donkey and redeploys when code changes |
 
 **Why OpenSearch is better here:**
 Kendra is more powerful but starts at $810/month. For a portfolio project, OpenSearch (or ChromaDB) gives you more control and costs less.
@@ -270,9 +270,9 @@ Kendra is more powerful but starts at $810/month. For a portfolio project, OpenS
 
 | | Azure OpenAI (our choice) | Cognitive Services | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **LLM quality** | GPT-4o (state-of-the-art) | No LLM capability | The donkey 🐴 |
-| **Text analysis** | Via LLM prompts | Pre-built NLP models | The donkey 🐴 |
-| **RAG support** | Full RAG pipeline | Not designed for RAG | backpack check 🫏 |
+| **LLM quality** | GPT-4o (state-of-the-art) | No LLM capability | Only Azure OpenAI ships a writing donkey; Cognitive Services has no donkey at all |
+| **Text analysis** | Via LLM prompts | Pre-built NLP models | Donkey reads cargo and answers freeform vs Cognitive Services' fixed-shape rubber-stamp answers |
+| **RAG support** | Full RAG pipeline | Not designed for RAG | Robot stable hand — auto-tests the donkey and redeploys when code changes |
 
 **Why Azure OpenAI is better:**
 Cognitive Services doesn't have a conversational LLM. It does text analytics (sentiment, entities) but can't generate answers from context.
@@ -282,9 +282,9 @@ Cognitive Services doesn't have a conversational LLM. It does text analytics (se
 | | Bedrock/Azure OpenAI (our choice) | Self-hosted (Llama 3) | 🫏 Donkey |
 | --- | --- | --- | --- |
 | **GPU cost** | $0 idle | ~$730/month (g5.xlarge) | Feed bill 🌾 |
-| **Quality** | GPT-4o / Claude (best) | Good but not as strong | The donkey 🐴 |
-| **Maintenance** | None | You manage everything | 🫏 On the route |
-| **Latency** | ~1–3 seconds | ~2–5 seconds | 🫏 On the route |
+| **Quality** | GPT-4o / Claude (best) | Good but not as strong | Cloud-managed donkeys are top-of-class writers; self-hosted Llama is decent but not as polished |
+| **Maintenance** | None | You manage everything | Donkey-side view of Maintenance — affects how the donkey loads, reads, or delivers the cargo |
+| **Latency** | ~1–3 seconds | ~2–5 seconds | Tachograph reading — how long the donkey took on the round trip |
 
 **Why managed is better:**
 Self-hosting requires a GPU instance running 24/7 (~$730/month for AWS, ~$600/month for Azure).
@@ -295,9 +295,9 @@ Unless you need complete data isolation, managed APIs are cheaper and easier.
 
 | | FastAPI (our choice) | Step Functions + Lambda | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Architecture** | Monolith (simple) | Microservices (complex) | 🫏 On the route |
+| **Architecture** | Monolith (simple) | Microservices (complex) | Donkey-side view of Architecture — affects how the donkey loads, reads, or delivers the cargo |
 | **Min cost** | $30/month (Fargate) | ~$5/month (Lambda free tier) | Stable stall 🐎 |
-| **Complexity** | Low | High (state machines, IAM, etc.) | 🫏 On the route |
+| **Complexity** | Low | High (state machines, IAM, etc.) | Stable keys — only authorised callers may ask the donkey to deliver |
 | **Latency** | ~1s (in-memory) | ~3–5s (cold starts + state transitions) | Trip log 📒 |
 
 **Why FastAPI is better for a portfolio project:**
@@ -323,8 +323,8 @@ If documents came from 10 different sources (SharePoint, Salesforce, databases) 
 | --- | --- | --- | --- |
 | **Management** | Serverless containers | You manage the cluster | Stable stall 🐎 |
 | **Min cost** | ~$20–30/month | ~$75/month (EKS) / ~$100/month (AKS) | Alternative stable 🏗️ |
-| **Scaling** | Automatic | Auto-scaling (more config) | 🫏 On the route |
-| **Complexity** | Low | High (kubectl, helm, etc.) | 🫏 On the route |
+| **Scaling** | Automatic | Auto-scaling (more config) | How the stable adds or removes donkeys when delivery volume changes |
+| **Complexity** | Low | High (kubectl, helm, etc.) | Donkey-side view of Complexity — affects how the donkey loads, reads, or delivers the cargo |
 
 **Why serverless containers are better here:**
 Kubernetes is designed for teams running dozens of microservices. For a single FastAPI app, EKS/AKS adds $75–100/month in cluster costs plus significant operational complexity. Fargate and Container Apps give you the same benefits (containerized, scalable) without the overhead.
@@ -333,9 +333,9 @@ Kubernetes is designed for teams running dozens of microservices. For a single F
 
 | | Lambda (our choice) | Glue | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Purpose** | Lightweight event processing | Heavy ETL (Spark) | 🫏 On the route |
+| **Purpose** | Lightweight event processing | Heavy ETL (Spark) | Donkey-side view of Purpose — affects how the donkey loads, reads, or delivers the cargo |
 | **Min cost** | Free tier (1M invocations) | ~$0.44/DPU-hour | Feed bill 🌾 |
-| **Startup time** | ~1s (cold start) | ~2–5 min (Spark cluster) | 🫏 On the route |
+| **Startup time** | ~1s (cold start) | ~2–5 min (Spark cluster) | Donkey-side view of Startup time — affects how the donkey loads, reads, or delivers the cargo |
 
 **Why Lambda is better:**
 Glue spins up a full Spark cluster for each job. A single document ingestion takes seconds in Lambda but minutes in Glue (just for cluster startup). Glue makes sense when processing millions of records, not individual document uploads.
@@ -348,12 +348,12 @@ Glue spins up a full Spark cluster for each job. A single document ingestion tak
 
 | Decision | Chosen | Alternative | Why chosen wins | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| LLM | Bedrock / Azure OpenAI / **Ollama (dev)** | SageMaker / Self-hosted | $0 idle vs $730/month GPU | The donkey 🐴 |
+| LLM | Bedrock / Azure OpenAI / **Ollama (dev)** | SageMaker / Self-hosted | $0 idle vs $730/month GPU | Rent a managed donkey on demand instead of stabling a $730/month GPU donkey full-time |
 | Vector Store | OpenSearch / AI Search / **DynamoDB (cheap AWS)** / **ChromaDB (dev)** | Kendra / Pinecone | Cheaper, more control, DynamoDB is $0/month | AWS search hub 🔍 |
 | Hosting | Fargate / Container Apps | EKS / AKS | Simpler, cheaper | Stable stall 🐎 |
 | Orchestration | FastAPI (monolith) | Step Functions + Lambda | Lower latency, simpler | Alternative stable 🏗️ |
 | Document pipeline | Lambda / Azure Functions | Glue / Data Factory | Faster startup, cheaper | Alternative stable 🏗️ |
-| Embeddings | Managed (Titan / OpenAI) / **nomic-embed-text (dev)** | Self-hosted (Sentence-BERT) | No GPU needed | The donkey 🐴 |
+| Embeddings | Managed (Titan / OpenAI) / **nomic-embed-text (dev)** | Self-hosted (Sentence-BERT) | No GPU needed | GPS-stamping is outsourced — no GPU donkey needed just to print address labels |
 
 - 🫏 **Donkey:** The head groom's final checklist — all trade-offs weighed, best bag chosen, donkey ready to dispatch.
 
@@ -385,22 +385,22 @@ Running the full lab suite (`poetry run python scripts/run_all_labs.py`) makes r
 
 | Phase | Experiments | API Calls | Type | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| Phase 1 (Labs 1-2) | 1a-2d | ~8 evaluate | LLM + embedding | The donkey 🐴 |
-| Phase 2 (Labs 3-5) | 3a-5b | ~8 evaluate + chat | LLM + embedding | The donkey 🐴 |
-| Phase 3 (Labs 6-8) | 6a-6d, 7-8 (thinking) | ~5 evaluate + 1 suite (25 cases) | LLM + embedding | The donkey 🐴 |
-| **Phase 4 (Labs 9-13)** | **9a-13d** | **7 chat + 22 evaluate + 1 batch upload** | **LLM + embedding** | The donkey 🐴 |
-| Phase 5 (Labs 14-16) | 14a-16a | 2 stats/failures + 1 metrics + 1 suite (25 cases) | LLM + embedding | The donkey 🐴 |
-| **Total** | **50 API experiments** | **~70 LLM calls** (including 2 golden suites of 25 each) | | The donkey 🐴 |
+| Phase 1 (Labs 1-2) | 1a-2d | ~8 evaluate | LLM + embedding | Donkey takes ~8 short practice deliveries while learning the route |
+| Phase 2 (Labs 3-5) | 3a-5b | ~8 evaluate + chat | LLM + embedding | Donkey makes ~8 deliveries plus a few chats with the customer |
+| Phase 3 (Labs 6-8) | 6a-6d, 7-8 (thinking) | ~5 evaluate + 1 suite (25 cases) | LLM + embedding | Donkey runs the first full 25-delivery report card alongside a handful of one-off trips |
+| **Phase 4 (Labs 9-13)** | **9a-13d** | **7 chat + 22 evaluate + 1 batch upload** | **LLM + embedding** | Heaviest workload — donkey hauls 30+ deliveries across guardrails, reranking, hybrid search, HNSW |
+| Phase 5 (Labs 14-16) | 14a-16a | 2 stats/failures + 1 metrics + 1 suite (25 cases) | LLM + embedding | Donkey runs the second 25-delivery report card while the tachograph reads off final stats |
+| **Total** | **50 API experiments** | **~70 LLM calls** (including 2 golden suites of 25 each) | | ~70 trips total across the whole curriculum — small hay bill for a lot of learning |
 
 ### Cost per full run
 
 | Provider | LLM Cost | Embedding Cost | Vector Store Cost | Total per Run | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
-| **Local (Ollama)** | $0 | $0 | $0 (ChromaDB) | **$0** | The donkey 🐴 |
-| **AWS (Bedrock + DynamoDB)** | ~$0.90 | ~$0.01 | $0 (DynamoDB free tier) | **~$0.91** | The donkey 🐴 |
-| **AWS (Bedrock + OpenSearch)** | ~$0.90 | ~$0.01 | $350/month (always on) | **~$0.91** + $350/month base | The donkey 🐴 |
-| **Azure (OpenAI + AI Search Free)** | ~$0.70 | ~$0.01 | $0 (free tier) | **~$0.71** | The donkey 🐴 |
-| **Azure (OpenAI + AI Search Basic)** | ~$0.70 | ~$0.01 | $75/month (always on) | **~$0.71** + $75/month base | The donkey 🐴 |
+| **Local (Ollama)** | $0 | $0 | $0 (ChromaDB) | **$0** | Local-barn donkey eats free hay — nothing leaves your laptop |
+| **AWS (Bedrock + DynamoDB)** | ~$0.90 | ~$0.01 | $0 (DynamoDB free tier) | **~$0.91** | AWS Claude donkey + free DynamoDB depot = under a dollar for a full curriculum run |
+| **AWS (Bedrock + OpenSearch)** | ~$0.90 | ~$0.01 | $350/month (always on) | **~$0.91** + $350/month base | Same AWS donkey, but the OpenSearch warehouse charges $350/month rent whether trips run or not |
+| **Azure (OpenAI + AI Search Free)** | ~$0.70 | ~$0.01 | $0 (free tier) | **~$0.71** | Azure GPT-4o donkey on the free AI Search hub — cheapest cloud option overall |
+| **Azure (OpenAI + AI Search Basic)** | ~$0.70 | ~$0.01 | $75/month (always on) | **~$0.71** + $75/month base | Same Azure donkey, but the Basic-tier hub adds a flat $75/month warehouse rent |
 
 ### Cost breakdown assumptions
 
@@ -415,11 +415,11 @@ Running the full lab suite (`poetry run python scripts/run_all_labs.py`) makes r
 
 | Lab | Experiments | Cloud Cost Notes | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Lab 9 (Guardrails)** | 7 chat calls (3 injection, 3 PII, 1 baseline) | Blocked requests = $0 (no LLM invoked). Only the baseline and unblocked requests cost tokens. | The donkey 🐴 |
-| **Lab 10 (Re-ranking)** | 6 evaluate calls | Standard LLM + embedding cost. Cross-encoder re-ranking runs locally (no extra cloud cost). | The donkey 🐴 |
-| **Lab 11 (Hybrid Search)** | 8 evaluate calls | Standard LLM + embedding cost. BM25 runs locally or in the vector store (no extra cost). | The donkey 🐴 |
+| **Lab 9 (Guardrails)** | 7 chat calls (3 injection, 3 PII, 1 baseline) | Blocked requests = $0 (no LLM invoked). Only the baseline and unblocked requests cost tokens. | Stable gate turns the donkey away on bad requests, so blocked trips burn zero hay |
+| **Lab 10 (Re-ranking)** | 6 evaluate calls | Standard LLM + embedding cost. Cross-encoder re-ranking runs locally (no extra cloud cost). | Backpack contents resorted by quality on your laptop before the donkey leaves — no cloud surcharge |
+| **Lab 11 (Hybrid Search)** | 8 evaluate calls | Standard LLM + embedding cost. BM25 runs locally or in the vector store (no extra cost). | Donkey checks both the GPS warehouse and the keyword index before loading — same per-trip cost |
 | **Lab 12 (Bulk Upload)** | 1 batch upload + 1 evaluate | Embedding cost for 5 test docs (~25 chunks). Negligible. | backpack piece 📦 |
-| **Lab 13 (HNSW)** | 6 evaluate calls | Standard LLM + embedding cost. HNSW settings don't change per-query cost. | The donkey 🐴 |
+| **Lab 13 (HNSW)** | 6 evaluate calls | Standard LLM + embedding cost. HNSW settings don't change per-query cost. | Tweaking the warehouse's stadium signs (HNSW) doesn't change what the donkey pays per trip |
 
 ### Running labs 10× (for tuning)
 
@@ -445,8 +445,8 @@ Both `infra/aws/` and `infra/azure/` include a **budget guard** (`budget.tf`) th
 
 | Threshold | Action | 🫏 Donkey |
 |---|---| --- |
-| **80% of limit (€4)** | Email warning sent to `alert_email` | 🫏 On the route |
-| **100% of limit (€5)** | Email + automatic resource kill switch triggered | 🫏 On the route |
+| **80% of limit (€4)** | Email warning sent to `alert_email` | Fuel-and-feed bill for keeping the donkey and stable running |
+| **100% of limit (€5)** | Email + automatic resource kill switch triggered | Fuel-and-feed bill for keeping the donkey and stable running |
 
 ### AWS
 

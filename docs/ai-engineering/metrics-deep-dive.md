@@ -195,9 +195,9 @@ metrics.record_chat_request(
 | Counter | What it measures | Why it matters | 🫏 Donkey |
 |---|---|---| --- |
 | `_chat_requests` | Total queries served | Throughput — are people using the system? | Feed bill 🌾 |
-| `_latencies` | Response time in ms | UX — are responses fast enough? | 🫏 On the route |
-| `_total_input_tokens` | Cumulative tokens sent to LLM | Cost driver — input tokens are cheaper | The donkey 🐴 |
-| `_total_output_tokens` | Cumulative tokens received from LLM | Cost driver — output tokens are 3-5x more expensive | The donkey 🐴 |
+| `_latencies` | Response time in ms | UX — are responses fast enough? | Tachograph reading — how long the donkey took on the round trip |
+| `_total_input_tokens` | Cumulative tokens sent to LLM | Cost driver — input tokens are cheaper | Hay loaded onto the donkey on the way out — cheaper per bale, but it adds up across every trip |
+| `_total_output_tokens` | Cumulative tokens received from LLM | Cost driver — output tokens are 3-5x more expensive | Hay the donkey burns writing the reply — 3–5x pricier than input hay, so verbose answers hurt the budget |
 | `_total_estimated_cost` | Running cost total | Budget tracking — are we within SLA? | Feed bill 🌾 |
 
 - 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
@@ -221,8 +221,8 @@ error_rate = _chat_errors / _chat_requests
 | Error rate | Status | Action | 🫏 Donkey |
 |---|---|---| --- |
 | < 1% | ✅ Healthy | Normal operation | Donkey check ✅ |
-| 1-5% | ⚠️ Warning | Investigate — LLM timeouts? | The donkey 🐴 |
-| > 5% | 🔴 Critical | Page on-call — system is degraded | 🫏 On the route |
+| 1-5% | ⚠️ Warning | Investigate — LLM timeouts? | Donkey is stumbling on a few trips — check whether the LLM is timing out or the backpack is arriving empty |
+| > 5% | 🔴 Critical | Page on-call — system is degraded | Donkey-side view of > 5% — affects how the donkey loads, reads, or delivers the cargo |
 
 **DE parallel:** Same as pipeline failure rate. If more than 5% of Airflow DAG runs fail, something is wrong.
 
@@ -471,7 +471,7 @@ These are metrics that **don't exist in traditional software** but are critical 
 | **Token usage / request** | How much context + answer per query | > 2000 tokens/request | Cost growth | Cargo unit ⚖️ |
 | **Cost per query** | $ per chat interaction | > $0.02/query | Budget overrun | Feed bill 🌾 |
 | **Input/output ratio** | Input tokens ÷ output tokens | > 10:1 means verbose context | Over-retrieval | Cargo unit ⚖️ |
-| **Latency P99** | Worst-case response time | > 10s | UX degradation | 🫏 On the route |
+| **Latency P99** | Worst-case response time | > 10s | UX degradation | Tachograph reading — how long the donkey took on the round trip |
 | **Error rate** | Failures / total requests | > 5% | System reliability | Feed bill 🌾 |
 | **Chunks per document** | Average chunk count | > 500/doc | Storage bloat | backpack piece 📦 |
 

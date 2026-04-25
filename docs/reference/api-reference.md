@@ -77,7 +77,7 @@ Send a question and get an answer grounded in your uploaded documents.
 
 | Field | Type | Required | Default | Description | 🫏 Donkey |
 |---|---|---|---|---| --- |
-| `message` | string | ✅ | — | The user's question | 🫏 On the route |
+| `message` | string | ✅ | — | The user's question | Donkey-side view of message — affects how the donkey loads, reads, or delivers the cargo |
 | `session_id` | string | ❌ | auto-generated UUID | Conversation session ID for history | Trip log 📒 |
 | `max_sources` | integer | ❌ | `5` | Max source chunks to retrieve | backpack piece 📦 |
 
@@ -148,7 +148,7 @@ embedded, and indexed in the vector store.
 
 | Field | Type | Required | Description | 🫏 Donkey |
 |---|---|---|---| --- |
-| `file` | file | ✅ | The document file (PDF, TXT, MD, CSV, DOCX) | 🫏 On the route |
+| `file` | file | ✅ | The document file (PDF, TXT, MD, CSV, DOCX) | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
 
 **Supported file types:**
 - `.pdf` — Portable Document Format
@@ -247,7 +247,7 @@ Delete a document and all its associated vector embeddings.
 
 | Parameter | Type | Description | 🫏 Donkey |
 |---|---|---| --- |
-| `document_id` | string | The document's unique ID | 🫏 On the route |
+| `document_id` | string | The document's unique ID | Donkey-side view of document_id — affects how the donkey loads, reads, or delivers the cargo |
 
 **Response `200 OK`:**
 
@@ -279,8 +279,8 @@ AND quality scores (retrieval, faithfulness, answer relevance, overall).
 
 | Field | Type | Required | Default | Description | 🫏 Donkey |
 |---|---|---|---|---| --- |
-| `question` | string | ✅ | — | The question to evaluate | Report card 📝 |
-| `expected_answer` | string | ❌ | `null` | Optional ground truth for comparison | 🫏 On the route |
+| `question` | string | ✅ | — | The question to evaluate | The customer question the donkey will deliver an answer to — the only required field |
+| `expected_answer` | string | ❌ | `null` | Optional ground truth for comparison | The 25 standard test deliveries used to grade the donkey's report card |
 | `top_k` | integer | ❌ | `5` | Number of chunks to retrieve | backpack piece 📦 |
 
 **Example Request:**
@@ -330,7 +330,7 @@ per-case results and aggregated metrics.
 | Field | Type | Required | Default | Description | 🫏 Donkey |
 |---|---|---|---|---| --- |
 | `categories` | string[] | ❌ | all | Filter by test categories (e.g. `["policy", "edge_case"]`) | Test delivery 🧪 |
-| `top_k` | integer | ❌ | `5` | Override top_k for all cases | 🫏 On the route |
+| `top_k` | integer | ❌ | `5` | Override top_k for all cases | How many backpacks the donkey grabs from the warehouse for one delivery |
 
 **Example Request:**
 
@@ -388,8 +388,8 @@ List recent queries that failed evaluation. Use this to diagnose production issu
 
 | Param | Type | Default | Description | 🫏 Donkey |
 |---|---|---|---| --- |
-| `limit` | integer | `20` | Max results (1–100) | 🫏 On the route |
-| `days` | integer | `7` | How many days back (1–30) | 🫏 On the route |
+| `limit` | integer | `20` | Max results (1–100) | Donkey-side view of limit — affects how the donkey loads, reads, or delivers the cargo |
+| `days` | integer | `7` | How many days back (1–30) | Donkey-side view of days — affects how the donkey loads, reads, or delivers the cargo |
 | `category` | string | all | Filter: `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`, `marginal` | Memory drift ⚠️ |
 
 **Example:**
@@ -434,7 +434,7 @@ Aggregate query quality statistics for dashboards and monitoring.
 
 | Param | Type | Default | Description | 🫏 Donkey |
 |---|---|---|---| --- |
-| `days` | integer | `1` | How many days to aggregate (1–30) | 🫏 On the route |
+| `days` | integer | `1` | How many days to aggregate (1–30) | Donkey-side view of days — affects how the donkey loads, reads, or delivers the cargo |
 
 **Example:**
 
@@ -507,21 +507,21 @@ rag_queries_failure_hallucination 5
 
 | Metric | Type | Description | 🫏 Donkey |
 |---|---|---| --- |
-| `rag_chat_requests_total` | counter | Total chat requests | backpack check 🫏 |
-| `rag_chat_errors_total` | counter | Total chat errors | backpack check 🫏 |
-| `rag_chat_error_rate_percent` | gauge | Current error rate % | backpack check 🫏 |
-| `rag_chat_latency_p50/p95/p99_ms` | gauge | Latency percentiles | backpack check 🫏 |
+| `rag_chat_requests_total` | counter | Total chat requests | Tachograph counter — how many deliveries the donkey completed |
+| `rag_chat_errors_total` | counter | Total chat errors | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
+| `rag_chat_error_rate_percent` | gauge | Current error rate % | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
+| `rag_chat_latency_p50/p95/p99_ms` | gauge | Latency percentiles | Tachograph reading — how long the donkey took on the round trip |
 | `rag_tokens_input_total` | counter | Total input tokens | Cargo unit ⚖️ |
 | `rag_tokens_output_total` | counter | Total output tokens | Cargo unit ⚖️ |
 | `rag_tokens_cost_usd_total` | counter | Estimated cost in USD | Cargo unit ⚖️ |
-| `rag_documents_ingested_total` | counter | Documents ingested | backpack check 🫏 |
+| `rag_documents_ingested_total` | counter | Documents ingested | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
 | `rag_chunks_created_total` | counter | Chunks created | backpack piece 📦 |
-| `rag_uptime_seconds` | gauge | App uptime | backpack check 🫏 |
-| `rag_queries_total` | gauge | Queries logged today | backpack check 🫏 |
-| `rag_queries_pass_rate_percent` | gauge | Pass rate today | backpack check 🫏 |
+| `rag_uptime_seconds` | gauge | App uptime | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
+| `rag_queries_total` | gauge | Queries logged today | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
+| `rag_queries_pass_rate_percent` | gauge | Pass rate today | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 | `rag_queries_avg_retrieval` | gauge | Avg retrieval score | backpack fetch 🎒 |
-| `rag_queries_avg_faithfulness` | gauge | Avg faithfulness score | backpack check 🫏 |
-| `rag_queries_failure_{category}` | gauge | Failures by category | backpack check 🫏 |
+| `rag_queries_avg_faithfulness` | gauge | Avg faithfulness score | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
+| `rag_queries_failure_{category}` | gauge | Failures by category | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 
 - 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
 
@@ -552,12 +552,12 @@ All error responses follow a consistent format:
 
 | Code | Meaning | 🫏 Donkey |
 |---|---| --- |
-| `200` | Success | 🫏 On the route |
-| `400` | Bad request — check your input | 🫏 On the route |
-| `404` | Resource not found | 🫏 On the route |
-| `413` | Payload too large | 🫏 On the route |
+| `200` | Success | Donkey delivered successfully — customer gets the answer |
+| `400` | Bad request — check your input | Customer's request was malformed — donkey refuses to leave the stable |
+| `404` | Resource not found | Customer's request was malformed — donkey refuses to leave the stable |
+| `413` | Payload too large | Customer's request was malformed — donkey refuses to leave the stable |
 | `500` | Internal server error | Hoof check 🔧 |
-| `503` | Service unavailable — a dependency is down | 🫏 On the route |
+| `503` | Service unavailable — a dependency is down | Supply shed manifest — lists every tool the stable needs to operate |
 
 - 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
 

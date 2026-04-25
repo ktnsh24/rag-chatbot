@@ -11,10 +11,10 @@
 
 | Run | LLM Model | Score Normalization | Reranker | Passed | Failed | Total | Pass Rate | 🫏 Donkey |
 |-----|-----------|-------------------|----------|--------|--------|-------|-----------| --- |
-| 1 | Amazon Nova Lite | ❌ Off | ✅ On (crashing) | 10 | 48 | 58 | 17% | 🫏 On the route |
-| 2 | Claude Haiku 4.5 | ❌ Off | ✅ On (crashing) | 12 | 46 | 58 | 21% | The donkey 🐴 |
-| 3 | Claude Sonnet 4.6 | ❌ Off | ✅ On (crashing) | 13 | 45 | 58 | 22% | The donkey 🐴 |
-| **4** | **Claude Sonnet 4.6** | **✅ On** | **❌ Off** | **25** | **33** | **58** | **43%** | The donkey 🐴 |
+| 1 | Amazon Nova Lite | ❌ Off | ✅ On (crashing) | 10 | 48 | 58 | 17% | Amazon's house donkey breed — cheap and AWS-native |
+| 2 | Claude Haiku 4.5 | ❌ Off | ✅ On (crashing) | 12 | 46 | 58 | 21% | A faster, lighter Anthropic donkey — quicker hooves but only marginally better deliveries |
+| 3 | Claude Sonnet 4.6 | ❌ Off | ✅ On (crashing) | 13 | 45 | 58 | 22% | The premium Anthropic donkey — strongest writer, but the broken road still wasted its talent |
+| **4** | **Claude Sonnet 4.6** | **✅ On** | **❌ Off** | **25** | **33** | **58** | **43%** | Same premium donkey, paved road this time — nearly doubled deliveries once retrieval scores were normalised |
 
 - 🫏 **Donkey:** The head groom's final checklist — all trade-offs weighed, best bag chosen, donkey ready to dispatch.
 
@@ -26,9 +26,9 @@ Imagine a donkey carrying goods across a mountain. You hire **three donkeys** �
 
 | Donkey | Cost | Goods Delivered | 🫏 Donkey |
 |--------|------|----------------| --- |
-| Nova Lite (cheap) | €0.03 | 10 packages | 🫏 On the route |
-| Haiku 4.5 (mid) | €0.04 | 12 packages | 🫏 On the route |
-| **Sonnet 4.6 (champion)** | **€0.16** | **13 packages** | 🫏 On the route |
+| Nova Lite (cheap) | €0.03 | 10 packages | Fuel-and-feed bill for keeping the donkey and stable running |
+| Haiku 4.5 (mid) | €0.04 | 12 packages | Fuel-and-feed bill for keeping the donkey and stable running |
+| **Sonnet 4.6 (champion)** | **€0.16** | **13 packages** | Fuel-and-feed bill for keeping the donkey and stable running |
 
 The champion barely outperforms the cheap donkey! Why? Because the **road was broken** — full of potholes (cosine similarities of 0.04–0.37) that no donkey could navigate. Spending 5x more on a better donkey only delivered 3 extra packages.
 
@@ -36,7 +36,7 @@ Then you **paved the road** (min-max normalization):
 
 | Donkey | Road | Goods Delivered | 🫏 Donkey |
 |--------|------|----------------| --- |
-| **Sonnet 4.6** | **Paved** ✅ | **25 packages** | 🫏 On the route |
+| **Sonnet 4.6** | **Paved** ✅ | **25 packages** | Donkey-side view of Sonnet 4.6 — affects how the donkey loads, reads, or delivers the cargo |
 
 Same donkey, same mountain, same goods — but with a proper road, deliveries nearly **doubled** from 13 → 25.
 
@@ -61,9 +61,9 @@ LLM can't compensate for `ret ≈ 0.03`.
 
 | Embedding Model | Provider | Typical Cosine Similarity (Related Text) | 🫏 Donkey |
 |----------------|----------|----------------------------------------| --- |
-| text-embedding-3-small | Azure/OpenAI | 0.70 – 0.95 | The donkey 🐴 |
-| nomic-embed-text | Local/Ollama | 0.65 – 0.90 | The donkey 🐴 |
-| **Titan Embed Text v2** | **AWS/Bedrock** | **0.04 – 0.37** | The donkey 🐴 |
+| text-embedding-3-small | Azure/OpenAI | 0.70 – 0.95 | The Azure-hub GPS stamper — produces tightly clustered coordinates so similar cargo lands close in the warehouse |
+| nomic-embed-text | Local/Ollama | 0.65 – 0.90 | The local barn GPS stamper — coordinates are nearly as tight as Azure's, surprisingly good for free |
+| **Titan Embed Text v2** | **AWS/Bedrock** | **0.04 – 0.37** | **The AWS-depot GPS stamper — spreads coordinates so widely the warehouse robot struggles to spot which shelves are close** |
 
 Titan's cosine similarities are **3-10x lower** than OpenAI's for the same text pairs. This is a 
 characteristic of the model, not a bug — Titan embeddings are already L2-normalized (norm = 1.0), 
@@ -162,7 +162,7 @@ Most remaining failures fall into these categories:
 | **Low faithfulness** | lab-2c, lab-5b_q3/q5 | Model hallucinates or adds context not in chunks | backpack piece 📦 |
 | **Data mismatch** | lab-1c, lab-6a | Golden dataset expects "14 days" but document says "5-7 days" | Test delivery 🧪 |
 | **Reranker labs** | lab-9, lab-10 (some) | Reranker was disabled for this run | Quality sort 📊 |
-| **Bulk ops** | lab-14, lab-15, lab-16 | Multi-document operations with timing issues | 🫏 On the route |
+| **Bulk ops** | lab-14, lab-15, lab-16 | Multi-document operations with timing issues | Donkey-side view of Bulk ops — affects how the donkey loads, reads, or delivers the cargo |
 
 - 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
 
@@ -171,8 +171,8 @@ Most remaining failures fall into these categories:
 | File | Change | Impact | 🫏 Donkey |
 |------|--------|--------| --- |
 | `src/vectorstore/aws_dynamodb.py` | Min-max score normalization | ret: 0.03 → 0.33+ | AWS depot 🏭 |
-| `src/rag/reranker.py` | `safe_top_k = min(top_k, len(sources))` | Prevents reranker crash | backpack check 🫏 |
-| `src/llm/aws_bedrock.py` | Removed `topP` from inferenceConfig | Fixes Sonnet 4.6 error | The donkey 🐴 |
+| `src/rag/reranker.py` | `safe_top_k = min(top_k, len(sources))` | Prevents reranker crash | How many backpacks the donkey grabs from the warehouse for one delivery |
+| `src/llm/aws_bedrock.py` | Removed `topP` from inferenceConfig | Fixes Sonnet 4.6 error | The AWS-depot donkey kept tripping on an unsupported parameter — removed it so it runs cleanly |
 | `infra/aws/iam.tf` | Fixed IAM tag values (removed em-dashes) | Terraform apply succeeds | Stable blueprint 🏗️ |
 | `infra/aws/s3.tf` | Added account ID to bucket name | S3 global uniqueness | Stable blueprint 🏗️ |
 | `infra/aws/locals.tf` | Added `data.aws_caller_identity.current` | Supports account ID lookup | Stable blueprint 🏗️ |

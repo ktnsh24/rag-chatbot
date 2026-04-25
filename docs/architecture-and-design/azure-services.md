@@ -17,8 +17,8 @@
 
 | Service | Purpose in this project | Cost model | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Azure OpenAI** | LLM inference (GPT-4o) + embeddings | Pay per token | The donkey 🐴 |
-| **Blob Storage** | Store uploaded documents | Pay per GB stored | Parcel shelf 📦 |
+| **Azure OpenAI** | LLM inference (GPT-4o) + embeddings | Pay per token | Azure-hosted stable that rents the donkey by the hay bale — GPT-4o writes answers, embeddings turn text into GPS coordinates |
+| **Blob Storage** | Store uploaded documents | Pay per GB stored | Azure's document warehouse — where the donkey picks up source files before pre-sorting them into chunks |
 | **Cosmos DB** | Conversation history | Pay per RU (serverless) | Azure trip-log 📒 |
 | **AI Search** | Vector store for embeddings | Tier-based (Free available) | Azure hub ☁️ |
 | **Container Apps** | Host the FastAPI container | Pay per vCPU/memory-second | Stable stall 🐎 |
@@ -71,7 +71,7 @@ response = await self._client.chat.completions.create(
 
 | Model | Deployment name | Purpose | Input cost | Output cost | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
-| gpt-4o | `gpt-4o` | Answer generation | $0.0025/1K | $0.01/1K | The donkey 🐴 |
+| gpt-4o | `gpt-4o` | Answer generation | $0.0025/1K | $0.01/1K | The premium donkey on Azure — strong and accurate, the default carrier for answer generation |
 | text-embedding-3-small | `text-embedding-3-small` | Text to vectors | $0.00002/1K | N/A | GPS stamp 📍 |
 
 ### Setup steps
@@ -193,8 +193,8 @@ Store document chunk embeddings and perform vector similarity search.
 | Tier | Cost/month | Storage | Indexes | Best for | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
 | **Free** | $0 | 50 MB | 3 | **Development (use this!)** | Free hay 🌿 |
-| Basic | $75 | 2 GB | 15 | Small production | 🫏 On the route |
-| Standard S1 | $250 | 25 GB | 50 | Medium production | 🫏 On the route |
+| Basic | $75 | 2 GB | 15 | Small production | Fuel-and-feed bill for keeping the donkey and stable running |
+| Standard S1 | $250 | 25 GB | 50 | Medium production | Fuel-and-feed bill for keeping the donkey and stable running |
 
 ### Why Free tier for development?
 
@@ -238,9 +238,9 @@ Host the FastAPI application in production.
 
 | | Container Apps (our choice) | App Service | AKS (Kubernetes) | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| Scale to zero | **Yes** | No (min 1 instance) | No (min 1 node) | 🫏 On the route |
+| Scale to zero | **Yes** | No (min 1 instance) | No (min 1 node) | How the stable adds or removes donkeys when delivery volume changes |
 | Min cost | $0 (idle) | ~$13/month (B1) | ~$100/month | Feed bill 🌾 |
-| Complexity | Low | Low | High | 🫏 On the route |
+| Complexity | Low | Low | High | Donkey-side view of Complexity — affects how the donkey loads, reads, or delivers the cargo |
 | Container support | Docker | Docker or code | Docker | Stable stall 🐎 |
 
 ### Cost advantage

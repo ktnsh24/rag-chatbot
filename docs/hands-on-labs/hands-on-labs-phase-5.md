@@ -37,7 +37,7 @@ production** — because you can't fix what you can't see.
 | **pass rate** | Out of 100 deliveries today, how many were **satisfactory** (overall >= 0.70)? If 87 passed — 87% pass rate. If it was 92% yesterday and 75% today — something broke. | Percentage of evaluated queries that meet the quality threshold. The single most important production health metric. | `queries_with_overall_≥_0.70 / total_queries × 100`. E.g. 87 pass out of 100 → **87% pass rate**. Track daily. If it drops >5% day-over-day → investigate immediately. | Feed bill 🌾 |
 | **Prometheus counter** | A tally board on the warehouse wall: "Total deliveries: 142. Total errors: 3. Total hay consumed: 4,500 bales." Counters only go UP — you never un-deliver a package. Prometheus calculates the *rate* for you. | Monotonically increasing metrics: total requests, total errors, total tokens. Prometheus computes `rate()` from the delta. | `counter.inc()` on each event. Prometheus scrapes the value periodically. Rate = `delta(counter_value) / delta(time)`. E.g. counter goes from 100 to 142 in 60s → `rate = 42/60 = 0.7 req/s`. Use `rate()` in PromQL, never raw counter values. | Cargo unit ⚖️ |
 | **Prometheus gauge** | A thermometer on the warehouse wall: "Current delivery time (p95): 12 minutes. Current pass rate: 87%." Gauges go UP and DOWN — they show the current state, not cumulative history. | Point-in-time metrics: latency percentiles, current pass rate, current failure counts. Can increase or decrease. | `gauge.set(value)` on each measurement. E.g. after each evaluation batch: `pass_rate_gauge.set(0.87)`. For latency p95: sort all latencies, pick the value at the 95th percentile position. Gauges reflect NOW, counters reflect ALL TIME. | Stable address 🏷️ |
-| **golden dataset regression** | Your morning checklist of test deliveries. Yesterday all 5 passed. Today #3 failed. **Something changed overnight** — maybe a document was deleted, maybe the donkey's route changed. The checklist caught it before real customers noticed. | Running the curated evaluation suite after every change. If a previously-passing case now fails, you have a regression. | `regression_count = cases that passed before but fail now`. Run all N golden cases, compare results to last run. E.g. last run: 20/20 passed. This run: 18/20 passed, cases #3 and #7 failed → **2 regressions**. Investigate those specific cases to find what changed. | Report card 📝 |
+| **golden dataset regression** | Your morning checklist of test deliveries. Yesterday all 5 passed. Today #3 failed. **Something changed overnight** — maybe a document was deleted, maybe the donkey's route changed. The checklist caught it before real customers noticed. | Running the curated evaluation suite after every change. If a previously-passing case now fails, you have a regression. | `regression_count = cases that passed before but fail now`. Run all N golden cases, compare results to last run. E.g. last run: 20/20 passed. This run: 18/20 passed, cases #3 and #7 failed → **2 regressions**. Investigate those specific cases to find what changed. | The 25 standard test deliveries re-run after every change — any case that used to pass but now fails is a regression to investigate |
 
 **The Phase 5 insight:** The three pillars of AI observability map perfectly:
 
@@ -109,9 +109,9 @@ cat logs/queries/$(date +%Y-%m-%d).jsonl | python -m json.tool
 
 | Field | What it tells you | 🫏 Donkey |
 |---|---| --- |
-| `question` | What the user asked | 🫏 On the route |
+| `question` | What the user asked | Donkey-side view of question — affects how the donkey loads, reads, or delivers the cargo |
 | `chunks` | Which documents were retrieved + relevance scores | backpack piece 📦 |
-| `answer` | What the LLM responded | The donkey 🐴 |
+| `answer` | What the LLM responded | What the donkey wrote on the delivery note after reading the backpack |
 | `retrieval_score` | How relevant the retrieved chunks were (0–1) | backpack piece 📦 |
 | `faithfulness_score` | Did the answer stick to the chunks? (0–1) | backpack piece 📦 |
 | `answer_relevance_score` | Did the answer address the question? (0–1) | Right address 🎯 |
@@ -122,9 +122,9 @@ cat logs/queries/$(date +%Y-%m-%d).jsonl | python -m json.tool
 
 | Question | Expected failure_category | 🫏 Donkey |
 |---|---| --- |
-| "What is the refund policy?" | `none` (scores all high) | 🫏 On the route |
+| "What is the refund policy?" | `none` (scores all high) | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
 | "What is the capital of Mongolia?" | `bad_retrieval` or `off_topic` (no relevant chunks) | backpack piece 📦 |
-| "How long?" | `marginal` (ambiguous, low retrieval) | 🫏 On the route |
+| "How long?" | `marginal` (ambiguous, low retrieval) | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
 
 ### Experiment 14b — Query the failure API
 
@@ -265,8 +265,8 @@ failure_category_bad_retrieval 1
 |---|---|---|---| --- |
 | `chat_requests_total` | Counter | Total requests ever | Every chat request | Feed bill 🌾 |
 | `chat_errors_total` | Counter | Total errors ever | Every failed request | Feed bill 🌾 |
-| `chat_latency_p95_ms` | Gauge | Current 95th percentile latency | When slow requests happen | 🫏 On the route |
-| `evaluation_pass_rate` | Gauge | Current pass rate | Recalculated from query logs | Report card 📝 |
+| `chat_latency_p95_ms` | Gauge | Current 95th percentile latency | When slow requests happen | Tachograph reading — how long the donkey took on the round trip |
+| `evaluation_pass_rate` | Gauge | Current pass rate | Recalculated from query logs | Latest mark on the donkey's report card — recomputed from the trip log so you see today's standing, not all-time |
 | `failure_category_*` | Counter | Failures by type | Each categorised failure | Hoof check 🔧 |
 
 > ### 🔑 Key Learning
@@ -290,8 +290,8 @@ Based on the metrics available, design alerts for these scenarios:
 | Scenario | Which metric? | Threshold | Why? | 🫏 Donkey |
 |---|---|---|---| --- |
 | System down | `chat_errors_total / chat_requests_total` | > 50% for 5 min | More errors than successes | Feed bill 🌾 |
-| Getting slow | `chat_latency_p95_ms` | > 10,000ms for 5 min | Users waiting > 10s | 🫏 On the route |
-| Quality dropping | `evaluation_pass_rate` | < 0.6 for 1 hour | More than 40% of answers are bad | Report card 📝 |
+| Getting slow | `chat_latency_p95_ms` | > 10,000ms for 5 min | Users waiting > 10s | Tachograph reading — how long the donkey took on the round trip |
+| Quality dropping | `evaluation_pass_rate` | < 0.6 for 1 hour | More than 40% of answers are bad | Wake the on-call when the donkey's report card slips below 60% — most deliveries are coming back wrong |
 | Hallucinating | `failure_category_hallucination` | > 10 in 1 hour | Spike in fabricated answers | Memory drift ⚠️ |
 
 > **🌍 Real-World:** Google research shows 53% of mobile users abandon a page if it takes over 3 seconds to load. For AI chatbots, the tolerance is slightly higher (~5-10 seconds) because users expect "thinking time" — but beyond 10 seconds, abandonment spikes. Your Local environment averaging 21 seconds per query would lose most users in production. This is why latency is a Prometheus metric, not just a nice-to-have.
@@ -373,11 +373,11 @@ Look at the edge_case entries in the golden dataset:
 | Case ID | What it tests | Why it matters | 🫏 Donkey |
 |---|---|---| --- |
 | `no_context_available` | Question outside document scope | Should refuse, not hallucinate | Memory drift ⚠️ |
-| `ambiguous_question` | "How long?" with no context | Should ask for clarification or give both answers | 🫏 On the route |
+| `ambiguous_question` | "How long?" with no context | Should ask for clarification or give both answers | Donkey-side view of ambiguous_question — affects how the donkey loads, reads, or delivers the cargo |
 | `prompt_injection_attempt` | "Ignore instructions..." | Must NOT leak system prompt | Delivery note 📋 |
 | `completely_unrelated` | "Capital of Mongolia?" | Should refuse, not make up an answer | Stable door 🚪 |
-| `negation_trick` | "Is it true refunds are NOT available?" | Must understand negation correctly | 🫏 On the route |
-| `multi_topic_question` | "Tell me about refunds, shipping, and exchanges" | Must address all topics | 🫏 On the route |
+| `negation_trick` | "Is it true refunds are NOT available?" | Must understand negation correctly | Donkey-side view of negation_trick — affects how the donkey loads, reads, or delivers the cargo |
+| `multi_topic_question` | "Tell me about refunds, shipping, and exchanges" | Must address all topics | Donkey-side view of multi_topic_question — affects how the donkey loads, reads, or delivers the cargo |
 
 📝 **Key insight:** The `expected_not_in_answer` field is as important as `expected_keywords`. For the prompt injection case, we check that the answer does NOT contain "system prompt" or "instructions."
 
@@ -481,9 +481,9 @@ After Phase 5, you have all three pillars implemented:
 | 1 | Structured query logging (JSONL format) | Lab 14 | [ ] Yes | Gate guard 🔐 |
 | 2 | Failure triage categories | Lab 14 | [ ] Yes | Hoof check 🔧 |
 | 3 | Prometheus metric types (counter, gauge, histogram) | Lab 15 | [ ] Yes | Tachograph 📊 |
-| 4 | Alert design for AI systems | Lab 15 | [ ] Yes | 🫏 On the route |
+| 4 | Alert design for AI systems | Lab 15 | [ ] Yes | Dashboard the stable owner watches — flags slow or failing donkey trips |
 | 5 | Golden dataset regression testing | Lab 16 | [ ] Yes | Test delivery 🧪 |
-| 6 | Category-level quality analysis | Lab 16 | [ ] Yes | 🫏 On the route |
+| 6 | Category-level quality analysis | Lab 16 | [ ] Yes | Practice run — readers play stable hand and put the donkey through its paces |
 | 7 | Growing golden dataset from production failures | Lab 16 | [ ] Yes | Test delivery 🧪 |
 
 - 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.

@@ -83,7 +83,7 @@ Document uploaded
 
 | What | Where | Format | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| Original file | S3 / Blob Storage | Raw bytes (PDF, TXT) | Re-download, delete, audit trail | Parcel shelf 📦 |
+| Original file | S3 / Blob Storage | Raw bytes (PDF, TXT) | Re-download, delete, audit trail | The original parcel kept in the warehouse — needed to re-pack chunks if the donkey's bag size changes |
 | Chunks + vectors | OpenSearch / AI Search / ChromaDB | Text + vectors | Semantic search during chat | AWS search hub 🔍 |
 
 **Why not just keep one?** Because:
@@ -135,10 +135,10 @@ The `BaseDocumentStorage` abstract class defines four operations:
 
 | Method | What it does | DE equivalent | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `upload()` | Store file, return metadata | `s3.put_object()` or `INSERT INTO files` | Parcel shelf 📦 |
-| `download()` | Get file bytes by ID | `s3.get_object()` or `SELECT content FROM files` | Parcel shelf 📦 |
-| `delete()` | Remove file by ID | `s3.delete_object()` or `DELETE FROM files` | Parcel shelf 📦 |
-| `list_documents()` | List all stored files | `s3.list_objects_v2()` or `SELECT * FROM files` | Parcel shelf 📦 |
+| `upload()` | Store file, return metadata | `s3.put_object()` or `INSERT INTO files` | Donkey accepts a parcel from the customer and shelves it in the warehouse with a tracking ID |
+| `download()` | Get file bytes by ID | `s3.get_object()` or `SELECT content FROM files` | Donkey fetches a parcel back from the warehouse using its tracking ID |
+| `delete()` | Remove file by ID | `s3.delete_object()` or `DELETE FROM files` | Donkey throws out a parcel from the warehouse — used when a document is no longer needed |
+| `list_documents()` | List all stored files | `s3.list_objects_v2()` or `SELECT * FROM files` | Donkey reads the warehouse inventory list — every parcel currently on the shelves |
 
 **Key design decision:** The interface uses `document_id` (a UUID), not `filename`.
 This avoids conflicts when two users upload files with the same name.
@@ -249,15 +249,15 @@ workaround. For high-traffic apps this matters; for this project, the difference
 
 | Aspect | AWS S3 | Azure Blob Storage | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **SDK** | `boto3` (sync) | `azure-storage-blob` (async native) | backpack check 🫏 |
-| **Container concept** | Bucket | Storage Account → Container | backpack check 🫏 |
+| **SDK** | `boto3` (sync) | `azure-storage-blob` (async native) | Donkey can run other errands while waiting for the warehouse to respond |
+| **Container concept** | Bucket | Storage Account → Container | Cloud cupboard where raw mail is parked before the post office sorts it |
 | **Object path** | `s3://bucket/key` | `container/blob-name` | Stable stall 🐎 |
-| **Authentication** | IAM role / access key | Connection string / managed identity | 🫏 On the route |
-| **Upload** | `put_object()` | `upload_blob()` | Parcel shelf 📦 |
-| **Download** | `get_object()["Body"].read()` | `download_blob()` → `readall()` | Parcel shelf 📦 |
-| **Delete** | `delete_objects()` (batch) | Loop + `delete_blob()` (one by one) | Parcel shelf 📦 |
-| **List** | Paginator pattern | `async for` iterator | 🫏 On the route |
-| **Encryption** | AES256 / KMS (server-side) | Azure Storage encryption (default on) | backpack check 🫏 |
+| **Authentication** | IAM role / access key | Connection string / managed identity | Stable keys — only authorised callers may ask the donkey to deliver |
+| **Upload** | `put_object()` | `upload_blob()` | Same shelving action — different cloud's vocabulary for handing the parcel to the warehouse |
+| **Download** | `get_object()["Body"].read()` | `download_blob()` → `readall()` | Same pickup action — both clouds hand the parcel bytes back to the donkey |
+| **Delete** | `delete_objects()` (batch) | Loop + `delete_blob()` (one by one) | AWS lets the donkey discard many parcels in one trip; Azure makes the donkey go back for each one |
+| **List** | Paginator pattern | `async for` iterator | Donkey can run other errands while waiting for the warehouse to respond |
+| **Encryption** | AES256 / KMS (server-side) | Azure Storage encryption (default on) | Donkey-side view of Encryption — affects how the donkey loads, reads, or delivers the cargo |
 | **Cost (10 GB)** | ~$0.23/month | ~$0.20/month | Feed bill 🌾 |
 
 ### The code patterns side by side
@@ -377,9 +377,9 @@ vector store — the chunks + embeddings created during ingestion.
 | --- | --- | --- | --- |
 | `StoredDocument` model | Standard metadata DTO | Audit trail for data lineage | Manifest template 📋 |
 | `upload()` | S3 put_object, nothing new | Source-of-truth for re-ingestion if chunking strategy changes | backpack piece 📦 |
-| `list_documents()` | Paginated list, standard | Knowledge base inventory — what data has the LLM seen? | The donkey 🐴 |
-| `delete()` | Prefix delete, standard | Must delete from BOTH storage AND vector store, or orphan vectors remain | backpack check 🫏 |
-| Strategy pattern | Clean architecture | Essential for multi-cloud — can't hardcode providers in AI apps | 🫏 On the route |
+| `list_documents()` | Paginated list, standard | Knowledge base inventory — what data has the LLM seen? | Roll-call of every backpack the donkey is allowed to read from when answering |
+| `delete()` | Prefix delete, standard | Must delete from BOTH storage AND vector store, or orphan vectors remain | How the warehouse measures which backpacks are nearest to the customer's question |
+| Strategy pattern | Clean architecture | Essential for multi-cloud — can't hardcode providers in AI apps | Stable design — donkey doesn't care which warehouse brand it grabs from |
 
 - 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 

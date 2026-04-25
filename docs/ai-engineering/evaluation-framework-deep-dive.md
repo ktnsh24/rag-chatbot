@@ -36,9 +36,9 @@ This file implements a rule-based evaluation framework that scores every RAG res
 |---|---| --- |
 | Retrieval quality scoring | Data freshness and completeness checks | backpack fetch 🎒 |
 | Faithfulness scoring (anti-hallucination) | Referential integrity validation | Memory drift ⚠️ |
-| Answer relevance scoring | Output schema validation | Report card 📝 |
-| Weighted composite scores | Data quality dashboards (Great Expectations) | 🫏 On the route |
-| Rule-based evaluation (no LLM needed) | SQL-based data quality checks (no ML needed) | The donkey 🐴 |
+| Answer relevance scoring | Output schema validation | A grade on whether the donkey actually answered the question asked, not a different one |
+| Weighted composite scores | Data quality dashboards (Great Expectations) | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
+| Rule-based evaluation (no LLM needed) | SQL-based data quality checks (no ML needed) | Grading the donkey with a stopwatch and checklist instead of hiring a second donkey to judge |
 
 - 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
@@ -483,8 +483,8 @@ The evaluation framework is exposed through two API endpoints:
 
 | Endpoint | Purpose | When to use | 🫏 Donkey |
 |---|---|---| --- |
-| `POST /api/evaluate` | Evaluate a single question | Testing specific questions, debugging low scores | Report card 📝 |
-| `POST /api/evaluate/suite` | Run the full golden dataset | After any setting change, before deploying | Report card 📝 |
+| `POST /api/evaluate` | Evaluate a single question | Testing specific questions, debugging low scores | Grade one delivery on the spot — useful for diagnosing why a single trip scored badly |
+| `POST /api/evaluate/suite` | Run the full golden dataset | After any setting change, before deploying | Run all 25 standard test deliveries to get a full report card before letting changes ship |
 
 **Single question** — in **Swagger UI** (`http://localhost:8000/docs`) → `POST /api/evaluate` → **"Try it out"**:
 
@@ -512,11 +512,11 @@ Or use Swagger UI at `http://localhost:8000/docs` → find the **Evaluation** se
 
 | Component | Uses cloud? | Why | 🫏 Donkey |
 |---|---|---| --- |
-| `_evaluate_retrieval()` | ❌ | Just math on similarity scores | Report card 📝 |
+| `_evaluate_retrieval()` | ❌ | Just math on similarity scores | The retrieval column on the report card — pure arithmetic on GPS-distance scores, no extra donkey needed |
 | `_evaluate_faithfulness()` | ❌ | Keyword overlap — pure string comparison | backpack piece 📦 |
-| `_evaluate_answer_relevance()` | ❌ | Keyword presence check | Report card 📝 |
-| `_split_sentences()` | ❌ | Regex splitting | 🫏 On the route |
-| `_extract_keywords()` | ❌ | Stop word removal | 🫏 On the route |
+| `_evaluate_answer_relevance()` | ❌ | Keyword presence check | The relevance column on the report card — checks the answer's keywords match the customer's question |
+| `_split_sentences()` | ❌ | Regex splitting | Donkey-side view of split_sentences() — affects how the donkey loads, reads, or delivers the cargo |
+| `_extract_keywords()` | ❌ | Stop word removal | Donkey-side view of extract_keywords() — affects how the donkey loads, reads, or delivers the cargo |
 
 **This means:**
 - Evaluation costs **$0** on all providers
@@ -536,9 +536,9 @@ Or use Swagger UI at `http://localhost:8000/docs` → find the **Evaluation** se
 |---|---|---| --- |
 | **Retrieval < 0.5** | Chunks are irrelevant | Check chunk content — is the right document ingested? | backpack piece 📦 |
 | **Retrieval < 0.5** | Embedding quality poor | Try different embedding model (local: `nomic-embed-text` → `all-minilm`) | GPS stamp 📍 |
-| **Faithfulness < 0.8** | LLM is hallucinating | Tighten prompt rules, lower temperature | The donkey 🐴 |
-| **Faithfulness < 0.8** | Keyword extraction too strict | Check if answer uses synonyms not in context | backpack match 🫏 |
-| **Relevance < 0.6** | LLM answered different question | Check if question is ambiguous | The donkey 🐴 |
+| **Faithfulness < 0.8** | LLM is hallucinating | Tighten prompt rules, lower temperature | The donkey is making things up — tighten the delivery note and make its writing more predictable |
+| **Faithfulness < 0.8** | Keyword extraction too strict | Check if answer uses synonyms not in context | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
+| **Relevance < 0.6** | LLM answered different question | Check if question is ambiguous | The donkey answered a different question than the one on the order — check if the customer was vague |
 | **Relevance < 0.6** | Answer is a refusal | Check if context was empty (correct behaviour) | Right address 🎯 |
 | **Overall < 0.7** | Multiple issues | Debug each score individually | Hoof check 🔧 |
 

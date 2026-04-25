@@ -64,9 +64,9 @@ You may have used OpenSearch for log aggregation in your DE work. Here both plat
 | **Dimensions** | 1024 (matches Titan) | Any (auto, stored as JSON) | 1536 (matches text-embedding-3-small) | GPS stamp 📍 |
 | **Algorithm** | HNSW via `nmslib` engine | **Brute-force cosine** (in Python) | HNSW via `HnswAlgorithmConfiguration` | Compass bearing 🧭 |
 | **Distance metric** | `cosinesimil` | Cosine (numpy) | Cosine (default) | Tachograph 📊 |
-| **Store operation** | `index()` one at a time | `batch_writer()` | `upload_documents()` in batches of 1000 | 🫏 On the route |
+| **Store operation** | `index()` one at a time | `batch_writer()` | `upload_documents()` in batches of 1000 | Donkey-side view of Store operation — affects how the donkey loads, reads, or delivers the cargo |
 | **Search operation** | `knn` query in JSON body | Query all + numpy cosine | `VectorizedQuery` object | GPS warehouse 🗺️ |
-| **Delete operation** | `delete_by_query()` (native) | GSI query + `batch_writer()` | Search + `delete_documents()` (two-step) | 🫏 On the route |
+| **Delete operation** | `delete_by_query()` (native) | GSI query + `batch_writer()` | Search + `delete_documents()` (two-step) | The customer's question that goes on the delivery note |
 | **Minimum cost** | **~$350/month** | **~$0/month** (free tier) | **~$75/month** (Basic), Free tier available | Feed bill 🌾 |
 | **Best for** | Production (>10K chunks) | Portfolio / dev (<10K chunks) | Production + dev | backpack piece 📦 |
 
@@ -151,9 +151,9 @@ Both providers implement HNSW but configure it differently:
 
 | Config | AWS OpenSearch | Azure AI Search | 🫏 Donkey |
 | --- | --- | --- | --- |
-| Algorithm | `"name": "hnsw"` in JSON | `HnswAlgorithmConfiguration()` object | 🫏 On the route |
+| Algorithm | `"name": "hnsw"` in JSON | `HnswAlgorithmConfiguration()` object | How the warehouse measures which backpacks are nearest to the customer's question |
 | Engine | `nmslib` | Azure-managed (not configurable) | Azure hub ☁️ |
-| Search accuracy | `ef_search: 512` | Default (auto-tuned) | 🫏 On the route |
+| Search accuracy | `ef_search: 512` | Default (auto-tuned) | Stable broke down — donkey couldn't complete the trip, customer sees an error |
 | Distance metric | `"cosinesimil"` | Cosine (default, not specified) | Tachograph 📊 |
 
 - 🫏 **Donkey:** The compass bearing between two GPS coordinates — donkeys pointed the same direction are talking about the same topic.
@@ -202,9 +202,9 @@ def _ensure_index(self):
 | --- | --- | --- | --- | --- |
 | `"knn": True` | Enable | Turns on vector search for this index | Like enabling full-text search | GPS warehouse 🗺️ |
 | `"dimension": 1024` | 1024 | The vector size — MUST match Titan | Like column length (`VARCHAR(1024)`) | GPS warehouse 🗺️ |
-| `"hnsw"` | Algorithm | The search algorithm | Like B-tree for regular indexes | 🫏 On the route |
+| `"hnsw"` | Algorithm | The search algorithm | Like B-tree for regular indexes | How the warehouse measures which backpacks are nearest to the customer's question |
 | `"cosinesimil"` | Distance | Measures angle between vectors | Like matching function in text search | GPS warehouse 🗺️ |
-| `"ef_search": 512` | Accuracy | Nodes to check during search | Like scan depth in a tree index | 🫏 On the route |
+| `"ef_search": 512` | Accuracy | Nodes to check during search | Like scan depth in a tree index | Stable broke down — donkey couldn't complete the trip, customer sees an error |
 
 - 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
 
@@ -338,9 +338,9 @@ def __init__(self, endpoint: str, index_name: str, region: str):
 | Aspect | Value | 🫏 Donkey |
 | --- | --- | --- |
 | Auth | AWS SigV4 via IAM roles (`AWSV4SignerAuth`) | AWS depot 🏭 |
-| Service code | `"aoss"` (not `"es"`) | 🫏 On the route |
+| Service code | `"aoss"` (not `"es"`) | Donkey-side view of Service code — affects how the donkey loads, reads, or delivers the cargo |
 | Scaling | Auto-scales with OCUs (OpenSearch Compute Units) | AWS search hub 🔍 |
-| Minimum OCUs | 4 (2 indexing + 2 search) | 🫏 On the route |
+| Minimum OCUs | 4 (2 indexing + 2 search) | Donkey-side view of Minimum OCUs — affects how the donkey loads, reads, or delivers the cargo |
 | Minimum cost | **~$350/month** ($0.24/hr × 4 OCUs × 730 hrs) | Feed bill 🌾 |
 
 - 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
@@ -402,10 +402,10 @@ return results[:top_k]
 
 | Chunks in collection | Search latency | Acceptable? | 🫏 Donkey |
 | --- | --- | --- | --- |
-| 100 | ~10ms | ✅ Instant | 🫏 On the route |
-| 1,000 | ~50ms | ✅ Fast | 🫏 On the route |
-| 5,000 | ~200ms | ✅ Acceptable | 🫏 On the route |
-| 10,000 | ~500ms | ⚠️ Noticeable | 🫏 On the route |
+| 100 | ~10ms | ✅ Instant | Donkey-side view of 100 — affects how the donkey loads, reads, or delivers the cargo |
+| 1,000 | ~50ms | ✅ Fast | Donkey-side view of 1,000 — affects how the donkey loads, reads, or delivers the cargo |
+| 5,000 | ~200ms | ✅ Acceptable | Donkey-side view of 5,000 — affects how the donkey loads, reads, or delivers the cargo |
+| 10,000 | ~500ms | ⚠️ Noticeable | Stable broke down — donkey couldn't complete the trip, customer sees an error |
 | 50,000+ | ~2–5s | ❌ Use OpenSearch instead | AWS search hub 🔍 |
 
 ### How to enable it
@@ -468,12 +468,12 @@ def _ensure_index(self):
 
 | Aspect | AWS OpenSearch | Azure AI Search | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Style** | JSON mappings (dict) | Python objects (`SearchField`, `SearchIndex`) | 🫏 On the route |
+| **Style** | JSON mappings (dict) | Python objects (`SearchField`, `SearchIndex`) | Donkey-side view of Style — affects how the donkey loads, reads, or delivers the cargo |
 | **Vector field** | `"type": "knn_vector"` | `SearchFieldDataType.Collection(Edm.Single)` | GPS warehouse 🗺️ |
 | **Dimensions** | `"dimension": 1024` | `vector_search_dimensions=1536` | GPS warehouse 🗺️ |
 | **Algorithm config** | Inline in field mapping | Separate `VectorSearch` + `VectorSearchProfile` | GPS warehouse 🗺️ |
-| **Key field** | Auto-generated `_id` | Explicit `key=True` field | 🫏 On the route |
-| **Create method** | `indices.create(name, body)` | `create_or_update_index(index_obj)` | 🫏 On the route |
+| **Key field** | Auto-generated `_id` | Explicit `key=True` field | Donkey-side view of Key field — affects how the donkey loads, reads, or delivers the cargo |
+| **Create method** | `indices.create(name, body)` | `create_or_update_index(index_obj)` | The actual cargo text inside the backpack the donkey is carrying |
 
 **DE parallel:** AWS OpenSearch is like defining a DynamoDB table with raw CloudFormation JSON. Azure AI Search is like using Terraform resource objects — more structured, more typed, but conceptually the same thing: "create an index with these fields and this algorithm."
 
@@ -522,10 +522,10 @@ async def store_vectors(self, document_id, document_name, texts, embeddings, met
 
 | Aspect | AWS OpenSearch | Azure AI Search | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Approach** | Index one at a time in a loop | Build a list, then upload in batches | 🫏 On the route |
+| **Approach** | Index one at a time in a loop | Build a list, then upload in batches | Donkey-side view of Approach — affects how the donkey loads, reads, or delivers the cargo |
 | **API call** | `client.index()` per document | `upload_documents(batch)` per 1000 docs | Stable door 🚪 |
 | **23 chunks** | 23 API calls + 1 refresh | 1 API call (all 23 in one batch) | backpack piece 📦 |
-| **Refresh** | Manual `indices.refresh()` needed | Automatic (no refresh call) | 🫏 On the route |
+| **Refresh** | Manual `indices.refresh()` needed | Automatic (no refresh call) | How quickly newly-sorted mail shows up on the warehouse shelves |
 
 **DE parallel:** AWS OpenSearch's `index()` in a loop is like DynamoDB's `put_item()` in a loop. Azure's `upload_documents(batch)` is like DynamoDB's `batch_write_item()` but with a 1000-item limit instead of 25.
 
@@ -594,9 +594,9 @@ for hit in response["hits"]["hits"]:            for result in results:
 | Aspect | AWS OpenSearch | Azure AI Search | 🫏 Donkey |
 | --- | --- | --- | --- |
 | **Query style** | JSON body dict | Python objects (`VectorizedQuery`) | GPS warehouse 🗺️ |
-| **Text search** | Separate query type (`match`) | `search_text=None` disables text search | 🫏 On the route |
-| **Score field** | `hit["_score"]` | `result["@search.score"]` | 🫏 On the route |
-| **Response parsing** | `response["hits"]["hits"]` → `["_source"]` | Direct field access on result object | 🫏 On the route |
+| **Text search** | Separate query type (`match`) | `search_text=None` disables text search | The customer's question that goes on the delivery note |
+| **Score field** | `hit["_score"]` | `result["@search.score"]` | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
+| **Response parsing** | `response["hits"]["hits"]` → `["_source"]` | Direct field access on result object | Label on the original mail item the backpack was sliced from |
 
 **Azure is more Pythonic** — typed objects instead of nested dicts. AWS is more "raw JSON" — same style as regular OpenSearch queries.
 
@@ -632,9 +632,9 @@ async def delete_document(self, document_id: str) -> int:
 
 | | AWS OpenSearch | Azure AI Search | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Method** | `delete_by_query(filter)` — one call | Search → collect IDs → `delete_documents(ids)` — two calls | 🫏 On the route |
+| **Method** | `delete_by_query(filter)` — one call | Search → collect IDs → `delete_documents(ids)` — two calls | Donkey-side view of Method — affects how the donkey loads, reads, or delivers the cargo |
 | **Why?** | OpenSearch has native `delete_by_query` | Azure AI Search requires explicit document IDs for deletion | AWS search hub 🔍 |
-| **DE parallel** | `DELETE FROM table WHERE doc_id = 'x'` | `SELECT id FROM table WHERE doc_id = 'x'` then `DELETE FROM table WHERE id IN (...)` | 🫏 On the route |
+| **DE parallel** | `DELETE FROM table WHERE doc_id = 'x'` | `SELECT id FROM table WHERE doc_id = 'x'` then `DELETE FROM table WHERE id IN (...)` | Donkey-side view of DE parallel — affects how the donkey loads, reads, or delivers the cargo |
 
 This is a design limitation of Azure AI Search — there's no `delete_by_filter` API. You must find the IDs first, then delete them explicitly.
 
@@ -685,8 +685,8 @@ auth = AWSV4SignerAuth(credentials, region, "aoss")
 | Tier | Cost | Storage | Replicas | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
 | **Free** | $0/month | 50 MB, 3 indexes | None | Free hay 🌿 |
-| **Basic** | ~$75/month | 2 GB | Up to 3 | 🫏 On the route |
-| **Standard S1** | ~$250/month | 25 GB | Up to 12 | 🫏 On the route |
+| **Basic** | ~$75/month | 2 GB | Up to 3 | Fuel-and-feed bill for keeping the donkey and stable running |
+| **Standard S1** | ~$250/month | 25 GB | Up to 12 | Fuel-and-feed bill for keeping the donkey and stable running |
 
 - 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
 
@@ -698,7 +698,7 @@ auth = AWSV4SignerAuth(credentials, region, "aoss")
 | --- | --- | --- | --- | --- |
 | **Minimum cost** | **~$350/month** | **~$75/month** | **$0/month** | Feed bill 🌾 |
 | **Free tier** | ❌ No | ✅ Yes (50 MB, 3 indexes) | ✅ Always free | Free hay 🌿 |
-| **Scaling** | Auto (OCUs) | Manual (tier upgrade) | Single machine only | 🫏 On the route |
+| **Scaling** | Auto (OCUs) | Manual (tier upgrade) | Single machine only | How the stable adds or removes donkeys when delivery volume changes |
 | **For learning/dev** | Expensive — paying for idle | Cheap — free tier works | **Best — zero cost, zero setup** | Feed bill 🌾 |
 | **For production** | Good if already on AWS | Good if already on Azure | Not suitable (no HA, no scaling) | AWS depot 🏭 |
 
@@ -759,7 +759,7 @@ class ChromaDBVectorStore(BaseVectorStore):
 | --- | --- | --- | --- | --- |
 | **Client setup** | `OpenSearch(hosts, auth, ssl)` | `SearchClient(endpoint, credential)` | `chromadb.PersistentClient(path, settings)` | AWS search hub 🔍 |
 | **Auth** | SigV4 (IAM roles) | API key | **None** | Stable door 🚪 |
-| **Index creation** | JSON mappings, explicit dimensions | Python objects, explicit dimensions | **Auto-detect dimensions** | 🫏 On the route |
+| **Index creation** | JSON mappings, explicit dimensions | Python objects, explicit dimensions | **Auto-detect dimensions** | Length of the donkey's GPS coordinate — more digits = finer location, more storage |
 | **Algorithm** | HNSW (nmslib engine) | HNSW (Azure-managed) | HNSW (built-in) | Azure hub ☁️ |
 | **Distance** | `cosinesimil` | Cosine (default) | `cosine` (configured via metadata) | Compass bearing 🧭 |
 | **Persistence** | Always (cloud) | Always (cloud) | Optional (in-memory or SQLite) | Trip log 📒 |
@@ -795,9 +795,9 @@ self._collection.upsert(
 
 | Aspect | AWS OpenSearch | Azure AI Search | **Local ChromaDB** | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| **Method** | `client.index()` per doc | `upload_documents(batch)` | `collection.upsert()` | 🫏 On the route |
+| **Method** | `client.index()` per doc | `upload_documents(batch)` | `collection.upsert()` | Donkey-side view of Method — affects how the donkey loads, reads, or delivers the cargo |
 | **23 chunks** | 23 API calls + refresh | 1 API call (batch 1000) | **1 Python call** | backpack piece 📦 |
-| **Upsert** | Manual (index with same ID) | Manual (upload overwrites) | **Native** — `upsert()` | 🫏 On the route |
+| **Upsert** | Manual (index with same ID) | Manual (upload overwrites) | **Native** — `upsert()` | Donkey-side view of Upsert — affects how the donkey loads, reads, or delivers the cargo |
 | **Refresh** | Manual `indices.refresh()` | Automatic | **Instant** (in-memory) | Trip log 📒 |
 | **Network** | 23 HTTP requests | 1 HTTP request | **0 HTTP requests** | Stable door 🚪 |
 
@@ -918,7 +918,7 @@ QUERY:
 | "What's the difference between `knn` query and `match` query in OpenSearch?" | `match` searches by keywords (text). `knn` searches by vector similarity (meaning). | Semantic vs keyword search | AWS search hub 🔍 |
 | "Why does Azure need two steps to delete but AWS only needs one?" | Azure AI Search has no `delete_by_filter`. You must find IDs first, then delete them explicitly. OpenSearch has native `delete_by_query`. | API design differences | AWS search hub 🔍 |
 | "Why does Azure use `search_text=None` in vector search?" | The `search()` method supports both text and vector search. `search_text=None` disables text search, so only the vector query runs. | Hybrid search capability | GPS warehouse 🗺️ |
-| "Could you use Azure AI Search with AWS Bedrock embeddings (Titan, 1024-dim)?" | Technically yes — configure the index for 1024 dimensions. But you'd need cross-cloud networking and auth. Not practical. | Provider coupling | The donkey 🐴 |
+| "Could you use Azure AI Search with AWS Bedrock embeddings (Titan, 1024-dim)?" | Technically yes — configure the index for 1024 dimensions. But you'd need cross-cloud networking and auth. Not practical. | Provider coupling | The donkey could in theory pick backpacks from Azure's hub while writing on AWS, but cross-cloud plumbing makes it impractical |
 | "Why is OpenSearch Serverless so much more expensive than Azure AI Search?" | Minimum 4 OCUs (2 indexing + 2 search) at $0.24/hr each. Azure Basic is a fixed $75/month. Different pricing models. | Cost architecture | AWS search hub 🔍 |
 | "Could you replace either with PostgreSQL + pgvector?" | Yes — pgvector adds vector search to PostgreSQL. Same `BaseVectorStore` interface, different implementation. | Strategy pattern | GPS warehouse 🗺️ |
 | "What happens to ChromaDB data when you restart the app?" | In-memory mode: lost. Persistent mode (`CHROMA_PERSIST_DIRECTORY`): saved to SQLite on disk. | Persistence | Local barn 🏚️ |

@@ -100,13 +100,13 @@ Only `question` is required. `expected_answer` and `top_k` are optional.
 
 | Field | Type | What it tells you | 🫏 Donkey |
 |---|---|---| --- |
-| `question` | string | The question you asked | 🫏 On the route |
-| `answer` | string | The LLM's generated answer | The donkey 🐴 |
+| `question` | string | The question you asked | Donkey-side view of question — affects how the donkey loads, reads, or delivers the cargo |
+| `answer` | string | The LLM's generated answer | What the donkey wrote on the delivery note after reading the backpack |
 | `scores.retrieval` | float | Did vector search find relevant chunks? (0.0–1.0) | backpack piece 📦 |
-| `scores.faithfulness` | float | Did the LLM stick to context? (0.0–1.0) | The donkey 🐴 |
-| `scores.answer_relevance` | float | Did the LLM answer the question? (0.0–1.0) | The donkey 🐴 |
-| `scores.overall` | float | Weighted average (ret 30% + faith 40% + rel 30%) | backpack check 🫏 |
-| `scores.passed` | bool | Overall ≥ 0.7 | 🫏 On the route |
+| `scores.faithfulness` | float | Did the LLM stick to context? (0.0–1.0) | Did the donkey use only what was in the backpack, or did it invent things along the way? |
+| `scores.answer_relevance` | float | Did the LLM answer the question? (0.0–1.0) | Did the donkey actually deliver to the address on the question, or drop the parcel somewhere nearby? |
+| `scores.overall` | float | Weighted average (ret 30% + faith 40% + rel 30%) | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
+| `scores.passed` | bool | Overall ≥ 0.7 | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
 | `scores.has_hallucination` | bool | True = answer has claims not in context | Memory drift ⚠️ |
 | `evaluation_notes` | list | Warnings (e.g. "⚠️ RETRIEVAL: Chunks have low relevance") | backpack piece 📦 |
 | `sources_used` | int | How many chunks were retrieved | backpack piece 📦 |
@@ -147,11 +147,11 @@ Aggregate: total, passed, failed, pass_rate, average_score
 | Field | Type | What it tells you | 🫏 Donkey |
 |---|---|---| --- |
 | `total_cases` | int | How many cases were run | Feed bill 🌾 |
-| `passed` | int | Cases with overall ≥ 0.7 | 🫏 On the route |
+| `passed` | int | Cases with overall ≥ 0.7 | Donkey's report card — share of test deliveries that scored above the bar |
 | `failed` | int | Cases with overall < 0.7 | Hoof check 🔧 |
-| `pass_rate` | float | Percentage passed (e.g. 80.0) | 🫏 On the route |
+| `pass_rate` | float | Percentage passed (e.g. 80.0) | Donkey's report card — share of test deliveries that scored above the bar |
 | `average_overall_score` | float | Average score across all cases | Stable address 🏷️ |
-| `cases` | list | Per-case results (same scores as single evaluate) | Report card 📝 |
+| `cases` | list | Per-case results (same scores as single evaluate) | One row of the report card per test delivery — same score breakdown you'd get from evaluating a single question |
 
 - 🫏 **Donkey:** The 25 standard test deliveries the donkey must pass every release — a fixed benchmark that never changes so you can compare runs fairly.
 
@@ -161,10 +161,10 @@ Aggregate: total, passed, failed, pass_rate, average_score
 
 | Score | Excellent | Good | Needs work | Broken | 🫏 Donkey |
 |---|---|---|---|---| --- |
-| **Retrieval** | ≥ 0.85 | ≥ 0.70 | ≥ 0.50 | < 0.50 | 🫏 On the route |
-| **Faithfulness** | ≥ 0.95 | ≥ 0.80 | ≥ 0.60 | < 0.60 | backpack match 🫏 |
+| **Retrieval** | ≥ 0.85 | ≥ 0.70 | ≥ 0.50 | < 0.50 | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
+| **Faithfulness** | ≥ 0.95 | ≥ 0.80 | ≥ 0.60 | < 0.60 | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
 | **Answer Relevance** | ≥ 0.80 | ≥ 0.60 | ≥ 0.40 | < 0.40 | Right address 🎯 |
-| **Overall** | ≥ 0.85 | ≥ 0.70 | ≥ 0.50 | < 0.50 | 🫏 On the route |
+| **Overall** | ≥ 0.85 | ≥ 0.70 | ≥ 0.50 | < 0.50 | Donkey-side view of Overall — affects how the donkey loads, reads, or delivers the cargo |
 
 **If a score is low, here's what to fix:**
 

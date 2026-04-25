@@ -31,7 +31,7 @@ This is the **most important file in the entire application**. Every other file 
 
 | What you'll learn | DE parallel | 🫏 Donkey |
 |---|---| --- |
-| Factory pattern for multi-provider setup | Database connection factory (`get_engine('postgres')` vs `get_engine('mysql')`) | Parcel shelf 📦 |
+| Factory pattern for multi-provider setup | Database connection factory (`get_engine('postgres')` vs `get_engine('mysql')`) | The stable foreman picks the right donkey for the cloud (AWS Bedrock vs Azure OpenAI vs local Ollama) at startup |
 | Ingestion pipeline orchestration | ETL pipeline — extract, transform, load | Pre-sort 📮 |
 | Query pipeline orchestration | Read-path pipeline — query, join, format, return | Robot hand 🤖 |
 | Cost estimation per provider | Cloud cost monitoring per service | Tachograph 📊 |
@@ -204,8 +204,8 @@ def _create_local_backends(settings: Settings) -> tuple[BaseLLM, BaseVectorStore
 |---|---|---|---|---| --- |
 | **Env var** | `CLOUD_PROVIDER=aws` | `CLOUD_PROVIDER=aws` | `CLOUD_PROVIDER=azure` | `CLOUD_PROVIDER=local` | AWS depot 🏭 |
 | **Extra env** | — | `VECTOR_STORE_TYPE=dynamodb` | — | — | AWS depot 🏭 |
-| **LLM class** | `BedrockLLM` | `BedrockLLM` | `AzureOpenAILLM` | `OllamaLLM` | The donkey 🐴 |
-| **LLM model** | Claude 3.5 Sonnet | Claude 3.5 Sonnet | GPT-4o | llama3.2 | The donkey 🐴 |
+| **LLM class** | `BedrockLLM` | `BedrockLLM` | `AzureOpenAILLM` | `OllamaLLM` | Which donkey breed shows up at the stable's front door to do the writing |
+| **LLM model** | Claude 3.5 Sonnet | Claude 3.5 Sonnet | GPT-4o | llama3.2 | The specific donkey assigned — older, faster, or smarter — that actually writes the answer |
 | **Vector store** | `OpenSearchVectorStore` | `DynamoDBVectorStore` | `AzureAISearchVectorStore` | `ChromaDBVectorStore` | AWS search hub 🔍 |
 | **Vector cost** | ~$350/month | **~$0/month** | $0–75/month | $0 | Feed bill 🌾 |
 | **Embedding source** | Amazon Titan | Amazon Titan | Azure text-embedding-3 | nomic-embed-text | GPS stamp 📍 |
@@ -263,7 +263,7 @@ CSV file → [Extract] → raw rows → [Transform] → cleaned rows → [Load] 
 
 | Ingestion step | DE parallel | What it does | 🫏 Donkey |
 |---|---|---| --- |
-| `read_document()` | `pandas.read_csv()` | Extracts raw text from PDF/TXT | 🫏 On the route |
+| `read_document()` | `pandas.read_csv()` | Extracts raw text from PDF/TXT | Donkey-side view of read_document() — affects how the donkey loads, reads, or delivers the cargo |
 | `chunk_document()` | Data partitioning / windowing | Splits text into 500-char windows with 50-char overlap | backpack piece 📦 |
 | `get_embeddings_batch()` | `df.apply(transform_fn)` | Converts each chunk to a 1536-dim vector | backpack piece 📦 |
 | `store_vectors()` | `df.to_sql(warehouse)` | Indexes vectors for similarity search | GPS warehouse 🗺️ |
@@ -347,10 +347,10 @@ async def query(
 
 | Query step | DE parallel | What it does | 🫏 Donkey |
 |---|---|---| --- |
-| Embed question | Build query parameters | Convert question to searchable format | 🫏 On the route |
+| Embed question | Build query parameters | Convert question to searchable format | Stable inspector — checks the code is tidy before letting the donkey out |
 | Vector search | `SELECT * WHERE similarity > threshold ORDER BY score LIMIT 5` | Find relevant data | GPS warehouse 🗺️ |
-| Build context | JOIN results into a single payload | Combine search results | 🫏 On the route |
-| LLM generate | Apply business logic / stored procedure | Transform data into answer | The donkey 🐴 |
+| Build context | JOIN results into a single payload | Combine search results | Closest SQL/DE concept — for engineers who think in tables not GPS coordinates |
+| LLM generate | Apply business logic / stored procedure | Transform data into answer | The donkey reads the delivery note plus the backpack and writes the final reply |
 | Build response | Format as API response | Package result for caller | Stable door 🚪 |
 
 - 🫏 **Donkey:** The warehouse robot dispatched to find the right backpack shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
@@ -379,9 +379,9 @@ def _estimate_cost(self, input_tokens: int, output_tokens: int) -> float:
 
 | Provider | Input | Output | Typical query cost (~845 input, ~200 output) | 🫏 Donkey |
 |---|---|---|---| --- |
-| AWS (Claude 3.5 Sonnet) | $0.003 | $0.015 | **$0.0055** | The donkey 🐴 |
-| Azure (GPT-4o) | $0.0025 | $0.010 | **$0.0041** | The donkey 🐴 |
-| Local (Ollama) | $0.000 | $0.000 | **$0.0000** | The donkey 🐴 |
+| AWS (Claude 3.5 Sonnet) | $0.003 | $0.015 | **$0.0055** | The premium AWS donkey — eats the most hay per delivery but writes the sharpest answers |
+| Azure (GPT-4o) | $0.0025 | $0.010 | **$0.0041** | The Azure-hub donkey — slightly cheaper hay rate per delivery than the AWS one |
+| Local (Ollama) | $0.000 | $0.000 | **$0.0000** | The local barn donkey — eats no metered hay because it runs on your own laptop |
 
 **Monthly cost projection at 1000 queries/day:**
 
@@ -483,10 +483,10 @@ CHROMA_PERSIST_DIRECTORY=./data/chromadb
 | Problem | Symptom | Cause | Fix | 🫏 Donkey |
 |---|---|---|---| --- |
 | `ValueError: Unsupported cloud provider` | App crashes on startup | `CLOUD_PROVIDER` not set or misspelled | Set `CLOUD_PROVIDER=local` in `.env` | Hoof check 🔧 |
-| `ConnectionRefusedError` (local) | Ingestion fails | Ollama not running | `ollama serve` in a separate terminal | The donkey 🐴 |
+| `ConnectionRefusedError` (local) | Ingestion fails | Ollama not running | `ollama serve` in a separate terminal | The local barn donkey isn't awake yet — boot it before asking it to deliver |
 | Empty search results | "I don't have enough information" | Documents not ingested yet | Upload documents first via `POST /documents` | Pre-sort 📮 |
-| High latency (>5s) | Slow responses | LLM is slow (especially local) | Use a smaller model or increase hardware | The donkey 🐴 |
-| Token limit exceeded | API error from LLM | Too many chunks in context (`top_k` too high) | Reduce `top_k` from 5 to 3 | The donkey 🐴 |
+| High latency (>5s) | Slow responses | LLM is slow (especially local) | Use a smaller model or increase hardware | The donkey is plodding — swap in a lighter breed or feed it stronger hardware |
+| Token limit exceeded | API error from LLM | Too many chunks in context (`top_k` too high) | Reduce `top_k` from 5 to 3 | Backpack overstuffed with hay — the donkey can't carry it; pack fewer chunks |
 | Zero cost in metrics | Metrics show $0.000 | Using local provider | Expected — local is free | Feed bill 🌾 |
 | Stale embeddings | Old documents still returned | Vectors not deleted after re-upload | Implement delete + re-ingest flow | Pre-sort 📮 |
 

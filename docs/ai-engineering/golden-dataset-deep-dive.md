@@ -108,11 +108,11 @@ User question → [Embed] → [Search] → [Context] → [LLM] → [Evaluate]
 
 | Category | Count | Purpose | 🫏 Donkey |
 |---|---|---| --- |
-| `policy` | 4 | Refund, digital refund, exchange, warranty | 🫏 On the route |
-| `logistics` | 3 | Return shipping, delivery time, order tracking | 🫏 On the route |
-| `contact` | 3 | Support channels, hours, escalation | 🫏 On the route |
-| `product` | 2 | Compatibility, specifications | 🫏 On the route |
-| `multi_turn` | 3 | Follow-up questions needing context | 🫏 On the route |
+| `policy` | 4 | Refund, digital refund, exchange, warranty | Stable keys — only authorised callers may ask the donkey to deliver |
+| `logistics` | 3 | Return shipping, delivery time, order tracking | Donkey-side view of logistics — affects how the donkey loads, reads, or delivers the cargo |
+| `contact` | 3 | Support channels, hours, escalation | Donkey-side view of contact — affects how the donkey loads, reads, or delivers the cargo |
+| `product` | 2 | Compatibility, specifications | Donkey-side view of product — affects how the donkey loads, reads, or delivers the cargo |
+| `multi_turn` | 3 | Follow-up questions needing context | Donkey-side view of multi_turn — affects how the donkey loads, reads, or delivers the cargo |
 | `edge_case` | 6 | Ambiguous, out-of-scope, prompt injection, negation, multi-topic | Delivery note 📋 |
 | `pii` | 4 | PII in input, PII request, phone number, GDPR deletion | Gate rule 🚧 |
 
@@ -151,8 +151,8 @@ The cases below are representative examples. See [`golden_dataset.py`](../../src
 
 | Aspect | Check | Why | 🫏 Donkey |
 |---|---|---| --- |
-| **Keywords present** | "14", "days", "refund", "email" | Core facts must appear in the answer | 🫏 On the route |
-| **Keywords absent** | "cryptocurrency", "bitcoin" | The LLM must not invent payment methods | The donkey 🐴 |
+| **Keywords present** | "14", "days", "refund", "email" | Core facts must appear in the answer | What the donkey wrote and brought back to the customer |
+| **Keywords absent** | "cryptocurrency", "bitcoin" | The LLM must not invent payment methods | The donkey must never write words that weren't in the backpack — no inventing payment methods |
 | **Retrieval scores** | 0.95, 0.88, 0.82 (avg 0.88) | All chunks are relevant — high quality retrieval | backpack fetch 🎒 |
 | **Faithfulness** | ≥ 0.8 | Answer must be grounded in the 3 chunks | backpack piece 📦 |
 
@@ -276,8 +276,8 @@ The cases below are representative examples. See [`golden_dataset.py`](../../src
 | Threshold | Value | Why | 🫏 Donkey |
 |---|---|---| --- |
 | `min_retrieval_score` | 0.3 | "How long?" is vague — chunks will have low relevance | backpack piece 📦 |
-| `min_faithfulness` | 0.6 | The LLM might mention both refunds AND shipping — hard to ground precisely | The donkey 🐴 |
-| `expected_keywords` | `[]` | Can't predict what the LLM will say for a vague question | The donkey 🐴 |
+| `min_faithfulness` | 0.6 | The LLM might mention both refunds AND shipping — hard to ground precisely | Lower the bar — when the question is vague, the donkey may legitimately weave together two backpacks |
+| `expected_keywords` | `[]` | Can't predict what the LLM will say for a vague question | No keyword checklist — for ambiguous orders nobody can predict which words the donkey will choose |
 
 **What a good answer looks like:** *"Your question 'How long?' is ambiguous. Based on the documents: refund processing takes 14 business days, and shipping takes 5-7 business days."*
 
@@ -330,7 +330,7 @@ for case in GOLDEN_DATASET:
 | Trigger | Why | 🫏 Donkey |
 |---|---| --- |
 | Changed a prompt template | Prompts affect every answer — regression test ALL cases | Delivery note 📋 |
-| Switched LLM model | Different models behave differently — baseline them | The donkey 🐴 |
+| Switched LLM model | Different models behave differently — baseline them | Re-run the 25 standard test deliveries with the new donkey breed to see how its writing differs |
 | Changed chunking strategy | Affects retrieval quality — test #1, #2, #3 | backpack fetch 🎒 |
 | Changed `top_k` or `chunk_size` | Affects context quality — test all cases | backpack piece 📦 |
 | Before deploying to production | Final sanity check | Robot hand 🤖 |
@@ -370,11 +370,11 @@ The golden dataset is **identical** across providers. The test cases, questions,
 
 | Test case | Claude 3.5 (AWS) | GPT-4o (Azure) | llama3.2 (Local) | 🫏 Donkey |
 |---|---|---|---| --- |
-| `refund_basic` | ~0.92 | ~0.90 | ~0.80 | 🫏 On the route |
-| `refund_digital` | ~0.91 | ~0.88 | ~0.75 | 🫏 On the route |
-| `shipping_return` | ~0.88 | ~0.86 | ~0.78 | 🫏 On the route |
-| `no_context_available` | ~0.95 | ~0.93 | ~0.70 ⚠️ | 🫏 On the route |
-| `ambiguous_question` | ~0.80 | ~0.78 | ~0.60 | 🫏 On the route |
+| `refund_basic` | ~0.92 | ~0.90 | ~0.80 | Donkey-side view of refund_basic — affects how the donkey loads, reads, or delivers the cargo |
+| `refund_digital` | ~0.91 | ~0.88 | ~0.75 | Donkey-side view of refund_digital — affects how the donkey loads, reads, or delivers the cargo |
+| `shipping_return` | ~0.88 | ~0.86 | ~0.78 | Donkey-side view of shipping_return — affects how the donkey loads, reads, or delivers the cargo |
+| `no_context_available` | ~0.95 | ~0.93 | ~0.70 ⚠️ | Donkey-side view of no_context_available — affects how the donkey loads, reads, or delivers the cargo |
+| `ambiguous_question` | ~0.80 | ~0.78 | ~0.60 | Donkey-side view of ambiguous_question — affects how the donkey loads, reads, or delivers the cargo |
 
 ⚠️ **Local models may struggle with case #4** — smaller models sometimes try to answer instead of refusing. If `no_context_available` fails locally:
 - Lower `min_faithfulness` to 0.7 for local testing
@@ -422,8 +422,8 @@ When you encounter a bug in production (e.g., the LLM gives a wrong answer), add
 
 | Guideline | Why | 🫏 Donkey |
 |---|---| --- |
-| At least 1 happy path per category | Baseline behaviour | 🫏 On the route |
-| At least 1 edge case | Boundary behaviour | 🫏 On the route |
+| At least 1 happy path per category | Baseline behaviour | Donkey-side view of At least 1 happy path per category — affects how the donkey loads, reads, or delivers the cargo |
+| At least 1 edge case | Boundary behaviour | Donkey-side view of At least 1 edge case — affects how the donkey loads, reads, or delivers the cargo |
 | Put previous hallucinations in `expected_not_in_answer` | Regression-proof the fix | Memory drift ⚠️ |
 | Use realistic similarity scores (0.4–0.95) | Don't use 1.0 — real search is never perfect | Compass bearing 🧭 |
 | Set thresholds based on cloud model performance | Don't set to 0.99 — allow natural variation | Manifest template 📋 |

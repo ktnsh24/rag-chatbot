@@ -29,7 +29,7 @@ This is the file where **your DE skills apply most directly.** The ingestion pip
 
 | What you'll learn | DE parallel | 🫏 Donkey |
 |---|---| --- |
-| Reading multiple file formats | Reading CSV, JSON, Parquet | 🫏 On the route |
+| Reading multiple file formats | Reading CSV, JSON, Parquet | Stable inspector — checks the code is tidy before letting the donkey out |
 | Chunking text into pieces | Partitioning data into batches | backpack piece 📦 |
 | Why chunk size matters | Why partition size matters | backpack piece 📦 |
 | Why overlap exists | Why you keep boundary records in adjacent partitions | backpack piece 📦 |
@@ -108,9 +108,9 @@ Takes raw file bytes and extracts plain text. That's it.
 
 | File type | How it's read | DE parallel | 🫏 Donkey |
 |---|---|---| --- |
-| `.pdf` | `pypdf` library → extracts text per page | Like reading Parquet → extract columns | 🫏 On the route |
-| `.txt`, `.md`, `.csv` | `content.decode("utf-8")` | Like reading a CSV as text | 🫏 On the route |
-| `.docx` | `python-docx` library → extracts paragraphs | Like reading Excel → extract cells | backpack check 🫏 |
+| `.pdf` | `pypdf` library → extracts text per page | Like reading Parquet → extract columns | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
+| `.txt`, `.md`, `.csv` | `content.decode("utf-8")` | Like reading a CSV as text | The actual cargo text inside the backpack the donkey is carrying |
+| `.docx` | `python-docx` library → extracts paragraphs | Like reading Excel → extract cells | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
 
 **DE parallel:** This is your "source connector." In DE work, you have connectors for Kinesis, DynamoDB, S3. Here, you have connectors for PDF, Word, text. Same pattern — abstract away the source format, output a standard format (plain text / rows).
 
@@ -212,10 +212,10 @@ Reason 3: COST
 | chunk_size | Effect on retrieval | Effect on answers | Effect on cost | 🫏 Donkey |
 |---|---|---|---| --- |
 | 200 | Very precise — finds exact sentences | May lose context (split between chunks) | Cheapest per query | backpack piece 📦 |
-| 500 | Precise — paragraph-level | Usually enough context | Cheap | backpack check 🫏 |
-| **1000** | **Good balance (this repo's default)** | **Full paragraphs with context** | **Moderate** | backpack check 🫏 |
-| 2000 | Less precise — section-level | Always has full context | More expensive | 🫏 On the route |
-| 5000 | Imprecise — chapter-level | Too much noise | Expensive | 🫏 On the route |
+| 500 | Precise — paragraph-level | Usually enough context | Cheap | Stable broke down — donkey couldn't complete the trip, customer sees an error |
+| **1000** | **Good balance (this repo's default)** | **Full paragraphs with context** | **Moderate** | Donkey-side view of 1000 — affects how the donkey loads, reads, or delivers the cargo |
+| 2000 | Less precise — section-level | Always has full context | More expensive | How big each backpack-piece of cargo is — bigger = more context, fewer matches |
+| 5000 | Imprecise — chapter-level | Too much noise | Expensive | Stable broke down — donkey couldn't complete the trip, customer sees an error |
 
 **There is no universally correct chunk_size.** An AI engineer experiments with different values and measures the impact using the [Evaluation Framework](evaluation-framework-deep-dive.md).
 
@@ -334,11 +334,11 @@ Later, when user asks "What is the refund policy?":
 
 | Metric | Value | 🫏 Donkey |
 |---|---| --- |
-| Document size | 15,000 characters (5 pages) | 🫏 On the route |
+| Document size | 15,000 characters (5 pages) | Donkey-side view of Document size — affects how the donkey loads, reads, or delivers the cargo |
 | Chunks created | 18 (chunk_size=1000, overlap=200) | backpack piece 📦 |
 | Vectors stored | 18 × 1024 floats = 18,432 numbers | GPS warehouse 🗺️ |
 | Embedding cost | $0.00009 | Feed bill 🌾 |
-| Storage size | ~74 KB (18 × 4096 bytes per vector) | backpack check 🫏 |
+| Storage size | ~74 KB (18 × 4096 bytes per vector) | How the warehouse measures which backpacks are nearest to the customer's question |
 | Ingestion time | ~3 seconds | Pre-sort 📮 |
 | If 500 documents | 500 × 18 = 9,000 vectors, ~$0.045 total, ~25 minutes | Feed bill 🌾 |
 
@@ -351,11 +351,11 @@ Later, when user asks "What is the refund policy?":
 | Question | Answer | Concept it tests | 🫏 Donkey |
 |---|---|---| --- |
 | "Why chunk_size=1000 and not 500 or 2000?" | Trade-off: 500 is more precise but loses context. 2000 has more context but less precise retrieval. 1000 is the default balance — but you should TEST with your data. | Chunk size tuning | backpack piece 📦 |
-| "What happens if chunk_overlap=0?" | Sentences at chunk boundaries get cut in half. The LLM gets incomplete information. Answers degrade at boundary points. | Overlap purpose | The donkey 🐴 |
-| "Why use RecursiveCharacterTextSplitter instead of just slicing every 1000 chars?" | Blind slicing cuts words and sentences in half. Recursive splitter finds natural boundaries (paragraphs → sentences → words). | Smart splitting | backpack check 🫏 |
-| "What happens if a PDF has tables?" | `pypdf` extracts table text as plain text — rows become lines, columns become spaces. Structure is mostly lost. This is a known limitation. | Document parsing | 🫏 On the route |
+| "What happens if chunk_overlap=0?" | Sentences at chunk boundaries get cut in half. The LLM gets incomplete information. Answers degrade at boundary points. | Overlap purpose | Without overlapping cargo edges, sentences get sliced in half and the donkey gets garbled backpacks |
+| "Why use RecursiveCharacterTextSplitter instead of just slicing every 1000 chars?" | Blind slicing cuts words and sentences in half. Recursive splitter finds natural boundaries (paragraphs → sentences → words). | Smart splitting | Donkey-side view of "Why use RecursiveCharacterTextSplitter instead of just slicing every 1000 chars?" — affects how the donkey loads, reads, or delivers the cargo |
+| "What happens if a PDF has tables?" | `pypdf` extracts table text as plain text — rows become lines, columns become spaces. Structure is mostly lost. This is a known limitation. | Document parsing | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
 | "How is this different from an ETL pipeline?" | It's NOT different in structure. Extract (read file) → Transform (chunk + embed) → Load (store vectors). Only the transform step is AI-specific. | DE → AI bridge | backpack piece 📦 |
-| "What's the most expensive step?" | Embedding is cheap ($0.00002/1K tokens). The expensive part is storing in OpenSearch (~$350/month minimum) and later sending chunks to the LLM for generation. | Cost awareness | The donkey 🐴 |
+| "What's the most expensive step?" | Embedding is cheap ($0.00002/1K tokens). The expensive part is storing in OpenSearch (~$350/month minimum) and later sending chunks to the LLM for generation. | Cost awareness | GPS-stamping is cheap; the costly bits are warehouse rent (OpenSearch) and feeding the donkey hay |
 
 - 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 

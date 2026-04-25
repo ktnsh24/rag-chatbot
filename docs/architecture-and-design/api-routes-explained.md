@@ -93,7 +93,7 @@ def create_app() -> FastAPI:
 
 | Line | What it does | DE parallel | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `lifespan=lifespan` | Runs startup/shutdown code (initialise RAG chain, close connections) | Like `@app.on_event("startup")` in shared-proxy | backpack check 🫏 |
+| `lifespan=lifespan` | Runs startup/shutdown code (initialise RAG chain, close connections) | Like `@app.on_event("startup")` in shared-proxy | Donkey-side view of lifespan=lifespan — affects how the donkey loads, reads, or delivers the cargo |
 | `prefix="/api"` | All routes get `/api` prefix → `/chat` becomes `/api/chat` | Same as any FastAPI app | Stable door 🚪 |
 | `tags=["Chat"]` | Groups endpoints in Swagger UI | Same as any FastAPI app | Stable door 🚪 |
 
@@ -202,9 +202,9 @@ detailed deep-dive document:
 | Route file | Endpoint(s) | AI complexity | Deep dive | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
 | `health.py` | `GET /api/health` | ★☆☆☆☆ — nothing new | 📖 [Health Endpoint Deep Dive](api-routes/health-endpoint-explained.md) | Donkey check ✅ |
-| `chat.py` | `POST /api/chat` | ★★★★★ — the RAG query pipeline | 📖 [Chat Endpoint Deep Dive](api-routes/chat-endpoint-explained.md) | backpack check 🫏 |
+| `chat.py` | `POST /api/chat` | ★★★★★ — the RAG query pipeline | 📖 [Chat Endpoint Deep Dive](api-routes/chat-endpoint-explained.md) | Stable's front door — the URL customers use to drop off a question |
 | `documents.py` | `POST /api/documents/upload`, `GET /api/documents`, `DELETE /api/documents/{id}` | ★★★★☆ — the ingestion pipeline | 📖 [Documents Endpoint Deep Dive](api-routes/documents-endpoint-explained.md) | Pre-sort 📮 |
-| `evaluate.py` | `POST /api/evaluate`, `POST /api/evaluate/suite` | ★★★★★ — the AI quality pipeline | 📖 [Evaluate Endpoint Deep Dive](api-routes/evaluate-endpoint-explained.md) | Report card 📝 |
+| `evaluate.py` | `POST /api/evaluate`, `POST /api/evaluate/suite` | ★★★★★ — the AI quality pipeline | 📖 [Evaluate Endpoint Deep Dive](api-routes/evaluate-endpoint-explained.md) | Stable's grading window — submit a question and get back the donkey's report card with per-dimension scores |
 | `queries.py` | `GET /api/queries/stats`, `GET /api/queries/failures` | ★★★☆☆ — production debugging | 📖 [Queries Endpoint Deep Dive](api-routes/queries-endpoint-explained.md) | Stable door 🚪 |
 | `metrics.py` | `GET /api/metrics` | ★★☆☆☆ — Prometheus metrics | 📖 [Metrics Endpoint Deep Dive](api-routes/metrics-endpoint-explained.md) | Tachograph 📊 |
 
@@ -326,10 +326,10 @@ the same and what's different:
 | **Router pattern** | `APIRouter()` + `include_router()` | `APIRouter()` + `include_router()` | Stable door 🚪 |
 | **Middleware** | `BnaEventMiddleware` | `RequestLoggingMiddleware` | Gate guard 🔐 |
 | **Request validation** | Pydantic models | Pydantic models | Manifest template 📋 |
-| **Dependency injection** | `app.state` or FastAPI `Depends()` | `app.state` (for rag_chain) | backpack check 🫏 |
+| **Dependency injection** | `app.state` or FastAPI `Depends()` | `app.state` (for rag_chain) | Stable manager — receives requests at the front door and dispatches the donkey |
 | **Error handling** | `HTTPException` | `HTTPException` | Stable door 🚪 |
 | **Logging** | Loguru | Loguru | Gate guard 🔐 |
-| **What routes call** | Service classes → DynamoDB/S3 | `rag_chain` → LLM + Vector Store + Storage | The donkey 🐴 |
+| **What routes call** | Service classes → DynamoDB/S3 | `rag_chain` → LLM + Vector Store + Storage | DE routes hit databases; AI routes wake the donkey, send it to the GPS warehouse, and pick up storage on the way back |
 | **Response contains** | Data records | Answer + sources + token usage | Cargo unit ⚖️ |
 | **New concepts** | None | Embeddings, semantic search, token costs | Cargo unit ⚖️ |
 

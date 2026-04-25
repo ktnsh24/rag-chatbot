@@ -202,11 +202,11 @@ same — `_documents[id] = info` vs `dynamodb.put_item(item=info)`.
 
 | Format | Parser used | Why supported | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `.pdf` | `pypdf` (PdfReader) | Most common document format in enterprises | 🫏 On the route |
-| `.txt` | Built-in `.decode("utf-8")` | Plain text, simplest case | 🫏 On the route |
-| `.md` | Built-in `.decode("utf-8")` | Documentation, READMEs | 🫏 On the route |
-| `.csv` | Built-in `.decode("utf-8")` | Tabular data (each row becomes text) | 🫏 On the route |
-| `.docx` | `python-docx` | Microsoft Word — common in enterprises | 🫏 On the route |
+| `.pdf` | `pypdf` (PdfReader) | Most common document format in enterprises | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
+| `.txt` | Built-in `.decode("utf-8")` | Plain text, simplest case | Donkey-side view of .txt — affects how the donkey loads, reads, or delivers the cargo |
+| `.md` | Built-in `.decode("utf-8")` | Documentation, READMEs | Donkey-side view of .md — affects how the donkey loads, reads, or delivers the cargo |
+| `.csv` | Built-in `.decode("utf-8")` | Tabular data (each row becomes text) | Donkey-side view of .csv — affects how the donkey loads, reads, or delivers the cargo |
+| `.docx` | `python-docx` | Microsoft Word — common in enterprises | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
 
 **Not supported:** `.xlsx` (Excel), `.pptx` (PowerPoint), `.html` — each would need
 its own parser. These could be added later.
@@ -326,9 +326,9 @@ regardless of input format.
 
 | ETL Extract | RAG Extract | 🫏 Donkey |
 | --- | --- | --- |
-| Read CSV from S3 → DataFrame | Read PDF from upload → string | Parcel shelf 📦 |
+| Read CSV from S3 → DataFrame | Read PDF from upload → string | Same fetch-and-parse skill — instead of loading rows into pandas, the donkey loads pages into a string |
 | Read JSON from API → DataFrame | Read DOCX from upload → string | Stable door 🚪 |
-| Read Parquet from S3 → DataFrame | Read TXT from upload → string | Parcel shelf 📦 |
+| Read Parquet from S3 → DataFrame | Read TXT from upload → string | Same fetch-and-parse skill — instead of columnar tables, the donkey reads plain text |
 
 **Why `[Page N]` markers?** When the document is later chunked, these markers help
 track which page each chunk came from. This is how `page_number` ends up in the
@@ -523,9 +523,9 @@ it like:
 | ETL Transform | RAG Transform (embedding) | 🫏 Donkey |
 | --- | --- | --- |
 | Convert CSV strings to typed columns | Convert text chunks to number vectors | backpack piece 📦 |
-| Parse dates, cast integers | Run through neural network to get floats | 🫏 On the route |
-| Output: structured rows | Output: vectors — 1024-dim (AWS Titan), 1536-dim (Azure), or 768-dim (Local Ollama) | The donkey 🐴 |
-| Purpose: make data queryable by SQL | Purpose: make text searchable by meaning | 🫏 On the route |
+| Parse dates, cast integers | Run through neural network to get floats | Stable yard fencing — controls which routes traffic may take in and out |
+| Output: structured rows | Output: vectors — 1024-dim (AWS Titan), 1536-dim (Azure), or 768-dim (Local Ollama) | Each chunk leaves the post office stamped with GPS coordinates — the dimension count depends on which embedding stamper you use |
+| Purpose: make data queryable by SQL | Purpose: make text searchable by meaning | Closest SQL/DE concept — for engineers who think in tables not GPS coordinates |
 
 **Cost of this step:**
 
@@ -811,12 +811,12 @@ registry entry and returns the response.
 
 | Field | Example | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `document_id` | `"a1b2c3d4-..."` | Unique identifier | 🫏 On the route |
-| `filename` | `"refund-policy.pdf"` | Original filename | 🫏 On the route |
-| `status` | `DocumentStatus.READY` | Lifecycle stage | 🫏 On the route |
+| `document_id` | `"a1b2c3d4-..."` | Unique identifier | Tracking number stamped on the parcel so the donkey can find it again |
+| `filename` | `"refund-policy.pdf"` | Original filename | Stable keys — only authorised callers may ask the donkey to deliver |
+| `status` | `DocumentStatus.READY` | Lifecycle stage | Donkey-side view of status — affects how the donkey loads, reads, or delivers the cargo |
 | `chunk_count` | `42` | How many searchable pieces it became | backpack piece 📦 |
-| `uploaded_at` | `2026-04-07T10:30:00Z` | When it was uploaded | 🫏 On the route |
-| `file_size_bytes` | `1048576` | File size (1 MB) | 🫏 On the route |
+| `uploaded_at` | `2026-04-07T10:30:00Z` | When it was uploaded | Timestamp stamped on the trip log entry — when the donkey set off or returned |
+| `file_size_bytes` | `1048576` | File size (1 MB) | Donkey-side view of file_size_bytes — affects how the donkey loads, reads, or delivers the cargo |
 
 **Status lifecycle:**
 
@@ -1036,11 +1036,11 @@ the ingestion cost 1000x.
 
 | Error scenario | What happens | HTTP status | 🫏 Donkey |
 | --- | --- | --- | --- |
-| Unsupported file type (.exe, .xlsx) | Validation rejects before any AI call | `400` | 🫏 On the route |
-| RAG chain not initialised | Route returns error immediately | `500` | backpack check 🫏 |
-| PDF is corrupted / unparseable | `read_document()` throws → caught by try/except | `500` | 🫏 On the route |
+| Unsupported file type (.exe, .xlsx) | Validation rejects before any AI call | `400` | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
+| RAG chain not initialised | Route returns error immediately | `500` | Stable's front door — the URL customers use to drop off a question |
+| PDF is corrupted / unparseable | `read_document()` throws → caught by try/except | `500` | Stable broke down — donkey couldn't complete the trip, customer sees an error |
 | PDF is scanned images (no text) | `read_document()` returns empty string → 0 chunks | `200` (with chunk_count=0) | backpack piece 📦 |
-| Embedding API fails (Bedrock / Azure OpenAI down) | Exception in Step 3 → document saved as FAILED | `500` | The donkey 🐴 |
+| Embedding API fails (Bedrock / Azure OpenAI down) | Exception in Step 3 → document saved as FAILED | `500` | GPS stamper is offline — the post office can't label parcels for the warehouse, so the document is shelved as FAILED |
 | Vector store down (OpenSearch / Azure AI Search) | Exception in Step 4 → document saved as FAILED | `500` | AWS search hub 🔍 |
 | File is too large (out of memory) | `await file.read()` fails → exception | `500` | Trip log 📒 |
 

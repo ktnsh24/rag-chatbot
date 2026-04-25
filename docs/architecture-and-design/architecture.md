@@ -217,9 +217,9 @@ This demonstrates that you can design systems that aren't locked into one cloud 
 | **API** | `src/api/` | HTTP interface (routes, models, middleware) | Stable door 🚪 |
 | **Guardrails** | `src/api/middleware/` | Input/output safety, PII redaction, prompt injection defense | Delivery note 📋 |
 | **RAG** | `src/rag/` | RAG pipeline (chain, ingestion, prompts) | Delivery note 📋 |
-| **LLM** | `src/llm/` | LLM abstraction + implementations | The donkey 🐴 |
+| **LLM** | `src/llm/` | LLM abstraction + implementations | Where the donkey lives — swap stables (AWS / Azure / Ollama) without touching the rest of the code |
 | **Vector Store** | `src/vectorstore/` | Vector DB abstraction + implementations | GPS warehouse 🗺️ |
-| **Storage** | `src/storage/` | Document storage abstraction | backpack check 🫏 |
+| **Storage** | `src/storage/` | Document storage abstraction | Stable design — donkey doesn't care which warehouse brand it grabs from |
 | **History** | `src/history/` | Conversation history abstraction | Trip log 📒 |
 | **Monitoring** | `src/monitoring/` | Metrics, query logging (JSONL), OpenTelemetry tracing | Tachograph 📊 |
 | **Config** | `src/config.py` | Pydantic Settings (env vars) | Manifest template 📋 |
@@ -227,7 +227,7 @@ This demonstrates that you can design systems that aren't locked into one cloud 
 | **Infrastructure** | `infra/` | Terraform (AWS + Azure); Local needs no infra | Stable blueprint 🏗️ |
 | **CI/CD** | `.github/workflows/` | GitHub Actions | Robot hand 🤖 |
 | **Tests** | `tests/` | Unit + integration tests | Test delivery 🧪 |
-| **Docs** | `docs/` | You are here | 🫏 On the route |
+| **Docs** | `docs/` | You are here | Donkey-side view of Docs — affects how the donkey loads, reads, or delivers the cargo |
 
 - 🫏 **Donkey:** The modular gear room — each layer (LLM, vector store, storage) handles one job, so you can swap any piece out without touching the rest.
 

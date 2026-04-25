@@ -73,8 +73,8 @@ az account set --subscription "your-subscription-id"
 
 | Variable | Default | Description | 🫏 Donkey |
 |---|---|---| --- |
-| `project_name` | `"rag-chatbot"` | Prefix for all resource names | backpack check 🫏 |
-| `environment` | `"dev"` | Environment tag | 🫏 On the route |
+| `project_name` | `"rag-chatbot"` | Prefix for all resource names | The donkey's name tag — every AWS resource is tagged as belonging to this donkey |
+| `environment` | `"dev"` | Environment tag | Which stable the donkey lives in — dev (training), staging (rehearsal), prod (real deliveries) |
 | `aws_region` | `"eu-west-1"` | AWS region | AWS depot 🏭 |
 
 ### S3 Bucket
@@ -144,8 +144,8 @@ The ECS task role grants least-privilege access:
 | Resource | Purpose | Free Tier? | 🫏 Donkey |
 |---|---|---| --- |
 | `azurerm_resource_group` | Resource container | ✅ Free | Stable stall 🐎 |
-| `azurerm_storage_account` | Document storage | ✅ 5 GB LRS | backpack check 🫏 |
-| `azurerm_storage_container` | Blob container | ✅ Included | backpack check 🫏 |
+| `azurerm_storage_account` | Document storage | ✅ 5 GB LRS | Azure's document warehouse where the donkey picks up source files for ingestion |
+| `azurerm_storage_container` | Blob container | ✅ Included | The labelled bin inside the warehouse where uploaded documents are sorted |
 | `azurerm_cosmosdb_account` | Conversation history | ✅ 1000 RU/s free | Azure trip-log 📒 |
 | `azurerm_cosmosdb_sql_database` | Database | ✅ Included | Azure trip-log 📒 |
 | `azurerm_cosmosdb_sql_container` | Container | ✅ Included | Azure trip-log 📒 |
@@ -155,8 +155,8 @@ The ECS task role grants least-privilege access:
 
 | Variable | Default | Description | 🫏 Donkey |
 |---|---|---| --- |
-| `project_name` | `"ragchatbot"` | Prefix for resource names | backpack check 🫏 |
-| `environment` | `"dev"` | Environment tag | 🫏 On the route |
+| `project_name` | `"ragchatbot"` | Prefix for resource names | The donkey's name tag for the Azure stable (no dashes — Azure naming rules) |
+| `environment` | `"dev"` | Environment tag | Which Azure stable the donkey lives in — dev, staging, or prod |
 | `location` | `"westeurope"` | Azure region | Azure hub ☁️ |
 
 ### Cosmos DB (Serverless)
@@ -311,7 +311,7 @@ terraform destroy -var="environment=dev"
 
 | Resource | Monthly Cost | 🫏 Donkey |
 |---|---| --- |
-| Storage Account (5 GB LRS) | ~$0.10 | backpack check 🫏 |
+| Storage Account (5 GB LRS) | ~$0.10 | Cheap warehouse rent — pennies per month to store the donkey's source documents |
 | Cosmos DB (serverless, free tier) | $0.00 | Azure trip-log 📒 |
 | Container Registry (Basic) | ~$4.20 | Stable address 🏷️ |
 | Resource Group | $0.00 | Free hay 🌿 |

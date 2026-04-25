@@ -147,7 +147,7 @@ The `BaseConversationHistory` abstract class defines three operations:
 
 | Method | What it does | DE equivalent | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `add_message()` | Store one message | `INSERT INTO messages VALUES (...)` | 🫏 On the route |
+| `add_message()` | Store one message | `INSERT INTO messages VALUES (...)` | Donkey-side view of add_message() — affects how the donkey loads, reads, or delivers the cargo |
 | `get_history()` | Get last N messages for a session | `SELECT * FROM messages WHERE session_id = ? ORDER BY timestamp DESC LIMIT 10` | Trip log 📒 |
 | `delete_session()` | Delete all messages for a session | `DELETE FROM messages WHERE session_id = ?` | Trip log 📒 |
 
@@ -327,10 +327,10 @@ Same concept as DynamoDB TTL — conversations auto-expire.
 | --- | --- | --- | --- |
 | **SDK** | `boto3` (sync) | `azure-cosmos` (async native) | Azure trip-log 📒 |
 | **Key design** | Composite: `session_id` (PK) + `timestamp` (SK) | `id` (unique) + `session_id` (partition key) | Trip log 📒 |
-| **Unique ID** | Not needed — PK+SK is unique | Required — `id` field with UUID | 🫏 On the route |
+| **Unique ID** | Not needed — PK+SK is unique | Required — `id` field with UUID | Tracking number stamped on the parcel so the donkey can find it again |
 | **Query language** | `KeyConditionExpression` (DynamoDB-specific) | SQL-like syntax (`SELECT`, `WHERE`, `ORDER BY`) | AWS depot 🏭 |
 | **Get latest N** | `ScanIndexForward=False, Limit=N` + reverse | `SELECT TOP N ... ORDER BY timestamp DESC` + reverse | Test delivery 🧪 |
-| **Batch delete** | `batch_writer()` + loop | `async for` + `delete_item()` one by one | 🫏 On the route |
+| **Batch delete** | `batch_writer()` + loop | `async for` + `delete_item()` one by one | Donkey can run other errands while waiting for the warehouse to respond |
 | **TTL** | `expires_at` attribute | `default_ttl` on container (seconds) | Stable stall 🐎 |
 | **Cost (serverless)** | ~$0 idle, $1.25/M writes, $0.25/M reads | ~$0 idle, ~$0.28/M RUs | Feed bill 🌾 |
 | **Consistency** | Eventually consistent (default) | Session consistency (configured) | Trip log 📒 |
@@ -461,12 +461,12 @@ for most follow-up questions without excessive token costs.
 | Aspect | What a DE sees | What an AI Engineer sees | 🫏 Donkey |
 | --- | --- | --- | --- |
 | `ConversationMessage` model | Standard message table schema | Token budget — each message costs tokens in the next prompt | Cargo unit ⚖️ |
-| `add_message()` | Insert row, done | Must save BOTH user and assistant messages for complete replay | 🫏 On the route |
+| `add_message()` | Insert row, done | Must save BOTH user and assistant messages for complete replay | Donkey-side view of add_message() — affects how the donkey loads, reads, or delivers the cargo |
 | `get_history(limit=10)` | Pagination, standard | Token cost control — limit = max tokens spent on history | Cargo unit ⚖️ |
 | `delete_session()` | Cleanup, standard | Privacy + cost — old sessions = wasted storage + prompt bloat | Delivery note 📋 |
 | TTL (7 days) | Standard data retention | Context window management — conversations older than 7 days aren't useful | Trip log 📒 |
 | `session_id` | Partition key for grouping | Session isolation — one user's history never leaks into another's prompt | Alternative stable 🏗️ |
-| Sort by timestamp | Standard ordering | Chronological replay is required — LLM needs messages in order | The donkey 🐴 |
+| Sort by timestamp | Standard ordering | Chronological replay is required — LLM needs messages in order | Donkey replays the trip log in order — out-of-order messages would confuse the next answer |
 
 - 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 

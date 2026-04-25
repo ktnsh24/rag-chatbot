@@ -99,7 +99,7 @@ Creates:
 
 | # | Resource | Terraform resource type | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| 1 | S3 bucket | `aws_s3_bucket` | Store uploaded documents | Parcel shelf 📦 |
+| 1 | S3 bucket | `aws_s3_bucket` | Store uploaded documents | AWS warehouse for source files — the donkey reads from here at ingestion time |
 | 2 | S3 versioning | `aws_s3_bucket_versioning` | Protect against accidental deletes | AWS depot 🏭 |
 | 3 | S3 encryption | `aws_s3_bucket_server_side_encryption_configuration` | Encrypt at rest | Stable door 🚪 |
 | 4 | S3 public block | `aws_s3_bucket_public_access_block` | Block all public access | AWS depot 🏭 |
@@ -144,8 +144,8 @@ Creates:
 | # | Resource | Terraform resource type | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
 | 1 | Resource Group | `azurerm_resource_group` | Logical container for all resources | Stable stall 🐎 |
-| 2 | Storage Account | `azurerm_storage_account` | Blob storage for documents | Parcel shelf 📦 |
-| 3 | Storage Container | `azurerm_storage_container` | Container within the storage account | backpack check 🫏 |
+| 2 | Storage Account | `azurerm_storage_account` | Blob storage for documents | Azure warehouse for source files — same role as S3, different cloud |
+| 3 | Storage Container | `azurerm_storage_container` | Container within the storage account | Portable stable — donkey ships in a sealed container that runs anywhere |
 | 4 | Cosmos DB Account | `azurerm_cosmosdb_account` | NoSQL database (serverless) | Azure trip-log 📒 |
 | 5 | Cosmos DB Database | `azurerm_cosmosdb_sql_database` | Database within the account | Azure trip-log 📒 |
 | 6 | Cosmos DB Container | `azurerm_cosmosdb_sql_container` | Table with partition key + TTL | Azure trip-log 📒 |
@@ -159,12 +159,12 @@ Creates:
 
 | Purpose | AWS Resource | Azure Resource | Same concept? | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| **Document storage** | S3 bucket | Storage Account + Container | ✅ Same — blob/object storage | Parcel shelf 📦 |
+| **Document storage** | S3 bucket | Storage Account + Container | ✅ Same — blob/object storage | Same warehouse concept on both clouds — the donkey fetches source files from either |
 | **Conversation history** | DynamoDB table | Cosmos DB account + database + container | ✅ Same — NoSQL key-value store | AWS depot 🏭 |
 | **Docker registry** | ECR | ACR | ✅ Same — container registry | Stable address 🏷️ |
 | **Container hosting** | ECS Fargate (referenced) | Container Apps (referenced) | ✅ Same — serverless containers | Stable stall 🐎 |
-| **AI model access** | Bedrock (IAM permission) | OpenAI (connection string) | ⚡ Different auth model | The donkey 🐴 |
-| **Resource grouping** | Tags only | Resource Group (explicit) | ↔ Different approach | 🫏 On the route |
+| **AI model access** | Bedrock (IAM permission) | OpenAI (connection string) | ⚡ Different auth model | Same donkey-hiring idea, different paperwork — AWS uses an IAM role, Azure hands over a connection string |
+| **Resource grouping** | Tags only | Resource Group (explicit) | ↔ Different approach | Label on the original mail item the backpack was sliced from |
 | **IAM** | Role + inline policy | Managed identity (not shown) | ↔ Different auth model | Manifest template 📋 |
 
 ### Key observation
@@ -374,11 +374,11 @@ Pessimistic constraint (`~>`) — allows 5.x but not 6.0. Standard Terraform bes
 | --- | --- | --- | --- |
 | **OpenSearch Serverless** | $350/month minimum — too expensive for dev | `aws_opensearchserverless_collection` with HNSW index | AWS search hub 🔍 |
 | **Azure AI Search** | Free tier is manual setup | `azurerm_search_service` with vector index config | Azure hub ☁️ |
-| **Bedrock model access** | No Terraform resource needed (just IAM) | Model access is enabled per-region in AWS console | The donkey 🐴 |
-| **Azure OpenAI deployment** | Requires manual provisioning | `azurerm_cognitive_deployment` for GPT-4o + embedding models | The donkey 🐴 |
+| **Bedrock model access** | No Terraform resource needed (just IAM) | Model access is enabled per-region in AWS console | No blueprint needed — you tick a box in the AWS console to let the donkey carry Claude in that region |
+| **Azure OpenAI deployment** | Requires manual provisioning | `azurerm_cognitive_deployment` for GPT-4o + embedding models | Blueprints can spin up the GPT-4o donkey and the embedding GPS stamper as cognitive deployments |
 | **ECS Fargate service** | Referenced but full config omitted for simplicity | Task definition, service, ALB, target group | Stable stall 🐎 |
 | **Container App** | Referenced but full config omitted | `azurerm_container_app` with ingress, scaling rules | Stable stall 🐎 |
-| **VPC / Network** | Not needed for serverless resources | VPC, subnets, security groups for production | 🫏 On the route |
+| **VPC / Network** | Not needed for serverless resources | VPC, subnets, security groups for production | Stable yard fencing — controls which routes traffic may take in and out |
 
 **The takeaway:** This Terraform creates the "DE-familiar" resources (storage, database,
 container registry). The AI-specific resources (vector store, model endpoints) are either
@@ -392,13 +392,13 @@ too expensive for dev or require manual provisioning.
 
 | Aspect | What a DE sees | What an AI Engineer sees | 🫏 Donkey |
 | --- | --- | --- | --- |
-| S3 bucket | Standard document storage | Raw file backup for re-ingestion when chunking strategy changes | Parcel shelf 📦 |
+| S3 bucket | Standard document storage | Raw file backup for re-ingestion when chunking strategy changes | The original parcel store — needed if you ever change how the donkey cuts chunks and need to re-pack |
 | DynamoDB table | Standard session store | Token budget storage — each row becomes input tokens | AWS depot 🏭 |
 | DynamoDB TTL | Standard data retention | Context window management — old conversations are worthless tokens | AWS depot 🏭 |
 | ECR repository | Standard container registry | Same — no AI difference | Stable address 🏷️ |
-| IAM `bedrock:InvokeModel` | New permission, never used before | The permission that enables the entire AI pipeline | The donkey 🐴 |
+| IAM `bedrock:InvokeModel` | New permission, never used before | The permission that enables the entire AI pipeline | First permission DEs ever grant the donkey — without it, the stable manager can't dispatch a single delivery |
 | Missing OpenSearch | "Why isn't the vector store here?" | Cost decision — $350/month for a portfolio project is wasteful | AWS search hub 🔍 |
-| `PAY_PER_REQUEST` | Standard dev billing mode | Essential for AI apps — query patterns are unpredictable and bursty | 🫏 On the route |
+| `PAY_PER_REQUEST` | Standard dev billing mode | Essential for AI apps — query patterns are unpredictable and bursty | Fuel-and-feed bill for keeping the donkey and stable running |
 
 - 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 

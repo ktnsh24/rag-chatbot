@@ -34,8 +34,8 @@ Think of it as npm/yarn for Python.
 
 | Task | pip (old way) | Poetry (this project) | 🫏 Donkey |
 | --- | --- | --- | --- |
-| Define dependencies | `requirements.txt` (manual) | `pyproject.toml` (structured) | 🫏 On the route |
-| Lock exact versions | `pip freeze > requirements.txt` (fragile) | `poetry.lock` (automatic) | backpack check 🫏 |
+| Define dependencies | `requirements.txt` (manual) | `pyproject.toml` (structured) | The supply shed manifest — every tool the donkey needs, structured and versioned |
+| Lock exact versions | `pip freeze > requirements.txt` (fragile) | `poetry.lock` (automatic) | Locks every tool to an exact version so any stable rebuilds the donkey identically |
 | Install dependencies | `pip install -r requirements.txt` | `poetry install` | Supply manifest 📜 |
 | Add a package | Edit requirements.txt + `pip install` | `poetry add <package>` | Supply manifest 📜 |
 | Remove a package | Edit requirements.txt + `pip uninstall` | `poetry remove <package>` | Supply manifest 📜 |

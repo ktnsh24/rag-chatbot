@@ -89,13 +89,13 @@ All integration/E2E/feature tests share fixtures defined in `tests/conftest.py`:
 
 | Fixture | What it provides | 🫏 Donkey |
 |---|---| --- |
-| `mock_rag_chain` | `AsyncMock` with `.query()`, `.ingest_document()`, `.ingest_documents()`, `._vector_store` | backpack check 🫏 |
-| `app_with_rag` | `create_app()` with mocked RAG chain on `app.state` | backpack check 🫏 |
-| `client_with_rag` | `httpx.AsyncClient` using `ASGITransport` — full async HTTP testing | backpack check 🫏 |
-| `app_no_rag` | App where `app.state.rag_chain = None` (simulates init failure) | backpack check 🫏 |
-| `client_no_rag` | Client for testing error paths when RAG chain is unavailable | backpack check 🫏 |
+| `mock_rag_chain` | `AsyncMock` with `.query()`, `.ingest_document()`, `.ingest_documents()`, `._vector_store` | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
+| `app_with_rag` | `create_app()` with mocked RAG chain on `app.state` | Practice deliveries with stand-in cargo — checks the donkey behaves correctly |
+| `client_with_rag` | `httpx.AsyncClient` using `ASGITransport` — full async HTTP testing | Stable manager — receives requests at the front door and dispatches the donkey |
+| `app_no_rag` | App where `app.state.rag_chain = None` (simulates init failure) | Donkey's report card — share of test deliveries that scored above the bar |
+| `client_no_rag` | Client for testing error paths when RAG chain is unavailable | Donkey-side view of client_no_rag — affects how the donkey loads, reads, or delivers the cargo |
 | `mock_guardrails` | Real `LocalGuardrails()` instance (pattern-based, no network) | Gate rule 🚧 |
-| `app_with_guardrails` | App with both RAG chain and guardrails enabled | backpack check 🫏 |
+| `app_with_guardrails` | App with both RAG chain and guardrails enabled | Stable gate — refuses harmful or off-topic deliveries before the donkey leaves |
 | `client_with_guardrails` | Client for testing guardrail behavior end-to-end | Test delivery 🧪 |
 
 **Mock response constant:**
@@ -119,11 +119,11 @@ Existing unit tests cover individual components in isolation:
 | File | Tests | What it covers | 🫏 Donkey |
 |---|---|---| --- |
 | `test_chat.py` | 7 | Chat route logic, request validation, error handling | Test delivery 🧪 |
-| `test_evaluate_route.py` | 16 | Evaluate route logic, response format, error handling | Report card 📝 |
+| `test_evaluate_route.py` | 16 | Evaluate route logic, response format, error handling | Verifies the grading window hands back the report card in the right shape and fails gracefully on bad requests |
 | `test_ingestion.py` | 9 | Document chunking, ingestion pipeline, deduplication | backpack piece 📦 |
 | `test_evaluation.py` | 14 | Evaluation framework, metrics computation, golden dataset | Tachograph 📊 |
 | `test_guardrails.py` | 20 | Guardrail pattern matching, PII regex, injection detection | Test delivery 🧪 |
-| `test_reranker.py` | 7 | Cross-encoder scoring, re-ranking logic | Report card 📝 |
+| `test_reranker.py` | 7 | Cross-encoder scoring, re-ranking logic | Confirms the quality inspector re-sorts backpack contents by score before the donkey heads out |
 | `test_hybrid_search.py` | 17 | BM25 tokenization, hybrid score fusion | Cargo unit ⚖️ |
 | `test_dynamodb_vectorstore.py` | 13 | DynamoDB CRUD, vector storage, batch operations | AWS depot 🏭 |
 | **Total** | **103** | | Feed bill 🌾 |
@@ -140,9 +140,9 @@ Tests every API endpoint through the full FastAPI stack (middleware, routing, se
 
 | Class | Tests | What it validates | 🫏 Donkey |
 |---|---|---| --- |
-| `TestHealthIntegration` | 2 | `GET /health` returns status + services; degrades when RAG chain is missing | backpack check 🫏 |
-| `TestChatIntegration` | 6 | `POST /api/chat` — success, session IDs, custom `top_k`, validation (empty/missing question), 500 without RAG | backpack check 🫏 |
-| `TestEvaluateIntegration` | 3 | `POST /api/evaluate` — single question, expected answer comparison, 500 without RAG | backpack check 🫏 |
+| `TestHealthIntegration` | 2 | `GET /health` returns status + services; degrades when RAG chain is missing | Quick check — is the donkey awake, loaded, and ready to deliver? |
+| `TestChatIntegration` | 6 | `POST /api/chat` — success, session IDs, custom `top_k`, validation (empty/missing question), 500 without RAG | How many backpacks the donkey grabs from the warehouse for one delivery |
+| `TestEvaluateIntegration` | 3 | `POST /api/evaluate` — single question, expected answer comparison, 500 without RAG | Stable's front door — the URL customers use to drop off a question |
 | `TestDocumentsIntegration` | 4 | `GET /api/documents`, `POST /api/documents/upload`, `POST /api/documents/upload/batch`, `DELETE /api/documents/{id}` | Test delivery 🧪 |
 | `TestQueryAnalysisIntegration` | 4 | `GET /api/queries/stats`, `/api/queries/slow`, `/api/queries/patterns`, `/api/queries/recent` — returns 503 when query logger not configured | Test delivery 🧪 |
 | `TestMetricsIntegration` | 1 | `GET /metrics` returns Prometheus format | Tachograph 📊 |
@@ -160,7 +160,7 @@ Simulates complete user journeys through the system. Uses a **stateful mock** th
 
 | Class | Tests | What it validates | 🫏 Donkey |
 |---|---|---| --- |
-| `TestE2EFullPipeline` | 4 | Upload → chat (gets relevant answer), upload → evaluate (scores returned), chat without docs (empty answer), multiple uploads → chat | Report card 📝 |
+| `TestE2EFullPipeline` | 4 | Upload → chat (gets relevant answer), upload → evaluate (scores returned), chat without docs (empty answer), multiple uploads → chat | Full route: drop mail at the post office, then watch the donkey deliver from it, get graded, and stay silent when the warehouse is empty |
 | `TestE2EConversation` | 2 | Multi-turn conversation in same session, session isolation between users | Test delivery 🧪 |
 | `TestE2EObservability` | 2 | Metrics counter increments after chat, health endpoint remains up after activity | Donkey check ✅ |
 
@@ -206,15 +206,15 @@ Tests the guardrails feature flag (`GUARDRAILS_ENABLED`) by comparing behavior w
 | Test File | Tests | Type | Status | 🫏 Donkey |
 |---|---|---|---| --- |
 | `test_chat.py` | 7 | Unit | ✅ Passing | Test delivery 🧪 |
-| `test_evaluate_route.py` | 16 | Unit | ✅ Passing | Report card 📝 |
+| `test_evaluate_route.py` | 16 | Unit | ✅ Passing | Unit cover for the report-card route — request shapes, score response, and graceful errors |
 | `test_ingestion.py` | 9 | Unit | ✅ Passing | Pre-sort 📮 |
-| `test_evaluation.py` | 14 | Unit | ✅ Passing | Report card 📝 |
+| `test_evaluation.py` | 14 | Unit | ✅ Passing | Unit cover for the grading framework — score maths, thresholds, and golden dataset loading |
 | `test_guardrails.py` | 20 | Unit | ⚠️ 4 failures (redaction tag naming) | Test delivery 🧪 |
 | `test_reranker.py` | 7 | Unit | ⚠️ 3 failures (score mismatches) | Test delivery 🧪 |
 | `test_hybrid_search.py` | 17 | Unit | ⚠️ 9 errors (missing `rank_bm25` package) | Test delivery 🧪 |
 | `test_dynamodb_vectorstore.py` | 13 | Unit | ✅ Passing | AWS depot 🏭 |
 | `test_integration_api.py` | 23 | Integration | ✅ All 23 passing | Test delivery 🧪 |
-| `test_e2e_rag_pipeline.py` | 8 | E2E | ✅ All 8 passing | backpack check 🫏 |
+| `test_e2e_rag_pipeline.py` | 8 | E2E | ✅ All 8 passing | Robot stable hand — auto-tests the donkey and redeploys when code changes |
 | `test_integration_features.py` | 12 | Feature flags | ✅ All 12 passing | Test delivery 🧪 |
 | **Total** | **146** | | **130 passing, 7 failing, 9 errors** | Feed bill 🌾 |
 

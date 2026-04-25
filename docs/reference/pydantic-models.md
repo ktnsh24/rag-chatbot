@@ -101,33 +101,33 @@ class Settings(BaseSettings):
 | Field | Type | Default | Env Variable | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
 | `cloud_provider` | `CloudProvider` | `local` | `CLOUD_PROVIDER` | Controls which cloud backends to use | Local barn 🏚️ |
-| `app_name` | `str` | `rag-chatbot` | `APP_NAME` | Service name in logs | backpack check 🫏 |
+| `app_name` | `str` | `rag-chatbot` | `APP_NAME` | Service name in logs | Donkey's trip log — every delivery's details written to disk for later review |
 | `app_env` | `AppEnvironment` | `dev` | `APP_ENV` | Environment (affects logging) | Gate guard 🔐 |
-| `app_port` | `int` | `8000` | `APP_PORT` | Server port | 🫏 On the route |
+| `app_port` | `int` | `8000` | `APP_PORT` | Server port | Donkey-side view of app_port — affects how the donkey loads, reads, or delivers the cargo |
 | `log_level` | `str` | `INFO` | `LOG_LEVEL` | Logging verbosity | Gate guard 🔐 |
 | `rag_top_k` | `int` | `5` | `RAG_TOP_K` | Chunks retrieved per query | backpack piece 📦 |
 | `rag_chunk_size` | `int` | `1000` | `RAG_CHUNK_SIZE` | Max characters per chunk | backpack piece 📦 |
 | `rag_chunk_overlap` | `int` | `200` | `RAG_CHUNK_OVERLAP` | Overlap between chunks | backpack piece 📦 |
 | `aws_region` | `str` | `eu-central-1` | `AWS_REGION` | AWS region | AWS depot 🏭 |
-| `aws_bedrock_model_id` | `str` | Claude 3.5 Sonnet | `AWS_BEDROCK_MODEL_ID` | Bedrock model | The donkey 🐴 |
+| `aws_bedrock_model_id` | `str` | Claude 3.5 Sonnet | `AWS_BEDROCK_MODEL_ID` | Bedrock model | Which AWS-depot donkey breed shows up to write the answer |
 | `aws_opensearch_endpoint` | `str` | `""` | `AWS_OPENSEARCH_ENDPOINT` | OpenSearch URL | AWS search hub 🔍 |
-| `aws_s3_bucket_name` | `str` | `rag-chatbot-documents` | `AWS_S3_BUCKET_NAME` | S3 bucket | Parcel shelf 📦 |
+| `aws_s3_bucket_name` | `str` | `rag-chatbot-documents` | `AWS_S3_BUCKET_NAME` | S3 bucket | The AWS warehouse name where source documents are uploaded for the donkey to fetch |
 | `aws_dynamodb_table_name` | `str` | `rag-chatbot-conversations` | `AWS_DYNAMODB_TABLE_NAME` | DynamoDB table (history) | AWS depot 🏭 |
 | `aws_dynamodb_vector_table_name` | `str` | `rag-chatbot-vectors` | `AWS_DYNAMODB_VECTOR_TABLE_NAME` | DynamoDB table (vector store — cheap alternative to OpenSearch) | AWS search hub 🔍 |
 | `vector_store_type` | `VectorStoreType` | `auto` | `VECTOR_STORE_TYPE` | Override vector store: `auto` (default for provider) or `dynamodb` ($0/month) | AWS depot 🏭 |
-| `azure_openai_endpoint` | `str` | `""` | `AZURE_OPENAI_ENDPOINT` | Azure OpenAI URL | The donkey 🐴 |
-| `azure_openai_api_key` | `str` | `""` | `AZURE_OPENAI_API_KEY` | Azure OpenAI key | The donkey 🐴 |
-| `azure_openai_deployment_name` | `str` | `gpt-4o` | `AZURE_OPENAI_DEPLOYMENT_NAME` | Model deployment | The donkey 🐴 |
+| `azure_openai_endpoint` | `str` | `""` | `AZURE_OPENAI_ENDPOINT` | Azure OpenAI URL | The street address of the Azure-hub stable where the donkey reports for work |
+| `azure_openai_api_key` | `str` | `""` | `AZURE_OPENAI_API_KEY` | Azure OpenAI key | The stable-gate password that lets you summon the Azure-hub donkey |
+| `azure_openai_deployment_name` | `str` | `gpt-4o` | `AZURE_OPENAI_DEPLOYMENT_NAME` | Model deployment | Which specific Azure-hub donkey (by name) gets dispatched for each delivery |
 | `azure_search_endpoint` | `str` | `""` | `AZURE_SEARCH_ENDPOINT` | AI Search URL | Azure hub ☁️ |
 | `azure_search_api_key` | `str` | `""` | `AZURE_SEARCH_API_KEY` | AI Search key | Azure hub ☁️ |
-| `ollama_base_url` | `str` | `http://localhost:11434` | `OLLAMA_BASE_URL` | Ollama REST API URL | The donkey 🐴 |
-| `ollama_model` | `str` | `llama3.2` | `OLLAMA_MODEL` | Ollama chat model | The donkey 🐴 |
-| `ollama_embedding_model` | `str` | `nomic-embed-text` | `OLLAMA_EMBEDDING_MODEL` | Ollama embedding model | The donkey 🐴 |
+| `ollama_base_url` | `str` | `http://localhost:11434` | `OLLAMA_BASE_URL` | Ollama REST API URL | Front-door address of the local barn where the laptop donkey lives |
+| `ollama_model` | `str` | `llama3.2` | `OLLAMA_MODEL` | Ollama chat model | Which local barn donkey breed writes the answers on your laptop |
+| `ollama_embedding_model` | `str` | `nomic-embed-text` | `OLLAMA_EMBEDDING_MODEL` | Ollama embedding model | The local barn worker that converts text into GPS coordinates for warehouse storage |
 | `chroma_collection_name` | `str` | `rag-chatbot` | `CHROMA_COLLECTION_NAME` | ChromaDB collection | Local barn 🏚️ |
 | `chroma_persist_directory` | `str` | `""` | `CHROMA_PERSIST_DIRECTORY` | ChromaDB storage path (empty = in-memory) | Local barn 🏚️ |
-| `enable_tracing` | `bool` | `False` | `ENABLE_TRACING` | OpenTelemetry tracing | 🫏 On the route |
+| `enable_tracing` | `bool` | `False` | `ENABLE_TRACING` | OpenTelemetry tracing | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 | `query_log_enabled` | `bool` | `True` | `QUERY_LOG_ENABLED` | Structured per-query JSONL logging (I30) | Gate guard 🔐 |
-| `query_log_dir` | `str` | `logs/queries` | `QUERY_LOG_DIR` | Directory for daily JSONL log files | 🫏 On the route |
+| `query_log_dir` | `str` | `logs/queries` | `QUERY_LOG_DIR` | Directory for daily JSONL log files | Donkey's trip log — every delivery's details written to disk for later review |
 
 **How it works:**
 
@@ -162,7 +162,7 @@ class ChatRequest(BaseModel):
 
 | Field | Type | Required? | Validation | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
-| `question` | `str` | **Yes** | 1–5000 chars | The user's question | 🫏 On the route |
+| `question` | `str` | **Yes** | 1–5000 chars | The user's question | Stable broke down — donkey couldn't complete the trip, customer sees an error |
 | `session_id` | `str` or `None` | No | None | Links follow-up questions together | Trip log 📒 |
 | `top_k` | `int` or `None` | No | 1–20 if provided | Override default chunk count | backpack piece 📦 |
 
@@ -206,11 +206,11 @@ class ChatResponse(BaseModel):
 
 | Field | Type | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `answer` | `str` | The AI-generated answer | 🫏 On the route |
+| `answer` | `str` | The AI-generated answer | What the donkey wrote and brought back to the customer |
 | `sources` | `list[SourceChunk]` | Which document chunks were used (citations) | backpack piece 📦 |
 | `session_id` | `str` | Session ID for follow-up questions | Trip log 📒 |
 | `request_id` | `UUID` | Unique ID for debugging/tracing | Hoof check 🔧 |
-| `cloud_provider` | `CloudProvider` | Which cloud processed this request | 🫏 On the route |
+| `cloud_provider` | `CloudProvider` | Which cloud processed this request | Donkey-side view of cloud_provider — affects how the donkey loads, reads, or delivers the cargo |
 | `latency_ms` | `int` | Total processing time | Feed bill 🌾 |
 | `token_usage` | `TokenUsage` or `None` | Token counts for cost tracking | Cargo unit ⚖️ |
 
@@ -227,7 +227,7 @@ class ChatResponse(BaseModel):
 | `document_name` | `str` | Which file this chunk came from | backpack piece 📦 |
 | `chunk_text` | `str` | The actual text content | backpack piece 📦 |
 | `relevance_score` | `float` (0.0–1.0) | How similar to the question (1.0 = perfect) | Right address 🎯 |
-| `page_number` | `int` or `None` | Page in original PDF | 🫏 On the route |
+| `page_number` | `int` or `None` | Page in original PDF | Which page of the original mail the backpack came from |
 
 - 🫏 **Donkey:** backpack-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
 
@@ -264,11 +264,11 @@ Example cost calculation (Claude 3.5 Sonnet):
 
 | Field | Type | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `document_id` | `str` | Unique ID for this document | 🫏 On the route |
-| `filename` | `str` | Original filename | 🫏 On the route |
+| `document_id` | `str` | Unique ID for this document | Donkey-side view of document_id — affects how the donkey loads, reads, or delivers the cargo |
+| `filename` | `str` | Original filename | Label on the original mail item the backpack was sliced from |
 | `status` | `DocumentStatus` | pending / processing / ready / failed | Hoof check 🔧 |
 | `chunk_count` | `int` | How many searchable chunks were created | backpack piece 📦 |
-| `message` | `str` | Human-readable status | 🫏 On the route |
+| `message` | `str` | Human-readable status | Donkey-side view of message — affects how the donkey loads, reads, or delivers the cargo |
 
 - 🫏 **Donkey:** The parcels being ingested — split into backpack-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.
 

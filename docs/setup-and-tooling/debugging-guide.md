@@ -86,9 +86,9 @@ In the dropdown at the top, you'll see three options:
 
 | Configuration | What it does | 🫏 Donkey |
 | --- | --- | --- |
-| **RAG Chatbot — Debug Server** | Starts the FastAPI server with debugger attached. Use this for testing endpoints. | backpack check 🫏 |
-| **RAG Chatbot — Debug Tests** | Runs all pytest tests with debugger. Use this when a test fails and you want to step through it. | backpack check 🫏 |
-| **RAG Chatbot — Debug Single Test File** | Runs only the currently open test file. Fastest for debugging one test. | backpack check 🫏 |
+| **RAG Chatbot — Debug Server** | Starts the FastAPI server with debugger attached. Use this for testing endpoints. | Stable manager — receives requests at the front door and dispatches the donkey |
+| **RAG Chatbot — Debug Tests** | Runs all pytest tests with debugger. Use this when a test fails and you want to step through it. | Donkey's report card — share of test deliveries that scored above the bar |
+| **RAG Chatbot — Debug Single Test File** | Runs only the currently open test file. Fastest for debugging one test. | Figuring out which part of the stable, donkey, or warehouse went wrong |
 
 ### Step 6: Set breakpoints
 
@@ -98,11 +98,11 @@ Click in the **gutter** (the space to the left of line numbers) to set a red dot
 
 | File | Line | Why | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `src/main.py` | Line inside `lifespan()` | See what happens at startup | 🫏 On the route |
+| `src/main.py` | Line inside `lifespan()` | See what happens at startup | Donkey-side view of src/main.py — affects how the donkey loads, reads, or delivers the cargo |
 | `src/api/routes/chat.py` | First line of `chat()` | See every incoming chat request | Stable door 🚪 |
-| `src/rag/chain.py` | Inside `query()` | See RAG retrieval + generation | backpack check 🫏 |
-| `src/llm/aws_bedrock.py` | Inside `generate()` | See the Bedrock API call | The donkey 🐴 |
-| `src/llm/azure_openai.py` | Inside `generate()` | See the Azure OpenAI API call | The donkey 🐴 |
+| `src/rag/chain.py` | Inside `query()` | See RAG retrieval + generation | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
+| `src/llm/aws_bedrock.py` | Inside `generate()` | See the Bedrock API call | Inspect the donkey's call to AWS Bedrock — see the raw Converse request and response |
+| `src/llm/azure_openai.py` | Inside `generate()` | See the Azure OpenAI API call | Inspect the donkey's call to Azure OpenAI — see the raw chat.completions request and response |
 | `src/vectorstore/base.py` | Inside `search()` | See vector search results | GPS warehouse 🗺️ |
 | `src/rag/ingestion.py` | Inside `chunk_document()` | See how documents are split | backpack piece 📦 |
 
@@ -143,13 +143,13 @@ When the debugger pauses, you can:
 
 | Action | How | Example | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **See variable values** | Look at the Variables panel | `body.question = "What is this?"` | 🫏 On the route |
-| **Hover over a variable** | Move mouse over it in the code | Shows the value in a tooltip | 🫏 On the route |
-| **Evaluate an expression** | Type in the Debug Console (bottom) | `len(search_results)` → `5` | Report card 📝 |
-| **Step over** | Press `F10` | Execute current line, move to next | 🫏 On the route |
-| **Step into** | Press `F11` | Go inside the function call | 🫏 On the route |
-| **Step out** | Press `Shift+F11` | Finish current function, go back to caller | 🫏 On the route |
-| **Continue** | Press `F5` | Run until next breakpoint | 🫏 On the route |
+| **See variable values** | Look at the Variables panel | `body.question = "What is this?"` | The actual cargo text inside the backpack the donkey is carrying |
+| **Hover over a variable** | Move mouse over it in the code | Shows the value in a tooltip | Donkey-side view of Hover over a variable — affects how the donkey loads, reads, or delivers the cargo |
+| **Evaluate an expression** | Type in the Debug Console (bottom) | `len(search_results)` → `5` | An on-route mini report card from the debugger about any in-flight donkey variable |
+| **Step over** | Press `F10` | Execute current line, move to next | Donkey-side view of Step over — affects how the donkey loads, reads, or delivers the cargo |
+| **Step into** | Press `F11` | Go inside the function call | Donkey-side view of Step into — affects how the donkey loads, reads, or delivers the cargo |
+| **Step out** | Press `Shift+F11` | Finish current function, go back to caller | Donkey-side view of Step out — affects how the donkey loads, reads, or delivers the cargo |
+| **Continue** | Press `F5` | Run until next breakpoint | Donkey-side view of Continue — affects how the donkey loads, reads, or delivers the cargo |
 | **Stop** | Press `Shift+F5` | Stop the debugger | Hoof check 🔧 |
 
 - 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
@@ -205,13 +205,13 @@ PyCharm's debugger has the same controls:
 | Action | VS Code | PyCharm | 🫏 Donkey |
 | --- | --- | --- | --- |
 | Start debugging | `F5` | `Shift+F9` | Hoof check 🔧 |
-| Set breakpoint | Click gutter / `F9` | Click gutter / `Ctrl+F8` | 🫏 On the route |
-| Step over | `F10` | `F8` | 🫏 On the route |
-| Step into | `F11` | `F7` | 🫏 On the route |
-| Step out | `Shift+F11` | `Shift+F8` | 🫏 On the route |
-| Continue | `F5` | `F9` | 🫏 On the route |
-| Stop | `Shift+F5` | `Ctrl+F2` | 🫏 On the route |
-| Evaluate expression | Debug Console | Alt+F8 | Report card 📝 |
+| Set breakpoint | Click gutter / `F9` | Click gutter / `Ctrl+F8` | Donkey-side view of Set breakpoint — affects how the donkey loads, reads, or delivers the cargo |
+| Step over | `F10` | `F8` | Donkey-side view of Step over — affects how the donkey loads, reads, or delivers the cargo |
+| Step into | `F11` | `F7` | Donkey-side view of Step into — affects how the donkey loads, reads, or delivers the cargo |
+| Step out | `Shift+F11` | `Shift+F8` | Donkey-side view of Step out — affects how the donkey loads, reads, or delivers the cargo |
+| Continue | `F5` | `F9` | Donkey-side view of Continue — affects how the donkey loads, reads, or delivers the cargo |
+| Stop | `Shift+F5` | `Ctrl+F2` | Donkey-side view of Stop — affects how the donkey loads, reads, or delivers the cargo |
+| Evaluate expression | Debug Console | Alt+F8 | A quick on-route report card from the debugger about any in-flight donkey variable |
 
 - 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
@@ -230,10 +230,10 @@ This is the central AI orchestrator. Set breakpoints on all 5 steps:
 
 | Step | Line (approx) | Code | What to inspect | AI concept you're seeing | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
-| **1. Embed** | 188 | `query_embedding = await self._llm.get_embedding(question)` | Hover `query_embedding` → 768 floats representing your question's meaning | **Text → Vector embedding** | The donkey 🐴 |
+| **1. Embed** | 188 | `query_embedding = await self._llm.get_embedding(question)` | Hover `query_embedding` → 768 floats representing your question's meaning | **Text → Vector embedding** | Donkey converts the question into 768 GPS coordinates — your first look at how text becomes meaning |
 | **2. Search** | 191 | `search_results = await self._vector_store.search(` | Hover `search_results` → list of chunks with similarity scores (0.0–1.0) | **HNSW vector similarity search** | backpack piece 📦 |
-| **3. Context** | 204 | `context_texts = [result.text for result in search_results]` | Hover `context_texts` → the actual text chunks the LLM will read | **RAG context building** | The donkey 🐴 |
-| **4. Generate** | 207 | `llm_response = await self._llm.generate(` | After step-over: hover `llm_response` → the LLM's answer + token count | **LLM text generation** | The donkey 🐴 |
+| **3. Context** | 204 | `context_texts = [result.text for result in search_results]` | Hover `context_texts` → the actual text chunks the LLM will read | **RAG context building** | Inspect the actual backpack contents the donkey will read before writing the answer |
+| **4. Generate** | 207 | `llm_response = await self._llm.generate(` | After step-over: hover `llm_response` → the LLM's answer + token count | **LLM text generation** | Watch the donkey produce its answer — text plus token count returned from the writing stable |
 | **5. Cost** | 223 | `token_usage = {` | Hover to see input/output tokens + estimated $ cost | **Token counting & cost estimation** | Cargo unit ⚖️ |
 
 **What to look for:**
@@ -249,7 +249,7 @@ Go deeper to see the raw HTTP communication with Ollama:
 
 | Method | Line (approx) | Code | What to inspect | AI concept | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
-| `generate()` | ~87 | `response = await self._client.post(` | Step over → hover `response` → see the raw JSON Ollama returns (model, created_at, response text) | **LLM HTTP API call** | The donkey 🐴 |
+| `generate()` | ~87 | `response = await self._client.post(` | Step over → hover `response` → see the raw JSON Ollama returns (model, created_at, response text) | **LLM HTTP API call** | See the raw HTTP call the donkey makes to the local Ollama stable to compose an answer |
 | `get_embedding()` | ~135 | `response = await self._client.post(` | Step over → hover `response` → see the raw embedding array from nomic-embed-text | **Embedding API call** | Stable door 🚪 |
 | `get_embeddings_batch()` | ~167 | `response = await self._client.post(` | Same as above but for multiple texts at once (used during document upload) | **Batch embedding** | GPS warehouse 🗺️ |
 
@@ -281,9 +281,9 @@ Set these when uploading a document to see the full ETL-for-AI pipeline:
 
 | Step | Line (approx) | Code | What to inspect | AI concept | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
-| **1. Parse** | 140 | `text = read_document(filename, content)` | Hover `text` → raw text extracted from your PDF/DOCX/TXT | **Document parsing** | 🫏 On the route |
+| **1. Parse** | 140 | `text = read_document(filename, content)` | Hover `text` → raw text extracted from your PDF/DOCX/TXT | **Document parsing** | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
 | **2. Chunk** | 144 | `chunks = chunk_document(` | Hover `chunks` → list of overlapping text pieces (1000 chars each, 200 overlap) | **Text chunking (RecursiveCharacterTextSplitter)** | backpack piece 📦 |
-| **3. Embed** | ~152 | `embeddings = await self._llm.get_embeddings_batch(chunks)` | Hover `embeddings` → N×768 matrix (N chunks, each with 768-dim vector) | **Batch embedding generation** | The donkey 🐴 |
+| **3. Embed** | ~152 | `embeddings = await self._llm.get_embeddings_batch(chunks)` | Hover `embeddings` → N×768 matrix (N chunks, each with 768-dim vector) | **Batch embedding generation** | Batch step where every chunk is converted into GPS coordinates in one trip to the embedding stable |
 | **4. Store** | ~156 | `stored = await self._vector_store.store_vectors(` | Step over → see how many vectors were indexed in ChromaDB | **Vector storage & HNSW indexing** | Local barn 🏚️ |
 
 **What to look for:**
@@ -295,7 +295,7 @@ Set these when uploading a document to see the full ETL-for-AI pipeline:
 
 | Function | Line | What to inspect | AI concept | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| `read_document()` | Start of function | `filename` and `content` → see what format was uploaded | **Multi-format document parsing** | 🫏 On the route |
+| `read_document()` | Start of function | `filename` and `content` → see what format was uploaded | **Multi-format document parsing** | Stable inspector — checks the code is tidy before letting the donkey out |
 | `chunk_document()` | After `text_splitter.split_text()` | The `chunks` list → see exactly where the text was split and how overlap works | **Chunking strategy** | backpack piece 📦 |
 
 **Try in the Debug Console:**

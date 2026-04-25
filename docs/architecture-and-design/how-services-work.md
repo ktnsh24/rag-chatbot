@@ -149,8 +149,8 @@ response = self._runtime_client.converse(
 
 | boto3 method | AWS API action | When it happens | IAM permission | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| `converse()` | `bedrock-runtime:Converse` | Every chat query | `bedrock:InvokeModel` | The donkey 🐴 |
-| `invoke_model()` | `bedrock-runtime:InvokeModel` | Every embedding request | `bedrock:InvokeModel` | The donkey 🐴 |
+| `converse()` | `bedrock-runtime:Converse` | Every chat query | `bedrock:InvokeModel` | The donkey rings AWS's stable phone via Converse for every chat trip |
+| `invoke_model()` | `bedrock-runtime:InvokeModel` | Every embedding request | `bedrock:InvokeModel` | The donkey rings AWS's stable phone via InvokeModel to convert text into GPS coordinates |
 
 ### How the Converse API differs from InvokeModel
 
@@ -242,8 +242,8 @@ a complex combination of many linguistic features.
 | Model | Dimensions | Quality | Speed | Storage per chunk | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
 | Titan Embeddings v2 | 1024 | Good | Fast | 4 KB | GPS warehouse 🗺️ |
-| OpenAI text-embedding-3-small | 1536 | Better | Fast | 6 KB | The donkey 🐴 |
-| OpenAI text-embedding-3-large | 3072 | Best | Slower | 12 KB | The donkey 🐴 |
+| OpenAI text-embedding-3-small | 1536 | Better | Fast | 6 KB | Slightly richer GPS coordinates (1536 dims) at modest extra storage per chunk |
+| OpenAI text-embedding-3-large | 3072 | Best | Slower | 12 KB | Highest-fidelity GPS coordinates (3072 dims) but slower to compute and triple the storage |
 
 - 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
@@ -399,11 +399,11 @@ response = self._client.search(index=self.index_name, body=body)
 
 | Python method | OpenSearch action | When it happens | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `client.indices.create()` | `PUT /index-name` | Once, at startup (creates the index) | 🫏 On the route |
+| `client.indices.create()` | `PUT /index-name` | Once, at startup (creates the index) | Donkey-side view of client.indices.create() — affects how the donkey loads, reads, or delivers the cargo |
 | `client.index()` | `PUT /index-name/_doc/id` | For each chunk during document ingestion | backpack piece 📦 |
 | `client.indices.refresh()` | `POST /index-name/_refresh` | After ingestion (makes new docs searchable) | Pre-sort 📮 |
 | `client.search()` | `POST /index-name/_search` | Every chat query (vector similarity search) | GPS warehouse 🗺️ |
-| `client.delete_by_query()` | `POST /index-name/_delete_by_query` | When deleting a document | 🫏 On the route |
+| `client.delete_by_query()` | `POST /index-name/_delete_by_query` | When deleting a document | Donkey-side view of client.delete_by_query() — affects how the donkey loads, reads, or delivers the cargo |
 
 ### How authentication works
 
@@ -494,13 +494,13 @@ response = await self._client.chat.completions.create(
 
 | Aspect | Bedrock (our AWS code) | Azure OpenAI (our Azure code) | 🫏 Donkey |
 | --- | --- | --- | --- |
-| Python SDK | `boto3` | `openai` (same as OpenAI's SDK!) | The donkey 🐴 |
+| Python SDK | `boto3` | `openai` (same as OpenAI's SDK!) | Different stable-manager toolkits the donkey uses to call each cloud's stables |
 | Auth | IAM SigV4 (automatic) | API key or Managed Identity | Stable door 🚪 |
-| API style | `converse()` — universal format | `chat.completions.create()` — OpenAI format | The donkey 🐴 |
-| Async | ❌ boto3 is sync | ✅ `AsyncAzureOpenAI` | The donkey 🐴 |
-| Models | Claude, Llama, Titan, Mistral | GPT-4, GPT-4o, GPT-3.5 | The donkey 🐴 |
+| API style | `converse()` — universal format | `chat.completions.create()` — OpenAI format | Converse uses one universal cargo manifest; OpenAI uses its own format for every call |
+| Async | ❌ boto3 is sync | ✅ `AsyncAzureOpenAI` | Azure's SDK lets the donkey trot many deliveries concurrently; boto3 makes it wait between trips |
+| Models | Claude, Llama, Titan, Mistral | GPT-4, GPT-4o, GPT-3.5 | Bedrock stables many donkey breeds; Azure stables the GPT family exclusively |
 | Embedding call | `invoke_model()` — separate API | `embeddings.create()` — same SDK | Stable door 🚪 |
-| Streaming | `converse_stream()` | `stream=True` parameter | 🫏 On the route |
+| Streaming | `converse_stream()` | `stream=True` parameter | Donkey-side view of Streaming — affects how the donkey loads, reads, or delivers the cargo |
 
 ### Embedding with Azure OpenAI
 
@@ -589,10 +589,10 @@ for result in results:
 | Aspect | OpenSearch Serverless | Azure AI Search | 🫏 Donkey |
 | --- | --- | --- | --- |
 | Vector algorithm | HNSW (open-source) | Proprietary (HNSW-based) | GPS warehouse 🗺️ |
-| Dimensions | 1024 (Titan) | 1536 (OpenAI) | The donkey 🐴 |
+| Dimensions | 1024 (Titan) | 1536 (OpenAI) | Titan writes 1024 GPS coordinates per text, Azure 1536 — the warehouse index must match |
 | Auth | AWS SigV4 | API key or Managed Identity | Stable door 🚪 |
 | Min cost | ~$350/month ⚠️ | **Free tier available** ✅ | Feed bill 🌾 |
-| Refresh needed? | Yes (`_refresh` after indexing) | No (immediate) | 🫏 On the route |
+| Refresh needed? | Yes (`_refresh` after indexing) | No (immediate) | How quickly newly-sorted mail shows up on the warehouse shelves |
 | Python SDK | `opensearch-py` | `azure-search-documents` | AWS search hub 🔍 |
 | Query format | JSON body with `knn` | `VectorizedQuery` object | GPS warehouse 🗺️ |
 
@@ -684,7 +684,7 @@ This is why DynamoDB is called "single-digit millisecond latency"
 
 | Python method | DynamoDB API action | When it happens | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `table.put_item()` | `PutItem` | Storing each message (user + assistant) | 🫏 On the route |
+| `table.put_item()` | `PutItem` | Storing each message (user + assistant) | Donkey-side view of table.put_item() — affects how the donkey loads, reads, or delivers the cargo |
 | `table.query()` | `Query` | Loading conversation history for context | Trip log 📒 |
 | `table.batch_writer()` | `BatchWriteItem` | Deleting all messages in a session | Trip log 📒 |
 
@@ -701,11 +701,11 @@ The main difference is terminology and pricing:
 
 | Concept | DynamoDB | Cosmos DB | 🫏 Donkey |
 | --- | --- | --- | --- |
-| Data unit | Item | Document | 🫏 On the route |
-| Primary key | Partition key + Sort key | Partition key + id | 🫏 On the route |
-| Throughput | Read/Write Capacity Units | Request Units (RU) | 🫏 On the route |
-| Query language | Key conditions + filters | **SQL syntax** ✅ | 🫏 On the route |
-| Serverless mode | On-demand | Serverless | 🫏 On the route |
+| Data unit | Item | Document | Donkey-side view of Data unit — affects how the donkey loads, reads, or delivers the cargo |
+| Primary key | Partition key + Sort key | Partition key + id | Address label on the depot shelf — tells the donkey exactly which row to grab |
+| Throughput | Read/Write Capacity Units | Request Units (RU) | Tachograph counter — how many deliveries the donkey completed |
+| Query language | Key conditions + filters | **SQL syntax** ✅ | The customer's question that goes on the delivery note |
+| Serverless mode | On-demand | Serverless | Donkey-side view of Serverless mode — affects how the donkey loads, reads, or delivers the cargo |
 | Free tier | 25 GB + 25 RCU/WCU | 1000 RU/s + 25 GB | Free hay 🌿 |
 
 ### The big advantage: SQL queries
@@ -744,10 +744,10 @@ Every operation costs RUs:
 
 | Operation | Cost | 🫏 Donkey |
 | --- | --- | --- |
-| Read 1 document (1 KB) by id + partition key | 1 RU | 🫏 On the route |
-| Write 1 document (1 KB) | 5 RU | 🫏 On the route |
-| Query returning 5 documents | ~5-10 RU | 🫏 On the route |
-| Cross-partition query | 10-100+ RU ⚠️ | 🫏 On the route |
+| Read 1 document (1 KB) by id + partition key | 1 RU | Address label on the depot shelf — tells the donkey exactly which row to grab |
+| Write 1 document (1 KB) | 5 RU | Donkey-side view of Write 1 document (1 KB) — affects how the donkey loads, reads, or delivers the cargo |
+| Query returning 5 documents | ~5-10 RU | The customer's question that goes on the delivery note |
+| Cross-partition query | 10-100+ RU ⚠️ | The customer's question that goes on the delivery note |
 
 In serverless mode: $0.25 per million RU. For our conversation history,
 each chat exchange costs ~11 RU (5 RU write user + 5 RU write assistant + 1 RU read).
@@ -821,10 +821,10 @@ TOTAL COST: ~$0.004 (less than half a cent per question)
 | Step | Service | API action | Time | Cost | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
 | ① Load history | DynamoDB / Cosmos DB | Query | ~5ms | ~$0.000001 | AWS depot 🏭 |
-| ② Embed question | Bedrock Titan / Azure OpenAI | InvokeModel / embeddings.create | ~100ms | ~$0.000002 | The donkey 🐴 |
+| ② Embed question | Bedrock Titan / Azure OpenAI | InvokeModel / embeddings.create | ~100ms | ~$0.000002 | Convert the customer's question into GPS coordinates so the warehouse can be searched |
 | ③ Vector search | OpenSearch / AI Search | k-NN search | ~50ms | ~$0.0001 | AWS search hub 🔍 |
 | ④ Build prompt | (local, no service call) | — | ~1ms | $0 | Delivery note 📋 |
-| ⑤ Generate answer | Bedrock Claude / Azure GPT-4o | Converse / chat.completions | ~2000ms | ~$0.004 | The donkey 🐴 |
+| ⑤ Generate answer | Bedrock Claude / Azure GPT-4o | Converse / chat.completions | ~2000ms | ~$0.004 | The donkey writes the final answer — slowest and most expensive step of the trip |
 | ⑥ Save history | DynamoDB / Cosmos DB | PutItem × 2 | ~5ms | ~$0.000003 | AWS depot 🏭 |
 | **Total** | | | **~2.2s** | **~$0.004** | Feed bill 🌾 |
 

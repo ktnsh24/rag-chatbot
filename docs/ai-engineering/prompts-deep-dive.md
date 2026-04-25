@@ -33,9 +33,9 @@ This 65-line file controls **100% of the LLM's behaviour**. Change one word in t
 
 | What you'll learn | DE parallel | 🫏 Donkey |
 |---|---| --- |
-| System prompts that set LLM behaviour | SQL query templates with bind variables | The donkey 🐴 |
+| System prompts that set LLM behaviour | SQL query templates with bind variables | The standing-orders sheet pinned to the stable wall that every donkey reads before any trip |
 | Constraints that prevent hallucination | CHECK constraints that prevent bad data | Memory drift ⚠️ |
-| Template variables (`{context}`, `{question}`) | Parameterised queries (`?`, `$1`) | 🫏 On the route |
+| Template variables (`{context}`, `{question}`) | Parameterised queries (`?`, `$1`) | Blank slots on the delivery note where the cargo manifest and question get pasted in |
 | Multi-turn conversation context | Session state management | Trip log 📒 |
 | The cost impact of prompt length | The cost of scanning too many rows | Delivery note 📋 |
 
@@ -131,9 +131,9 @@ The role definition doesn't enforce anything technically — but it shifts the m
 
 | With role definition | Without role definition | 🫏 Donkey |
 |---|---| --- |
-| "Based on the documents, refunds take 14 days." | "Generally, refunds take 5-30 business days depending on the company." | 🫏 On the route |
-| Grounded in YOUR documents | Grounded in internet training data | 🫏 On the route |
-| Trustworthy for business use | Dangerous for business use | 🫏 On the route |
+| "Based on the documents, refunds take 14 days." | "Generally, refunds take 5-30 business days depending on the company." | Donkey-side view of "Based on the documents, refunds take 14 days." — affects how the donkey loads, reads, or delivers the cargo |
+| Grounded in YOUR documents | Grounded in internet training data | Donkey-side view of Grounded in YOUR documents — affects how the donkey loads, reads, or delivers the cargo |
+| Trustworthy for business use | Dangerous for business use | Donkey-side view of Trustworthy for business use — affects how the donkey loads, reads, or delivers the cargo |
 
 - 🫏 **Donkey:** The donkey itself — it carries the question in, consults the backpack, and writes the answer on the way back.
 
@@ -146,12 +146,12 @@ Each rule targets a specific failure mode:
 | Rule | What it prevents | DE parallel | 🫏 Donkey |
 |---|---|---| --- |
 | **Rule 1:** ONLY use context | Hallucination — making up facts | Referential integrity — no orphaned foreign keys | Memory drift ⚠️ |
-| **Rule 2:** Say "I don't know" | Confident wrong answers | `COALESCE(result, 'No data available')` | 🫏 On the route |
-| **Rule 3:** Cite sources | Untraceable claims | Audit trail — every row has a source system ID | 🫏 On the route |
-| **Rule 4:** Be thorough | Incomplete answers | `SELECT *` vs `SELECT id` — return all relevant columns | 🫏 On the route |
-| **Rule 5:** Bullet points | Wall-of-text answers | Output formatting — structured JSON vs raw strings | 🫏 On the route |
-| **Rule 6:** Handle ambiguity | Wrong interpretation | Input validation — clarify before processing | 🫏 On the route |
-| **Rule 7:** Never make up info | Reinforces Rule 1 | Defence in depth — multiple checks for the same risk | 🫏 On the route |
+| **Rule 2:** Say "I don't know" | Confident wrong answers | `COALESCE(result, 'No data available')` | The donkey honestly admitting it has no matching backpack rather than guessing |
+| **Rule 3:** Cite sources | Untraceable claims | Audit trail — every row has a source system ID | Label on the original mail item the backpack was sliced from |
+| **Rule 4:** Be thorough | Incomplete answers | `SELECT *` vs `SELECT id` — return all relevant columns | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
+| **Rule 5:** Bullet points | Wall-of-text answers | Output formatting — structured JSON vs raw strings | Stable inspector — checks the code is tidy before letting the donkey out |
+| **Rule 6:** Handle ambiguity | Wrong interpretation | Input validation — clarify before processing | Donkey-side view of Rule 6:** Handle ambiguity — affects how the donkey loads, reads, or delivers the cargo |
+| **Rule 7:** Never make up info | Reinforces Rule 1 | Defence in depth — multiple checks for the same risk | Donkey-side view of Rule 7:** Never make up info — affects how the donkey loads, reads, or delivers the cargo |
 
 **Why Rule 7 repeats Rule 1:** LLMs respond to emphasis. Saying "only use context" (Rule 1) and "never make up information" (Rule 7) at the top AND bottom of the rules creates a "sandwich" effect — the model is less likely to hallucinate.
 
@@ -284,9 +284,9 @@ RAG_SYSTEM_PROMPT                   query():
 | Aspect | AWS (Bedrock/Claude) | Azure (OpenAI/GPT-4o) | Local (Ollama/llama3.2) | 🫏 Donkey |
 |---|---|---|---| --- |
 | **System prompt placement** | Separate `system` field | `role: "system"` message | `role: "system"` message | Delivery note 📋 |
-| **User message** | `content: [{text: ...}]` (nested) | `content: "..."` (flat string) | `content: "..."` (flat string) | 🫏 On the route |
+| **User message** | `content: [{text: ...}]` (nested) | `content: "..."` (flat string) | `content: "..."` (flat string) | The customer's question — written on the delivery note for the donkey to read |
 | **Prompt format** | Identical template text | Identical template text | Identical template text | Delivery note 📋 |
-| **Behaviour difference** | Best instruction following | More creative/verbose | Good but less nuanced | 🫏 On the route |
+| **Behaviour difference** | Best instruction following | More creative/verbose | Good but less nuanced | How precisely the donkey obeys the standing orders on the delivery note |
 | **Cost per prompt** | ~$0.0025 | ~$0.0021 | **$0** | Delivery note 📋 |
 
 **Key insight:** The prompt text is the same across all providers. Only the API format differs. This is handled by each provider's `generate()` method, not by the prompt itself.
@@ -299,11 +299,11 @@ RAG_SYSTEM_PROMPT                   query():
 
 | Rule | This prompt's example | Anti-pattern | 🫏 Donkey |
 |---|---|---| --- |
-| **Be specific** | "ONLY use information from the context" | "Try to use the context" | 🫏 On the route |
-| **Define fallback** | "If context doesn't have the answer, say so" | (no fallback → LLM guesses) | The donkey 🐴 |
-| **Constrain format** | "Use bullet points" | (no format → wall of text) | 🫏 On the route |
-| **Separate sections** | `---` between context and question | Everything jumbled together | 🫏 On the route |
-| **Limit scope** | "answers questions based on provided documents" | "You are a general-purpose AI" | 🫏 On the route |
+| **Be specific** | "ONLY use information from the context" | "Try to use the context" | Stable inspector — checks the code is tidy before letting the donkey out |
+| **Define fallback** | "If context doesn't have the answer, say so" | (no fallback → LLM guesses) | Tell the donkey what to say when the backpack is empty, or it will invent cargo to deliver |
+| **Constrain format** | "Use bullet points" | (no format → wall of text) | Stable inspector — checks the code is tidy before letting the donkey out |
+| **Separate sections** | `---` between context and question | Everything jumbled together | Donkey-side view of Separate sections — affects how the donkey loads, reads, or delivers the cargo |
+| **Limit scope** | "answers questions based on provided documents" | "You are a general-purpose AI" | Donkey-side view of Limit scope — affects how the donkey loads, reads, or delivers the cargo |
 
 - 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
 
@@ -329,10 +329,10 @@ The same prompt produces different quality answers depending on the model:
 
 | Aspect | Claude 3.5 Sonnet (AWS) | GPT-4o (Azure) | llama3.2 (Local) | 🫏 Donkey |
 |---|---|---|---| --- |
-| **Instruction following** | Excellent — follows rules precisely | Very good — sometimes verbose | Good — occasionally ignores minor rules | 🫏 On the route |
-| **Citation accuracy** | Almost always cites correctly | Usually cites, sometimes forgets | May not cite consistently | 🫏 On the route |
-| **"I don't know" response** | Reliably says it when context is empty | Usually says it | Sometimes tries to answer anyway | 🫏 On the route |
-| **Temperature sensitivity** | Very responsive to 0.1 | Responsive | Less precise control | 🫏 On the route |
+| **Instruction following** | Excellent — follows rules precisely | Very good — sometimes verbose | Good — occasionally ignores minor rules | How precisely the donkey obeys the standing orders on the delivery note |
+| **Citation accuracy** | Almost always cites correctly | Usually cites, sometimes forgets | May not cite consistently | Receipts the donkey hands over — which backpacks the answer came from |
+| **"I don't know" response** | Reliably says it when context is empty | Usually says it | Sometimes tries to answer anyway | What the donkey wrote and brought back to the customer |
+| **Temperature sensitivity** | Very responsive to 0.1 | Responsive | Less precise control | How predictable the donkey's writing is — low = same words every trip, high = the donkey gets creative |
 | **Recommended for** | Production (highest quality) | Production (good balance) | Development and testing | Test delivery 🧪 |
 | **Cost per query** | ~$0.0065 | ~$0.005 | **$0** | Feed bill 🌾 |
 

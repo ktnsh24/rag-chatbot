@@ -58,7 +58,7 @@ This is identical to building a pipeline monitoring API:
 
 | Concept | Data Engineering | RAG Chatbot | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Log source** | Airflow task logs, DAG run metadata | JSONL query logs from QueryLogger | 🫏 On the route |
+| **Log source** | Airflow task logs, DAG run metadata | JSONL query logs from QueryLogger | Donkey's trip log — every delivery's details written to disk for later review |
 | **Failure list** | `/pipeline/failures` — which DAGs failed and why | `/queries/failures` — which queries failed and why | Robot hand 🤖 |
 | **Aggregate stats** | DAG success rate, avg duration, failure reasons | Pass rate, avg scores, failure categories | Hoof check 🔧 |
 | **Triage** | "data_quality", "timeout", "permission_denied" | "bad_retrieval", "hallucination", "both_bad" | Memory drift ⚠️ |
@@ -94,8 +94,8 @@ async def list_failures(
 
 | Parameter | Default | What it controls | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `limit` | 20 | Max results to return (1–100) | 🫏 On the route |
-| `days` | 7 | How far back to search (1–30 days) | 🫏 On the route |
+| `limit` | 20 | Max results to return (1–100) | Donkey-side view of limit — affects how the donkey loads, reads, or delivers the cargo |
+| `days` | 7 | How far back to search (1–30 days) | Donkey-side view of days — affects how the donkey loads, reads, or delivers the cargo |
 | `category` | None | Filter by failure type: `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`, `marginal` | Memory drift ⚠️ |
 
 ### Example response
@@ -186,10 +186,10 @@ category based on which dimensions failed:
 
 | Category | Retrieval | Faithfulness | Relevance | What it means | 🫏 Donkey |
 | --- | --- | --- | --- | --- | --- |
-| `bad_retrieval` | Low | OK | Low | Wrong chunks retrieved — the LLM couldn't answer because it got irrelevant context | The donkey 🐴 |
-| `hallucination` | OK | Low | OK | Right chunks, but the LLM made things up instead of using them | The donkey 🐴 |
-| `both_bad` | Low | Low | — | Wrong chunks AND the LLM improvised — worst case | The donkey 🐴 |
-| `off_topic` | OK | OK | Low | Chunks were relevant, LLM was faithful, but the answer missed the actual question | The donkey 🐴 |
+| `bad_retrieval` | Low | OK | Low | Wrong chunks retrieved — the LLM couldn't answer because it got irrelevant context | Donkey arrived with the wrong backpack — couldn't write a useful note because the cargo had nothing to do with the question |
+| `hallucination` | OK | Low | OK | Right chunks, but the LLM made things up instead of using them | Backpack was correct, but the donkey scribbled extras from memory instead of using what it was carrying |
+| `both_bad` | Low | Low | — | Wrong chunks AND the LLM improvised — worst case | Wrong backpack and the donkey made things up on top — worst possible delivery |
+| `off_topic` | OK | OK | Low | Chunks were relevant, LLM was faithful, but the answer missed the actual question | Right backpack, honest donkey, but the answer never reached the address the customer wrote on the question |
 | `marginal` | — | — | — | Failed overall but no single dimension is terrible — borderline case | Hoof check 🔧 |
 
 ### DE parallel for triage

@@ -127,7 +127,7 @@ CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
 | `python:3.12-slim` | Slim base image | ✅ Standard practice | Stable stall 🐎 |
 | `poetry install --without dev` | Prod deps only | ✅ Standard — skip test/lint deps | Test delivery 🧪 |
 | `virtualenvs.create false` | No venv inside container | ✅ Standard — container IS the isolation | Stable stall 🐎 |
-| Layer ordering (deps → code) | Cache optimization | ✅ Standard — deps change rarely, code changes often | 🫏 On the route |
+| Layer ordering (deps → code) | Cache optimization | ✅ Standard — deps change rarely, code changes often | Donkey-side view of Layer ordering (deps → code) — affects how the donkey loads, reads, or delivers the cargo |
 | `HEALTHCHECK` | Container health endpoint | ✅ Standard — ECS/Container Apps use this | Stable stall 🐎 |
 | `uvicorn` CMD | ASGI server | ✅ Standard FastAPI deployment | Stable door 🚪 |
 
@@ -319,10 +319,10 @@ Manual trigger → Login to Azure → Login to ACR → Build + Push → Terrafor
 | --- | --- | --- | --- |
 | **Container hosting** | ECS Fargate | Azure Container Apps | Stable stall 🐎 |
 | **Registry** | ECR | ACR | Stable address 🏷️ |
-| **Auth method** | OIDC → IAM role | OIDC → service principal | 🫏 On the route |
+| **Auth method** | OIDC → IAM role | OIDC → service principal | Stable keys — only authorised callers may ask the donkey to deliver |
 | **Secrets needed** | 1 (`AWS_ROLE_ARN`) | 4 (`CLIENT_ID`, `TENANT_ID`, `SUBSCRIPTION_ID`, `ACR_NAME`) | Stable address 🏷️ |
 | **Deploy command** | `aws ecs update-service` | `az containerapp update` | Robot hand 🤖 |
-| **Scaling** | ECS auto-scaling (configured in task def) | Built-in scaling rules | 🫏 On the route |
+| **Scaling** | ECS auto-scaling (configured in task def) | Built-in scaling rules | Always-on donkey stall — container that keeps the stable up 24/7 |
 | **Cost (idle)** | Fargate charges per vCPU-hour | Container Apps can scale to zero | Stable stall 🐎 |
 | **Cost (1 vCPU, 2GB)** | ~$30/month (always running) | ~$0/month (scale to zero) | Feed bill 🌾 |
 
@@ -387,11 +387,11 @@ Health check passes → /api/health returns 200
 
 | Aspect | What a DE sees | What an AI Engineer sees | 🫏 Donkey |
 | --- | --- | --- | --- |
-| Dockerfile | Standard Python container | Cloud models = small image (~500MB). Local mode calls Ollama externally (not in container). Bundling models inside container would be 10GB+ with GPU deps | The donkey 🐴 |
-| `HEALTHCHECK` | Container health | AI-specific: checks connections to LLM, vector store, not just HTTP 200 | The donkey 🐴 |
-| CI lint + test | Standard quality gates | Tests mock AI services — real LLM calls would cost money per CI run | The donkey 🐴 |
-| Deploy Terraform | Standard infra-as-code | Creates AI-specific resources (Bedrock IAM, OpenSearch if added) | The donkey 🐴 |
-| Manual deploy | Safety measure | Essential for AI — deploying a broken prompt to production can cause embarrassing LLM outputs | The donkey 🐴 |
+| Dockerfile | Standard Python container | Cloud models = small image (~500MB). Local mode calls Ollama externally (not in container). Bundling models inside container would be 10GB+ with GPU deps | Small stable on wheels — the donkey lives in the cloud, so the container only needs to phone its API |
+| `HEALTHCHECK` | Container health | AI-specific: checks connections to LLM, vector store, not just HTTP 200 | Asks "is the donkey awake, is the warehouse reachable, is the GPS stamper ready?" — not just "is the door open?" |
+| CI lint + test | Standard quality gates | Tests mock AI services — real LLM calls would cost money per CI run | Robot stable hand uses a fake donkey during tests so every CI run doesn't burn real hay |
+| Deploy Terraform | Standard infra-as-code | Creates AI-specific resources (Bedrock IAM, OpenSearch if added) | Blueprints raise the stable plus AI-only fittings — Bedrock permissions for the donkey, an OpenSearch warehouse if needed |
+| Manual deploy | Safety measure | Essential for AI — deploying a broken prompt to production can cause embarrassing LLM outputs | A human opens the gate before a new delivery note ships — one bad prompt can spoil every customer reply |
 | Image tag = git SHA | Traceability | Rollback is critical — a bad prompt change can degrade all AI responses | Delivery note 📋 |
 
 ### Why manual deploy matters more for AI

@@ -27,9 +27,9 @@ This is the **first AI file** you encounter after Phase 1. It defines the contra
 
 | # | Concept | Method / class | DE parallel | What's new | 🫏 Donkey |
 |---|---|---|---|---| --- |
-| 1 | **Tokens** | `LLMResponse` | RCU/WCU (DynamoDB capacity units) | The unit of cost — output tokens cost 5× more than input | The donkey 🐴 |
+| 1 | **Tokens** | `LLMResponse` | RCU/WCU (DynamoDB capacity units) | The unit of cost — output tokens cost 5× more than input | Bales of hay the donkey eats — output bales cost 5× more than input bales |
 | 2 | **Generation** | `generate()` | `db.query(sql)` → rows | Send prompt + context → get text + token counts back | Cargo unit ⚖️ |
-| 3 | **Temperature** | `temperature` param | ❌ No parallel — pure AI | Controls randomness: 0.0 = deterministic, 1.0 = creative | 🫏 On the route |
+| 3 | **Temperature** | `temperature` param | ❌ No parallel — pure AI | Controls randomness: 0.0 = deterministic, 1.0 = creative | How predictable the donkey's writing is — low = same words every trip, high = the donkey gets creative |
 | 4 | **Embeddings** | `get_embedding()` | ❌ No parallel — brand new | Converts text → fixed-size vector that captures meaning | GPS warehouse 🗺️ |
 | 5 | **Batch embeddings** | `get_embeddings_batch()` | Batch INSERT | One API call instead of N — same performance pattern | Stable door 🚪 |
 
@@ -89,7 +89,7 @@ Because they have different prices:
 | Token type | Who produces it | Claude 3.5 Sonnet price | DE parallel | 🫏 Donkey |
 |---|---|---|---| --- |
 | **Input tokens** | You send them (prompt + context) | $0.003 / 1K tokens | Like DynamoDB Read Capacity Units | AWS depot 🏭 |
-| **Output tokens** | LLM generates them (the answer) | $0.015 / 1K tokens (**5× more**) | Like DynamoDB Write Capacity Units | The donkey 🐴 |
+| **Output tokens** | LLM generates them (the answer) | $0.015 / 1K tokens (**5× more**) | Like DynamoDB Write Capacity Units | Hay the donkey burns while writing the reply — costs five times more than hay it eats while reading |
 
 Output tokens cost **5× more** than input tokens — same pattern as DynamoDB where writes cost more than reads. Tracking them separately lets you optimise: a verbose LLM answer costs more than a concise one.
 
@@ -122,7 +122,7 @@ async def generate(
 |---|---|---|---| --- |
 | `prompt` | The user's question + system instructions | `"What is the refund policy?"` | The SQL query | Delivery note 📋 |
 | `context` | Document chunks retrieved by vector search | `["Our refund policy allows...", "Returns must be..."]` | The tables the query runs against | backpack piece 📦 |
-| `temperature` | Randomness control (0.0 = deterministic, 1.0 = creative) | `0.1` | ❌ No DE parallel — pure AI concept | 🫏 On the route |
+| `temperature` | Randomness control (0.0 = deterministic, 1.0 = creative) | `0.1` | ❌ No DE parallel — pure AI concept | How predictable the donkey's writing is — low = same words every trip, high = the donkey gets creative |
 
 ### How generation works end-to-end
 
@@ -171,10 +171,10 @@ Next word probabilities for "The refund policy ___":
 
 | Temperature | Behaviour | Use case | 🫏 Donkey |
 |---|---|---| --- |
-| 0.0 | Always picks the highest-probability word | Math, code generation | 🫏 On the route |
-| **0.1** | **Almost always the highest, tiny variation** | **RAG chatbots (this repo) — accuracy matters** | backpack check 🫏 |
+| 0.0 | Always picks the highest-probability word | Math, code generation | Donkey-side view of 0.0 — affects how the donkey loads, reads, or delivers the cargo |
+| **0.1** | **Almost always the highest, tiny variation** | **RAG chatbots (this repo) — accuracy matters** | Donkey-side view of 0.1 — affects how the donkey loads, reads, or delivers the cargo |
 | 0.7 | Distributes across likely words | Creative writing, brainstorming | Stable address 🏷️ |
-| 1.0 | Nearly uniform distribution — anything goes | Experimental, often unusable | 🫏 On the route |
+| 1.0 | Nearly uniform distribution — anything goes | Experimental, often unusable | Donkey-side view of 1.0 — affects how the donkey loads, reads, or delivers the cargo |
 
 ### Why 0.1 for this chatbot?
 
@@ -224,9 +224,9 @@ Think of a hash function — it takes any input and produces a fixed-size output
 | Property | Value | Why it matters | 🫏 Donkey |
 |---|---|---| --- |
 | Output size | Always 1024 floats (Titan) or 1536 (Azure) | Vector store must match this dimension | GPS warehouse 🗺️ |
-| Input can be any length | `"Hi"` or a 2000-char paragraph → same 1024 floats | The model compresses meaning into fixed-size | backpack check 🫏 |
+| Input can be any length | `"Hi"` or a 2000-char paragraph → same 1024 floats | The model compresses meaning into fixed-size | How big each backpack-piece of cargo is — bigger = more context, fewer matches |
 | Runs at two different times | Ingestion (embed every chunk) AND query (embed the question) | Both must use the **same** model — mixing models = garbage results | backpack piece 📦 |
-| Not reversible | Cannot convert [0.12, -0.45, ...] back to text | Like a hash — one-way function | 🫏 On the route |
+| Not reversible | Cannot convert [0.12, -0.45, ...] back to text | Like a hash — one-way function | Donkey-side view of Not reversible — affects how the donkey loads, reads, or delivers the cargo |
 
 ### When `get_embedding()` runs in the RAG pipeline
 
@@ -312,9 +312,9 @@ USER: "What is the refund policy?"
 | Question | Answer | Concept it tests | 🫏 Donkey |
 |---|---|---| --- |
 | "What does `get_embedding()` return for a 2-word input vs a 2000-word input?" | The same: a list of exactly 1024 floats (Titan). Input length doesn't affect output size. | Embeddings | GPS warehouse 🗺️ |
-| "Why does `LLMResponse` track `input_tokens` and `output_tokens` separately?" | Because output tokens cost 5× more. Tracking separately enables cost optimisation. | Tokens & cost | The donkey 🐴 |
+| "Why does `LLMResponse` track `input_tokens` and `output_tokens` separately?" | Because output tokens cost 5× more. Tracking separately enables cost optimisation. | Tokens & cost | Counting reading-hay separately from writing-hay so you can see which trips burn the donkey's most expensive bales |
 | "What happens if you use temperature=0.8 instead of 0.1 for this chatbot?" | Answers become inconsistent and creative. The same question might get different answers. Hallucination risk increases. | Temperature | Memory drift ⚠️ |
-| "Why is `get_embedding()` on the same `BaseLLM` class as `generate()`?" | Because the LLM *provider* (Bedrock/Azure) handles both, even though they use different models internally. It's an interface grouping by provider, not by model. | Strategy pattern | The donkey 🐴 |
+| "Why is `get_embedding()` on the same `BaseLLM` class as `generate()`?" | Because the LLM *provider* (Bedrock/Azure) handles both, even though they use different models internally. It's an interface grouping by provider, not by model. | Strategy pattern | One stable handles both writing donkeys and GPS-stamping workers — group by stable, not by job |
 | "What happens if you embed documents with Titan (1024-dim) but embed the question with Azure (1536-dim)?" | Vector search fails — you can't compare vectors of different dimensions. Both must use the same model. | Dimension matching | GPS warehouse 🗺️ |
 | "How much does one `get_embedding()` call cost vs one `generate()` call?" | Embedding: ~$0.00002 (30 tokens × $0.0001/1K). Generation: ~$0.005 (1430 input + 70 output). Generation is ~250× more expensive. | Cost awareness | Cargo unit ⚖️ |
 

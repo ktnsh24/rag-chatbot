@@ -17,8 +17,8 @@
 
 | Service | Purpose in this project | Cost model | 🫏 Donkey |
 | --- | --- | --- | --- |
-| **Bedrock** | LLM inference (Claude) + embeddings (Titan) | Pay per token | The donkey 🐴 |
-| **S3** | Store uploaded documents | Pay per GB stored | Parcel shelf 📦 |
+| **Bedrock** | LLM inference (Claude) + embeddings (Titan) | Pay per token | Cloud stable that hires the donkey by the hay bale — Claude carries questions, Titan stamps text with GPS coordinates |
+| **S3** | Store uploaded documents | Pay per GB stored | AWS warehouse — pennies per month to store the donkey's source documents |
 | **DynamoDB** | Conversation history + **vector store** (cheap mode) | Pay per request | AWS depot 🏭 |
 | **OpenSearch Serverless** | Vector store for embeddings (production) | Pay per OCU-hour | AWS search hub 🔍 |
 | **ECS Fargate** | Host the FastAPI container | Pay per vCPU/memory-hour | Stable stall 🐎 |
@@ -63,10 +63,10 @@ response = self._runtime_client.converse(
 
 | Model | Use case | Input cost | Output cost | 🫏 Donkey |
 | --- | --- | --- | --- | --- |
-| Claude 3.5 Sonnet v2 | Best for RAG (accurate, fast) | $0.003/1K | $0.015/1K | The donkey 🐴 |
-| Claude 3 Haiku | Cheaper, faster, less accurate | $0.00025/1K | $0.00125/1K | The donkey 🐴 |
+| Claude 3.5 Sonnet v2 | Best for RAG (accurate, fast) | $0.003/1K | $0.015/1K | Top-tier donkey — accurate and quick, the default carrier for production deliveries |
+| Claude 3 Haiku | Cheaper, faster, less accurate | $0.00025/1K | $0.00125/1K | Pony-sized donkey — cheaper hay and faster trips, but more likely to drop a detail |
 | Titan Text Embeddings v2 | Convert text to vectors | $0.00002/1K | N/A | Free hay 🌿 |
-| Llama 3.1 70B | Open source alternative | $0.00099/1K | $0.00099/1K | The donkey 🐴 |
+| Llama 3.1 70B | Open source alternative | $0.00099/1K | $0.00099/1K | Open-source donkey — same hay rate in and out, handy when you want to swap stables later |
 
 ### IAM permissions needed
 
@@ -148,10 +148,10 @@ TTL: expires_at (auto-delete old conversations)
 | Field | Type | Purpose | 🫏 Donkey |
 | --- | --- | --- | --- |
 | `session_id` | String (PK) | Groups messages in a conversation | Trip log 📒 |
-| `timestamp` | String (SK) | Orders messages chronologically | 🫏 On the route |
-| `role` | String | "user" or "assistant" | 🫏 On the route |
-| `content` | String | The message text | 🫏 On the route |
-| `expires_at` | Number | TTL — auto-delete after 7 days | 🫏 On the route |
+| `timestamp` | String (SK) | Orders messages chronologically | Timestamp stamped on the trip log entry — when the donkey set off or returned |
+| `role` | String | "user" or "assistant" | Stable keys — only authorised callers may ask the donkey to deliver |
+| `content` | String | The message text | The actual cargo text inside the backpack the donkey is carrying |
+| `expires_at` | Number | TTL — auto-delete after 7 days | Donkey-side view of expires_at — affects how the donkey loads, reads, or delivers the cargo |
 
 ### Why DynamoDB and not PostgreSQL?
 
@@ -235,10 +235,10 @@ Host the FastAPI application in production.
 
 | | Fargate (our choice) | EC2 | 🫏 Donkey |
 | --- | --- | --- | --- |
-| Server management | None | You manage instances | 🫏 On the route |
-| Scaling | Automatic | Configure auto-scaling groups | 🫏 On the route |
+| Server management | None | You manage instances | Donkey-side view of Server management — affects how the donkey loads, reads, or delivers the cargo |
+| Scaling | Automatic | Configure auto-scaling groups | How the stable adds or removes donkeys when delivery volume changes |
 | Cost | Pay per vCPU/memory-hour | Pay per instance-hour | Feed bill 🌾 |
-| Minimum | ~$30/month (0.25 vCPU) | ~$10/month (t3.micro) | 🫏 On the route |
+| Minimum | ~$30/month (0.25 vCPU) | ~$10/month (t3.micro) | Fuel-and-feed bill for keeping the donkey and stable running |
 
 ### Why Fargate
 
@@ -286,9 +286,9 @@ The ECS task has an IAM role with these permissions:
 
 | Permission | Resource | Why | 🫏 Donkey |
 | --- | --- | --- | --- |
-| `s3:GetObject`, `s3:PutObject` | Documents bucket | Read/write documents | Parcel shelf 📦 |
+| `s3:GetObject`, `s3:PutObject` | Documents bucket | Read/write documents | Permission slip letting the donkey pick up and drop off parcels at the AWS warehouse |
 | `dynamodb:GetItem`, `dynamodb:PutItem`, `dynamodb:Query` | Conversations table | Read/write history | AWS depot 🏭 |
-| `bedrock:InvokeModel` | All models | Call Claude and Titan | The donkey 🐴 |
+| `bedrock:InvokeModel` | All models | Call Claude and Titan | Without this permission the stable manager can't wake the donkey — every chat would die at the gate |
 
 ### Principle of least privilege
 

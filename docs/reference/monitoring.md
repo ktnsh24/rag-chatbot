@@ -31,10 +31,10 @@ Every `/api/chat` request is logged as a structured JSONL record in `logs/querie
 
 | Field | Description | 🫏 Donkey |
 |---|---| --- |
-| `request_id` | Unique request identifier | 🫏 On the route |
-| `question` | What the user asked | 🫏 On the route |
+| `request_id` | Unique request identifier | Tracking number stamped on the parcel so the donkey can find it again |
+| `question` | What the user asked | Donkey-side view of question — affects how the donkey loads, reads, or delivers the cargo |
 | `chunks` | Retrieved documents with relevance scores | backpack piece 📦 |
-| `answer` | LLM response | The donkey 🐴 |
+| `answer` | LLM response | What the donkey wrote on the delivery note after reading the backpack |
 | `retrieval_score` | How relevant the chunks were (0–1) | backpack piece 📦 |
 | `faithfulness_score` | Did the answer stick to the chunks? (0–1) | backpack piece 📦 |
 | `answer_relevance_score` | Did the answer address the question? (0–1) | Right address 🎯 |
@@ -46,9 +46,9 @@ Every `/api/chat` request is logged as a structured JSONL record in `logs/querie
 | Category | Root Cause | Fix | 🫏 Donkey |
 |---|---|---| --- |
 | `bad_retrieval` | Wrong chunks returned | Better chunking, more documents, tune top_k | backpack piece 📦 |
-| `hallucination` | Good chunks, LLM fabricated | Better system prompt, lower temperature | The donkey 🐴 |
+| `hallucination` | Good chunks, LLM fabricated | Better system prompt, lower temperature | Backpack was fine, but the donkey embellished — tighten the standing orders and lower temperature so it sticks to the cargo |
 | `both_bad` | Wrong chunks AND fabrication | Both fixes above | backpack piece 📦 |
-| `off_topic` | Question outside document scope | Add documents or refuse gracefully | 🫏 On the route |
+| `off_topic` | Question outside document scope | Add documents or refuse gracefully | Donkey-side view of off_topic — affects how the donkey loads, reads, or delivers the cargo |
 | `marginal` | Borderline scores | Monitor, may need prompt tuning | Delivery note 📋 |
 
 **Config:**
@@ -56,7 +56,7 @@ Every `/api/chat` request is logged as a structured JSONL record in `logs/querie
 | Env Var | Default | Description | 🫏 Donkey |
 |---|---|---| --- |
 | `QUERY_LOG_ENABLED` | `true` | Enable/disable query logging | Gate guard 🔐 |
-| `QUERY_LOG_DIR` | `logs/queries` | Directory for JSONL files | 🫏 On the route |
+| `QUERY_LOG_DIR` | `logs/queries` | Directory for JSONL files | Donkey's trip log — every delivery's details written to disk for later review |
 
 **Files:** `src/monitoring/query_logger.py`, `src/api/routes/queries.py`
 
@@ -72,26 +72,26 @@ Every `/api/chat` request is logged as a structured JSONL record in `logs/querie
 
 | Metric | Type | Description | 🫏 Donkey |
 |---|---|---| --- |
-| `rag_chat_requests_total` | counter | Total chat requests | backpack check 🫏 |
-| `rag_chat_errors_total` | counter | Total errors | backpack check 🫏 |
-| `rag_chat_error_rate_percent` | gauge | Current error rate | backpack check 🫏 |
-| `rag_chat_latency_p50/p95/p99_ms` | gauge | Latency percentiles | backpack check 🫏 |
+| `rag_chat_requests_total` | counter | Total chat requests | Tachograph counter — how many deliveries the donkey completed |
+| `rag_chat_errors_total` | counter | Total errors | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
+| `rag_chat_error_rate_percent` | gauge | Current error rate | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
+| `rag_chat_latency_p50/p95/p99_ms` | gauge | Latency percentiles | Tachograph reading — how long the donkey took on the round trip |
 | `rag_tokens_input_total` | counter | Input tokens consumed | Cargo unit ⚖️ |
 | `rag_tokens_output_total` | counter | Output tokens generated | Cargo unit ⚖️ |
 | `rag_tokens_cost_usd_total` | counter | Estimated cost | Cargo unit ⚖️ |
-| `rag_documents_ingested_total` | counter | Documents ingested | backpack check 🫏 |
+| `rag_documents_ingested_total` | counter | Documents ingested | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
 | `rag_chunks_created_total` | counter | Chunks created | backpack piece 📦 |
-| `rag_uptime_seconds` | gauge | Application uptime | backpack check 🫏 |
+| `rag_uptime_seconds` | gauge | Application uptime | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 
 **Query quality metrics (from QueryLogger):**
 
 | Metric | Type | Description | 🫏 Donkey |
 |---|---|---| --- |
-| `rag_queries_total` | gauge | Queries logged today | backpack check 🫏 |
-| `rag_queries_pass_rate_percent` | gauge | Evaluation pass rate | backpack check 🫏 |
+| `rag_queries_total` | gauge | Queries logged today | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
+| `rag_queries_pass_rate_percent` | gauge | Evaluation pass rate | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 | `rag_queries_avg_retrieval` | gauge | Avg retrieval score | backpack fetch 🎒 |
-| `rag_queries_avg_faithfulness` | gauge | Avg faithfulness score | backpack check 🫏 |
-| `rag_queries_failure_{category}` | gauge | Failures by category | backpack check 🫏 |
+| `rag_queries_avg_faithfulness` | gauge | Avg faithfulness score | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
+| `rag_queries_failure_{category}` | gauge | Failures by category | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 
 **Prometheus scrape config:**
 
@@ -117,9 +117,9 @@ OpenTelemetry is wired up in `src/monitoring/tracing.py`. When enabled, every HT
 
 | Env Var | Default | Description | 🫏 Donkey |
 |---|---|---| --- |
-| `OTEL_ENABLED` | `false` | Enable OpenTelemetry tracing | 🫏 On the route |
+| `OTEL_ENABLED` | `false` | Enable OpenTelemetry tracing | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | — | OTLP collector endpoint | Stable door 🚪 |
-| `OTEL_SERVICE_NAME` | `rag-chatbot` | Service name in traces | backpack check 🫏 |
+| `OTEL_SERVICE_NAME` | `rag-chatbot` | Service name in traces | Donkey-side view of OTEL_SERVICE_NAME — affects how the donkey loads, reads, or delivers the cargo |
 
 **What's traced:**
 - FastAPI request/response (via FastAPIInstrumentor)
@@ -137,10 +137,10 @@ OpenTelemetry is wired up in `src/monitoring/tracing.py`. When enabled, every HT
 
 | Scenario | Metric | Threshold | 🫏 Donkey |
 |---|---|---| --- |
-| System errors | `rag_chat_error_rate_percent` | > 50% for 5 min | backpack check 🫏 |
-| Slow responses | `rag_chat_latency_p95_ms` | > 10,000ms for 5 min | backpack check 🫏 |
-| Quality drop | `rag_queries_pass_rate_percent` | < 60% for 1 hour | backpack check 🫏 |
-| Hallucination spike | `rag_queries_failure_hallucination` | > 10 in 1 hour | backpack check 🫏 |
+| System errors | `rag_chat_error_rate_percent` | > 50% for 5 min | Donkey-side view of System errors — affects how the donkey loads, reads, or delivers the cargo |
+| Slow responses | `rag_chat_latency_p95_ms` | > 10,000ms for 5 min | Tachograph reading — how long the donkey took on the round trip |
+| Quality drop | `rag_queries_pass_rate_percent` | < 60% for 1 hour | Donkey's report card — share of test deliveries that scored above the bar |
+| Hallucination spike | `rag_queries_failure_hallucination` | > 10 in 1 hour | Donkey's report card — share of test deliveries that scored above the bar |
 | Cost runaway | `rag_tokens_cost_usd_total` | > daily budget | Cargo unit ⚖️ |
 
 - 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
