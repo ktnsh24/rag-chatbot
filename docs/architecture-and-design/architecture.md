@@ -109,7 +109,7 @@ User asks: "What is the refund policy?"
     │           ...
     │         ]
     │
-    ├── 4b½. (Planned) Re-rank chunks using Bedrock Reranker / Azure Semantic Ranker
+    ├── 4b½. (Optional — RERANKER_ENABLED=true to activate) Re-rank chunks using Bedrock Reranker / Azure Semantic Ranker
     │         → re-score for relevance, reorder top_k results
     │
     ├── 4c. LLM.generate(question, context_chunks)
