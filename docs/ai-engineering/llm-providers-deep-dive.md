@@ -36,12 +36,14 @@ In file #7 (`base.py`) you learned the **interface** — the abstract contract. 
 
 **The Strategy Pattern in action:** The rest of the codebase calls `llm.generate()` and `llm.get_embedding()` without knowing which provider is behind it. Swapping from AWS to Azure to Local means changing ONE environment variable — the code stays the same.
 
-| What you'll learn | DE parallel |
-|---|---|
-| How to call an LLM via boto3 (AWS), openai SDK (Azure), and httpx (Local) | How to call DynamoDB vs CosmosDB vs SQLite |
-| Three different API shapes for the same operation | Three different SDKs for the same storage pattern |
-| How embedding models are called on each platform | How secondary indexes work on each platform |
-| Cost differences between providers (including $0 local) | Cost differences between AWS, Azure, and local services |
+| What you'll learn | DE parallel | 🫏 Donkey |
+|---|---| --- |
+| How to call an LLM via boto3 (AWS), openai SDK (Azure), and httpx (Local) | How to call DynamoDB vs CosmosDB vs SQLite | The donkey 🐴 |
+| Three different API shapes for the same operation | Three different SDKs for the same storage pattern | Saddlebag check 🫏 |
+| How embedding models are called on each platform | How secondary indexes work on each platform | GPS stamp 📍 |
+| Cost differences between providers (including $0 local) | Cost differences between AWS, Azure, and local services | Feed bill 🌾 |
+
+- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -65,26 +67,30 @@ In file #7 (`base.py`) you learned the **interface** — the abstract contract. 
 └─────────────────────────────────────────┘    └─────────────────────────────────────────┘
 ```
 
+- 🫏 **Donkey:** Running multiple donkeys on the same route to confirm that AI engineering and data engineering practices mirror each other.
+
 ---
 
 ## The Three Providers Side by Side
 
 Before diving into each, here's the big picture comparison:
 
-| Aspect | AWS Bedrock (`aws_bedrock.py`) | Azure OpenAI (`azure_openai.py`) | **Local Ollama (`local_ollama.py`)** |
-|---|---|---|---|
-| **SDK** | `boto3` (AWS SDK) | `openai` (OpenAI SDK with Azure config) | `httpx` (plain HTTP client) |
-| **Generation model** | Claude 3.5 Sonnet | GPT-4o | Llama 3.2 / Mistral |
-| **Embedding model** | Amazon Titan v2 (1024 dim) | text-embedding-3-small (1536 dim) | nomic-embed-text (768 dim) |
-| **Generation API** | Converse API (Bedrock-specific) | ChatCompletion API (OpenAI standard) | `/api/chat` (Ollama REST) |
-| **Embedding API** | Invoke Model (raw, manual JSON) | Embeddings API (typed SDK) | `/api/embed` (Ollama REST) |
-| **Auth** | IAM roles / AWS credentials | API key or Managed Identity | **None** — localhost |
-| **Batch embeddings** | ❌ Not native (loops one by one) | ✅ Native (send list, get list) | ✅ Native (send list, get list) |
-| **Async** | ❌ Sync boto3 (wrapped in async) | ✅ True async (`AsyncAzureOpenAI`) | ✅ True async (`httpx.AsyncClient`) |
-| **Input token price** | $0.003 / 1K | $0.0025 / 1K | **$0.00** |
-| **Output token price** | $0.015 / 1K | $0.01 / 1K | **$0.00** |
-| **Quality** | ★★★★★ | ★★★★★ | ★★★☆☆ |
-| **Offline** | ❌ | ❌ | ✅ |
+| Aspect | AWS Bedrock (`aws_bedrock.py`) | Azure OpenAI (`azure_openai.py`) | **Local Ollama (`local_ollama.py`)** | 🫏 Donkey |
+|---|---|---|---| --- |
+| **SDK** | `boto3` (AWS SDK) | `openai` (OpenAI SDK with Azure config) | `httpx` (plain HTTP client) | The donkey 🐴 |
+| **Generation model** | Claude 3.5 Sonnet | GPT-4o | Llama 3.2 / Mistral | The donkey 🐴 |
+| **Embedding model** | Amazon Titan v2 (1024 dim) | text-embedding-3-small (1536 dim) | nomic-embed-text (768 dim) | GPS stamp 📍 |
+| **Generation API** | Converse API (Bedrock-specific) | ChatCompletion API (OpenAI standard) | `/api/chat` (Ollama REST) | The donkey 🐴 |
+| **Embedding API** | Invoke Model (raw, manual JSON) | Embeddings API (typed SDK) | `/api/embed` (Ollama REST) | The donkey 🐴 |
+| **Auth** | IAM roles / AWS credentials | API key or Managed Identity | **None** — localhost | Stable door 🚪 |
+| **Batch embeddings** | ❌ Not native (loops one by one) | ✅ Native (send list, get list) | ✅ Native (send list, get list) | GPS warehouse 🗺️ |
+| **Async** | ❌ Sync boto3 (wrapped in async) | ✅ True async (`AsyncAzureOpenAI`) | ✅ True async (`httpx.AsyncClient`) | The donkey 🐴 |
+| **Input token price** | $0.003 / 1K | $0.0025 / 1K | **$0.00** | Cargo unit ⚖️ |
+| **Output token price** | $0.015 / 1K | $0.01 / 1K | **$0.00** | Cargo unit ⚖️ |
+| **Quality** | ★★★★★ | ★★★★★ | ★★★☆☆ | 🫏 On the route |
+| **Offline** | ❌ | ❌ | ✅ | 🫏 On the route |
+
+- 🫏 **Donkey:** Choosing which stable to work with — AWS Bedrock, Azure OpenAI, or a local Ollama barn each offer different donkeys at different prices.
 
 ---
 
@@ -103,15 +109,17 @@ class BedrockLLM(BaseLLM):
         self._embedding_model_id = "amazon.titan-embed-text-v2:0"  # Titan (for embeddings)
 ```
 
-| Element | What it is | DE parallel |
-|---|---|---|
-| `boto3.client("bedrock-runtime")` | The service client | `boto3.client("dynamodb")` |
-| `model_id` (Claude) | Which LLM to call for generation | Which table to query |
-| `_embedding_model_id` (Titan) | Which model to call for embeddings | Which GSI to query |
+| Element | What it is | DE parallel | 🫏 Donkey |
+|---|---|---| --- |
+| `boto3.client("bedrock-runtime")` | The service client | `boto3.client("dynamodb")` | The donkey 🐴 |
+| `model_id` (Claude) | Which LLM to call for generation | Which table to query | The donkey 🐴 |
+| `_embedding_model_id` (Titan) | Which model to call for embeddings | Which GSI to query | GPS warehouse 🗺️ |
 
 **Why `bedrock-runtime` not `bedrock`?** Two separate APIs:
 - `bedrock` = management (list models, manage permissions) — like `dynamodb` for creating tables
 - `bedrock-runtime` = inference (send prompts, get answers) — like `dynamodb` for read/write operations
+
+- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
 
 ---
 
@@ -165,6 +173,8 @@ response = {
 }
 ```
 
+- 🫏 **Donkey:** The stable's front door — defined entry points where questions arrive and answers depart.
+
 ---
 
 ## AWS: Concept 2 — The Invoke Model API (`get_embedding()`)
@@ -184,12 +194,14 @@ return result["embedding"]                   # [0.12, -0.45, ...] (1024 floats)
 
 **Note the manual JSON handling:** `json.dumps()` for the request, `json.loads(response["body"].read())` for the response. The Invoke Model API is a raw HTTP wrapper — you handle serialisation yourself.
 
-| Titan Embeddings v2 | Value |
-|---|---|
-| Model ID | `amazon.titan-embed-text-v2:0` |
-| Output dimensions | **1024** floats |
-| Max input | 8,192 tokens |
-| Cost | $0.00002 / 1K tokens |
+| Titan Embeddings v2 | Value | 🫏 Donkey |
+|---|---| --- |
+| Model ID | `amazon.titan-embed-text-v2:0` | Manifest template 📋 |
+| Output dimensions | **1024** floats | 🫏 On the route |
+| Max input | 8,192 tokens | Cargo unit ⚖️ |
+| Cost | $0.00002 / 1K tokens | Cargo unit ⚖️ |
+
+- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -218,17 +230,19 @@ class AzureOpenAILLM(BaseLLM):
 
 ### Key differences from Bedrock
 
-| Aspect | AWS Bedrock | Azure OpenAI |
-|---|---|---|
-| SDK | `boto3` (AWS-specific) | `openai` (industry standard, Azure-configured) |
-| Client | `boto3.client("bedrock-runtime")` | `AsyncAzureOpenAI(endpoint, key, version)` |
-| Auth | IAM roles / env vars (AWS credentials) | API key or Managed Identity (Azure RBAC) |
-| Model reference | `model_id` (full ARN-like string) | `deployment_name` (you name it when deploying) |
-| Async | Sync (boto3 doesn't support async) | **True async** (`AsyncAzureOpenAI`) |
+| Aspect | AWS Bedrock | Azure OpenAI | 🫏 Donkey |
+|---|---|---| --- |
+| SDK | `boto3` (AWS-specific) | `openai` (industry standard, Azure-configured) | The donkey 🐴 |
+| Client | `boto3.client("bedrock-runtime")` | `AsyncAzureOpenAI(endpoint, key, version)` | The donkey 🐴 |
+| Auth | IAM roles / env vars (AWS credentials) | API key or Managed Identity (Azure RBAC) | Stable door 🚪 |
+| Model reference | `model_id` (full ARN-like string) | `deployment_name` (you name it when deploying) | Robot hand 🤖 |
+| Async | Sync (boto3 doesn't support async) | **True async** (`AsyncAzureOpenAI`) | The donkey 🐴 |
 
 **DE parallel:** This is like the difference between using `boto3` for DynamoDB vs using `psycopg2` for PostgreSQL. Different SDK, different connection pattern, but the operations are conceptually the same (query, insert, delete).
 
 **Why "deployment_name" not "model_id"?** In Azure, you first **deploy** a model to your resource, giving it a name (e.g., `"gpt-4o"`). Then you reference it by that deployment name. In AWS, you reference the model directly by its ID. Think of it like: AWS = calling the model by its "real name," Azure = calling it by a nickname you assigned.
+
+- 🫏 **Donkey:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for donkeys on the Azure route.
 
 ---
 
@@ -282,15 +296,17 @@ resp["usage"]["outputTokens"]                     resp.usage.completion_tokens
 
 ### Key differences
 
-| Aspect | AWS Bedrock | Azure OpenAI |
-|---|---|---|
-| **System prompt** | Separate `system=[...]` parameter | Inside `messages` as `{"role": "system", ...}` |
-| **Response parsing** | Dict keys: `response["output"]["message"]...` | Typed objects: `response.choices[0].message.content` |
-| **Token naming** | `inputTokens` / `outputTokens` | `prompt_tokens` / `completion_tokens` |
-| **Async** | Sync call (despite `async def`) | True `await` — non-blocking |
-| **Content format** | Nested: `[{"text": "..."}]` | Flat string: `"..."` |
+| Aspect | AWS Bedrock | Azure OpenAI | 🫏 Donkey |
+|---|---|---| --- |
+| **System prompt** | Separate `system=[...]` parameter | Inside `messages` as `{"role": "system", ...}` | Delivery note 📋 |
+| **Response parsing** | Dict keys: `response["output"]["message"]...` | Typed objects: `response.choices[0].message.content` | 🫏 On the route |
+| **Token naming** | `inputTokens` / `outputTokens` | `prompt_tokens` / `completion_tokens` | Cargo unit ⚖️ |
+| **Async** | Sync call (despite `async def`) | True `await` — non-blocking | 🫏 On the route |
+| **Content format** | Nested: `[{"text": "..."}]` | Flat string: `"..."` | 🫏 On the route |
 
 **The function is the same.** Both send a system prompt + user message + settings, get back text + token counts. The `LLMResponse` dataclass normalises the differences — the rest of the codebase never knows which provider was used.
+
+- 🫏 **Donkey:** The stable's front door — defined entry points where questions arrive and answers depart.
 
 ---
 
@@ -320,12 +336,12 @@ return result["embedding"]
 
 **Notice how much simpler the Azure call is.** No `json.dumps()`, no `json.loads()`, no `response["body"].read()`. The OpenAI SDK handles serialisation — you pass a string, get back a typed object.
 
-| text-embedding-3-small | Value |
-|---|---|
-| Deployment | `text-embedding-3-small` |
-| Output dimensions | **1536** floats (not 1024!) |
-| Max input | 8,191 tokens |
-| Cost | $0.00002 / 1K tokens |
+| text-embedding-3-small | Value | 🫏 Donkey |
+|---|---| --- |
+| Deployment | `text-embedding-3-small` | GPS stamp 📍 |
+| Output dimensions | **1536** floats (not 1024!) | 🫏 On the route |
+| Max input | 8,191 tokens | Cargo unit ⚖️ |
+| Cost | $0.00002 / 1K tokens | Cargo unit ⚖️ |
 
 ### ⚠️ Critical: Dimension difference
 
@@ -333,6 +349,8 @@ AWS Titan produces **1024** dimensions. Azure text-embedding-3-small produces **
 - Your vector store index must match the embedding model's dimension
 - You **cannot** mix embeddings from different models — a 1024-dim vector can't be compared to a 1536-dim vector
 - If you switch providers, you must **re-embed all documents**
+
+- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -356,16 +374,18 @@ class OllamaLLM(BaseLLM):
 
 ### Comparison with the other providers
 
-| Aspect | AWS Bedrock | Azure OpenAI | **Local Ollama** |
-| --- | --- | --- | --- |
-| **Client** | `boto3.client("bedrock-runtime")` | `AsyncAzureOpenAI(endpoint, key)` | `httpx.AsyncClient(base_url)` |
-| **Auth** | IAM credentials (auto from env) | API key in constructor | **None** — localhost, no auth |
-| **Two models** | `model_id` + `_embedding_model_id` | `deployment_name` + `embedding_deployment` | `model_name` + `embedding_model` |
-| **Timeout** | boto3 default | openai default | 120s (local models can be slow on CPU) |
+| Aspect | AWS Bedrock | Azure OpenAI | **Local Ollama** | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| **Client** | `boto3.client("bedrock-runtime")` | `AsyncAzureOpenAI(endpoint, key)` | `httpx.AsyncClient(base_url)` | The donkey 🐴 |
+| **Auth** | IAM credentials (auto from env) | API key in constructor | **None** — localhost, no auth | Stable door 🚪 |
+| **Two models** | `model_id` + `_embedding_model_id` | `deployment_name` + `embedding_deployment` | `model_name` + `embedding_model` | Robot hand 🤖 |
+| **Timeout** | boto3 default | openai default | 120s (local models can be slow on CPU) | The donkey 🐴 |
 
 **Why httpx instead of a dedicated Ollama SDK?** Ollama's REST API is simple enough that a generic HTTP client works perfectly. No need for another dependency. And `httpx` is already in `pyproject.toml` (used for testing too).
 
 **DE parallel:** Ollama is like running a local PostgreSQL server — you install it, it runs as a daemon, your app connects to it via localhost. The difference: PostgreSQL stores data, Ollama runs inference.
+
+- 🫏 **Donkey:** Your own backyard barn — no cloud costs, full control, ChromaDB SQLite under the floor.
 
 ---
 
@@ -444,6 +464,8 @@ except httpx.ConnectError:
 
 If Ollama isn't running, you get a clear error message instead of a cryptic `ConnectionRefusedError`.
 
+- 🫏 **Donkey:** The stable's front door — defined entry points where questions arrive and answers depart.
+
 ---
 
 ## Local: Concept 2 — The Embed API (`get_embedding()`)
@@ -486,11 +508,13 @@ return data["embeddings"][0]
 
 ### Dimensions: 768 vs 1024 vs 1536
 
-| Model | Provider | Dimensions | Quality |
-| --- | --- | --- | --- |
-| nomic-embed-text | Local (Ollama) | **768** | Good |
-| Titan v2 | AWS Bedrock | **1024** | Good |
-| text-embedding-3-small | Azure OpenAI | **1536** | Best |
+| Model | Provider | Dimensions | Quality | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| nomic-embed-text | Local (Ollama) | **768** | Good | The donkey 🐴 |
+| Titan v2 | AWS Bedrock | **1024** | Good | The donkey 🐴 |
+| text-embedding-3-small | Azure OpenAI | **1536** | Best | The donkey 🐴 |
+
+- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -531,13 +555,15 @@ async def get_embeddings_batch(self, texts: list[str]) -> list[list[float]]:
 
 ### The difference matters for ingestion
 
-| | AWS Bedrock | Azure OpenAI | **Local Ollama** |
-|---|---|---|---|
-| **42 chunks** | 42 API calls (42 network round trips) | **1 API call** (1 network round trip) | **1 API call** (localhost) |
-| **Latency** | 42 × ~50ms = ~2.1 seconds | ~200ms total | ~300ms total |
-| **Why?** | Titan has no batch endpoint | OpenAI SDK accepts a list natively | Ollama `/api/embed` accepts a list natively |
+| | AWS Bedrock | Azure OpenAI | **Local Ollama** | 🫏 Donkey |
+|---|---|---|---| --- |
+| **42 chunks** | 42 API calls (42 network round trips) | **1 API call** (1 network round trip) | **1 API call** (localhost) | Saddlebag piece 📦 |
+| **Latency** | 42 × ~50ms = ~2.1 seconds | ~200ms total | ~300ms total | Feed bill 🌾 |
+| **Why?** | Titan has no batch endpoint | OpenAI SDK accepts a list natively | Ollama `/api/embed` accepts a list natively | The donkey 🐴 |
 
 **DE parallel:** This is like DynamoDB's `batch_write_item` (limited to 25 items) vs PostgreSQL's multi-row `INSERT INTO ... VALUES (), (), ()` (unlimited). Azure has the better batch story here.
+
+- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -559,14 +585,16 @@ OllamaLLM class
 
 **Why?** Because generation and embedding are fundamentally different operations:
 
-| | Language Model | Embedding Model |
-|---|---|---|
-| **Purpose** | Generate text | Convert text → numbers |
-| **Output** | Variable-length text | Fixed-size float array |
-| **Cost** | Expensive | Cheap (100×–250× less) |
-| **Speed** | 1–5 seconds | ~50ms |
+| | Language Model | Embedding Model | 🫏 Donkey |
+|---|---|---| --- |
+| **Purpose** | Generate text | Convert text → numbers | 🫏 On the route |
+| **Output** | Variable-length text | Fixed-size float array | 🫏 On the route |
+| **Cost** | Expensive | Cheap (100×–250× less) | Feed bill 🌾 |
+| **Speed** | 1–5 seconds | ~50ms | 🫏 On the route |
 
 The class groups them by **provider** (who you're calling), not by **function** (what you're doing). This makes sense because auth, region, and client setup are per-provider.
+
+- 🫏 **Donkey:** Choosing which stable to work with — AWS Bedrock, Azure OpenAI, or a local Ollama barn each offer different donkeys at different prices.
 
 ---
 
@@ -603,13 +631,15 @@ The class groups them by **provider** (who you're calling), not by **function** 
 
 ### Monthly cost at 1000 queries/day
 
-| | AWS Bedrock | Azure OpenAI | **Local Ollama** |
-|---|---|---|---|
-| LLM cost | ~$160/month | ~$130/month | **$0/month** |
-| Vector store | ~$350/month (OpenSearch) | ~$75/month (AI Search) | **$0/month** (ChromaDB) |
-| **Total** | **~$510/month** | **~$205/month** | **$0/month** |
+| | AWS Bedrock | Azure OpenAI | **Local Ollama** | 🫏 Donkey |
+|---|---|---|---| --- |
+| LLM cost | ~$160/month | ~$130/month | **$0/month** | The donkey 🐴 |
+| Vector store | ~$350/month (OpenSearch) | ~$75/month (AI Search) | **$0/month** (ChromaDB) | AWS search hub 🔍 |
+| **Total** | **~$510/month** | **~$205/month** | **$0/month** | Feed bill 🌾 |
 
 **⚠️ The vector store is the biggest cost difference** — not the LLM. OpenSearch Serverless has a high minimum ($350/month). Azure AI Search Basic is much cheaper ($75/month). This often drives the cloud choice more than the LLM pricing.
+
+- 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
 
 ---
 
@@ -641,20 +671,24 @@ USER: "What is the refund policy?"
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
+- 🫏 **Donkey:** The donkey checks its saddlebag full of retrieved document chunks before answering — no guessing from memory.
+
 ---
 
 ## Self-Test Questions
 
-| Question | Answer | Concept it tests |
-|---|---|---|
-| "Why does Azure put the system prompt inside `messages` but Bedrock has a separate `system` parameter?" | API design difference. Same effect — the LLM gets system instructions either way. The `BaseLLM` interface hides this. | API abstraction |
-| "What happens if you use Azure embeddings (1536-dim) with an OpenSearch index configured for 1024-dim?" | Indexing fails — dimension mismatch. You must match embedding model to vector store config. | Dimension matching |
-| "Why is Azure's batch embedding faster than Bedrock's?" | Azure's API natively accepts a list of texts. Bedrock's Titan has no batch endpoint, so it loops internally. Network round trips: 1 vs N. | API capabilities |
-| "Could you use Claude (Bedrock) for generation but text-embedding-3-small (Azure) for embeddings?" | Technically yes — but you'd need two clients and the auth complexity doubles. The Strategy Pattern groups by provider for simplicity. | Architecture trade-offs |
-| "Why is `AsyncAzureOpenAI` truly async but `boto3` is not?" | The OpenAI SDK was built async-first. boto3 was built in 2015 before async was common in Python. You'd need `aioboto3` for true async Bedrock calls. | SDK maturity |
-| "Which provider should you choose?" | Depends: Azure is cheaper (especially vector store), AWS keeps data in your existing AWS account, Local is free and offline. Run evaluation on both cloud providers — answer quality may differ between Claude and GPT-4o. Use Local for development. | Provider selection |
-| "What happens if Ollama isn't running when the app starts?" | `httpx.ConnectError` → RuntimeError with instructions to run `ollama serve`. Clear error message, not a cryptic crash. | Local error handling |
-| "Why does Ollama use `httpx` instead of a dedicated SDK?" | Ollama's REST API is simple (2 endpoints: `/api/chat` and `/api/embed`). `httpx` is already a dependency — no need for another package. | Dependency management |
+| Question | Answer | Concept it tests | 🫏 Donkey |
+|---|---|---| --- |
+| "Why does Azure put the system prompt inside `messages` but Bedrock has a separate `system` parameter?" | API design difference. Same effect — the LLM gets system instructions either way. The `BaseLLM` interface hides this. | API abstraction | The donkey 🐴 |
+| "What happens if you use Azure embeddings (1536-dim) with an OpenSearch index configured for 1024-dim?" | Indexing fails — dimension mismatch. You must match embedding model to vector store config. | Dimension matching | GPS stamp 📍 |
+| "Why is Azure's batch embedding faster than Bedrock's?" | Azure's API natively accepts a list of texts. Bedrock's Titan has no batch endpoint, so it loops internally. Network round trips: 1 vs N. | API capabilities | The donkey 🐴 |
+| "Could you use Claude (Bedrock) for generation but text-embedding-3-small (Azure) for embeddings?" | Technically yes — but you'd need two clients and the auth complexity doubles. The Strategy Pattern groups by provider for simplicity. | Architecture trade-offs | The donkey 🐴 |
+| "Why is `AsyncAzureOpenAI` truly async but `boto3` is not?" | The OpenAI SDK was built async-first. boto3 was built in 2015 before async was common in Python. You'd need `aioboto3` for true async Bedrock calls. | SDK maturity | The donkey 🐴 |
+| "Which provider should you choose?" | Depends: Azure is cheaper (especially vector store), AWS keeps data in your existing AWS account, Local is free and offline. Run evaluation on both cloud providers — answer quality may differ between Claude and GPT-4o. Use Local for development. | Provider selection | The donkey 🐴 |
+| "What happens if Ollama isn't running when the app starts?" | `httpx.ConnectError` → RuntimeError with instructions to run `ollama serve`. Clear error message, not a cryptic crash. | Local error handling | The donkey 🐴 |
+| "Why does Ollama use `httpx` instead of a dedicated SDK?" | Ollama's REST API is simple (2 endpoints: `/api/chat` and `/api/embed`). `httpx` is already a dependency — no need for another package. | Dependency management | The donkey 🐴 |
+
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -669,3 +703,5 @@ Now that you've seen how **all three** LLM providers work, study where the resul
 - [How Services Work → Bedrock](../architecture-and-design/how-services-work.md#amazon-bedrock--how-llm-inference-works)
 - [Cost Analysis](cost-analysis.md)
 - [The LLM Interface (file #7)](llm-interface-deep-dive.md)
+
+- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

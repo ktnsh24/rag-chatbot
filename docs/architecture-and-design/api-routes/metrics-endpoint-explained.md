@@ -46,19 +46,23 @@ rag_chat_latency_p95_ms 1250.0
 
 No JSON. No HTML. Just the Prometheus text format that monitoring tools expect.
 
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+
 ---
 
 ## DE Parallel
 
-| Concept | Data Engineering | RAG Chatbot |
-| --- | --- | --- |
-| **What you expose** | DAG run count, task duration, queue depth | Chat requests, LLM latency, token usage |
-| **Format** | Prometheus text exposition | Prometheus text exposition |
-| **Scraper** | Prometheus → Grafana | Prometheus → Grafana |
-| **Alert on** | DAG failure rate > 5%, task duration > SLA | Pass rate < 80%, latency p95 > 2s |
-| **Pattern** | `GET /metrics` on Airflow webserver | `GET /api/metrics` on FastAPI |
+| Concept | Data Engineering | RAG Chatbot | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **What you expose** | DAG run count, task duration, queue depth | Chat requests, LLM latency, token usage | The donkey 🐴 |
+| **Format** | Prometheus text exposition | Prometheus text exposition | Tachograph 📊 |
+| **Scraper** | Prometheus → Grafana | Prometheus → Grafana | Tachograph 📊 |
+| **Alert on** | DAG failure rate > 5%, task duration > SLA | Pass rate < 80%, latency p95 > 2s | Hoof check 🔧 |
+| **Pattern** | `GET /metrics` on Airflow webserver | `GET /api/metrics` on FastAPI | Tachograph 📊 |
 
 **Bottom line:** Same infrastructure pattern, different business metrics.
+
+- 🫏 **Donkey:** Running multiple donkeys on the same route to confirm that AI engineering and data engineering practices mirror each other.
 
 ---
 
@@ -99,40 +103,44 @@ async def prometheus_metrics(request: Request) -> Response:
 3. **Media type** — `text/plain; version=0.0.4` is the Prometheus exposition format MIME type
 4. **No auth** — metrics endpoints are typically unprotected (Prometheus needs to scrape without tokens)
 
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+
 ---
 
 ## Metrics Exposed
 
 ### Counters (monotonically increasing)
 
-| Metric | Type | What it measures |
-| --- | --- | --- |
-| `rag_chat_requests_total` | counter | Total chat requests processed |
-| `rag_chat_errors_total` | counter | Total chat request errors |
-| `rag_tokens_input_total` | counter | Total input tokens consumed |
-| `rag_tokens_output_total` | counter | Total output tokens generated |
-| `rag_documents_uploaded_total` | counter | Total documents ingested |
-| `rag_queries_total` | counter | Total evaluated queries (from query logs) |
-| `rag_queries_passed_total` | counter | Queries that passed evaluation |
-| `rag_queries_failed_total` | counter | Queries that failed evaluation |
+| Metric | Type | What it measures | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `rag_chat_requests_total` | counter | Total chat requests processed | Saddlebag check 🫏 |
+| `rag_chat_errors_total` | counter | Total chat request errors | Saddlebag check 🫏 |
+| `rag_tokens_input_total` | counter | Total input tokens consumed | Cargo unit ⚖️ |
+| `rag_tokens_output_total` | counter | Total output tokens generated | Cargo unit ⚖️ |
+| `rag_documents_uploaded_total` | counter | Total documents ingested | Saddlebag check 🫏 |
+| `rag_queries_total` | counter | Total evaluated queries (from query logs) | Saddlebag check 🫏 |
+| `rag_queries_passed_total` | counter | Queries that passed evaluation | Saddlebag check 🫏 |
+| `rag_queries_failed_total` | counter | Queries that failed evaluation | Saddlebag check 🫏 |
 
 ### Gauges (point-in-time values)
 
-| Metric | Type | What it measures |
-| --- | --- | --- |
-| `rag_chat_latency_p50_ms` | gauge | Median chat response time |
-| `rag_chat_latency_p95_ms` | gauge | 95th percentile chat response time |
-| `rag_chat_latency_p99_ms` | gauge | 99th percentile chat response time |
-| `rag_query_pass_rate` | gauge | Current pass rate (0.0–1.0) |
-| `rag_query_avg_retrieval` | gauge | Average retrieval score |
-| `rag_query_avg_faithfulness` | gauge | Average faithfulness score |
-| `rag_failures_bad_retrieval` | gauge | Count of bad_retrieval failures (last 24h) |
-| `rag_failures_hallucination` | gauge | Count of hallucination failures (last 24h) |
+| Metric | Type | What it measures | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `rag_chat_latency_p50_ms` | gauge | Median chat response time | Saddlebag check 🫏 |
+| `rag_chat_latency_p95_ms` | gauge | 95th percentile chat response time | Saddlebag check 🫏 |
+| `rag_chat_latency_p99_ms` | gauge | 99th percentile chat response time | Saddlebag check 🫏 |
+| `rag_query_pass_rate` | gauge | Current pass rate (0.0–1.0) | Saddlebag check 🫏 |
+| `rag_query_avg_retrieval` | gauge | Average retrieval score | Saddlebag fetch 🎒 |
+| `rag_query_avg_faithfulness` | gauge | Average faithfulness score | Saddlebag check 🫏 |
+| `rag_failures_bad_retrieval` | gauge | Count of bad_retrieval failures (last 24h) | Saddlebag check 🫏 |
+| `rag_failures_hallucination` | gauge | Count of hallucination failures (last 24h) | Saddlebag check 🫏 |
 
 ### Why counters vs gauges?
 
 - **Counters** only go up — Prometheus calculates rates from them (e.g., `rate(rag_chat_requests_total[5m])` = requests per second)
 - **Gauges** can go up or down — they represent current state (e.g., current latency, current pass rate)
+
+- 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
 
 ---
 
@@ -152,20 +160,22 @@ scrape_configs:
 For AWS ECS or Azure Container Apps, replace `localhost:8000` with the service
 discovery target.
 
+- 🫏 **Donkey:** Adjusting the saddle fit and route preferences so the donkey delivers to the right address every time.
+
 ---
 
 ## Building a Grafana Dashboard
 
 With the metrics above, you can build panels for:
 
-| Panel | PromQL query | What it shows |
-| --- | --- | --- |
-| Request rate | `rate(rag_chat_requests_total[5m])` | Requests per second |
-| Error rate | `rate(rag_chat_errors_total[5m]) / rate(rag_chat_requests_total[5m])` | Percentage of errors |
-| Latency (p95) | `rag_chat_latency_p95_ms` | Response time for slow requests |
-| Pass rate | `rag_query_pass_rate` | AI quality over time |
-| Token burn | `rate(rag_tokens_output_total[1h])` | Output tokens per hour (cost proxy) |
-| Failure breakdown | `rag_failures_bad_retrieval` / `rag_failures_hallucination` | Which failure types dominate |
+| Panel | PromQL query | What it shows | 🫏 Donkey |
+| --- | --- | --- | --- |
+| Request rate | `rate(rag_chat_requests_total[5m])` | Requests per second | Saddlebag check 🫏 |
+| Error rate | `rate(rag_chat_errors_total[5m]) / rate(rag_chat_requests_total[5m])` | Percentage of errors | Saddlebag check 🫏 |
+| Latency (p95) | `rag_chat_latency_p95_ms` | Response time for slow requests | Saddlebag check 🫏 |
+| Pass rate | `rag_query_pass_rate` | AI quality over time | Saddlebag check 🫏 |
+| Token burn | `rate(rag_tokens_output_total[1h])` | Output tokens per hour (cost proxy) | Cargo unit ⚖️ |
+| Failure breakdown | `rag_failures_bad_retrieval` / `rag_failures_hallucination` | Which failure types dominate | Saddlebag check 🫏 |
 
 ### Alert rules
 
@@ -190,6 +200,8 @@ groups:
           summary: "Chat p95 latency exceeds 5 seconds"
 ```
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## Self-Check Questions
@@ -211,6 +223,8 @@ groups:
 - [ ] How would you add a histogram for latency distribution?
 - [ ] How would you add custom labels (e.g., per-document-type metrics)?
 
+- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.
+
 ---
 
 ## What to Study Next
@@ -218,3 +232,5 @@ groups:
 - **Previous:** [Queries Endpoint](queries-endpoint-explained.md) — the failure data this builds on
 - **Reference:** [API Routes Overview](../api-routes-explained.md) — how all routes fit together
 - **Hands-on:** [Phase 5 Labs](../../hands-on-labs/hands-on-labs-phase-5.md) — Lab 15 exercises this endpoint
+
+- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

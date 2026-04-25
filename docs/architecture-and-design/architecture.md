@@ -77,6 +77,8 @@
 > Queries (I30 — failure debugging) ·
 > Metrics (I31 — Prometheus endpoint).
 
+- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the saddlebags are loaded, and which route it takes to the customer.
+
 ---
 
 ## Data Flow — Chat Query
@@ -120,6 +122,8 @@ User asks: "What is the refund policy?"
 5. Return JSON response to client
 ```
 
+- 🫏 **Donkey:** The warehouse robot dispatched to find the right saddlebag shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+
 ---
 
 ## Data Flow — Document Ingestion
@@ -156,6 +160,8 @@ User uploads: "refund-policy.pdf" (12 pages)
     ▼
 3. Return: { document_id: "abc-123", chunk_count: 45, status: "ready" }
 ```
+
+- 🫏 **Donkey:** Post office pre-sorting: mail is split into saddlebag-sized chunks, stamped with GPS coordinates (embeddings), and shelved in the warehouse before the donkey ever arrives.
 
 ---
 
@@ -200,36 +206,42 @@ result = await rag_chain.query("What is the refund policy?")
 **Why this matters for your portfolio:**
 This demonstrates that you can design systems that aren't locked into one cloud provider — a key skill for enterprise architecture roles.
 
+- 🫏 **Donkey:** The modular saddlery — each layer handles one job so you can swap saddles without touching the donkey.
+
 ---
 
 ## Project Layer Map
 
-| Layer | Directory | Responsibility |
-| --- | --- | --- |
-| **API** | `src/api/` | HTTP interface (routes, models, middleware) |
-| **Guardrails** | `src/api/middleware/` | Input/output safety, PII redaction, prompt injection defense |
-| **RAG** | `src/rag/` | RAG pipeline (chain, ingestion, prompts) |
-| **LLM** | `src/llm/` | LLM abstraction + implementations |
-| **Vector Store** | `src/vectorstore/` | Vector DB abstraction + implementations |
-| **Storage** | `src/storage/` | Document storage abstraction |
-| **History** | `src/history/` | Conversation history abstraction |
-| **Monitoring** | `src/monitoring/` | Metrics, query logging (JSONL), OpenTelemetry tracing |
-| **Config** | `src/config.py` | Pydantic Settings (env vars) |
-| **Entry Point** | `src/main.py` | FastAPI app factory, lifespan |
-| **Infrastructure** | `infra/` | Terraform (AWS + Azure); Local needs no infra |
-| **CI/CD** | `.github/workflows/` | GitHub Actions |
-| **Tests** | `tests/` | Unit + integration tests |
-| **Docs** | `docs/` | You are here |
+| Layer | Directory | Responsibility | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **API** | `src/api/` | HTTP interface (routes, models, middleware) | Stable door 🚪 |
+| **Guardrails** | `src/api/middleware/` | Input/output safety, PII redaction, prompt injection defense | Delivery note 📋 |
+| **RAG** | `src/rag/` | RAG pipeline (chain, ingestion, prompts) | Delivery note 📋 |
+| **LLM** | `src/llm/` | LLM abstraction + implementations | The donkey 🐴 |
+| **Vector Store** | `src/vectorstore/` | Vector DB abstraction + implementations | GPS warehouse 🗺️ |
+| **Storage** | `src/storage/` | Document storage abstraction | Saddlebag check 🫏 |
+| **History** | `src/history/` | Conversation history abstraction | Trip log 📒 |
+| **Monitoring** | `src/monitoring/` | Metrics, query logging (JSONL), OpenTelemetry tracing | Tachograph 📊 |
+| **Config** | `src/config.py` | Pydantic Settings (env vars) | Manifest template 📋 |
+| **Entry Point** | `src/main.py` | FastAPI app factory, lifespan | Stable door 🚪 |
+| **Infrastructure** | `infra/` | Terraform (AWS + Azure); Local needs no infra | Stable blueprint 🏗️ |
+| **CI/CD** | `.github/workflows/` | GitHub Actions | Robot hand 🤖 |
+| **Tests** | `tests/` | Unit + integration tests | Test delivery 🧪 |
+| **Docs** | `docs/` | You are here | 🫏 On the route |
+
+- 🫏 **Donkey:** The modular saddlery — each layer handles one job so you can swap saddles without touching the donkey.
 
 ---
 
 ## Why this architecture?
 
-| Decision | Reason |
-| --- | --- |
-| **Monolith (single FastAPI app)** | Simpler than microservices for a 1-person project. Can always split later. |
-| **Abstract interfaces** | Cloud-agnostic. Can add GCP, local, or mock implementations without changing core logic. |
-| **Factory pattern** | One env variable (`CLOUD_PROVIDER`) switches the entire backend — `aws`, `azure`, or `local`. |
-| **Pydantic everywhere** | Type safety, validation, documentation — all from type hints. |
-| **Poetry** | Better dependency management than pip. Lock files prevent "works on my machine" issues. |
-| **FastAPI** | Async, fast, auto-generates API docs, native Pydantic support. |
+| Decision | Reason | 🫏 Donkey |
+| --- | --- | --- |
+| **Monolith (single FastAPI app)** | Simpler than microservices for a 1-person project. Can always split later. | Stable door 🚪 |
+| **Abstract interfaces** | Cloud-agnostic. Can add GCP, local, or mock implementations without changing core logic. | Local barn 🏚️ |
+| **Factory pattern** | One env variable (`CLOUD_PROVIDER`) switches the entire backend — `aws`, `azure`, or `local`. | AWS depot 🏭 |
+| **Pydantic everywhere** | Type safety, validation, documentation — all from type hints. | Gate rule 🚧 |
+| **Poetry** | Better dependency management than pip. Lock files prevent "works on my machine" issues. | Supply manifest 📜 |
+| **FastAPI** | Async, fast, auto-generates API docs, native Pydantic support. | Stable door 🚪 |
+
+- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the saddlebags are loaded, and which route it takes to the customer.

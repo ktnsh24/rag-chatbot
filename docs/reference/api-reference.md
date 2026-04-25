@@ -63,6 +63,8 @@ Returns the health status of the application and its connected services.
 }
 ```
 
+- 🫏 **Donkey:** Checking whether the donkey is awake, saddled, and ready to run before dispatching it.
+
 ---
 
 ## Chat
@@ -73,11 +75,11 @@ Send a question and get an answer grounded in your uploaded documents.
 
 **Request Body:**
 
-| Field | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `message` | string | ✅ | — | The user's question |
-| `session_id` | string | ❌ | auto-generated UUID | Conversation session ID for history |
-| `max_sources` | integer | ❌ | `5` | Max source chunks to retrieve |
+| Field | Type | Required | Default | Description | 🫏 Donkey |
+|---|---|---|---|---| --- |
+| `message` | string | ✅ | — | The user's question | 🫏 On the route |
+| `session_id` | string | ❌ | auto-generated UUID | Conversation session ID for history | Trip log 📒 |
+| `max_sources` | integer | ❌ | `5` | Max source chunks to retrieve | Saddlebag piece 📦 |
 
 **Example Request:**
 
@@ -129,6 +131,8 @@ Send a question and get an answer grounded in your uploaded documents.
 }
 ```
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## Documents
@@ -142,9 +146,9 @@ embedded, and indexed in the vector store.
 
 **Form Fields:**
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `file` | file | ✅ | The document file (PDF, TXT, MD, CSV, DOCX) |
+| Field | Type | Required | Description | 🫏 Donkey |
+|---|---|---|---| --- |
+| `file` | file | ✅ | The document file (PDF, TXT, MD, CSV, DOCX) | 🫏 On the route |
 
 **Supported file types:**
 - `.pdf` — Portable Document Format
@@ -201,6 +205,8 @@ async with httpx.AsyncClient() as client:
 }
 ```
 
+- 🫏 **Donkey:** The parcels being ingested — split into saddlebag-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.
+
 ---
 
 ### `GET /api/documents`
@@ -239,9 +245,9 @@ Delete a document and all its associated vector embeddings.
 
 **Path Parameters:**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `document_id` | string | The document's unique ID |
+| Parameter | Type | Description | 🫏 Donkey |
+|---|---|---| --- |
+| `document_id` | string | The document's unique ID | 🫏 On the route |
 
 **Response `200 OK`:**
 
@@ -271,11 +277,11 @@ AND quality scores (retrieval, faithfulness, answer relevance, overall).
 
 **Request Body:**
 
-| Field | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `question` | string | ✅ | — | The question to evaluate |
-| `expected_answer` | string | ❌ | `null` | Optional ground truth for comparison |
-| `top_k` | integer | ❌ | `5` | Number of chunks to retrieve |
+| Field | Type | Required | Default | Description | 🫏 Donkey |
+|---|---|---|---|---| --- |
+| `question` | string | ✅ | — | The question to evaluate | Report card 📝 |
+| `expected_answer` | string | ❌ | `null` | Optional ground truth for comparison | 🫏 On the route |
+| `top_k` | integer | ❌ | `5` | Number of chunks to retrieve | Saddlebag piece 📦 |
 
 **Example Request:**
 
@@ -310,6 +316,8 @@ AND quality scores (retrieval, faithfulness, answer relevance, overall).
 }
 ```
 
+- 🫏 **Donkey:** The donkey's report card — did it grab the right saddlebags and write an accurate answer?
+
 ---
 
 ### `POST /api/evaluate/suite`
@@ -319,10 +327,10 @@ per-case results and aggregated metrics.
 
 **Request Body:**
 
-| Field | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `categories` | string[] | ❌ | all | Filter by test categories (e.g. `["policy", "edge_case"]`) |
-| `top_k` | integer | ❌ | `5` | Override top_k for all cases |
+| Field | Type | Required | Default | Description | 🫏 Donkey |
+|---|---|---|---|---| --- |
+| `categories` | string[] | ❌ | all | Filter by test categories (e.g. `["policy", "edge_case"]`) | Test delivery 🧪 |
+| `top_k` | integer | ❌ | `5` | Override top_k for all cases | 🫏 On the route |
 
 **Example Request:**
 
@@ -378,11 +386,11 @@ List recent queries that failed evaluation. Use this to diagnose production issu
 
 **Query Parameters:**
 
-| Param | Type | Default | Description |
-|---|---|---|---|
-| `limit` | integer | `20` | Max results (1–100) |
-| `days` | integer | `7` | How many days back (1–30) |
-| `category` | string | all | Filter: `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`, `marginal` |
+| Param | Type | Default | Description | 🫏 Donkey |
+|---|---|---|---| --- |
+| `limit` | integer | `20` | Max results (1–100) | 🫏 On the route |
+| `days` | integer | `7` | How many days back (1–30) | 🫏 On the route |
+| `category` | string | all | Filter: `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`, `marginal` | Memory drift ⚠️ |
 
 **Example:**
 
@@ -414,6 +422,8 @@ GET /api/queries/failures?category=hallucination&limit=5&days=3
 
 **Response `503`** — Query logger not initialised (check `QUERY_LOG_ENABLED`).
 
+- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+
 ---
 
 ### `GET /api/queries/stats`
@@ -422,9 +432,9 @@ Aggregate query quality statistics for dashboards and monitoring.
 
 **Query Parameters:**
 
-| Param | Type | Default | Description |
-|---|---|---|---|
-| `days` | integer | `1` | How many days to aggregate (1–30) |
+| Param | Type | Default | Description | 🫏 Donkey |
+|---|---|---|---| --- |
+| `days` | integer | `1` | How many days to aggregate (1–30) | 🫏 On the route |
 
 **Example:**
 
@@ -495,23 +505,25 @@ rag_queries_failure_hallucination 5
 
 **Metrics exposed:**
 
-| Metric | Type | Description |
-|---|---|---|
-| `rag_chat_requests_total` | counter | Total chat requests |
-| `rag_chat_errors_total` | counter | Total chat errors |
-| `rag_chat_error_rate_percent` | gauge | Current error rate % |
-| `rag_chat_latency_p50/p95/p99_ms` | gauge | Latency percentiles |
-| `rag_tokens_input_total` | counter | Total input tokens |
-| `rag_tokens_output_total` | counter | Total output tokens |
-| `rag_tokens_cost_usd_total` | counter | Estimated cost in USD |
-| `rag_documents_ingested_total` | counter | Documents ingested |
-| `rag_chunks_created_total` | counter | Chunks created |
-| `rag_uptime_seconds` | gauge | App uptime |
-| `rag_queries_total` | gauge | Queries logged today |
-| `rag_queries_pass_rate_percent` | gauge | Pass rate today |
-| `rag_queries_avg_retrieval` | gauge | Avg retrieval score |
-| `rag_queries_avg_faithfulness` | gauge | Avg faithfulness score |
-| `rag_queries_failure_{category}` | gauge | Failures by category |
+| Metric | Type | Description | 🫏 Donkey |
+|---|---|---| --- |
+| `rag_chat_requests_total` | counter | Total chat requests | Saddlebag check 🫏 |
+| `rag_chat_errors_total` | counter | Total chat errors | Saddlebag check 🫏 |
+| `rag_chat_error_rate_percent` | gauge | Current error rate % | Saddlebag check 🫏 |
+| `rag_chat_latency_p50/p95/p99_ms` | gauge | Latency percentiles | Saddlebag check 🫏 |
+| `rag_tokens_input_total` | counter | Total input tokens | Cargo unit ⚖️ |
+| `rag_tokens_output_total` | counter | Total output tokens | Cargo unit ⚖️ |
+| `rag_tokens_cost_usd_total` | counter | Estimated cost in USD | Cargo unit ⚖️ |
+| `rag_documents_ingested_total` | counter | Documents ingested | Saddlebag check 🫏 |
+| `rag_chunks_created_total` | counter | Chunks created | Saddlebag piece 📦 |
+| `rag_uptime_seconds` | gauge | App uptime | Saddlebag check 🫏 |
+| `rag_queries_total` | gauge | Queries logged today | Saddlebag check 🫏 |
+| `rag_queries_pass_rate_percent` | gauge | Pass rate today | Saddlebag check 🫏 |
+| `rag_queries_avg_retrieval` | gauge | Avg retrieval score | Saddlebag fetch 🎒 |
+| `rag_queries_avg_faithfulness` | gauge | Avg faithfulness score | Saddlebag check 🫏 |
+| `rag_queries_failure_{category}` | gauge | Failures by category | Saddlebag check 🫏 |
+
+- 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
 
 ---
 
@@ -521,6 +533,8 @@ rag_queries_failure_hallucination 5
 
 Serves the built-in chat web interface. Open this URL in your browser
 to interact with the chatbot through a graphical interface.
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -536,14 +550,16 @@ All error responses follow a consistent format:
 
 **Common HTTP Status Codes:**
 
-| Code | Meaning |
-|---|---|
-| `200` | Success |
-| `400` | Bad request — check your input |
-| `404` | Resource not found |
-| `413` | Payload too large |
-| `500` | Internal server error |
-| `503` | Service unavailable — a dependency is down |
+| Code | Meaning | 🫏 Donkey |
+|---|---| --- |
+| `200` | Success | 🫏 On the route |
+| `400` | Bad request — check your input | 🫏 On the route |
+| `404` | Resource not found | 🫏 On the route |
+| `413` | Payload too large | 🫏 On the route |
+| `500` | Internal server error | Hoof check 🔧 |
+| `503` | Service unavailable — a dependency is down | 🫏 On the route |
+
+- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and saddle inspection checklist to find what went wrong.
 
 ---
 
@@ -552,12 +568,16 @@ All error responses follow a consistent format:
 > **Note:** Authentication is not implemented in v0.1.0.
 > Planned for v0.2.0: API key authentication via `X-API-Key` header.
 
+- 🫏 **Donkey:** The stable's lock and key — only authorised riders can dispatch the donkey.
+
 ---
 
 ## Rate Limiting (Future)
 
 > **Note:** Rate limiting is not implemented in v0.1.0.
 > Planned for v0.2.0: 60 requests/minute per API key.
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -570,3 +590,5 @@ FastAPI provides auto-generated interactive API documentation:
 
 These are available in development and can be disabled in production via the
 `DOCS_ENABLED` environment variable.
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.

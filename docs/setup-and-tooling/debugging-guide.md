@@ -41,6 +41,8 @@ When something goes wrong, `print()` statements won't cut it. You need to:
 - **Step through code line by line** (follow the exact flow)
 - **Evaluate expressions** (what would `result.score > 0.8` return?)
 
+- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+
 ---
 
 ## VS Code Debugger Setup
@@ -82,11 +84,11 @@ Click the play icon with a bug in the left sidebar (or press `Ctrl+Shift+D`).
 
 In the dropdown at the top, you'll see three options:
 
-| Configuration | What it does |
-| --- | --- |
-| **RAG Chatbot — Debug Server** | Starts the FastAPI server with debugger attached. Use this for testing endpoints. |
-| **RAG Chatbot — Debug Tests** | Runs all pytest tests with debugger. Use this when a test fails and you want to step through it. |
-| **RAG Chatbot — Debug Single Test File** | Runs only the currently open test file. Fastest for debugging one test. |
+| Configuration | What it does | 🫏 Donkey |
+| --- | --- | --- |
+| **RAG Chatbot — Debug Server** | Starts the FastAPI server with debugger attached. Use this for testing endpoints. | Saddlebag check 🫏 |
+| **RAG Chatbot — Debug Tests** | Runs all pytest tests with debugger. Use this when a test fails and you want to step through it. | Saddlebag check 🫏 |
+| **RAG Chatbot — Debug Single Test File** | Runs only the currently open test file. Fastest for debugging one test. | Saddlebag check 🫏 |
 
 ### Step 6: Set breakpoints
 
@@ -94,15 +96,15 @@ Click in the **gutter** (the space to the left of line numbers) to set a red dot
 
 **Recommended breakpoints for understanding the flow:**
 
-| File | Line | Why |
-| --- | --- | --- |
-| `src/main.py` | Line inside `lifespan()` | See what happens at startup |
-| `src/api/routes/chat.py` | First line of `chat()` | See every incoming chat request |
-| `src/rag/chain.py` | Inside `query()` | See RAG retrieval + generation |
-| `src/llm/aws_bedrock.py` | Inside `generate()` | See the Bedrock API call |
-| `src/llm/azure_openai.py` | Inside `generate()` | See the Azure OpenAI API call |
-| `src/vectorstore/base.py` | Inside `search()` | See vector search results |
-| `src/rag/ingestion.py` | Inside `chunk_document()` | See how documents are split |
+| File | Line | Why | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `src/main.py` | Line inside `lifespan()` | See what happens at startup | 🫏 On the route |
+| `src/api/routes/chat.py` | First line of `chat()` | See every incoming chat request | Stable door 🚪 |
+| `src/rag/chain.py` | Inside `query()` | See RAG retrieval + generation | Saddlebag check 🫏 |
+| `src/llm/aws_bedrock.py` | Inside `generate()` | See the Bedrock API call | The donkey 🐴 |
+| `src/llm/azure_openai.py` | Inside `generate()` | See the Azure OpenAI API call | The donkey 🐴 |
+| `src/vectorstore/base.py` | Inside `search()` | See vector search results | GPS warehouse 🗺️ |
+| `src/rag/ingestion.py` | Inside `chunk_document()` | See how documents are split | Saddlebag piece 📦 |
 
 ### Step 7: Start debugging
 
@@ -139,16 +141,18 @@ If you have a breakpoint in `chat()`, VS Code will:
 
 When the debugger pauses, you can:
 
-| Action | How | Example |
-| --- | --- | --- |
-| **See variable values** | Look at the Variables panel | `body.question = "What is this?"` |
-| **Hover over a variable** | Move mouse over it in the code | Shows the value in a tooltip |
-| **Evaluate an expression** | Type in the Debug Console (bottom) | `len(search_results)` → `5` |
-| **Step over** | Press `F10` | Execute current line, move to next |
-| **Step into** | Press `F11` | Go inside the function call |
-| **Step out** | Press `Shift+F11` | Finish current function, go back to caller |
-| **Continue** | Press `F5` | Run until next breakpoint |
-| **Stop** | Press `Shift+F5` | Stop the debugger |
+| Action | How | Example | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **See variable values** | Look at the Variables panel | `body.question = "What is this?"` | 🫏 On the route |
+| **Hover over a variable** | Move mouse over it in the code | Shows the value in a tooltip | 🫏 On the route |
+| **Evaluate an expression** | Type in the Debug Console (bottom) | `len(search_results)` → `5` | Report card 📝 |
+| **Step over** | Press `F10` | Execute current line, move to next | 🫏 On the route |
+| **Step into** | Press `F11` | Go inside the function call | 🫏 On the route |
+| **Step out** | Press `Shift+F11` | Finish current function, go back to caller | 🫏 On the route |
+| **Continue** | Press `F5` | Run until next breakpoint | 🫏 On the route |
+| **Stop** | Press `Shift+F5` | Stop the debugger | Hoof check 🔧 |
+
+- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -192,20 +196,24 @@ PyCharm's debugger has the same controls:
 - **Shift+F8** = Step Out
 - **F9** = Resume (Continue)
 
+- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+
 ---
 
 ## Debugger quick reference
 
-| Action | VS Code | PyCharm |
-| --- | --- | --- |
-| Start debugging | `F5` | `Shift+F9` |
-| Set breakpoint | Click gutter / `F9` | Click gutter / `Ctrl+F8` |
-| Step over | `F10` | `F8` |
-| Step into | `F11` | `F7` |
-| Step out | `Shift+F11` | `Shift+F8` |
-| Continue | `F5` | `F9` |
-| Stop | `Shift+F5` | `Ctrl+F2` |
-| Evaluate expression | Debug Console | Alt+F8 |
+| Action | VS Code | PyCharm | 🫏 Donkey |
+| --- | --- | --- | --- |
+| Start debugging | `F5` | `Shift+F9` | Hoof check 🔧 |
+| Set breakpoint | Click gutter / `F9` | Click gutter / `Ctrl+F8` | 🫏 On the route |
+| Step over | `F10` | `F8` | 🫏 On the route |
+| Step into | `F11` | `F7` | 🫏 On the route |
+| Step out | `Shift+F11` | `Shift+F8` | 🫏 On the route |
+| Continue | `F5` | `F9` | 🫏 On the route |
+| Stop | `Shift+F5` | `Ctrl+F2` | 🫏 On the route |
+| Evaluate expression | Debug Console | Alt+F8 | Report card 📝 |
+
+- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -220,13 +228,13 @@ Set them all, press F5, send a chat question from http://localhost:8000/docs, an
 
 This is the central AI orchestrator. Set breakpoints on all 5 steps:
 
-| Step | Line (approx) | Code | What to inspect | AI concept you're seeing |
-| --- | --- | --- | --- | --- |
-| **1. Embed** | 188 | `query_embedding = await self._llm.get_embedding(question)` | Hover `query_embedding` → 768 floats representing your question's meaning | **Text → Vector embedding** |
-| **2. Search** | 191 | `search_results = await self._vector_store.search(` | Hover `search_results` → list of chunks with similarity scores (0.0–1.0) | **HNSW vector similarity search** |
-| **3. Context** | 204 | `context_texts = [result.text for result in search_results]` | Hover `context_texts` → the actual text chunks the LLM will read | **RAG context building** |
-| **4. Generate** | 207 | `llm_response = await self._llm.generate(` | After step-over: hover `llm_response` → the LLM's answer + token count | **LLM text generation** |
-| **5. Cost** | 223 | `token_usage = {` | Hover to see input/output tokens + estimated $ cost | **Token counting & cost estimation** |
+| Step | Line (approx) | Code | What to inspect | AI concept you're seeing | 🫏 Donkey |
+| --- | --- | --- | --- | --- | --- |
+| **1. Embed** | 188 | `query_embedding = await self._llm.get_embedding(question)` | Hover `query_embedding` → 768 floats representing your question's meaning | **Text → Vector embedding** | The donkey 🐴 |
+| **2. Search** | 191 | `search_results = await self._vector_store.search(` | Hover `search_results` → list of chunks with similarity scores (0.0–1.0) | **HNSW vector similarity search** | Saddlebag piece 📦 |
+| **3. Context** | 204 | `context_texts = [result.text for result in search_results]` | Hover `context_texts` → the actual text chunks the LLM will read | **RAG context building** | The donkey 🐴 |
+| **4. Generate** | 207 | `llm_response = await self._llm.generate(` | After step-over: hover `llm_response` → the LLM's answer + token count | **LLM text generation** | The donkey 🐴 |
+| **5. Cost** | 223 | `token_usage = {` | Hover to see input/output tokens + estimated $ cost | **Token counting & cost estimation** | Cargo unit ⚖️ |
 
 **What to look for:**
 - **Step 1**: The embedding is a list of ~768 floats (nomic-embed-text). Each number captures a dimension of meaning.
@@ -239,11 +247,11 @@ This is the central AI orchestrator. Set breakpoints on all 5 steps:
 
 Go deeper to see the raw HTTP communication with Ollama:
 
-| Method | Line (approx) | Code | What to inspect | AI concept |
-| --- | --- | --- | --- | --- |
-| `generate()` | ~87 | `response = await self._client.post(` | Step over → hover `response` → see the raw JSON Ollama returns (model, created_at, response text) | **LLM HTTP API call** |
-| `get_embedding()` | ~135 | `response = await self._client.post(` | Step over → hover `response` → see the raw embedding array from nomic-embed-text | **Embedding API call** |
-| `get_embeddings_batch()` | ~167 | `response = await self._client.post(` | Same as above but for multiple texts at once (used during document upload) | **Batch embedding** |
+| Method | Line (approx) | Code | What to inspect | AI concept | 🫏 Donkey |
+| --- | --- | --- | --- | --- | --- |
+| `generate()` | ~87 | `response = await self._client.post(` | Step over → hover `response` → see the raw JSON Ollama returns (model, created_at, response text) | **LLM HTTP API call** | The donkey 🐴 |
+| `get_embedding()` | ~135 | `response = await self._client.post(` | Step over → hover `response` → see the raw embedding array from nomic-embed-text | **Embedding API call** | Stable door 🚪 |
+| `get_embeddings_batch()` | ~167 | `response = await self._client.post(` | Same as above but for multiple texts at once (used during document upload) | **Batch embedding** | GPS warehouse 🗺️ |
 
 **What to look for:**
 - In `generate()`: The request body contains the full prompt with context. You can see exactly what question + context is sent to the LLM.
@@ -251,15 +259,17 @@ Go deeper to see the raw HTTP communication with Ollama:
 
 #### File: `src/vectorstore/local_chromadb.py` — Inside vector search
 
-| Method | Line (approx) | Code | What to inspect | AI concept |
-| --- | --- | --- | --- | --- |
-| `search()` | ~116 | `results = self._collection.query(` | Step over → hover `results` → see `distances`, `documents`, `metadatas` | **ChromaDB HNSW k-NN search** |
-| `store_vectors()` | ~104 | `self._collection.upsert(` | See the chunk IDs, texts, and embeddings being stored | **Vector indexing** |
+| Method | Line (approx) | Code | What to inspect | AI concept | 🫏 Donkey |
+| --- | --- | --- | --- | --- | --- |
+| `search()` | ~116 | `results = self._collection.query(` | Step over → hover `results` → see `distances`, `documents`, `metadatas` | **ChromaDB HNSW k-NN search** | Local barn 🏚️ |
+| `store_vectors()` | ~104 | `self._collection.upsert(` | See the chunk IDs, texts, and embeddings being stored | **Vector indexing** | Saddlebag piece 📦 |
 
 **What to look for:**
 - `results['distances']` — lower = more similar (ChromaDB uses distance, not similarity score)
 - `results['documents']` — the actual text chunks returned
 - `results['metadatas']` — document name, chunk index, etc.
+
+- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -269,12 +279,12 @@ Set these when uploading a document to see the full ETL-for-AI pipeline:
 
 #### File: `src/rag/chain.py` — `ingest()` method
 
-| Step | Line (approx) | Code | What to inspect | AI concept |
-| --- | --- | --- | --- | --- |
-| **1. Parse** | 140 | `text = read_document(filename, content)` | Hover `text` → raw text extracted from your PDF/DOCX/TXT | **Document parsing** |
-| **2. Chunk** | 144 | `chunks = chunk_document(` | Hover `chunks` → list of overlapping text pieces (1000 chars each, 200 overlap) | **Text chunking (RecursiveCharacterTextSplitter)** |
-| **3. Embed** | ~152 | `embeddings = await self._llm.get_embeddings_batch(chunks)` | Hover `embeddings` → N×768 matrix (N chunks, each with 768-dim vector) | **Batch embedding generation** |
-| **4. Store** | ~156 | `stored = await self._vector_store.store_vectors(` | Step over → see how many vectors were indexed in ChromaDB | **Vector storage & HNSW indexing** |
+| Step | Line (approx) | Code | What to inspect | AI concept | 🫏 Donkey |
+| --- | --- | --- | --- | --- | --- |
+| **1. Parse** | 140 | `text = read_document(filename, content)` | Hover `text` → raw text extracted from your PDF/DOCX/TXT | **Document parsing** | 🫏 On the route |
+| **2. Chunk** | 144 | `chunks = chunk_document(` | Hover `chunks` → list of overlapping text pieces (1000 chars each, 200 overlap) | **Text chunking (RecursiveCharacterTextSplitter)** | Saddlebag piece 📦 |
+| **3. Embed** | ~152 | `embeddings = await self._llm.get_embeddings_batch(chunks)` | Hover `embeddings` → N×768 matrix (N chunks, each with 768-dim vector) | **Batch embedding generation** | The donkey 🐴 |
+| **4. Store** | ~156 | `stored = await self._vector_store.store_vectors(` | Step over → see how many vectors were indexed in ChromaDB | **Vector storage & HNSW indexing** | Local barn 🏚️ |
 
 **What to look for:**
 - **Step 2**: Check `len(chunks)` — a 10-page PDF might produce 50+ chunks. Check if chunks make sense (not cut mid-sentence).
@@ -283,10 +293,10 @@ Set these when uploading a document to see the full ETL-for-AI pipeline:
 
 #### File: `src/rag/ingestion.py` — Chunking internals
 
-| Function | Line | What to inspect | AI concept |
-| --- | --- | --- | --- |
-| `read_document()` | Start of function | `filename` and `content` → see what format was uploaded | **Multi-format document parsing** |
-| `chunk_document()` | After `text_splitter.split_text()` | The `chunks` list → see exactly where the text was split and how overlap works | **Chunking strategy** |
+| Function | Line | What to inspect | AI concept | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| `read_document()` | Start of function | `filename` and `content` → see what format was uploaded | **Multi-format document parsing** | 🫏 On the route |
+| `chunk_document()` | After `text_splitter.split_text()` | The `chunks` list → see exactly where the text was split and how overlap works | **Chunking strategy** | Saddlebag piece 📦 |
 
 **Try in the Debug Console:**
 ```python
@@ -369,3 +379,5 @@ Set a breakpoint in `src/rag/ingestion.py` → `read_document()`:
 - Is the file content correct (not empty)?
 - Is the PDF readable?
 - How many chunks were created?
+
+- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.

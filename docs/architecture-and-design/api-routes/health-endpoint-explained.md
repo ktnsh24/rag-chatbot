@@ -50,6 +50,8 @@ Server responds:
 or any microservice. Kubernetes/ECS uses this endpoint to decide whether to send
 traffic to this container or restart it.
 
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+
 ---
 
 ## The Complete Request Flow
@@ -91,6 +93,8 @@ JSON response sent to client
 **Notice:** There are NO AI calls here. No embeddings, no LLM, no vector search.
 This route just checks if the RAG chain object exists — it doesn't call it.
 
+- 🫏 **Donkey:** The step-by-step route map showing every checkpoint the donkey passes from question intake to answer delivery.
+
 ---
 
 ## Line-by-Line Code Walkthrough
@@ -116,12 +120,12 @@ _start_time = datetime.now(timezone.utc)
 
 **What each line does:**
 
-| Line | Purpose | DE parallel |
-| --- | --- | --- |
-| `from fastapi import APIRouter, Request` | Create a router, access the request object | Same as shared-proxy |
-| `from src.api.models import ...` | Import Pydantic response models | Same as any FastAPI app |
-| `router = APIRouter()` | Create the router that `main.py` will register | Same pattern everywhere |
-| `_start_time = datetime.now(timezone.utc)` | Record when the module was loaded (= app startup) | Common pattern for uptime tracking |
+| Line | Purpose | DE parallel | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `from fastapi import APIRouter, Request` | Create a router, access the request object | Same as shared-proxy | Stable door 🚪 |
+| `from src.api.models import ...` | Import Pydantic response models | Same as any FastAPI app | Stable door 🚪 |
+| `router = APIRouter()` | Create the router that `main.py` will register | Same pattern everywhere | Stable door 🚪 |
+| `_start_time = datetime.now(timezone.utc)` | Record when the module was loaded (= app startup) | Common pattern for uptime tracking | 🫏 On the route |
 
 **Why `_start_time` is module-level:** This line runs once when Python imports the
 module (at app startup). Every subsequent call to the health check uses this same
@@ -141,13 +145,13 @@ async def health_check(request: Request) -> HealthResponse:
 
 **What each part does:**
 
-| Part | Purpose |
-| --- | --- |
-| `@router.get("/health")` | Registers as GET, combined with `prefix="/api"` in main.py → becomes `GET /api/health` |
-| `response_model=HealthResponse` | Tells FastAPI to serialise the return value as this model, and to show it in Swagger |
-| `summary` and `description` | Shown in Swagger UI (`/docs`) — human-readable documentation |
-| `request: Request` | Gives access to `request.app.state` where the RAG chain lives |
-| `-> HealthResponse` | Type hint for your IDE — autocompletion on the response object |
+| Part | Purpose | 🫏 Donkey |
+| --- | --- | --- |
+| `@router.get("/health")` | Registers as GET, combined with `prefix="/api"` in main.py → becomes `GET /api/health` | Donkey check ✅ |
+| `response_model=HealthResponse` | Tells FastAPI to serialise the return value as this model, and to show it in Swagger | Donkey check ✅ |
+| `summary` and `description` | Shown in Swagger UI (`/docs`) — human-readable documentation | 🫏 On the route |
+| `request: Request` | Gives access to `request.app.state` where the RAG chain lives | Saddlebag check 🫏 |
+| `-> HealthResponse` | Type hint for your IDE — autocompletion on the response object | Donkey check ✅ |
 
 #### Step 1 — Check if the RAG chain is initialised
 
@@ -275,6 +279,8 @@ external APIs).
 }
 ```
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## The Pydantic Response Models
@@ -317,21 +323,25 @@ class HealthResponse(BaseModel):
 
 See [Pydantic Models Guide](../reference/pydantic-models.md) for full field details.
 
+- 🫏 **Donkey:** The cargo manifest template — every field is typed and validated before the donkey is loaded, preventing mispackaged deliveries.
+
 ---
 
 ## DE Comparison
 
-| Aspect | Shared-Proxy Health Check | RAG Chatbot Health Check |
-| --- | --- | --- |
-| **Endpoint** | `GET /health` or `GET /api/health` | `GET /api/health` |
-| **What it checks** | Database connectivity, upstream APIs | RAG chain (LLM + vector store) |
-| **Status values** | Usually `"ok"` / `"error"` | `healthy` / `degraded` / `unhealthy` |
-| **Pattern** | Check deps → worst status wins → return | Check deps → worst status wins → return |
-| **Used by** | Kubernetes liveness/readiness probes | Same |
-| **AI concepts** | None | None — it only checks if rag_chain is not None |
+| Aspect | Shared-Proxy Health Check | RAG Chatbot Health Check | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **Endpoint** | `GET /health` or `GET /api/health` | `GET /api/health` | Donkey check ✅ |
+| **What it checks** | Database connectivity, upstream APIs | RAG chain (LLM + vector store) | The donkey 🐴 |
+| **Status values** | Usually `"ok"` / `"error"` | `healthy` / `degraded` / `unhealthy` | Donkey check ✅ |
+| **Pattern** | Check deps → worst status wins → return | Check deps → worst status wins → return | 🫏 On the route |
+| **Used by** | Kubernetes liveness/readiness probes | Same | Alternative stable 🏗️ |
+| **AI concepts** | None | None — it only checks if rag_chain is not None | Saddlebag check 🫏 |
 
 **Bottom line:** If you can write a health check in shared-proxy, you can write this
 one. There's nothing new to learn here.
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -351,6 +361,8 @@ To understand what the RAG chain actually is and how it works, read:
 - [Chat Endpoint Deep Dive](chat-endpoint-explained.md) — how `rag_chain.query()` works
 - [Documents Endpoint Deep Dive](documents-endpoint-explained.md) — how `rag_chain.ingest_document()` works
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## Self-Check Questions
@@ -363,3 +375,4 @@ After reading this, can you answer:
 - [ ] Who calls this endpoint in production? (Kubernetes/ECS health probes)
 - [ ] Is there any AI-specific code in this route? (No — just checking if rag_chain exists)
 
+- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.

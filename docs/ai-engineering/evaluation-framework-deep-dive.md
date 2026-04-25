@@ -32,13 +32,15 @@ In traditional software you write unit tests that pass or fail. In AI engineerin
 
 This file implements a rule-based evaluation framework that scores every RAG response on three dimensions. **No LLM is needed for evaluation** — it's pure Python string analysis. This means evaluation is **free, fast, and deterministic**.
 
-| What you'll learn | DE parallel |
-|---|---|
-| Retrieval quality scoring | Data freshness and completeness checks |
-| Faithfulness scoring (anti-hallucination) | Referential integrity validation |
-| Answer relevance scoring | Output schema validation |
-| Weighted composite scores | Data quality dashboards (Great Expectations) |
-| Rule-based evaluation (no LLM needed) | SQL-based data quality checks (no ML needed) |
+| What you'll learn | DE parallel | 🫏 Donkey |
+|---|---| --- |
+| Retrieval quality scoring | Data freshness and completeness checks | Saddlebag fetch 🎒 |
+| Faithfulness scoring (anti-hallucination) | Referential integrity validation | Memory drift ⚠️ |
+| Answer relevance scoring | Output schema validation | Report card 📝 |
+| Weighted composite scores | Data quality dashboards (Great Expectations) | 🫏 On the route |
+| Rule-based evaluation (no LLM needed) | SQL-based data quality checks (no ML needed) | The donkey 🐴 |
+
+- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -61,6 +63,8 @@ dbt test:                                  Golden dataset test:
 ```
 
 **The key difference:** In DE, you check *data* against *rules*. In AI, you check *generated text* against *reference text*. Both answer the same question: **"Is the output good enough?"**
+
+- 🫏 **Donkey:** The donkey's report card — did it grab the right saddlebags and write an accurate answer?
 
 ---
 
@@ -112,6 +116,8 @@ class EvaluationResult:      # Combined result
                     │   passed:        ✅ True      │──→ ≥ 0.7
                     └─────────────────────────────┘
 ```
+
+- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the saddlebags are loaded, and which route it takes to the customer.
 
 ---
 
@@ -169,6 +175,8 @@ Output: RetrievalScore(
 **DE parallel:** This is like checking your JOIN hit rate. If you join `orders` to `customers` and only 60% match, your join quality is "fair." If 95% match, it's "excellent."
 
 **Why this matters:** If retrieval quality is poor, it doesn't matter how good the LLM is — it's working with irrelevant context. **Fix retrieval before fixing prompts.**
+
+- 🫏 **Donkey:** The warehouse robot dispatched to find the right saddlebag shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -268,6 +276,8 @@ WHERE c.id IS NULL;
 
 **Why the 0.5 keyword overlap threshold?** A sentence doesn't need to be a word-for-word copy — it just needs to be *about the same thing*. "Refunds are processed within 14 days" and "Refunds take 14 business days" share enough keywords to be considered grounded.
 
+- 🫏 **Donkey:** Checking whether the donkey's answer matches the cargo in its saddlebag — if it drifts from the documents, it's hallucinating.
+
 ---
 
 ## Concept 3: Answer Relevance
@@ -311,6 +321,8 @@ Score: 0/4 = 0.00  ← completely off-topic
 
 **DE parallel:** This is like output schema validation. If the user asks for `customer_id, name, email` and you return `order_id, total, date`, the output is valid SQL but answers the wrong question.
 
+- 🫏 **Donkey:** Verifying the donkey delivered to the right address — the answer should match what the customer actually asked for.
+
 ---
 
 ## Concept 4: Weighted Overall Score
@@ -353,6 +365,8 @@ Example calculation:
 
 **Why faithfulness gets the highest weight:** A system that says *"I don't know"* is better than one that confidently gives wrong information. In production, hallucination can cause legal, financial, or reputational damage. That's why detecting and preventing it gets 40% of the score.
 
+- 🫏 **Donkey:** The quality inspector's stamp — each delivered answer is graded on retrieval accuracy, faithfulness, and relevance before the customer signs.
+
 ---
 
 ## The Refusal Detector — Knowing When "I Don't Know" Is Correct
@@ -374,6 +388,8 @@ def _is_refusal(self, answer: str) -> bool:
 **Why refusals get a perfect faithfulness score (1.0):** If the LLM says "I don't know" when the context doesn't have the answer, that's the **correct behaviour** — it's not hallucinating. The prompt rules (#2) tell it to do exactly this.
 
 **DE parallel:** This is like a query returning zero rows. The query is correct — there's simply no matching data. You don't flag that as a data quality issue.
+
+- 🫏 **Donkey:** Small utility workers in the stable — they handle sentence-splitting and keyword extraction so the main donkey stays focused on delivery.
 
 ---
 
@@ -425,6 +441,8 @@ def _is_meta_sentence(self, sentence: str) -> bool:
 
 Sentences like *"According to [Document chunk 1]..."* are structural — they cite sources, not make claims. They're automatically counted as "in context."
 
+- 🫏 **Donkey:** Small utility workers in the stable — they handle sentence-splitting and keyword extraction so the main donkey stays focused on delivery.
+
 ---
 
 ## How It Fits in the Pipeline
@@ -463,10 +481,10 @@ The evaluator doesn't block the response — it runs **after** the answer is ret
 
 The evaluation framework is exposed through two API endpoints:
 
-| Endpoint | Purpose | When to use |
-|---|---|---|
-| `POST /api/evaluate` | Evaluate a single question | Testing specific questions, debugging low scores |
-| `POST /api/evaluate/suite` | Run the full golden dataset | After any setting change, before deploying |
+| Endpoint | Purpose | When to use | 🫏 Donkey |
+|---|---|---| --- |
+| `POST /api/evaluate` | Evaluate a single question | Testing specific questions, debugging low scores | Report card 📝 |
+| `POST /api/evaluate/suite` | Run the full golden dataset | After any setting change, before deploying | Report card 📝 |
 
 **Single question** — in **Swagger UI** (`http://localhost:8000/docs`) → `POST /api/evaluate` → **"Try it out"**:
 
@@ -484,19 +502,21 @@ Or use Swagger UI at `http://localhost:8000/docs` → find the **Evaluation** se
 
 📖 **See:** [Evaluate Endpoint Deep Dive](../architecture-and-design/api-routes/evaluate-endpoint-explained.md) for the full walkthrough.
 
+- 🫏 **Donkey:** The mechanics of the stable — understanding how each piece fits so you can maintain and extend the system.
+
 ---
 
 ## Cloud vs Local — Provider-Agnostic by Design
 
 **The evaluator doesn't use any cloud services.** It's pure Python string analysis:
 
-| Component | Uses cloud? | Why |
-|---|---|---|
-| `_evaluate_retrieval()` | ❌ | Just math on similarity scores |
-| `_evaluate_faithfulness()` | ❌ | Keyword overlap — pure string comparison |
-| `_evaluate_answer_relevance()` | ❌ | Keyword presence check |
-| `_split_sentences()` | ❌ | Regex splitting |
-| `_extract_keywords()` | ❌ | Stop word removal |
+| Component | Uses cloud? | Why | 🫏 Donkey |
+|---|---|---| --- |
+| `_evaluate_retrieval()` | ❌ | Just math on similarity scores | Report card 📝 |
+| `_evaluate_faithfulness()` | ❌ | Keyword overlap — pure string comparison | Saddlebag piece 📦 |
+| `_evaluate_answer_relevance()` | ❌ | Keyword presence check | Report card 📝 |
+| `_split_sentences()` | ❌ | Regex splitting | 🫏 On the route |
+| `_extract_keywords()` | ❌ | Stop word removal | 🫏 On the route |
 
 **This means:**
 - Evaluation costs **$0** on all providers
@@ -506,19 +526,21 @@ Or use Swagger UI at `http://localhost:8000/docs` → find the **Evaluation** se
 
 **Trade-off:** Rule-based evaluation is simpler and cheaper than LLM-based evaluation (e.g., using GPT-4 to judge GPT-4's answers), but it's also less nuanced. It can't detect subtle semantic errors — only keyword-level problems.
 
+- 🫏 **Donkey:** Choosing which stable to work with — AWS Bedrock, Azure OpenAI, or a local Ollama barn each offer different donkeys at different prices.
+
 ---
 
 ## Common Evaluation Failures and How to Debug Them
 
-| Score too low? | Likely cause | How to debug |
-|---|---|---|
-| **Retrieval < 0.5** | Chunks are irrelevant | Check chunk content — is the right document ingested? |
-| **Retrieval < 0.5** | Embedding quality poor | Try different embedding model (local: `nomic-embed-text` → `all-minilm`) |
-| **Faithfulness < 0.8** | LLM is hallucinating | Tighten prompt rules, lower temperature |
-| **Faithfulness < 0.8** | Keyword extraction too strict | Check if answer uses synonyms not in context |
-| **Relevance < 0.6** | LLM answered different question | Check if question is ambiguous |
-| **Relevance < 0.6** | Answer is a refusal | Check if context was empty (correct behaviour) |
-| **Overall < 0.7** | Multiple issues | Debug each score individually |
+| Score too low? | Likely cause | How to debug | 🫏 Donkey |
+|---|---|---| --- |
+| **Retrieval < 0.5** | Chunks are irrelevant | Check chunk content — is the right document ingested? | Saddlebag piece 📦 |
+| **Retrieval < 0.5** | Embedding quality poor | Try different embedding model (local: `nomic-embed-text` → `all-minilm`) | GPS stamp 📍 |
+| **Faithfulness < 0.8** | LLM is hallucinating | Tighten prompt rules, lower temperature | The donkey 🐴 |
+| **Faithfulness < 0.8** | Keyword extraction too strict | Check if answer uses synonyms not in context | Saddlebag match 🫏 |
+| **Relevance < 0.6** | LLM answered different question | Check if question is ambiguous | The donkey 🐴 |
+| **Relevance < 0.6** | Answer is a refusal | Check if context was empty (correct behaviour) | Right address 🎯 |
+| **Overall < 0.7** | Multiple issues | Debug each score individually | Hoof check 🔧 |
 
 **Debugging workflow:**
 
@@ -540,6 +562,8 @@ print(result.to_dict())
 # If faithfulness is low → fix prompt / temperature
 # If relevance is low → fix prompt / chunking
 ```
+
+- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -566,6 +590,8 @@ print(result.to_dict())
 - [ ] How would you use evaluation scores to auto-tune `top_k` or `chunk_size`?
 - [ ] If faithfulness is 0.65 and you need to reach 0.8, what do you try first?
 
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+
 ---
 
 ## What to Study Next
@@ -579,3 +605,4 @@ You now understand how to measure RAG quality. Next:
 - [RAG Chain Deep Dive (#13)](rag-chain-deep-dive.md) — the pipeline being evaluated
 - [RAG Concepts → Evaluation](rag-concepts.md)
 
+- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

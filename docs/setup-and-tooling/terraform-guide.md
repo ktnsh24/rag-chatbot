@@ -51,6 +51,8 @@ az login
 az account set --subscription "your-subscription-id"
 ```
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## AWS Infrastructure
@@ -59,21 +61,21 @@ az account set --subscription "your-subscription-id"
 
 ### Resources Created
 
-| Resource | Purpose | Free Tier? |
-|---|---|---|
-| `aws_s3_bucket` | Store uploaded documents | ✅ 5 GB |
-| `aws_dynamodb_table` | Conversation history | ✅ 25 GB |
-| `aws_ecr_repository` | Docker image registry | ✅ 500 MB |
-| `aws_iam_role` | ECS task execution role | ✅ Free |
-| `aws_iam_role_policy` | Least-privilege policy | ✅ Free |
+| Resource | Purpose | Free Tier? | 🫏 Donkey |
+|---|---|---| --- |
+| `aws_s3_bucket` | Store uploaded documents | ✅ 5 GB | AWS depot 🏭 |
+| `aws_dynamodb_table` | Conversation history | ✅ 25 GB | AWS depot 🏭 |
+| `aws_ecr_repository` | Docker image registry | ✅ 500 MB | Stable address 🏷️ |
+| `aws_iam_role` | ECS task execution role | ✅ Free | Free hay 🌿 |
+| `aws_iam_role_policy` | Least-privilege policy | ✅ Free | Free hay 🌿 |
 
 ### Variables
 
-| Variable | Default | Description |
-|---|---|---|
-| `project_name` | `"rag-chatbot"` | Prefix for all resource names |
-| `environment` | `"dev"` | Environment tag |
-| `aws_region` | `"eu-west-1"` | AWS region |
+| Variable | Default | Description | 🫏 Donkey |
+|---|---|---| --- |
+| `project_name` | `"rag-chatbot"` | Prefix for all resource names | Saddlebag check 🫏 |
+| `environment` | `"dev"` | Environment tag | 🫏 On the route |
+| `aws_region` | `"eu-west-1"` | AWS region | AWS depot 🏭 |
 
 ### S3 Bucket
 
@@ -129,6 +131,8 @@ The ECS task role grants least-privilege access:
 - OpenSearch: `ESHttpGet`, `ESHttpPut`, `ESHttpPost`, `ESHttpDelete`
 - CloudWatch Logs: `CreateLogGroup`, `CreateLogStream`, `PutLogEvents`
 
+- 🫏 **Donkey:** Blueprints for building the stable — run one command and the whole building appears, fences and all.
+
 ---
 
 ## Azure Infrastructure
@@ -137,23 +141,23 @@ The ECS task role grants least-privilege access:
 
 ### Resources Created
 
-| Resource | Purpose | Free Tier? |
-|---|---|---|
-| `azurerm_resource_group` | Resource container | ✅ Free |
-| `azurerm_storage_account` | Document storage | ✅ 5 GB LRS |
-| `azurerm_storage_container` | Blob container | ✅ Included |
-| `azurerm_cosmosdb_account` | Conversation history | ✅ 1000 RU/s free |
-| `azurerm_cosmosdb_sql_database` | Database | ✅ Included |
-| `azurerm_cosmosdb_sql_container` | Container | ✅ Included |
-| `azurerm_container_registry` | Docker images | Basic SKU ~€4.20/mo |
+| Resource | Purpose | Free Tier? | 🫏 Donkey |
+|---|---|---| --- |
+| `azurerm_resource_group` | Resource container | ✅ Free | Stable stall 🐎 |
+| `azurerm_storage_account` | Document storage | ✅ 5 GB LRS | Saddlebag check 🫏 |
+| `azurerm_storage_container` | Blob container | ✅ Included | Saddlebag check 🫏 |
+| `azurerm_cosmosdb_account` | Conversation history | ✅ 1000 RU/s free | Azure trip-log 📒 |
+| `azurerm_cosmosdb_sql_database` | Database | ✅ Included | Azure trip-log 📒 |
+| `azurerm_cosmosdb_sql_container` | Container | ✅ Included | Azure trip-log 📒 |
+| `azurerm_container_registry` | Docker images | Basic SKU ~€4.20/mo | Stable stall 🐎 |
 
 ### Variables
 
-| Variable | Default | Description |
-|---|---|---|
-| `project_name` | `"ragchatbot"` | Prefix for resource names |
-| `environment` | `"dev"` | Environment tag |
-| `location` | `"westeurope"` | Azure region |
+| Variable | Default | Description | 🫏 Donkey |
+|---|---|---| --- |
+| `project_name` | `"ragchatbot"` | Prefix for resource names | Saddlebag check 🫏 |
+| `environment` | `"dev"` | Environment tag | 🫏 On the route |
+| `location` | `"westeurope"` | Azure region | Azure hub ☁️ |
 
 ### Cosmos DB (Serverless)
 
@@ -182,6 +186,8 @@ resource "azurerm_container_registry" "main" {
   # Sufficient for a portfolio project
 }
 ```
+
+- 🫏 **Donkey:** Blueprints for building the stable — run one command and the whole building appears, fences and all.
 
 ---
 
@@ -216,6 +222,8 @@ terraform {
   }
 }
 ```
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -263,6 +271,8 @@ terraform apply -var="environment=staging"
 terraform workspace select default
 ```
 
+- 🫏 **Donkey:** Saddling up the donkey in a new stable — same harness, same route map, different building.
+
 ---
 
 ## Destroying
@@ -281,33 +291,37 @@ terraform destroy -var="environment=dev"
 
 **Tip:** Always destroy resources when you're not using them to avoid costs.
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## Cost Impact
 
 ### AWS (all free-tier eligible)
 
-| Resource | Monthly Cost |
-|---|---|
-| S3 (5 GB) | $0.00 |
-| DynamoDB (on-demand) | $0.00 |
-| ECR (500 MB) | $0.00 |
-| IAM | $0.00 |
-| **Total** | **$0.00** |
+| Resource | Monthly Cost | 🫏 Donkey |
+|---|---| --- |
+| S3 (5 GB) | $0.00 | Free hay 🌿 |
+| DynamoDB (on-demand) | $0.00 | AWS depot 🏭 |
+| ECR (500 MB) | $0.00 | Stable address 🏷️ |
+| IAM | $0.00 | Free hay 🌿 |
+| **Total** | **$0.00** | Feed bill 🌾 |
 
 ### Azure
 
-| Resource | Monthly Cost |
-|---|---|
-| Storage Account (5 GB LRS) | ~$0.10 |
-| Cosmos DB (serverless, free tier) | $0.00 |
-| Container Registry (Basic) | ~$4.20 |
-| Resource Group | $0.00 |
-| **Total** | **~$4.30** |
+| Resource | Monthly Cost | 🫏 Donkey |
+|---|---| --- |
+| Storage Account (5 GB LRS) | ~$0.10 | Saddlebag check 🫏 |
+| Cosmos DB (serverless, free tier) | $0.00 | Azure trip-log 📒 |
+| Container Registry (Basic) | ~$4.20 | Stable address 🏷️ |
+| Resource Group | $0.00 | Free hay 🌿 |
+| **Total** | **~$4.30** | Feed bill 🌾 |
 
 > 💡 The Azure Container Registry is the only resource with a meaningful
 > cost. You can skip it during development and push images directly to
 > Azure Container Apps from your local machine.
+
+- 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
 
 ---
 
@@ -335,3 +349,5 @@ If a previous `terraform apply` was interrupted:
 # Find the lock ID in the error message, then:
 terraform force-unlock <LOCK_ID>
 ```
+
+- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and saddle inspection checklist to find what went wrong.

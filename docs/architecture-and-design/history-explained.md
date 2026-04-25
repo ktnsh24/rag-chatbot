@@ -67,6 +67,8 @@ With history:
     → AI understands "what about" refers to refunds
 ```
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## Why Does a RAG App Need Conversation History?
@@ -107,6 +109,8 @@ Think of it like a stored procedure that has no session state:
 - If you want context from previous calls, you must pass it explicitly
 - History storage = the table where you log inputs/outputs for replay
 
+- 🫏 **Donkey:** The donkey's trip log — it remembers what was said 3 questions ago so it doesn't re-ask for your address.
+
 ---
 
 ## The Three Files
@@ -122,6 +126,8 @@ src/history/
 > history is not yet persisted — each server restart starts fresh. The Local
 > provider focuses on LLM + vector store. Adding a local history backend
 > (e.g., SQLite) would follow the same `BaseConversationHistory` interface.
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -139,11 +145,11 @@ class ConversationMessage:
 
 The `BaseConversationHistory` abstract class defines three operations:
 
-| Method | What it does | DE equivalent |
-| --- | --- | --- |
-| `add_message()` | Store one message | `INSERT INTO messages VALUES (...)` |
-| `get_history()` | Get last N messages for a session | `SELECT * FROM messages WHERE session_id = ? ORDER BY timestamp DESC LIMIT 10` |
-| `delete_session()` | Delete all messages for a session | `DELETE FROM messages WHERE session_id = ?` |
+| Method | What it does | DE equivalent | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `add_message()` | Store one message | `INSERT INTO messages VALUES (...)` | 🫏 On the route |
+| `get_history()` | Get last N messages for a session | `SELECT * FROM messages WHERE session_id = ? ORDER BY timestamp DESC LIMIT 10` | Trip log 📒 |
+| `delete_session()` | Delete all messages for a session | `DELETE FROM messages WHERE session_id = ?` | Trip log 📒 |
 
 ### Key design decisions
 
@@ -165,6 +171,8 @@ When you replay history in the prompt, each message must say who sent it:
 **limit parameter (default 10)** — You don't replay ALL history, only the last 10
 messages. More history = more input tokens = more cost. This is a trade-off between
 context quality and cost (explained in detail in [The Token Cost of History](#the-token-cost-of-history)).
+
+- 🫏 **Donkey:** The universal saddle fitting — any donkey (AWS, Azure, local) accepts the same harness so you can swap providers without re-training the rider.
 
 ---
 
@@ -229,6 +237,8 @@ ttl {
 
 Conversations auto-expire after 7 days. No cron job needed — DynamoDB handles deletion.
 This keeps costs down and avoids storing stale data forever.
+
+- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
 
 ---
 
@@ -307,21 +317,23 @@ default_ttl = 604800  # 7 days in seconds
 
 Same concept as DynamoDB TTL — conversations auto-expire.
 
+- 🫏 **Donkey:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for donkeys on the Azure route.
+
 ---
 
 ## AWS vs Azure — Side-by-Side Comparison
 
-| Aspect | AWS DynamoDB | Azure Cosmos DB |
-| --- | --- | --- |
-| **SDK** | `boto3` (sync) | `azure-cosmos` (async native) |
-| **Key design** | Composite: `session_id` (PK) + `timestamp` (SK) | `id` (unique) + `session_id` (partition key) |
-| **Unique ID** | Not needed — PK+SK is unique | Required — `id` field with UUID |
-| **Query language** | `KeyConditionExpression` (DynamoDB-specific) | SQL-like syntax (`SELECT`, `WHERE`, `ORDER BY`) |
-| **Get latest N** | `ScanIndexForward=False, Limit=N` + reverse | `SELECT TOP N ... ORDER BY timestamp DESC` + reverse |
-| **Batch delete** | `batch_writer()` + loop | `async for` + `delete_item()` one by one |
-| **TTL** | `expires_at` attribute | `default_ttl` on container (seconds) |
-| **Cost (serverless)** | ~$0 idle, $1.25/M writes, $0.25/M reads | ~$0 idle, ~$0.28/M RUs |
-| **Consistency** | Eventually consistent (default) | Session consistency (configured) |
+| Aspect | AWS DynamoDB | Azure Cosmos DB | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **SDK** | `boto3` (sync) | `azure-cosmos` (async native) | Azure trip-log 📒 |
+| **Key design** | Composite: `session_id` (PK) + `timestamp` (SK) | `id` (unique) + `session_id` (partition key) | Trip log 📒 |
+| **Unique ID** | Not needed — PK+SK is unique | Required — `id` field with UUID | 🫏 On the route |
+| **Query language** | `KeyConditionExpression` (DynamoDB-specific) | SQL-like syntax (`SELECT`, `WHERE`, `ORDER BY`) | AWS depot 🏭 |
+| **Get latest N** | `ScanIndexForward=False, Limit=N` + reverse | `SELECT TOP N ... ORDER BY timestamp DESC` + reverse | Test delivery 🧪 |
+| **Batch delete** | `batch_writer()` + loop | `async for` + `delete_item()` one by one | 🫏 On the route |
+| **TTL** | `expires_at` attribute | `default_ttl` on container (seconds) | Stable stall 🐎 |
+| **Cost (serverless)** | ~$0 idle, $1.25/M writes, $0.25/M reads | ~$0 idle, ~$0.28/M RUs | Feed bill 🌾 |
+| **Consistency** | Eventually consistent (default) | Session consistency (configured) | Trip log 📒 |
 
 ### The code patterns side by side
 
@@ -358,6 +370,8 @@ async for item in container.query_items(query=query, partition_key=session_id):
     items.append(item)
 ```
 
+- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
+
 ---
 
 ## How History Gets Used in the Chat Pipeline
@@ -393,6 +407,8 @@ POST /api/chat  {"question": "What about digital products?", "session_id": "sess
 **Steps 6 is critical** — both the question AND the answer are saved. On the next
 question, `get_history()` returns all previous turns, including this one.
 
+- 🫏 **Donkey:** The donkey's trip log — it remembers what was said 3 questions ago so it doesn't re-ask for your address.
+
 ---
 
 ## The Token Cost of History
@@ -413,42 +429,46 @@ Total history tokens: ~123 input tokens added to EVERY subsequent prompt
 
 With the default `limit=10` (10 messages = 5 conversation turns):
 
-| Messages in history | Extra input tokens | Extra cost per query (Claude) |
-| --- | --- | --- |
-| 0 (first question) | 0 | $0.000 |
-| 2 (1 turn) | ~60 | $0.00018 |
-| 6 (3 turns) | ~180 | $0.00054 |
-| 10 (5 turns) | ~300 | $0.00090 |
-| 20 (10 turns) | ~600 | $0.00180 |
+| Messages in history | Extra input tokens | Extra cost per query (Claude) | 🫏 Donkey |
+| --- | --- | --- | --- |
+| 0 (first question) | 0 | $0.000 | Free hay 🌿 |
+| 2 (1 turn) | ~60 | $0.00018 | Free hay 🌿 |
+| 6 (3 turns) | ~180 | $0.00054 | Free hay 🌿 |
+| 10 (5 turns) | ~300 | $0.00090 | Free hay 🌿 |
+| 20 (10 turns) | ~600 | $0.00180 | Free hay 🌿 |
 
 **This is why there's a limit.** Without it, a 50-message conversation would add ~1500
 tokens to every prompt — tripling the cost per query for diminishing returns.
 
 ### The trade-off
 
-| Fewer history messages | More history messages |
-| --- | --- |
-| Lower cost per query | Higher cost per query |
-| Less context for follow-ups | Better understanding of conversation |
-| User may need to repeat context | Smooth, natural conversation |
-| `limit=4` is minimum for usable follow-ups | `limit=20` is maximum before costs explode |
+| Fewer history messages | More history messages | 🫏 Donkey |
+| --- | --- | --- |
+| Lower cost per query | Higher cost per query | Feed bill 🌾 |
+| Less context for follow-ups | Better understanding of conversation | Trip log 📒 |
+| User may need to repeat context | Smooth, natural conversation | Trip log 📒 |
+| `limit=4` is minimum for usable follow-ups | `limit=20` is maximum before costs explode | Feed bill 🌾 |
 
 The default `limit=10` is a good balance — 5 conversation turns gives enough context
 for most follow-up questions without excessive token costs.
+
+- 🫏 **Donkey:** The donkey's trip log — it remembers what was said 3 questions ago so it doesn't re-ask for your address.
 
 ---
 
 ## DE vs AI Engineer — What Each Sees
 
-| Aspect | What a DE sees | What an AI Engineer sees |
-| --- | --- | --- |
-| `ConversationMessage` model | Standard message table schema | Token budget — each message costs tokens in the next prompt |
-| `add_message()` | Insert row, done | Must save BOTH user and assistant messages for complete replay |
-| `get_history(limit=10)` | Pagination, standard | Token cost control — limit = max tokens spent on history |
-| `delete_session()` | Cleanup, standard | Privacy + cost — old sessions = wasted storage + prompt bloat |
-| TTL (7 days) | Standard data retention | Context window management — conversations older than 7 days aren't useful |
-| `session_id` | Partition key for grouping | Session isolation — one user's history never leaks into another's prompt |
-| Sort by timestamp | Standard ordering | Chronological replay is required — LLM needs messages in order |
+| Aspect | What a DE sees | What an AI Engineer sees | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `ConversationMessage` model | Standard message table schema | Token budget — each message costs tokens in the next prompt | Cargo unit ⚖️ |
+| `add_message()` | Insert row, done | Must save BOTH user and assistant messages for complete replay | 🫏 On the route |
+| `get_history(limit=10)` | Pagination, standard | Token cost control — limit = max tokens spent on history | Cargo unit ⚖️ |
+| `delete_session()` | Cleanup, standard | Privacy + cost — old sessions = wasted storage + prompt bloat | Delivery note 📋 |
+| TTL (7 days) | Standard data retention | Context window management — conversations older than 7 days aren't useful | Trip log 📒 |
+| `session_id` | Partition key for grouping | Session isolation — one user's history never leaks into another's prompt | Alternative stable 🏗️ |
+| Sort by timestamp | Standard ordering | Chronological replay is required — LLM needs messages in order | The donkey 🐴 |
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -473,3 +493,5 @@ Test your understanding:
 5. The **last** 10 — query sorts by timestamp DESC with Limit=10, then reverses. Recent context matters more than what was asked 30 messages ago.
 6. Roughly 300 tokens (~30 tokens per message × 10 messages). At $0.003/1K tokens (Claude input), that's ~$0.0009 extra per query.
 7. DynamoDB uses a composite key (session_id + timestamp) which is naturally unique. Cosmos DB requires a standalone `id` field for document identity.
+
+- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.

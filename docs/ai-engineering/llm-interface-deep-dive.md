@@ -25,13 +25,15 @@
 
 This is the **first AI file** you encounter after Phase 1. It defines the contract that every LLM provider (Bedrock, Azure OpenAI, Ollama) must follow. The code pattern is something you already know — `ABC` with `@abstractmethod`. What's new are the **five AI concepts** embedded in the interface:
 
-| # | Concept | Method / class | DE parallel | What's new |
-|---|---|---|---|---|
-| 1 | **Tokens** | `LLMResponse` | RCU/WCU (DynamoDB capacity units) | The unit of cost — output tokens cost 5× more than input |
-| 2 | **Generation** | `generate()` | `db.query(sql)` → rows | Send prompt + context → get text + token counts back |
-| 3 | **Temperature** | `temperature` param | ❌ No parallel — pure AI | Controls randomness: 0.0 = deterministic, 1.0 = creative |
-| 4 | **Embeddings** | `get_embedding()` | ❌ No parallel — brand new | Converts text → fixed-size vector that captures meaning |
-| 5 | **Batch embeddings** | `get_embeddings_batch()` | Batch INSERT | One API call instead of N — same performance pattern |
+| # | Concept | Method / class | DE parallel | What's new | 🫏 Donkey |
+|---|---|---|---|---| --- |
+| 1 | **Tokens** | `LLMResponse` | RCU/WCU (DynamoDB capacity units) | The unit of cost — output tokens cost 5× more than input | The donkey 🐴 |
+| 2 | **Generation** | `generate()` | `db.query(sql)` → rows | Send prompt + context → get text + token counts back | Cargo unit ⚖️ |
+| 3 | **Temperature** | `temperature` param | ❌ No parallel — pure AI | Controls randomness: 0.0 = deterministic, 1.0 = creative | 🫏 On the route |
+| 4 | **Embeddings** | `get_embedding()` | ❌ No parallel — brand new | Converts text → fixed-size vector that captures meaning | GPS warehouse 🗺️ |
+| 5 | **Batch embeddings** | `get_embeddings_batch()` | Batch INSERT | One API call instead of N — same performance pattern | Stable door 🚪 |
+
+- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -53,6 +55,8 @@ This is the **first AI file** you encounter after Phase 1. It defines the contra
 ```
 
 You've used this pattern in DE work — abstract class with multiple concrete implementations. You swap DynamoDB ↔ PostgreSQL. Here you swap Bedrock ↔ Azure OpenAI ↔ Ollama (local). **The pattern is identical. Only the domain is different.**
+
+- 🫏 **Donkey:** Running multiple donkeys on the same route to confirm that AI engineering and data engineering practices mirror each other.
 
 ---
 
@@ -82,10 +86,10 @@ Not a word, not a character — a **subword piece** produced by a tokenizer. Rou
 
 Because they have different prices:
 
-| Token type | Who produces it | Claude 3.5 Sonnet price | DE parallel |
-|---|---|---|---|
-| **Input tokens** | You send them (prompt + context) | $0.003 / 1K tokens | Like DynamoDB Read Capacity Units |
-| **Output tokens** | LLM generates them (the answer) | $0.015 / 1K tokens (**5× more**) | Like DynamoDB Write Capacity Units |
+| Token type | Who produces it | Claude 3.5 Sonnet price | DE parallel | 🫏 Donkey |
+|---|---|---|---| --- |
+| **Input tokens** | You send them (prompt + context) | $0.003 / 1K tokens | Like DynamoDB Read Capacity Units | AWS depot 🏭 |
+| **Output tokens** | LLM generates them (the answer) | $0.015 / 1K tokens (**5× more**) | Like DynamoDB Write Capacity Units | The donkey 🐴 |
 
 Output tokens cost **5× more** than input tokens — same pattern as DynamoDB where writes cost more than reads. Tracking them separately lets you optimise: a verbose LLM answer costs more than a concise one.
 
@@ -94,6 +98,8 @@ Output tokens cost **5× more** than input tokens — same pattern as DynamoDB w
 Every model has a maximum total tokens (input + output). Claude 3.5 Sonnet: 200K tokens. Exceed it → the API returns an error — like a `VARCHAR(255)` limit but for the entire conversation.
 
 📖 **More on tokens:** [RAG Concepts → What is a Token?](rag-concepts.md#what-is-a-token) · [Cost Analysis](cost-analysis.md)
+
+- 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
 
 ---
 
@@ -112,11 +118,11 @@ async def generate(
 
 ### Three parameters, three concepts
 
-| Parameter | What it is | What goes in | DE parallel |
-|---|---|---|---|
-| `prompt` | The user's question + system instructions | `"What is the refund policy?"` | The SQL query |
-| `context` | Document chunks retrieved by vector search | `["Our refund policy allows...", "Returns must be..."]` | The tables the query runs against |
-| `temperature` | Randomness control (0.0 = deterministic, 1.0 = creative) | `0.1` | ❌ No DE parallel — pure AI concept |
+| Parameter | What it is | What goes in | DE parallel | 🫏 Donkey |
+|---|---|---|---| --- |
+| `prompt` | The user's question + system instructions | `"What is the refund policy?"` | The SQL query | Delivery note 📋 |
+| `context` | Document chunks retrieved by vector search | `["Our refund policy allows...", "Returns must be..."]` | The tables the query runs against | Saddlebag piece 📦 |
+| `temperature` | Randomness control (0.0 = deterministic, 1.0 = creative) | `0.1` | ❌ No DE parallel — pure AI concept | 🫏 On the route |
 
 ### How generation works end-to-end
 
@@ -136,6 +142,8 @@ Cost: (1430/1000 × $0.003) + (70/1000 × $0.015) = $0.00429 + $0.00105 = ~$0.00
 ### Key insight
 
 The LLM does **NOT** search for documents. It only **reads what you give it** (the context) and **writes an answer**. The searching happened earlier — `generate()` is step 3 of the RAG pipeline, not step 1.
+
+- 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
 
 ---
 
@@ -161,18 +169,20 @@ Next word probabilities for "The refund policy ___":
 
 ### Temperature cheat sheet
 
-| Temperature | Behaviour | Use case |
-|---|---|---|
-| 0.0 | Always picks the highest-probability word | Math, code generation |
-| **0.1** | **Almost always the highest, tiny variation** | **RAG chatbots (this repo) — accuracy matters** |
-| 0.7 | Distributes across likely words | Creative writing, brainstorming |
-| 1.0 | Nearly uniform distribution — anything goes | Experimental, often unusable |
+| Temperature | Behaviour | Use case | 🫏 Donkey |
+|---|---|---| --- |
+| 0.0 | Always picks the highest-probability word | Math, code generation | 🫏 On the route |
+| **0.1** | **Almost always the highest, tiny variation** | **RAG chatbots (this repo) — accuracy matters** | Saddlebag check 🫏 |
+| 0.7 | Distributes across likely words | Creative writing, brainstorming | Stable address 🏷️ |
+| 1.0 | Nearly uniform distribution — anything goes | Experimental, often unusable | 🫏 On the route |
 
 ### Why 0.1 for this chatbot?
 
 It answers questions about documents. You want **accurate, consistent** answers — not creative writing. The same question should give essentially the same answer every time. Like using `SELECT ... ORDER BY` instead of random sampling.
 
 📖 **More on temperature:** [How Services Work → Converse API parameters](../architecture-and-design/how-services-work.md#the-converse-api--what-each-parameter-does)
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -211,12 +221,12 @@ Think of a hash function — it takes any input and produces a fixed-size output
 
 ### Critical facts about embeddings
 
-| Property | Value | Why it matters |
-|---|---|---|
-| Output size | Always 1024 floats (Titan) or 1536 (Azure) | Vector store must match this dimension |
-| Input can be any length | `"Hi"` or a 2000-char paragraph → same 1024 floats | The model compresses meaning into fixed-size |
-| Runs at two different times | Ingestion (embed every chunk) AND query (embed the question) | Both must use the **same** model — mixing models = garbage results |
-| Not reversible | Cannot convert [0.12, -0.45, ...] back to text | Like a hash — one-way function |
+| Property | Value | Why it matters | 🫏 Donkey |
+|---|---|---| --- |
+| Output size | Always 1024 floats (Titan) or 1536 (Azure) | Vector store must match this dimension | GPS warehouse 🗺️ |
+| Input can be any length | `"Hi"` or a 2000-char paragraph → same 1024 floats | The model compresses meaning into fixed-size | Saddlebag check 🫏 |
+| Runs at two different times | Ingestion (embed every chunk) AND query (embed the question) | Both must use the **same** model — mixing models = garbage results | Saddlebag piece 📦 |
+| Not reversible | Cannot convert [0.12, -0.45, ...] back to text | Like a hash — one-way function | 🫏 On the route |
 
 ### When `get_embedding()` runs in the RAG pipeline
 
@@ -230,6 +240,8 @@ Think of a hash function — it takes any input and produces a fixed-size output
 ```
 
 📖 **More on embeddings:** [RAG Concepts → What are Embeddings?](rag-concepts.md#what-are-embeddings) · [RAG Concepts → 42 Chunks Example](rag-concepts.md#concrete-example-42-chunks--42-vectors) · [RAG Concepts → Dimensions Must Match](rag-concepts.md#dimensions-must-match-between-model-and-store)
+
+- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -255,6 +267,8 @@ vectors = await llm.get_embeddings_batch(42_chunks)  # 1 API call = 1 round trip
 ```
 
 Used during **ingestion** when embedding all chunks of a document at once. At query time you only embed one question, so `get_embedding()` is sufficient.
+
+- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -289,18 +303,22 @@ USER: "What is the refund policy?"
 
 **Notice:** `base.py` is used in steps 1 AND 3. The same `BaseLLM` interface handles both embedding and generation — but they use **different underlying models** (Titan for embeddings, Claude for generation). You'll see this in `aws_bedrock.py` (file #8).
 
+- 🫏 **Donkey:** The donkey checks its saddlebag full of retrieved document chunks before answering — no guessing from memory.
+
 ---
 
 ## Questions to Ask Yourself After Reading This File
 
-| Question | Answer | Concept it tests |
-|---|---|---|
-| "What does `get_embedding()` return for a 2-word input vs a 2000-word input?" | The same: a list of exactly 1024 floats (Titan). Input length doesn't affect output size. | Embeddings |
-| "Why does `LLMResponse` track `input_tokens` and `output_tokens` separately?" | Because output tokens cost 5× more. Tracking separately enables cost optimisation. | Tokens & cost |
-| "What happens if you use temperature=0.8 instead of 0.1 for this chatbot?" | Answers become inconsistent and creative. The same question might get different answers. Hallucination risk increases. | Temperature |
-| "Why is `get_embedding()` on the same `BaseLLM` class as `generate()`?" | Because the LLM *provider* (Bedrock/Azure) handles both, even though they use different models internally. It's an interface grouping by provider, not by model. | Strategy pattern |
-| "What happens if you embed documents with Titan (1024-dim) but embed the question with Azure (1536-dim)?" | Vector search fails — you can't compare vectors of different dimensions. Both must use the same model. | Dimension matching |
-| "How much does one `get_embedding()` call cost vs one `generate()` call?" | Embedding: ~$0.00002 (30 tokens × $0.0001/1K). Generation: ~$0.005 (1430 input + 70 output). Generation is ~250× more expensive. | Cost awareness |
+| Question | Answer | Concept it tests | 🫏 Donkey |
+|---|---|---| --- |
+| "What does `get_embedding()` return for a 2-word input vs a 2000-word input?" | The same: a list of exactly 1024 floats (Titan). Input length doesn't affect output size. | Embeddings | GPS warehouse 🗺️ |
+| "Why does `LLMResponse` track `input_tokens` and `output_tokens` separately?" | Because output tokens cost 5× more. Tracking separately enables cost optimisation. | Tokens & cost | The donkey 🐴 |
+| "What happens if you use temperature=0.8 instead of 0.1 for this chatbot?" | Answers become inconsistent and creative. The same question might get different answers. Hallucination risk increases. | Temperature | Memory drift ⚠️ |
+| "Why is `get_embedding()` on the same `BaseLLM` class as `generate()`?" | Because the LLM *provider* (Bedrock/Azure) handles both, even though they use different models internally. It's an interface grouping by provider, not by model. | Strategy pattern | The donkey 🐴 |
+| "What happens if you embed documents with Titan (1024-dim) but embed the question with Azure (1536-dim)?" | Vector search fails — you can't compare vectors of different dimensions. Both must use the same model. | Dimension matching | GPS warehouse 🗺️ |
+| "How much does one `get_embedding()` call cost vs one `generate()` call?" | Embedding: ~$0.00002 (30 tokens × $0.0001/1K). Generation: ~$0.005 (1430 input + 70 output). Generation is ~250× more expensive. | Cost awareness | Cargo unit ⚖️ |
+
+- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.
 
 ---
 
@@ -314,3 +332,5 @@ Now that you understand the **interface**, study the **implementations**:
 - [Deep Dive: LLM Providers (AWS Bedrock + Azure OpenAI + Local Ollama)](llm-providers-deep-dive.md)
 - [RAG Concepts → Three Components](rag-concepts.md#the-three-components-you-must-understand)
 - [Cost Analysis](cost-analysis.md)
+
+- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

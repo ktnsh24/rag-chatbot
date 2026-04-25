@@ -75,6 +75,8 @@ from the vector store).
 **DE parallel:** Upload is an ETL pipeline. Extract (read the file) → Transform
 (chunk + embed) → Load (store in vector DB). List and Delete are standard CRUD.
 
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+
 ---
 
 ## Endpoint 1: Upload
@@ -146,6 +148,8 @@ Response: {
 }
 ```
 
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+
 ---
 
 ### Upload Part 1: The Route Layer
@@ -166,10 +170,10 @@ SUPPORTED_EXTENSIONS = {".pdf", ".txt", ".md", ".csv", ".docx"}
 
 **What each line does:**
 
-| Line | Purpose | DE parallel |
-| --- | --- | --- |
-| `_documents: dict[str, DocumentInfo] = {}` | In-memory storage for document metadata | Like a cache dict — in prod you'd use DynamoDB |
-| `SUPPORTED_EXTENSIONS` | Allowlist of file types we can parse | Input validation — same as any upload endpoint |
+| Line | Purpose | DE parallel | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `_documents: dict[str, DocumentInfo] = {}` | In-memory storage for document metadata | Like a cache dict — in prod you'd use DynamoDB | AWS depot 🏭 |
+| `SUPPORTED_EXTENSIONS` | Allowlist of file types we can parse | Input validation — same as any upload endpoint | Stable door 🚪 |
 
 **Why in-memory?** This is a portfolio project. In production, you'd store this in
 DynamoDB (AWS) or CosmosDB (Azure) so it survives app restarts. The pattern is the
@@ -196,13 +200,13 @@ same — `_documents[id] = info` vs `dynamodb.put_item(item=info)`.
 
 **Why these specific formats?**
 
-| Format | Parser used | Why supported |
-| --- | --- | --- |
-| `.pdf` | `pypdf` (PdfReader) | Most common document format in enterprises |
-| `.txt` | Built-in `.decode("utf-8")` | Plain text, simplest case |
-| `.md` | Built-in `.decode("utf-8")` | Documentation, READMEs |
-| `.csv` | Built-in `.decode("utf-8")` | Tabular data (each row becomes text) |
-| `.docx` | `python-docx` | Microsoft Word — common in enterprises |
+| Format | Parser used | Why supported | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `.pdf` | `pypdf` (PdfReader) | Most common document format in enterprises | 🫏 On the route |
+| `.txt` | Built-in `.decode("utf-8")` | Plain text, simplest case | 🫏 On the route |
+| `.md` | Built-in `.decode("utf-8")` | Documentation, READMEs | 🫏 On the route |
+| `.csv` | Built-in `.decode("utf-8")` | Tabular data (each row becomes text) | 🫏 On the route |
+| `.docx` | `python-docx` | Microsoft Word — common in enterprises | 🫏 On the route |
 
 **Not supported:** `.xlsx` (Excel), `.pptx` (PowerPoint), `.html` — each would need
 its own parser. These could be added later.
@@ -320,11 +324,11 @@ format (PDF/CSV/DOCX) into a common format (plain text). Same as reading a CSV f
 S3 and loading it into a Pandas DataFrame — the output format is always the same
 regardless of input format.
 
-| ETL Extract | RAG Extract |
-| --- | --- |
-| Read CSV from S3 → DataFrame | Read PDF from upload → string |
-| Read JSON from API → DataFrame | Read DOCX from upload → string |
-| Read Parquet from S3 → DataFrame | Read TXT from upload → string |
+| ETL Extract | RAG Extract | 🫏 Donkey |
+| --- | --- | --- |
+| Read CSV from S3 → DataFrame | Read PDF from upload → string | Parcel shelf 📦 |
+| Read JSON from API → DataFrame | Read DOCX from upload → string | Stable door 🚪 |
+| Read Parquet from S3 → DataFrame | Read TXT from upload → string | Parcel shelf 📦 |
 
 **Why `[Page N]` markers?** When the document is later chunked, these markers help
 track which page each chunk came from. This is how `page_number` ends up in the
@@ -441,11 +445,11 @@ and aggregating data, you're splitting and sizing it. Think of it like partition
 a large file into smaller files for parallel processing, but with overlapping
 boundaries so you don't lose context at the edges.
 
-| ETL Transform | RAG Transform (chunking) |
-| --- | --- |
-| Split large CSV into 100 row batches | Split document into 1000 char chunks |
-| Partitioning with no overlap | Partitioning WITH overlap (200 chars) |
-| Purpose: parallel processing | Purpose: precise vector matching |
+| ETL Transform | RAG Transform (chunking) | 🫏 Donkey |
+| --- | --- | --- |
+| Split large CSV into 100 row batches | Split document into 1000 char chunks | Saddlebag piece 📦 |
+| Partitioning with no overlap | Partitioning WITH overlap (200 chars) | Saddlebag piece 📦 |
+| Purpose: parallel processing | Purpose: precise vector matching | GPS warehouse 🗺️ |
 
 **Cost of this step:** $0 — pure Python computation, no API calls.
 
@@ -516,12 +520,12 @@ These vectors capture the *meaning* of each chunk. Later, when someone asks a qu
 transformation. First you chunked (split), now you embed (convert format). Think of
 it like:
 
-| ETL Transform | RAG Transform (embedding) |
-| --- | --- |
-| Convert CSV strings to typed columns | Convert text chunks to number vectors |
-| Parse dates, cast integers | Run through neural network to get floats |
-| Output: structured rows | Output: vectors — 1024-dim (AWS Titan), 1536-dim (Azure), or 768-dim (Local Ollama) |
-| Purpose: make data queryable by SQL | Purpose: make text searchable by meaning |
+| ETL Transform | RAG Transform (embedding) | 🫏 Donkey |
+| --- | --- | --- |
+| Convert CSV strings to typed columns | Convert text chunks to number vectors | Saddlebag piece 📦 |
+| Parse dates, cast integers | Run through neural network to get floats | 🫏 On the route |
+| Output: structured rows | Output: vectors — 1024-dim (AWS Titan), 1536-dim (Azure), or 768-dim (Local Ollama) | The donkey 🐴 |
+| Purpose: make data queryable by SQL | Purpose: make text searchable by meaning | 🫏 On the route |
 
 **Cost of this step:**
 
@@ -702,13 +706,13 @@ a graph structure that lets you jump to the most similar vectors in ~O(log N) ti
 into a database. The difference is the data type — instead of rows in Redshift,
 you're storing vectors in OpenSearch.
 
-| ETL Load | RAG Load |
-| --- | --- |
-| Write rows to Redshift | Write vectors to OpenSearch / Azure AI Search |
-| CREATE TABLE with columns | CREATE INDEX with knn_vector mapping (AWS) or SearchIndex (Azure) |
-| INSERT INTO table VALUES | `client.index(body=doc)` (AWS) or `upload_documents(batch)` (Azure) |
-| Each row has typed columns | Each doc has text + vector + metadata |
-| Queried with SQL WHERE | Queried with k-NN vector search |
+| ETL Load | RAG Load | 🫏 Donkey |
+| --- | --- | --- |
+| Write rows to Redshift | Write vectors to OpenSearch / Azure AI Search | AWS search hub 🔍 |
+| CREATE TABLE with columns | CREATE INDEX with knn_vector mapping (AWS) or SearchIndex (Azure) | GPS warehouse 🗺️ |
+| INSERT INTO table VALUES | `client.index(body=doc)` (AWS) or `upload_documents(batch)` (Azure) | AWS depot 🏭 |
+| Each row has typed columns | Each doc has text + vector + metadata | GPS warehouse 🗺️ |
+| Queried with SQL WHERE | Queried with k-NN vector search | GPS warehouse 🗺️ |
 
 **Why `document_id` is stored with every chunk:**
 
@@ -805,14 +809,14 @@ registry entry and returns the response.
 
 **What each field means:**
 
-| Field | Example | Purpose |
-| --- | --- | --- |
-| `document_id` | `"a1b2c3d4-..."` | Unique identifier |
-| `filename` | `"refund-policy.pdf"` | Original filename |
-| `status` | `DocumentStatus.READY` | Lifecycle stage |
-| `chunk_count` | `42` | How many searchable pieces it became |
-| `uploaded_at` | `2026-04-07T10:30:00Z` | When it was uploaded |
-| `file_size_bytes` | `1048576` | File size (1 MB) |
+| Field | Example | Purpose | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `document_id` | `"a1b2c3d4-..."` | Unique identifier | 🫏 On the route |
+| `filename` | `"refund-policy.pdf"` | Original filename | 🫏 On the route |
+| `status` | `DocumentStatus.READY` | Lifecycle stage | 🫏 On the route |
+| `chunk_count` | `42` | How many searchable pieces it became | Saddlebag piece 📦 |
+| `uploaded_at` | `2026-04-07T10:30:00Z` | When it was uploaded | 🫏 On the route |
+| `file_size_bytes` | `1048576` | File size (1 MB) | 🫏 On the route |
 
 **Status lifecycle:**
 
@@ -920,6 +924,8 @@ async def list_documents() -> DocumentListResponse:
 }
 ```
 
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+
 ---
 
 ## Endpoint 3: Delete
@@ -954,6 +960,8 @@ results. This is a known limitation documented in the code.
 
 **DE parallel:** `DELETE FROM documents WHERE id = ?` + `DELETE FROM chunks WHERE document_id = ?`
 — cascading deletes. Nothing AI-specific here.
+
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
 
 ---
 
@@ -995,20 +1003,22 @@ LOAD                                        LOAD (Step 4: STORE)
 - Querying isn't SQL WHERE — it's cosine similarity
 - "Quality" isn't data completeness — it's embedding accuracy and chunk granularity
 
+- 🫏 **Donkey:** Running multiple donkeys on the same route to confirm that AI engineering and data engineering practices mirror each other.
+
 ---
 
 ## The Cost of Ingesting One Document
 
 For a 12-page PDF (~8000 words, ~42 chunks):
 
-| Step | What happens | AWS cost | Azure cost | AWS time | Azure time |
-| --- | --- | --- | --- | --- | --- |
-| 1. READ | Parse PDF → text | $0 | $0 | ~50ms | ~50ms |
-| 2. CHUNK | Split into 42 pieces | $0 | $0 | ~5ms | ~5ms |
-| 3. EMBED | Convert chunks → vectors | $0.000168 (Titan, 42 calls) | $0.000168 (text-embedding-3-small, 1 call) | **~2100ms** | **~150ms** |
-| 4. STORE | Write to vector database | ~$0 (OpenSearch) | ~$0 (AI Search) | **~420ms** | **~50ms** |
-| **Total per doc** | | **~$0.0002** | **~$0.0002** | **~2.6s** | **~0.25s** |
-| **Monthly infra** | | ~$350 (OpenSearch 2 OCU) | ~$75 (AI Search Basic) | — | — |
+| Step | What happens | AWS cost | Azure cost | AWS time | Azure time | 🫏 Donkey |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1. READ | Parse PDF → text | $0 | $0 | ~50ms | ~50ms | Free hay 🌿 |
+| 2. CHUNK | Split into 42 pieces | $0 | $0 | ~5ms | ~5ms | Saddlebag piece 📦 |
+| 3. EMBED | Convert chunks → vectors | $0.000168 (Titan, 42 calls) | $0.000168 (text-embedding-3-small, 1 call) | **~2100ms** | **~150ms** | GPS stamp 📍 |
+| 4. STORE | Write to vector database | ~$0 (OpenSearch) | ~$0 (AI Search) | **~420ms** | **~50ms** | AWS search hub 🔍 |
+| **Total per doc** | | **~$0.0002** | **~$0.0002** | **~2.6s** | **~0.25s** | Feed bill 🌾 |
+| **Monthly infra** | | ~$350 (OpenSearch 2 OCU) | ~$75 (AI Search Basic) | — | — | AWS search hub 🔍 |
 
 **Key insight:** Same cost, but **Azure is ~10x faster for ingestion** due to native
 batch support in both embedding and storage. The per-document cost is negligible on
@@ -1018,19 +1028,23 @@ both clouds — the expensive part is the monthly infrastructure.
 costs $0.0065. After ~30 questions about that document, the query costs have exceeded
 the ingestion cost 1000x.
 
+- 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
+
 ---
 
 ## What Could Go Wrong
 
-| Error scenario | What happens | HTTP status |
-| --- | --- | --- |
-| Unsupported file type (.exe, .xlsx) | Validation rejects before any AI call | `400` |
-| RAG chain not initialised | Route returns error immediately | `500` |
-| PDF is corrupted / unparseable | `read_document()` throws → caught by try/except | `500` |
-| PDF is scanned images (no text) | `read_document()` returns empty string → 0 chunks | `200` (with chunk_count=0) |
-| Embedding API fails (Bedrock / Azure OpenAI down) | Exception in Step 3 → document saved as FAILED | `500` |
-| Vector store down (OpenSearch / Azure AI Search) | Exception in Step 4 → document saved as FAILED | `500` |
-| File is too large (out of memory) | `await file.read()` fails → exception | `500` |
+| Error scenario | What happens | HTTP status | 🫏 Donkey |
+| --- | --- | --- | --- |
+| Unsupported file type (.exe, .xlsx) | Validation rejects before any AI call | `400` | 🫏 On the route |
+| RAG chain not initialised | Route returns error immediately | `500` | Saddlebag check 🫏 |
+| PDF is corrupted / unparseable | `read_document()` throws → caught by try/except | `500` | 🫏 On the route |
+| PDF is scanned images (no text) | `read_document()` returns empty string → 0 chunks | `200` (with chunk_count=0) | Saddlebag piece 📦 |
+| Embedding API fails (Bedrock / Azure OpenAI down) | Exception in Step 3 → document saved as FAILED | `500` | The donkey 🐴 |
+| Vector store down (OpenSearch / Azure AI Search) | Exception in Step 4 → document saved as FAILED | `500` | AWS search hub 🔍 |
+| File is too large (out of memory) | `await file.read()` fails → exception | `500` | Trip log 📒 |
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -1060,3 +1074,4 @@ the ingestion cost 1000x.
 - [ ] When would you make ingestion async (background job) instead of synchronous?
 - [ ] How would you handle duplicate documents (re-uploading the same file)?
 
+- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.

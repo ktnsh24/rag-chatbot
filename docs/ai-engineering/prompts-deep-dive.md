@@ -31,13 +31,15 @@
 
 This 65-line file controls **100% of the LLM's behaviour**. Change one word in the prompt and every answer the chatbot gives could change. In traditional engineering you write logic; in AI engineering you write *instructions* that a probabilistic model interprets.
 
-| What you'll learn | DE parallel |
-|---|---|
-| System prompts that set LLM behaviour | SQL query templates with bind variables |
-| Constraints that prevent hallucination | CHECK constraints that prevent bad data |
-| Template variables (`{context}`, `{question}`) | Parameterised queries (`?`, `$1`) |
-| Multi-turn conversation context | Session state management |
-| The cost impact of prompt length | The cost of scanning too many rows |
+| What you'll learn | DE parallel | 🫏 Donkey |
+|---|---| --- |
+| System prompts that set LLM behaviour | SQL query templates with bind variables | The donkey 🐴 |
+| Constraints that prevent hallucination | CHECK constraints that prevent bad data | Memory drift ⚠️ |
+| Template variables (`{context}`, `{question}`) | Parameterised queries (`?`, `$1`) | 🫏 On the route |
+| Multi-turn conversation context | Session state management | Trip log 📒 |
+| The cost impact of prompt length | The cost of scanning too many rows | Delivery note 📋 |
+
+- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -60,6 +62,8 @@ Bad query = wrong rows.                    Bad prompt = hallucinated answers.
 
 **The key difference:** A SQL template always returns the same result for the same input. A prompt template returns *slightly different* text each time (because LLMs are probabilistic). That's why `temperature=0.1` — to minimise the randomness.
 
+- 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
+
 ---
 
 ## The Three Prompts
@@ -71,6 +75,8 @@ src/rag/prompts.py
 ├── RAG_CONVERSATIONAL_PROMPT      ← For follow-up questions (includes history).
 └── SUMMARIZE_PROMPT               ← For document summarisation (future feature).
 ```
+
+- 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
 
 ---
 
@@ -101,6 +107,8 @@ USER QUESTION: {question}"""
 
 **Every single line serves a purpose.** Let's break it down.
 
+- 🫏 **Donkey:** The donkey checks its saddlebag full of retrieved document chunks before answering — no guessing from memory.
+
 ---
 
 ## Concept 1: Role Definition — Telling the LLM What It Is
@@ -121,11 +129,13 @@ The role definition doesn't enforce anything technically — but it shifts the m
 
 **What happens without it:**
 
-| With role definition | Without role definition |
-|---|---|
-| "Based on the documents, refunds take 14 days." | "Generally, refunds take 5-30 business days depending on the company." |
-| Grounded in YOUR documents | Grounded in internet training data |
-| Trustworthy for business use | Dangerous for business use |
+| With role definition | Without role definition | 🫏 Donkey |
+|---|---| --- |
+| "Based on the documents, refunds take 14 days." | "Generally, refunds take 5-30 business days depending on the company." | 🫏 On the route |
+| Grounded in YOUR documents | Grounded in internet training data | 🫏 On the route |
+| Trustworthy for business use | Dangerous for business use | 🫏 On the route |
+
+- 🫏 **Donkey:** The donkey itself — it carries the question in, consults the saddlebag, and writes the answer on the way back.
 
 ---
 
@@ -133,17 +143,19 @@ The role definition doesn't enforce anything technically — but it shifts the m
 
 Each rule targets a specific failure mode:
 
-| Rule | What it prevents | DE parallel |
-|---|---|---|
-| **Rule 1:** ONLY use context | Hallucination — making up facts | Referential integrity — no orphaned foreign keys |
-| **Rule 2:** Say "I don't know" | Confident wrong answers | `COALESCE(result, 'No data available')` |
-| **Rule 3:** Cite sources | Untraceable claims | Audit trail — every row has a source system ID |
-| **Rule 4:** Be thorough | Incomplete answers | `SELECT *` vs `SELECT id` — return all relevant columns |
-| **Rule 5:** Bullet points | Wall-of-text answers | Output formatting — structured JSON vs raw strings |
-| **Rule 6:** Handle ambiguity | Wrong interpretation | Input validation — clarify before processing |
-| **Rule 7:** Never make up info | Reinforces Rule 1 | Defence in depth — multiple checks for the same risk |
+| Rule | What it prevents | DE parallel | 🫏 Donkey |
+|---|---|---| --- |
+| **Rule 1:** ONLY use context | Hallucination — making up facts | Referential integrity — no orphaned foreign keys | Memory drift ⚠️ |
+| **Rule 2:** Say "I don't know" | Confident wrong answers | `COALESCE(result, 'No data available')` | 🫏 On the route |
+| **Rule 3:** Cite sources | Untraceable claims | Audit trail — every row has a source system ID | 🫏 On the route |
+| **Rule 4:** Be thorough | Incomplete answers | `SELECT *` vs `SELECT id` — return all relevant columns | 🫏 On the route |
+| **Rule 5:** Bullet points | Wall-of-text answers | Output formatting — structured JSON vs raw strings | 🫏 On the route |
+| **Rule 6:** Handle ambiguity | Wrong interpretation | Input validation — clarify before processing | 🫏 On the route |
+| **Rule 7:** Never make up info | Reinforces Rule 1 | Defence in depth — multiple checks for the same risk | 🫏 On the route |
 
 **Why Rule 7 repeats Rule 1:** LLMs respond to emphasis. Saying "only use context" (Rule 1) and "never make up information" (Rule 7) at the top AND bottom of the rules creates a "sandwich" effect — the model is less likely to hallucinate.
+
+- 🫏 **Donkey:** When the donkey ignores the saddlebag and invents an answer from memory — RAG is the cure.
 
 ---
 
@@ -183,6 +195,8 @@ At $0 (Local) = free
 
 **The cost engineering insight:** The 80-token system prompt is cheap. The 750-token context is where cost grows. Reducing `top_k` from 5 to 3 saves ~300 tokens per query — that's ~$0.001 per query, or $30/month at 1000 queries/day.
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## Prompt 2: `RAG_CONVERSATIONAL_PROMPT` — Multi-Turn Chat
@@ -220,6 +234,8 @@ Without history, the LLM would say *"I don't know what you're referring to"* —
 
 📖 **Related:** [Conversation History Deep Dive](../architecture-and-design/history-explained.md)
 
+- 🫏 **Donkey:** The donkey checks its saddlebag full of retrieved document chunks before answering — no guessing from memory.
+
 ---
 
 ## Prompt 3: `SUMMARIZE_PROMPT` — Document Summarisation
@@ -236,6 +252,8 @@ DOCUMENT:
 This is a simpler prompt — no context retrieval needed, just summarise a full document. It's used for the future document summary feature.
 
 **Key constraints:** "under 500 words" limits output tokens (~670 tokens). Without this limit, the LLM might generate a 2000-word summary that costs 4x more.
+
+- 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
 
 ---
 
@@ -263,39 +281,45 @@ RAG_SYSTEM_PROMPT                   query():
                      content:msg}]      content:msg}]        content:msg}]
 ```
 
-| Aspect | AWS (Bedrock/Claude) | Azure (OpenAI/GPT-4o) | Local (Ollama/llama3.2) |
-|---|---|---|---|
-| **System prompt placement** | Separate `system` field | `role: "system"` message | `role: "system"` message |
-| **User message** | `content: [{text: ...}]` (nested) | `content: "..."` (flat string) | `content: "..."` (flat string) |
-| **Prompt format** | Identical template text | Identical template text | Identical template text |
-| **Behaviour difference** | Best instruction following | More creative/verbose | Good but less nuanced |
-| **Cost per prompt** | ~$0.0025 | ~$0.0021 | **$0** |
+| Aspect | AWS (Bedrock/Claude) | Azure (OpenAI/GPT-4o) | Local (Ollama/llama3.2) | 🫏 Donkey |
+|---|---|---|---| --- |
+| **System prompt placement** | Separate `system` field | `role: "system"` message | `role: "system"` message | Delivery note 📋 |
+| **User message** | `content: [{text: ...}]` (nested) | `content: "..."` (flat string) | `content: "..."` (flat string) | 🫏 On the route |
+| **Prompt format** | Identical template text | Identical template text | Identical template text | Delivery note 📋 |
+| **Behaviour difference** | Best instruction following | More creative/verbose | Good but less nuanced | 🫏 On the route |
+| **Cost per prompt** | ~$0.0025 | ~$0.0021 | **$0** | Delivery note 📋 |
 
 **Key insight:** The prompt text is the same across all providers. Only the API format differs. This is handled by each provider's `generate()` method, not by the prompt itself.
+
+- 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
 
 ---
 
 ## What Makes a Good Prompt — The Engineering Rules
 
-| Rule | This prompt's example | Anti-pattern |
-|---|---|---|
-| **Be specific** | "ONLY use information from the context" | "Try to use the context" |
-| **Define fallback** | "If context doesn't have the answer, say so" | (no fallback → LLM guesses) |
-| **Constrain format** | "Use bullet points" | (no format → wall of text) |
-| **Separate sections** | `---` between context and question | Everything jumbled together |
-| **Limit scope** | "answers questions based on provided documents" | "You are a general-purpose AI" |
+| Rule | This prompt's example | Anti-pattern | 🫏 Donkey |
+|---|---|---| --- |
+| **Be specific** | "ONLY use information from the context" | "Try to use the context" | 🫏 On the route |
+| **Define fallback** | "If context doesn't have the answer, say so" | (no fallback → LLM guesses) | The donkey 🐴 |
+| **Constrain format** | "Use bullet points" | (no format → wall of text) | 🫏 On the route |
+| **Separate sections** | `---` between context and question | Everything jumbled together | 🫏 On the route |
+| **Limit scope** | "answers questions based on provided documents" | "You are a general-purpose AI" | 🫏 On the route |
+
+- 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
 
 ---
 
 ## What Goes Wrong — Common Prompt Failures
 
-| Problem | Cause | Fix | How to detect |
-|---|---|---|---|
-| Hallucination | Rules too weak or model ignores them | Stronger constraints, lower temperature | Faithfulness score < 0.8 in evaluator |
-| Verbose answers | No length constraint | Add "Keep answers under 200 words" | Token count > 500 output tokens |
-| Ignores citations | Model doesn't see "[Document chunk N]" pattern | Add example output in prompt | Missing `[Document chunk` in answer |
-| Wrong language | User asks in Dutch, prompt is English | Add "Answer in the same language as the question" | Manual review |
-| Off-topic | Context chunks are irrelevant | Better chunking/retrieval, not a prompt fix | Answer relevance score < 0.5 |
+| Problem | Cause | Fix | How to detect | 🫏 Donkey |
+|---|---|---|---| --- |
+| Hallucination | Rules too weak or model ignores them | Stronger constraints, lower temperature | Faithfulness score < 0.8 in evaluator | Memory drift ⚠️ |
+| Verbose answers | No length constraint | Add "Keep answers under 200 words" | Token count > 500 output tokens | Cargo unit ⚖️ |
+| Ignores citations | Model doesn't see "[Document chunk N]" pattern | Add example output in prompt | Missing `[Document chunk` in answer | Saddlebag piece 📦 |
+| Wrong language | User asks in Dutch, prompt is English | Add "Answer in the same language as the question" | Manual review | Delivery note 📋 |
+| Off-topic | Context chunks are irrelevant | Better chunking/retrieval, not a prompt fix | Answer relevance score < 0.5 | Saddlebag piece 📦 |
+
+- 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
 
 ---
 
@@ -303,19 +327,21 @@ RAG_SYSTEM_PROMPT                   query():
 
 The same prompt produces different quality answers depending on the model:
 
-| Aspect | Claude 3.5 Sonnet (AWS) | GPT-4o (Azure) | llama3.2 (Local) |
-|---|---|---|---|
-| **Instruction following** | Excellent — follows rules precisely | Very good — sometimes verbose | Good — occasionally ignores minor rules |
-| **Citation accuracy** | Almost always cites correctly | Usually cites, sometimes forgets | May not cite consistently |
-| **"I don't know" response** | Reliably says it when context is empty | Usually says it | Sometimes tries to answer anyway |
-| **Temperature sensitivity** | Very responsive to 0.1 | Responsive | Less precise control |
-| **Recommended for** | Production (highest quality) | Production (good balance) | Development and testing |
-| **Cost per query** | ~$0.0065 | ~$0.005 | **$0** |
+| Aspect | Claude 3.5 Sonnet (AWS) | GPT-4o (Azure) | llama3.2 (Local) | 🫏 Donkey |
+|---|---|---|---| --- |
+| **Instruction following** | Excellent — follows rules precisely | Very good — sometimes verbose | Good — occasionally ignores minor rules | 🫏 On the route |
+| **Citation accuracy** | Almost always cites correctly | Usually cites, sometimes forgets | May not cite consistently | 🫏 On the route |
+| **"I don't know" response** | Reliably says it when context is empty | Usually says it | Sometimes tries to answer anyway | 🫏 On the route |
+| **Temperature sensitivity** | Very responsive to 0.1 | Responsive | Less precise control | 🫏 On the route |
+| **Recommended for** | Production (highest quality) | Production (good balance) | Development and testing | Test delivery 🧪 |
+| **Cost per query** | ~$0.0065 | ~$0.005 | **$0** | Feed bill 🌾 |
 
 **Practical advice:**
 - **Develop and iterate** with `CLOUD_PROVIDER=local` — test prompt changes for free
 - **Validate** with a cloud provider before deploying — run the evaluation suite (#14)
 - **Monitor** faithfulness scores (#16) — if they drop, the prompt needs adjustment
+
+- 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
 
 ---
 
@@ -344,6 +370,8 @@ After reading this, can you answer:
 - [ ] If the faithfulness score drops after changing the prompt, what do you check first?
 - [ ] How does prompt length interact with the model's context window limit?
 
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+
 ---
 
 ## What to Study Next
@@ -359,3 +387,4 @@ Now you know how the LLM gets its instructions. Next:
 - [Cost Analysis](cost-analysis.md)
 - [LLM Interface Deep Dive (#7)](llm-interface-deep-dive.md)
 
+- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

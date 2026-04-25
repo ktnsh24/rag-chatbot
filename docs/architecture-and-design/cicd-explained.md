@@ -71,6 +71,8 @@ git push
 └──────────────────────────────────────────────────────┘
 ```
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## The Four Files
@@ -82,6 +84,8 @@ Dockerfile                          # Container definition
 ├── deploy-aws.yml                  # Deploy to AWS ECS Fargate (manual)
 └── deploy-azure.yml                # Deploy to Azure Container Apps (manual)
 ```
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -118,14 +122,14 @@ CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 ### What you already know (everything)
 
-| Line | Pattern | DE familiarity |
-| --- | --- | --- |
-| `python:3.12-slim` | Slim base image | ✅ Standard practice |
-| `poetry install --without dev` | Prod deps only | ✅ Standard — skip test/lint deps |
-| `virtualenvs.create false` | No venv inside container | ✅ Standard — container IS the isolation |
-| Layer ordering (deps → code) | Cache optimization | ✅ Standard — deps change rarely, code changes often |
-| `HEALTHCHECK` | Container health endpoint | ✅ Standard — ECS/Container Apps use this |
-| `uvicorn` CMD | ASGI server | ✅ Standard FastAPI deployment |
+| Line | Pattern | DE familiarity | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `python:3.12-slim` | Slim base image | ✅ Standard practice | Stable stall 🐎 |
+| `poetry install --without dev` | Prod deps only | ✅ Standard — skip test/lint deps | Test delivery 🧪 |
+| `virtualenvs.create false` | No venv inside container | ✅ Standard — container IS the isolation | Stable stall 🐎 |
+| Layer ordering (deps → code) | Cache optimization | ✅ Standard — deps change rarely, code changes often | 🫏 On the route |
+| `HEALTHCHECK` | Container health endpoint | ✅ Standard — ECS/Container Apps use this | Stable stall 🐎 |
+| `uvicorn` CMD | ASGI server | ✅ Standard FastAPI deployment | Stable door 🚪 |
 
 ### What to notice for an AI app
 
@@ -139,6 +143,8 @@ image. You'd run `ollama serve` on the host and the container calls it via HTTP 
 `OLLAMA_BASE_URL`. For cloud deployments (Bedrock, Azure OpenAI), the Dockerfile
 is standard. If you wanted Ollama **inside** the container, you'd need GPU support,
 NVIDIA base images, and model weights (~5-15 GB) — that's a different architecture.
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -199,6 +205,8 @@ on:
 
 Runs on every push to main/develop and every PR to main. Standard branch protection.
 
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+
 ---
 
 ## deploy-aws.yml — Deploy to ECS Fargate
@@ -234,12 +242,12 @@ Manual trigger → Login to AWS → Build + Push to ECR → Terraform apply → 
 
 ### What you already know
 
-| Step | DE familiarity |
-| --- | --- |
-| OIDC auth (`role-to-assume`) | ✅ Standard GitHub Actions pattern |
-| ECR login + push | ✅ Standard container deployment |
-| Terraform apply in CI | ✅ Standard — same pattern everywhere |
-| ECS force-new-deployment | ✅ Standard — triggers rolling update |
+| Step | DE familiarity | 🫏 Donkey |
+| --- | --- | --- |
+| OIDC auth (`role-to-assume`) | ✅ Standard GitHub Actions pattern | Robot hand 🤖 |
+| ECR login + push | ✅ Standard container deployment | Stable address 🏷️ |
+| Terraform apply in CI | ✅ Standard — same pattern everywhere | Stable blueprint 🏗️ |
+| ECS force-new-deployment | ✅ Standard — triggers rolling update | Robot hand 🤖 |
 
 ### Manual dispatch with environment choice
 
@@ -254,6 +262,8 @@ on:
 
 Deploy is **manual** (not automatic on push). This is a deliberate choice for a
 portfolio project — you don't want accidental deploys to cloud resources that cost money.
+
+- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
 
 ---
 
@@ -292,33 +302,37 @@ Manual trigger → Login to Azure → Login to ACR → Build + Push → Terrafor
 
 ### Key differences from AWS
 
-| Step | AWS | Azure |
-| --- | --- | --- |
-| Auth | `role-to-assume` (1 secret) | `client-id` + `tenant-id` + `subscription-id` (3 secrets) |
-| Registry login | `amazon-ecr-login` action | `az acr login` CLI |
-| Image URL | `$ECR_REGISTRY/$ECR_REPOSITORY:$TAG` | `$ACR_NAME.azurecr.io/rag-chatbot:$TAG` |
-| Deploy | `aws ecs update-service --force-new-deployment` | `az containerapp update --image` |
+| Step | AWS | Azure | 🫏 Donkey |
+| --- | --- | --- | --- |
+| Auth | `role-to-assume` (1 secret) | `client-id` + `tenant-id` + `subscription-id` (3 secrets) | Stable address 🏷️ |
+| Registry login | `amazon-ecr-login` action | `az acr login` CLI | Stable address 🏷️ |
+| Image URL | `$ECR_REGISTRY/$ECR_REPOSITORY:$TAG` | `$ACR_NAME.azurecr.io/rag-chatbot:$TAG` | Stable address 🏷️ |
+| Deploy | `aws ecs update-service --force-new-deployment` | `az containerapp update --image` | Robot hand 🤖 |
+
+- 🫏 **Donkey:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for donkeys on the Azure route.
 
 ---
 
 ## AWS vs Azure — Deployment Comparison
 
-| Aspect | AWS (ECS Fargate) | Azure (Container Apps) |
-| --- | --- | --- |
-| **Container hosting** | ECS Fargate | Azure Container Apps |
-| **Registry** | ECR | ACR |
-| **Auth method** | OIDC → IAM role | OIDC → service principal |
-| **Secrets needed** | 1 (`AWS_ROLE_ARN`) | 4 (`CLIENT_ID`, `TENANT_ID`, `SUBSCRIPTION_ID`, `ACR_NAME`) |
-| **Deploy command** | `aws ecs update-service` | `az containerapp update` |
-| **Scaling** | ECS auto-scaling (configured in task def) | Built-in scaling rules |
-| **Cost (idle)** | Fargate charges per vCPU-hour | Container Apps can scale to zero |
-| **Cost (1 vCPU, 2GB)** | ~$30/month (always running) | ~$0/month (scale to zero) |
+| Aspect | AWS (ECS Fargate) | Azure (Container Apps) | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **Container hosting** | ECS Fargate | Azure Container Apps | Stable stall 🐎 |
+| **Registry** | ECR | ACR | Stable address 🏷️ |
+| **Auth method** | OIDC → IAM role | OIDC → service principal | 🫏 On the route |
+| **Secrets needed** | 1 (`AWS_ROLE_ARN`) | 4 (`CLIENT_ID`, `TENANT_ID`, `SUBSCRIPTION_ID`, `ACR_NAME`) | Stable address 🏷️ |
+| **Deploy command** | `aws ecs update-service` | `az containerapp update` | Robot hand 🤖 |
+| **Scaling** | ECS auto-scaling (configured in task def) | Built-in scaling rules | 🫏 On the route |
+| **Cost (idle)** | Fargate charges per vCPU-hour | Container Apps can scale to zero | Stable stall 🐎 |
+| **Cost (1 vCPU, 2GB)** | ~$30/month (always running) | ~$0/month (scale to zero) | Feed bill 🌾 |
 
 ### Cost insight for AI apps
 
 Azure Container Apps can **scale to zero** — $0 when nobody is using the chatbot.
 ECS Fargate charges for running time even with zero traffic. For a portfolio project
 with sporadic usage, Azure's scale-to-zero saves money.
+
+- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
 
 ---
 
@@ -365,24 +379,28 @@ Application running with new code
 Health check passes → /api/health returns 200
 ```
 
+- 🫏 **Donkey:** The step-by-step route map showing every checkpoint the donkey passes from question intake to answer delivery.
+
 ---
 
 ## DE vs AI Engineer — What Each Sees
 
-| Aspect | What a DE sees | What an AI Engineer sees |
-| --- | --- | --- |
-| Dockerfile | Standard Python container | Cloud models = small image (~500MB). Local mode calls Ollama externally (not in container). Bundling models inside container would be 10GB+ with GPU deps |
-| `HEALTHCHECK` | Container health | AI-specific: checks connections to LLM, vector store, not just HTTP 200 |
-| CI lint + test | Standard quality gates | Tests mock AI services — real LLM calls would cost money per CI run |
-| Deploy Terraform | Standard infra-as-code | Creates AI-specific resources (Bedrock IAM, OpenSearch if added) |
-| Manual deploy | Safety measure | Essential for AI — deploying a broken prompt to production can cause embarrassing LLM outputs |
-| Image tag = git SHA | Traceability | Rollback is critical — a bad prompt change can degrade all AI responses |
+| Aspect | What a DE sees | What an AI Engineer sees | 🫏 Donkey |
+| --- | --- | --- | --- |
+| Dockerfile | Standard Python container | Cloud models = small image (~500MB). Local mode calls Ollama externally (not in container). Bundling models inside container would be 10GB+ with GPU deps | The donkey 🐴 |
+| `HEALTHCHECK` | Container health | AI-specific: checks connections to LLM, vector store, not just HTTP 200 | The donkey 🐴 |
+| CI lint + test | Standard quality gates | Tests mock AI services — real LLM calls would cost money per CI run | The donkey 🐴 |
+| Deploy Terraform | Standard infra-as-code | Creates AI-specific resources (Bedrock IAM, OpenSearch if added) | The donkey 🐴 |
+| Manual deploy | Safety measure | Essential for AI — deploying a broken prompt to production can cause embarrassing LLM outputs | The donkey 🐴 |
+| Image tag = git SHA | Traceability | Rollback is critical — a bad prompt change can degrade all AI responses | Delivery note 📋 |
 
 ### Why manual deploy matters more for AI
 
 In traditional apps, a bug usually affects one endpoint or feature. In AI apps, a
 bad change to `prompts.py` or `chain.py` can make **every single response** worse.
 Manual deploy gives you a gate to validate the AI behaviour before going live.
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -407,3 +425,5 @@ Test your understanding:
 5. AWS: 1 secret (`AWS_ROLE_ARN`). Azure: 4 secrets (`CLIENT_ID`, `TENANT_ID`, `SUBSCRIPTION_ID`, `ACR_NAME`). AWS bundles auth into one IAM role ARN; Azure requires separate identity components.
 6. Functionally equivalent — both tell the container service to pull and run a new image version. `ecs update-service --force-new-deployment` triggers a rolling update. `containerapp update --image` does the same for Container Apps.
 7. You'd need: (a) NVIDIA CUDA base image instead of `python:3.12-slim`, (b) model weights downloaded or mounted (~5-15 GB), (c) GPU runtime configured, (d) image size ~10-15 GB instead of ~500 MB. The current setup keeps Ollama as an external process — the container calls it via HTTP at `OLLAMA_BASE_URL`, keeping the Docker image small.
+
+- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.

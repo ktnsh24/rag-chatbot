@@ -47,6 +47,8 @@ Question → RAG pipeline → Answer   Question → RAG pipeline → Answer
                                                            → Notes (warnings)
 ```
 
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+
 ---
 
 ## DE Parallel
@@ -63,6 +65,8 @@ dbt test                                   POST /api/evaluate/suite
   → Returns: 42 passed, 3 failed             → Returns: 4 passed, 1 failed
   → Shows which tests failed                 → Shows which cases failed + why
 ```
+
+- 🫏 **Donkey:** Running multiple donkeys on the same route to confirm that AI engineering and data engineering practices mirror each other.
 
 ---
 
@@ -94,18 +98,20 @@ Only `question` is required. `expected_answer` and `top_k` are optional.
 
 **Response structure:**
 
-| Field | Type | What it tells you |
-|---|---|---|
-| `question` | string | The question you asked |
-| `answer` | string | The LLM's generated answer |
-| `scores.retrieval` | float | Did vector search find relevant chunks? (0.0–1.0) |
-| `scores.faithfulness` | float | Did the LLM stick to context? (0.0–1.0) |
-| `scores.answer_relevance` | float | Did the LLM answer the question? (0.0–1.0) |
-| `scores.overall` | float | Weighted average (ret 30% + faith 40% + rel 30%) |
-| `scores.passed` | bool | Overall ≥ 0.7 |
-| `scores.has_hallucination` | bool | True = answer has claims not in context |
-| `evaluation_notes` | list | Warnings (e.g. "⚠️ RETRIEVAL: Chunks have low relevance") |
-| `sources_used` | int | How many chunks were retrieved |
+| Field | Type | What it tells you | 🫏 Donkey |
+|---|---|---| --- |
+| `question` | string | The question you asked | 🫏 On the route |
+| `answer` | string | The LLM's generated answer | The donkey 🐴 |
+| `scores.retrieval` | float | Did vector search find relevant chunks? (0.0–1.0) | Saddlebag piece 📦 |
+| `scores.faithfulness` | float | Did the LLM stick to context? (0.0–1.0) | The donkey 🐴 |
+| `scores.answer_relevance` | float | Did the LLM answer the question? (0.0–1.0) | The donkey 🐴 |
+| `scores.overall` | float | Weighted average (ret 30% + faith 40% + rel 30%) | Saddlebag check 🫏 |
+| `scores.passed` | bool | Overall ≥ 0.7 | 🫏 On the route |
+| `scores.has_hallucination` | bool | True = answer has claims not in context | Memory drift ⚠️ |
+| `evaluation_notes` | list | Warnings (e.g. "⚠️ RETRIEVAL: Chunks have low relevance") | Saddlebag piece 📦 |
+| `sources_used` | int | How many chunks were retrieved | Saddlebag piece 📦 |
+
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
 
 ---
 
@@ -138,34 +144,38 @@ Aggregate: total, passed, failed, pass_rate, average_score
 
 **Response structure:**
 
-| Field | Type | What it tells you |
-|---|---|---|
-| `total_cases` | int | How many cases were run |
-| `passed` | int | Cases with overall ≥ 0.7 |
-| `failed` | int | Cases with overall < 0.7 |
-| `pass_rate` | float | Percentage passed (e.g. 80.0) |
-| `average_overall_score` | float | Average score across all cases |
-| `cases` | list | Per-case results (same scores as single evaluate) |
+| Field | Type | What it tells you | 🫏 Donkey |
+|---|---|---| --- |
+| `total_cases` | int | How many cases were run | Feed bill 🌾 |
+| `passed` | int | Cases with overall ≥ 0.7 | 🫏 On the route |
+| `failed` | int | Cases with overall < 0.7 | Hoof check 🔧 |
+| `pass_rate` | float | Percentage passed (e.g. 80.0) | 🫏 On the route |
+| `average_overall_score` | float | Average score across all cases | Stable address 🏷️ |
+| `cases` | list | Per-case results (same scores as single evaluate) | Report card 📝 |
+
+- 🫏 **Donkey:** The 25 standard test deliveries the donkey must pass every release — a fixed benchmark that never changes so you can compare runs fairly.
 
 ---
 
 ## Reading the Scores — What Good Looks Like
 
-| Score | Excellent | Good | Needs work | Broken |
-|---|---|---|---|---|
-| **Retrieval** | ≥ 0.85 | ≥ 0.70 | ≥ 0.50 | < 0.50 |
-| **Faithfulness** | ≥ 0.95 | ≥ 0.80 | ≥ 0.60 | < 0.60 |
-| **Answer Relevance** | ≥ 0.80 | ≥ 0.60 | ≥ 0.40 | < 0.40 |
-| **Overall** | ≥ 0.85 | ≥ 0.70 | ≥ 0.50 | < 0.50 |
+| Score | Excellent | Good | Needs work | Broken | 🫏 Donkey |
+|---|---|---|---|---| --- |
+| **Retrieval** | ≥ 0.85 | ≥ 0.70 | ≥ 0.50 | < 0.50 | 🫏 On the route |
+| **Faithfulness** | ≥ 0.95 | ≥ 0.80 | ≥ 0.60 | < 0.60 | Saddlebag match 🫏 |
+| **Answer Relevance** | ≥ 0.80 | ≥ 0.60 | ≥ 0.40 | < 0.40 | Right address 🎯 |
+| **Overall** | ≥ 0.85 | ≥ 0.70 | ≥ 0.50 | < 0.50 | 🫏 On the route |
 
 **If a score is low, here's what to fix:**
 
-| Low score | What to try |
-|---|---|
-| Retrieval < 0.7 | Smaller `chunk_size`, different embedding model, more overlap |
-| Faithfulness < 0.8 | Stricter prompt instructions, lower temperature |
-| Relevance < 0.6 | Better prompt, check if question is ambiguous |
-| Overall < 0.7 | Debug each sub-score individually |
+| Low score | What to try | 🫏 Donkey |
+|---|---| --- |
+| Retrieval < 0.7 | Smaller `chunk_size`, different embedding model, more overlap | GPS stamp 📍 |
+| Faithfulness < 0.8 | Stricter prompt instructions, lower temperature | Delivery note 📋 |
+| Relevance < 0.6 | Better prompt, check if question is ambiguous | Delivery note 📋 |
+| Overall < 0.7 | Debug each sub-score individually | Hoof check 🔧 |
+
+- 🫏 **Donkey:** The quality inspector's stamp — each delivered answer is graded on retrieval accuracy, faithfulness, and relevance before the customer signs.
 
 ---
 
@@ -194,6 +204,8 @@ After (chunk_size=500):
 → Improvement! Smaller chunks give more precise retrieval.
 → Keep the change.
 ```
+
+- 🫏 **Donkey:** The step-by-step route map showing every checkpoint the donkey passes from question intake to answer delivery.
 
 ---
 
@@ -237,6 +249,8 @@ async def run_evaluation_suite():
         assert data["pass_rate"] >= 70.0, f"Quality regression: {data['pass_rate']}%"
 ```
 
+- 🫏 **Donkey:** The mechanics of the stable — understanding how each piece fits so you can maintain and extend the system.
+
 ---
 
 ## Self-Check Questions
@@ -261,6 +275,8 @@ async def run_evaluation_suite():
 - [ ] When would rule-based evaluation (current) not be good enough?
 - [ ] How would you add A/B testing support (compare two models)?
 
+- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.
+
 ---
 
 ## What to Study Next
@@ -268,3 +284,5 @@ async def run_evaluation_suite():
 - [Evaluation Framework Deep Dive](../../ai-engineering/evaluation-framework-deep-dive.md) — how the scoring works internally
 - [Golden Dataset Deep Dive](../../ai-engineering/golden-dataset-deep-dive.md) — how to add test cases
 - [Chat Endpoint Deep Dive](chat-endpoint-explained.md) — the RAG pipeline this builds on
+
+- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

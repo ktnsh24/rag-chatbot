@@ -48,23 +48,27 @@ went wrong — bad retrieval, hallucination, or both.
 **`/api/queries/stats`** returns aggregate numbers — total queries, pass rate,
 average scores per dimension, and failure breakdown by category.
 
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+
 ---
 
 ## DE Parallel
 
 This is identical to building a pipeline monitoring API:
 
-| Concept | Data Engineering | RAG Chatbot |
-| --- | --- | --- |
-| **Log source** | Airflow task logs, DAG run metadata | JSONL query logs from QueryLogger |
-| **Failure list** | `/pipeline/failures` — which DAGs failed and why | `/queries/failures` — which queries failed and why |
-| **Aggregate stats** | DAG success rate, avg duration, failure reasons | Pass rate, avg scores, failure categories |
-| **Triage** | "data_quality", "timeout", "permission_denied" | "bad_retrieval", "hallucination", "both_bad" |
-| **Action** | Fix the DAG, re-run, verify | Fix retrieval/prompt, re-evaluate, verify |
+| Concept | Data Engineering | RAG Chatbot | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **Log source** | Airflow task logs, DAG run metadata | JSONL query logs from QueryLogger | 🫏 On the route |
+| **Failure list** | `/pipeline/failures` — which DAGs failed and why | `/queries/failures` — which queries failed and why | Robot hand 🤖 |
+| **Aggregate stats** | DAG success rate, avg duration, failure reasons | Pass rate, avg scores, failure categories | Hoof check 🔧 |
+| **Triage** | "data_quality", "timeout", "permission_denied" | "bad_retrieval", "hallucination", "both_bad" | Memory drift ⚠️ |
+| **Action** | Fix the DAG, re-run, verify | Fix retrieval/prompt, re-evaluate, verify | Delivery note 📋 |
 
 **Bottom line:** The route code is pure CRUD over structured logs. The AI
 complexity lives in how the logs were *produced* (by the evaluate pipeline), not
 in how they're *served*.
+
+- 🫏 **Donkey:** Running multiple donkeys on the same route to confirm that AI engineering and data engineering practices mirror each other.
 
 ---
 
@@ -88,11 +92,11 @@ async def list_failures(
 
 ### What each parameter does
 
-| Parameter | Default | What it controls |
-| --- | --- | --- |
-| `limit` | 20 | Max results to return (1–100) |
-| `days` | 7 | How far back to search (1–30 days) |
-| `category` | None | Filter by failure type: `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`, `marginal` |
+| Parameter | Default | What it controls | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `limit` | 20 | Max results to return (1–100) | 🫏 On the route |
+| `days` | 7 | How far back to search (1–30 days) | 🫏 On the route |
+| `category` | None | Filter by failure type: `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`, `marginal` | Memory drift ⚠️ |
 
 ### Example response
 
@@ -123,6 +127,8 @@ remote work policy, but the vector store returned refund policy chunks (retrieva
 score 0.25). The LLM faithfully summarised *what it was given* (faithfulness 0.85),
 but the answer is irrelevant (relevance 0.15). Fix: upload the remote work policy
 document, or tune chunk size/overlap.
+
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
 
 ---
 
@@ -169,6 +175,8 @@ async def query_stats(
 - **Low avg_faithfulness?** → LLM is hallucinating — consider tighter prompts or guardrails
 - **High bad_retrieval count?** → Vector store needs more/better documents
 
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+
 ---
 
 ## The Failure Triage Categories
@@ -176,13 +184,13 @@ async def query_stats(
 When a query's overall score falls below 0.70, the QueryLogger assigns a failure
 category based on which dimensions failed:
 
-| Category | Retrieval | Faithfulness | Relevance | What it means |
-| --- | --- | --- | --- | --- |
-| `bad_retrieval` | Low | OK | Low | Wrong chunks retrieved — the LLM couldn't answer because it got irrelevant context |
-| `hallucination` | OK | Low | OK | Right chunks, but the LLM made things up instead of using them |
-| `both_bad` | Low | Low | — | Wrong chunks AND the LLM improvised — worst case |
-| `off_topic` | OK | OK | Low | Chunks were relevant, LLM was faithful, but the answer missed the actual question |
-| `marginal` | — | — | — | Failed overall but no single dimension is terrible — borderline case |
+| Category | Retrieval | Faithfulness | Relevance | What it means | 🫏 Donkey |
+| --- | --- | --- | --- | --- | --- |
+| `bad_retrieval` | Low | OK | Low | Wrong chunks retrieved — the LLM couldn't answer because it got irrelevant context | The donkey 🐴 |
+| `hallucination` | OK | Low | OK | Right chunks, but the LLM made things up instead of using them | The donkey 🐴 |
+| `both_bad` | Low | Low | — | Wrong chunks AND the LLM improvised — worst case | The donkey 🐴 |
+| `off_topic` | OK | OK | Low | Chunks were relevant, LLM was faithful, but the answer missed the actual question | The donkey 🐴 |
+| `marginal` | — | — | — | Failed overall but no single dimension is terrible — borderline case | Hoof check 🔧 |
 
 ### DE parallel for triage
 
@@ -192,6 +200,8 @@ This is the same pattern as categorising pipeline failures:
 - `hallucination` → "logic_error" (code produced wrong output from correct input)
 - `both_bad` → "cascade_failure" (bad data + bad logic)
 - `off_topic` → "schema_mismatch" (correct processing, wrong target)
+
+- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and saddle inspection checklist to find what went wrong.
 
 ---
 
@@ -216,6 +226,8 @@ App startup:
 Log files are stored as JSONL (one JSON record per line) in `data/query_logs/`,
 rotated daily. This is the same pattern as structured application logs — no
 database needed, just append-only files.
+
+- 🫏 **Donkey:** The warehouse robot dispatched to find the right saddlebag shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -244,6 +256,8 @@ database needed, just append-only files.
 
 This is the **data flywheel** in action: detect failure → diagnose → fix → verify.
 
+- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+
 ---
 
 ## Self-Check Questions
@@ -265,6 +279,8 @@ This is the **data flywheel** in action: detect failure → diagnose → fix →
 - [ ] How would you add a new failure category (e.g., `token_limit_exceeded`)?
 - [ ] How would you build a Grafana dashboard from `/queries/stats`?
 
+- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.
+
 ---
 
 ## What to Study Next
@@ -272,3 +288,5 @@ This is the **data flywheel** in action: detect failure → diagnose → fix →
 - **Previous:** [Evaluate Endpoint](evaluate-endpoint-explained.md) — what produces the query logs
 - **Next:** [Metrics Endpoint](metrics-endpoint-explained.md) — Prometheus metrics for dashboards
 - **Reference:** [API Routes Overview](../api-routes-explained.md) — how all routes fit together
+
+- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

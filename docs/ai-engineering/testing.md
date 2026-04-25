@@ -36,6 +36,8 @@ poetry run pytest tests/ --cov=src --cov-report=term-missing
 poetry run pytest tests/test_integration_api.py::TestChatIntegration -v
 ```
 
+- 🫏 **Donkey:** Loading up the donkey for the first time — installing the saddle, attaching the saddlebags, and confirming the GPS coordinates before the first run.
+
 ---
 
 ## Test Architecture
@@ -58,6 +60,8 @@ tests/
 
 All tests run **without external services** — no Ollama, no cloud APIs, no databases. They use `AsyncMock` for the RAG chain and `LocalGuardrails` (real implementation, no network calls) for guardrail tests.
 
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+
 ---
 
 ## Test Pyramid
@@ -75,22 +79,24 @@ All tests run **without external services** — no Ollama, no cloud APIs, no dat
          146 total
 ```
 
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+
 ---
 
 ## Shared Fixtures (`conftest.py`)
 
 All integration/E2E/feature tests share fixtures defined in `tests/conftest.py`:
 
-| Fixture | What it provides |
-|---|---|
-| `mock_rag_chain` | `AsyncMock` with `.query()`, `.ingest_document()`, `.ingest_documents()`, `._vector_store` |
-| `app_with_rag` | `create_app()` with mocked RAG chain on `app.state` |
-| `client_with_rag` | `httpx.AsyncClient` using `ASGITransport` — full async HTTP testing |
-| `app_no_rag` | App where `app.state.rag_chain = None` (simulates init failure) |
-| `client_no_rag` | Client for testing error paths when RAG chain is unavailable |
-| `mock_guardrails` | Real `LocalGuardrails()` instance (pattern-based, no network) |
-| `app_with_guardrails` | App with both RAG chain and guardrails enabled |
-| `client_with_guardrails` | Client for testing guardrail behavior end-to-end |
+| Fixture | What it provides | 🫏 Donkey |
+|---|---| --- |
+| `mock_rag_chain` | `AsyncMock` with `.query()`, `.ingest_document()`, `.ingest_documents()`, `._vector_store` | Saddlebag check 🫏 |
+| `app_with_rag` | `create_app()` with mocked RAG chain on `app.state` | Saddlebag check 🫏 |
+| `client_with_rag` | `httpx.AsyncClient` using `ASGITransport` — full async HTTP testing | Saddlebag check 🫏 |
+| `app_no_rag` | App where `app.state.rag_chain = None` (simulates init failure) | Saddlebag check 🫏 |
+| `client_no_rag` | Client for testing error paths when RAG chain is unavailable | Saddlebag check 🫏 |
+| `mock_guardrails` | Real `LocalGuardrails()` instance (pattern-based, no network) | Gate rule 🚧 |
+| `app_with_guardrails` | App with both RAG chain and guardrails enabled | Saddlebag check 🫏 |
+| `client_with_guardrails` | Client for testing guardrail behavior end-to-end | Test delivery 🧪 |
 
 **Mock response constant:**
 
@@ -102,23 +108,27 @@ MOCK_QUERY_RESPONSE = {
 }
 ```
 
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+
 ---
 
 ## Unit Tests
 
 Existing unit tests cover individual components in isolation:
 
-| File | Tests | What it covers |
-|---|---|---|
-| `test_chat.py` | 7 | Chat route logic, request validation, error handling |
-| `test_evaluate_route.py` | 16 | Evaluate route logic, response format, error handling |
-| `test_ingestion.py` | 9 | Document chunking, ingestion pipeline, deduplication |
-| `test_evaluation.py` | 14 | Evaluation framework, metrics computation, golden dataset |
-| `test_guardrails.py` | 20 | Guardrail pattern matching, PII regex, injection detection |
-| `test_reranker.py` | 7 | Cross-encoder scoring, re-ranking logic |
-| `test_hybrid_search.py` | 17 | BM25 tokenization, hybrid score fusion |
-| `test_dynamodb_vectorstore.py` | 13 | DynamoDB CRUD, vector storage, batch operations |
-| **Total** | **103** | |
+| File | Tests | What it covers | 🫏 Donkey |
+|---|---|---| --- |
+| `test_chat.py` | 7 | Chat route logic, request validation, error handling | Test delivery 🧪 |
+| `test_evaluate_route.py` | 16 | Evaluate route logic, response format, error handling | Report card 📝 |
+| `test_ingestion.py` | 9 | Document chunking, ingestion pipeline, deduplication | Saddlebag piece 📦 |
+| `test_evaluation.py` | 14 | Evaluation framework, metrics computation, golden dataset | Tachograph 📊 |
+| `test_guardrails.py` | 20 | Guardrail pattern matching, PII regex, injection detection | Test delivery 🧪 |
+| `test_reranker.py` | 7 | Cross-encoder scoring, re-ranking logic | Report card 📝 |
+| `test_hybrid_search.py` | 17 | BM25 tokenization, hybrid score fusion | Cargo unit ⚖️ |
+| `test_dynamodb_vectorstore.py` | 13 | DynamoDB CRUD, vector storage, batch operations | AWS depot 🏭 |
+| **Total** | **103** | | Feed bill 🌾 |
+
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -128,15 +138,17 @@ Existing unit tests cover individual components in isolation:
 
 Tests every API endpoint through the full FastAPI stack (middleware, routing, serialization) using `httpx.AsyncClient` with `ASGITransport`. The RAG chain is mocked but all FastAPI machinery runs for real.
 
-| Class | Tests | What it validates |
-|---|---|---|
-| `TestHealthIntegration` | 2 | `GET /health` returns status + services; degrades when RAG chain is missing |
-| `TestChatIntegration` | 6 | `POST /api/chat` — success, session IDs, custom `top_k`, validation (empty/missing question), 500 without RAG |
-| `TestEvaluateIntegration` | 3 | `POST /api/evaluate` — single question, expected answer comparison, 500 without RAG |
-| `TestDocumentsIntegration` | 4 | `GET /api/documents`, `POST /api/documents/upload`, `POST /api/documents/upload/batch`, `DELETE /api/documents/{id}` |
-| `TestQueryAnalysisIntegration` | 4 | `GET /api/queries/stats`, `/api/queries/slow`, `/api/queries/patterns`, `/api/queries/recent` — returns 503 when query logger not configured |
-| `TestMetricsIntegration` | 1 | `GET /metrics` returns Prometheus format |
-| `TestErrorHandling` | 3 | Invalid JSON, wrong content type, non-existent endpoint |
+| Class | Tests | What it validates | 🫏 Donkey |
+|---|---|---| --- |
+| `TestHealthIntegration` | 2 | `GET /health` returns status + services; degrades when RAG chain is missing | Saddlebag check 🫏 |
+| `TestChatIntegration` | 6 | `POST /api/chat` — success, session IDs, custom `top_k`, validation (empty/missing question), 500 without RAG | Saddlebag check 🫏 |
+| `TestEvaluateIntegration` | 3 | `POST /api/evaluate` — single question, expected answer comparison, 500 without RAG | Saddlebag check 🫏 |
+| `TestDocumentsIntegration` | 4 | `GET /api/documents`, `POST /api/documents/upload`, `POST /api/documents/upload/batch`, `DELETE /api/documents/{id}` | Test delivery 🧪 |
+| `TestQueryAnalysisIntegration` | 4 | `GET /api/queries/stats`, `/api/queries/slow`, `/api/queries/patterns`, `/api/queries/recent` — returns 503 when query logger not configured | Test delivery 🧪 |
+| `TestMetricsIntegration` | 1 | `GET /metrics` returns Prometheus format | Tachograph 📊 |
+| `TestErrorHandling` | 3 | Invalid JSON, wrong content type, non-existent endpoint | Test delivery 🧪 |
+
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -146,11 +158,11 @@ Tests every API endpoint through the full FastAPI stack (middleware, routing, se
 
 Simulates complete user journeys through the system. Uses a **stateful mock** that tracks uploaded documents — when you upload a doc, subsequent chat queries return content-aware answers.
 
-| Class | Tests | What it validates |
-|---|---|---|
-| `TestE2EFullPipeline` | 4 | Upload → chat (gets relevant answer), upload → evaluate (scores returned), chat without docs (empty answer), multiple uploads → chat |
-| `TestE2EConversation` | 2 | Multi-turn conversation in same session, session isolation between users |
-| `TestE2EObservability` | 2 | Metrics counter increments after chat, health endpoint remains up after activity |
+| Class | Tests | What it validates | 🫏 Donkey |
+|---|---|---| --- |
+| `TestE2EFullPipeline` | 4 | Upload → chat (gets relevant answer), upload → evaluate (scores returned), chat without docs (empty answer), multiple uploads → chat | Report card 📝 |
+| `TestE2EConversation` | 2 | Multi-turn conversation in same session, session isolation between users | Test delivery 🧪 |
+| `TestE2EObservability` | 2 | Metrics counter increments after chat, health endpoint remains up after activity | Donkey check ✅ |
 
 **Stateful mock pattern:**
 
@@ -168,6 +180,8 @@ async def mock_query(question, **kwargs):
     return {"answer": "No documents available", ...}
 ```
 
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+
 ---
 
 ## Feature Flag Tests
@@ -176,55 +190,63 @@ async def mock_query(question, **kwargs):
 
 Tests the guardrails feature flag (`GUARDRAILS_ENABLED`) by comparing behavior with guardrails ON vs OFF. Uses real `LocalGuardrails` (not mocked) — tests actual regex patterns.
 
-| Class | Tests | What it validates |
-|---|---|---|
-| `TestGuardrailsInjection` | 4 | Prompt injection blocked (400), jailbreak blocked (400), safe questions pass, multiple safe questions pass |
-| `TestGuardrailsPII` | 3 | Email/SSN/credit card detected and flagged in responses |
-| `TestGuardrailsOff` | 2 | Same injection/PII queries pass through when guardrails disabled |
-| `TestFeatureFlagBehavior` | 3 | Evaluate works regardless of features, chat includes `cloud_provider`, health always available |
+| Class | Tests | What it validates | 🫏 Donkey |
+|---|---|---| --- |
+| `TestGuardrailsInjection` | 4 | Prompt injection blocked (400), jailbreak blocked (400), safe questions pass, multiple safe questions pass | Delivery note 📋 |
+| `TestGuardrailsPII` | 3 | Email/SSN/credit card detected and flagged in responses | Test delivery 🧪 |
+| `TestGuardrailsOff` | 2 | Same injection/PII queries pass through when guardrails disabled | Test delivery 🧪 |
+| `TestFeatureFlagBehavior` | 3 | Evaluate works regardless of features, chat includes `cloud_provider`, health always available | Donkey check ✅ |
+
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
 ## Full Test Inventory
 
-| Test File | Tests | Type | Status |
-|---|---|---|---|
-| `test_chat.py` | 7 | Unit | ✅ Passing |
-| `test_evaluate_route.py` | 16 | Unit | ✅ Passing |
-| `test_ingestion.py` | 9 | Unit | ✅ Passing |
-| `test_evaluation.py` | 14 | Unit | ✅ Passing |
-| `test_guardrails.py` | 20 | Unit | ⚠️ 4 failures (redaction tag naming) |
-| `test_reranker.py` | 7 | Unit | ⚠️ 3 failures (score mismatches) |
-| `test_hybrid_search.py` | 17 | Unit | ⚠️ 9 errors (missing `rank_bm25` package) |
-| `test_dynamodb_vectorstore.py` | 13 | Unit | ✅ Passing |
-| `test_integration_api.py` | 23 | Integration | ✅ All 23 passing |
-| `test_e2e_rag_pipeline.py` | 8 | E2E | ✅ All 8 passing |
-| `test_integration_features.py` | 12 | Feature flags | ✅ All 12 passing |
-| **Total** | **146** | | **130 passing, 7 failing, 9 errors** |
+| Test File | Tests | Type | Status | 🫏 Donkey |
+|---|---|---|---| --- |
+| `test_chat.py` | 7 | Unit | ✅ Passing | Test delivery 🧪 |
+| `test_evaluate_route.py` | 16 | Unit | ✅ Passing | Report card 📝 |
+| `test_ingestion.py` | 9 | Unit | ✅ Passing | Pre-sort 📮 |
+| `test_evaluation.py` | 14 | Unit | ✅ Passing | Report card 📝 |
+| `test_guardrails.py` | 20 | Unit | ⚠️ 4 failures (redaction tag naming) | Test delivery 🧪 |
+| `test_reranker.py` | 7 | Unit | ⚠️ 3 failures (score mismatches) | Test delivery 🧪 |
+| `test_hybrid_search.py` | 17 | Unit | ⚠️ 9 errors (missing `rank_bm25` package) | Test delivery 🧪 |
+| `test_dynamodb_vectorstore.py` | 13 | Unit | ✅ Passing | AWS depot 🏭 |
+| `test_integration_api.py` | 23 | Integration | ✅ All 23 passing | Test delivery 🧪 |
+| `test_e2e_rag_pipeline.py` | 8 | E2E | ✅ All 8 passing | Saddlebag check 🫏 |
+| `test_integration_features.py` | 12 | Feature flags | ✅ All 12 passing | Test delivery 🧪 |
+| **Total** | **146** | | **130 passing, 7 failing, 9 errors** | Feed bill 🌾 |
+
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
 ## Known Issues
 
-| Test File | Issue | Root Cause |
-|---|---|---|
-| `test_guardrails.py` | 4 failures | Tests expect `[REDACTED_EMAIL]` but code produces `[EMAIL_REDACTED]` (naming convention mismatch) |
-| `test_reranker.py` | 3 failures | Expected re-ranking scores don't match actual cross-encoder output |
-| `test_hybrid_search.py` | 9 errors | Missing `rank_bm25` package — install with `poetry add rank_bm25` |
+| Test File | Issue | Root Cause | 🫏 Donkey |
+|---|---|---| --- |
+| `test_guardrails.py` | 4 failures | Tests expect `[REDACTED_EMAIL]` but code produces `[EMAIL_REDACTED]` (naming convention mismatch) | Test delivery 🧪 |
+| `test_reranker.py` | 3 failures | Expected re-ranking scores don't match actual cross-encoder output | Test delivery 🧪 |
+| `test_hybrid_search.py` | 9 errors | Missing `rank_bm25` package — install with `poetry add rank_bm25` | Test delivery 🧪 |
 
 These are **pre-existing issues** unrelated to the integration/E2E tests.
+
+- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and saddle inspection checklist to find what went wrong.
 
 ---
 
 ## DE Parallel
 
-| AI Engineering Test | Data Engineering Equivalent |
-|---|---|
-| Mock RAG chain with `AsyncMock` | Mock DynamoDB with `moto`, mock S3 with `moto` |
-| `httpx.AsyncClient` + `ASGITransport` | `TestClient` for Flask/FastAPI in ETL APIs |
-| Stateful E2E mock (upload → query) | Integration test: load → transform → query with real Spark/Pandas |
-| Feature flag tests (guardrails ON/OFF) | Feature flag tests (data validation strict/lenient mode) |
-| `conftest.py` shared fixtures | `conftest.py` shared fixtures (same pattern, same tool) |
+| AI Engineering Test | Data Engineering Equivalent | 🫏 Donkey |
+|---|---| --- |
+| Mock RAG chain with `AsyncMock` | Mock DynamoDB with `moto`, mock S3 with `moto` | AWS depot 🏭 |
+| `httpx.AsyncClient` + `ASGITransport` | `TestClient` for Flask/FastAPI in ETL APIs | Test delivery 🧪 |
+| Stateful E2E mock (upload → query) | Integration test: load → transform → query with real Spark/Pandas | Test delivery 🧪 |
+| Feature flag tests (guardrails ON/OFF) | Feature flag tests (data validation strict/lenient mode) | Test delivery 🧪 |
+| `conftest.py` shared fixtures | `conftest.py` shared fixtures (same pattern, same tool) | Test delivery 🧪 |
+
+- 🫏 **Donkey:** Running multiple donkeys on the same route to confirm that AI engineering and data engineering practices mirror each other.
 
 ---
 
@@ -234,3 +256,4 @@ These are **pre-existing issues** unrelated to the integration/E2E tests.
 - [Getting Started](../setup-and-tooling/getting-started.md) — setup instructions including test commands
 - [Cost Analysis](cost-analysis.md) — what it costs to run tests with cloud providers
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.

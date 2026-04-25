@@ -61,6 +61,8 @@ User uploads refund-policy.pdf
 └─────────────────────────────────────────────────────┘
 ```
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## Why Does a RAG App Need File Storage?
@@ -79,10 +81,10 @@ Document uploaded
 
 **Two copies of the data exist, serving different purposes:**
 
-| What | Where | Format | Purpose |
-| --- | --- | --- | --- |
-| Original file | S3 / Blob Storage | Raw bytes (PDF, TXT) | Re-download, delete, audit trail |
-| Chunks + vectors | OpenSearch / AI Search / ChromaDB | Text + vectors | Semantic search during chat |
+| What | Where | Format | Purpose | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| Original file | S3 / Blob Storage | Raw bytes (PDF, TXT) | Re-download, delete, audit trail | Parcel shelf 📦 |
+| Chunks + vectors | OpenSearch / AI Search / ChromaDB | Text + vectors | Semantic search during chat | AWS search hub 🔍 |
 
 **Why not just keep one?** Because:
 - You can't reconstruct the original PDF from text chunks (formatting, images lost)
@@ -91,6 +93,8 @@ Document uploaded
 
 This is exactly like a data warehouse where you keep raw data in S3 _and_ transformed
 data in Redshift — same principle, different technology.
+
+- 🫏 **Donkey:** Choosing between the local barn (ChromaDB), the AWS depot (DynamoDB/OpenSearch), or the Azure hub (Azure AI Search) to store the GPS-indexed saddlebags.
 
 ---
 
@@ -108,6 +112,8 @@ src/storage/
 > in-memory during ingestion. The chunks and embeddings are stored in ChromaDB.
 > Adding a local storage backend (e.g., local filesystem) would follow the same
 > `BaseStorage` interface.
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -127,15 +133,17 @@ class StoredDocument:
 
 The `BaseDocumentStorage` abstract class defines four operations:
 
-| Method | What it does | DE equivalent |
-| --- | --- | --- |
-| `upload()` | Store file, return metadata | `s3.put_object()` or `INSERT INTO files` |
-| `download()` | Get file bytes by ID | `s3.get_object()` or `SELECT content FROM files` |
-| `delete()` | Remove file by ID | `s3.delete_object()` or `DELETE FROM files` |
-| `list_documents()` | List all stored files | `s3.list_objects_v2()` or `SELECT * FROM files` |
+| Method | What it does | DE equivalent | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `upload()` | Store file, return metadata | `s3.put_object()` or `INSERT INTO files` | Parcel shelf 📦 |
+| `download()` | Get file bytes by ID | `s3.get_object()` or `SELECT content FROM files` | Parcel shelf 📦 |
+| `delete()` | Remove file by ID | `s3.delete_object()` or `DELETE FROM files` | Parcel shelf 📦 |
+| `list_documents()` | List all stored files | `s3.list_objects_v2()` or `SELECT * FROM files` | Parcel shelf 📦 |
 
 **Key design decision:** The interface uses `document_id` (a UUID), not `filename`.
 This avoids conflicts when two users upload files with the same name.
+
+- 🫏 **Donkey:** The universal saddle fitting — any donkey (AWS, Azure, local) accepts the same harness so you can swap providers without re-training the rider.
 
 ---
 
@@ -189,6 +197,8 @@ The class uses **synchronous** boto3 but the methods are declared `async`. This 
 pragmatic choice — FastAPI runs these in a thread pool automatically. True async would
 require `aioboto3`, adding another dependency for minimal benefit in a low-traffic app.
 
+- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
+
 ---
 
 ## azure_blob.py — Azure Blob Storage Implementation
@@ -231,22 +241,24 @@ async for blob in container.list_blobs(name_starts_with=prefix):
 The Azure SDK uses `aio` (async I/O) — each call is a real `await`, not a thread pool
 workaround. For high-traffic apps this matters; for this project, the difference is negligible.
 
+- 🫏 **Donkey:** Choosing between the local barn (ChromaDB), the AWS depot (DynamoDB/OpenSearch), or the Azure hub (Azure AI Search) to store the GPS-indexed saddlebags.
+
 ---
 
 ## AWS vs Azure — Side-by-Side Comparison
 
-| Aspect | AWS S3 | Azure Blob Storage |
-| --- | --- | --- |
-| **SDK** | `boto3` (sync) | `azure-storage-blob` (async native) |
-| **Container concept** | Bucket | Storage Account → Container |
-| **Object path** | `s3://bucket/key` | `container/blob-name` |
-| **Authentication** | IAM role / access key | Connection string / managed identity |
-| **Upload** | `put_object()` | `upload_blob()` |
-| **Download** | `get_object()["Body"].read()` | `download_blob()` → `readall()` |
-| **Delete** | `delete_objects()` (batch) | Loop + `delete_blob()` (one by one) |
-| **List** | Paginator pattern | `async for` iterator |
-| **Encryption** | AES256 / KMS (server-side) | Azure Storage encryption (default on) |
-| **Cost (10 GB)** | ~$0.23/month | ~$0.20/month |
+| Aspect | AWS S3 | Azure Blob Storage | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **SDK** | `boto3` (sync) | `azure-storage-blob` (async native) | Saddlebag check 🫏 |
+| **Container concept** | Bucket | Storage Account → Container | Saddlebag check 🫏 |
+| **Object path** | `s3://bucket/key` | `container/blob-name` | Stable stall 🐎 |
+| **Authentication** | IAM role / access key | Connection string / managed identity | 🫏 On the route |
+| **Upload** | `put_object()` | `upload_blob()` | Parcel shelf 📦 |
+| **Download** | `get_object()["Body"].read()` | `download_blob()` → `readall()` | Parcel shelf 📦 |
+| **Delete** | `delete_objects()` (batch) | Loop + `delete_blob()` (one by one) | Parcel shelf 📦 |
+| **List** | Paginator pattern | `async for` iterator | 🫏 On the route |
+| **Encryption** | AES256 / KMS (server-side) | Azure Storage encryption (default on) | Saddlebag check 🫏 |
+| **Cost (10 GB)** | ~$0.23/month | ~$0.20/month | Feed bill 🌾 |
 
 ### The code patterns side by side
 
@@ -278,6 +290,8 @@ self._s3.delete_objects(Bucket=self._bucket, Delete={"Objects": objects})
 async for blob in container.list_blobs(name_starts_with=prefix):
     await container.get_blob_client(blob.name).delete_blob()
 ```
+
+- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
 
 ---
 
@@ -319,6 +333,8 @@ result = await storage.upload(document_id, filename, content, content_type)
 The route code never imports S3 or Blob — it works with the abstract type. Switching
 clouds means changing one config variable, not rewriting routes.
 
+- 🫏 **Donkey:** Understanding why the stable was built this way — every architectural choice is a trade-off the head groom made deliberately.
+
 ---
 
 ## How Storage Fits in the RAG Pipeline
@@ -351,17 +367,21 @@ POST /api/chat
 **Key insight:** The chat endpoint never touches file storage. It only needs the
 vector store — the chunks + embeddings created during ingestion.
 
+- 🫏 **Donkey:** Choosing between the local barn (ChromaDB), the AWS depot (DynamoDB/OpenSearch), or the Azure hub (Azure AI Search) to store the GPS-indexed saddlebags.
+
 ---
 
 ## DE vs AI Engineer — What Each Sees
 
-| Aspect | What a DE sees | What an AI Engineer sees |
-| --- | --- | --- |
-| `StoredDocument` model | Standard metadata DTO | Audit trail for data lineage |
-| `upload()` | S3 put_object, nothing new | Source-of-truth for re-ingestion if chunking strategy changes |
-| `list_documents()` | Paginated list, standard | Knowledge base inventory — what data has the LLM seen? |
-| `delete()` | Prefix delete, standard | Must delete from BOTH storage AND vector store, or orphan vectors remain |
-| Strategy pattern | Clean architecture | Essential for multi-cloud — can't hardcode providers in AI apps |
+| Aspect | What a DE sees | What an AI Engineer sees | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `StoredDocument` model | Standard metadata DTO | Audit trail for data lineage | Manifest template 📋 |
+| `upload()` | S3 put_object, nothing new | Source-of-truth for re-ingestion if chunking strategy changes | Saddlebag piece 📦 |
+| `list_documents()` | Paginated list, standard | Knowledge base inventory — what data has the LLM seen? | The donkey 🐴 |
+| `delete()` | Prefix delete, standard | Must delete from BOTH storage AND vector store, or orphan vectors remain | Saddlebag check 🫏 |
+| Strategy pattern | Clean architecture | Essential for multi-cloud — can't hardcode providers in AI apps | 🫏 On the route |
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -384,3 +404,5 @@ Test your understanding:
 4. UUIDs prevent filename collisions and ensure globally unique references across the system.
 5. FastAPI detects that the underlying code is synchronous and runs it in a thread pool via `asyncio.run_in_executor()`. The `async def` lets it integrate with FastAPI's async router.
 6. Create `src/storage/gcp_gcs.py` implementing `BaseDocumentStorage`. No changes to routes needed — just add a new provider option in `main.py`.
+
+- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.

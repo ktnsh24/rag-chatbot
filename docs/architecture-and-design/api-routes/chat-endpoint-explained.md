@@ -55,6 +55,8 @@ In plain English:
 - **Search:** Find the 5 most relevant rows in a database (but by *meaning*, not by SQL WHERE)
 - **Writer:** Feed those rows to an AI that writes a human-readable summary
 
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+
 ---
 
 ## The Complete Request Flow
@@ -129,6 +131,8 @@ Response: {
 }
 ```
 
+- 🫏 **Donkey:** The step-by-step route map showing every checkpoint the donkey passes from question intake to answer delivery.
+
 ---
 
 ## Part 1: The Route Layer
@@ -174,14 +178,14 @@ yourself — Pydantic does it.
 
 **What each line does:**
 
-| Line | Purpose |
-| --- | --- |
-| `start_time = time.time()` | Start a stopwatch to measure total latency |
-| `settings = get_settings()` | Load config (for default `top_k`, cloud provider, etc.) |
-| `request_id = uuid4()` | Generate unique ID for this request (for log tracing) |
-| `body.question[:100]` | Log only first 100 chars of question (privacy + log size) |
-| `getattr(..., None)` | Safely get rag_chain — returns None if it failed to init |
-| `raise HTTPException(500)` | If rag_chain is None, tell the user the system is broken |
+| Line | Purpose | 🫏 Donkey |
+| --- | --- | --- |
+| `start_time = time.time()` | Start a stopwatch to measure total latency | Feed bill 🌾 |
+| `settings = get_settings()` | Load config (for default `top_k`, cloud provider, etc.) | 🫏 On the route |
+| `request_id = uuid4()` | Generate unique ID for this request (for log tracing) | 🫏 On the route |
+| `body.question[:100]` | Log only first 100 chars of question (privacy + log size) | 🫏 On the route |
+| `getattr(..., None)` | Safely get rag_chain — returns None if it failed to init | Saddlebag check 🫏 |
+| `raise HTTPException(500)` | If rag_chain is None, tell the user the system is broken | Saddlebag check 🫏 |
 
 #### 4. Determine session_id and top_k
 
@@ -190,10 +194,10 @@ yourself — Pydantic does it.
     top_k = body.top_k or settings.rag_top_k
 ```
 
-| Variable | If user provided it | If user didn't provide it |
-| --- | --- | --- |
-| `session_id` | Use theirs (for multi-turn conversations) | Generate a new UUID (new conversation) |
-| `top_k` | Use theirs (1–20) | Use default from settings (usually 5) |
+| Variable | If user provided it | If user didn't provide it | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `session_id` | Use theirs (for multi-turn conversations) | Generate a new UUID (new conversation) | Trip log 📒 |
+| `top_k` | Use theirs (1–20) | Use default from settings (usually 5) | 🫏 On the route |
 
 **What is `top_k`?** It's how many document chunks to retrieve from the vector store.
 More chunks = more context for the LLM = better answers, but also more tokens = higher cost.
@@ -217,6 +221,8 @@ inside is explained in [Part 2](#part-2-the-ai-pipeline) below.
 function that orchestrates multiple steps (extract, transform, load). Here it's
 embed, search, generate.
 
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+
 ---
 
 ## Part 2: The AI Pipeline
@@ -227,6 +233,8 @@ When the route calls `rag_chain.query()`, five things happen in sequence. Let's
 trace each step with a concrete example.
 
 **Example question:** *"What is the refund policy?"*
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -276,13 +284,13 @@ Output: [0.023, -0.841, 0.112, 0.567, ..., 0.394]  (1024 numbers)
 uniqueness. A hash function turns data into a fixed-size number for deduplication.
 An embedding turns text into a fixed-size vector for meaning comparison.
 
-| Concept | Hash function | Embedding function |
-| --- | --- | --- |
-| **Input** | Any data | Text |
-| **Output** | Fixed-size number | Fixed-size vector (1024 numbers) |
-| **Purpose** | Check if two things are identical | Check if two things mean the same |
-| **Similar input** | Completely different hash | Similar vector |
-| **Example** | `md5("hello") → 5d41...` | `embed("hello") → [0.1, 0.2, ...]` |
+| Concept | Hash function | Embedding function | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **Input** | Any data | Text | 🫏 On the route |
+| **Output** | Fixed-size number | Fixed-size vector (1024 numbers) | GPS warehouse 🗺️ |
+| **Purpose** | Check if two things are identical | Check if two things mean the same | 🫏 On the route |
+| **Similar input** | Completely different hash | Similar vector | GPS warehouse 🗺️ |
+| **Example** | `md5("hello") → 5d41...` | `embed("hello") → [0.1, 0.2, ...]` | 🫏 On the route |
 
 **Cost of this step:** Extremely cheap. Titan Embeddings costs $0.00002 per 1K tokens.
 For a 10-word question (~13 tokens), this costs $0.00000026 — essentially free.
@@ -488,12 +496,12 @@ class VectorSearchResult:
 
 **DE parallel:** This is like `SELECT text, document_name, score FROM chunks ORDER BY similarity(embedding, ?) DESC LIMIT 5`. But instead of SQL, it's a vector similarity search. Instead of exact matching (`WHERE column = value`), it's meaning matching ("find rows that *mean* something similar").
 
-| SQL query | Vector search |
-| --- | --- |
-| `WHERE title = 'refund policy'` | Find vectors similar to embed("refund policy") |
-| Exact string match | Meaning match |
-| Returns rows where title equals exactly | Returns chunks that are *about* refunds |
-| Misses "return procedure" (different words) | Finds "return procedure" (same meaning!) |
+| SQL query | Vector search | 🫏 Donkey |
+| --- | --- | --- |
+| `WHERE title = 'refund policy'` | Find vectors similar to embed("refund policy") | GPS warehouse 🗺️ |
+| Exact string match | Meaning match | 🫏 On the route |
+| Returns rows where title equals exactly | Returns chunks that are *about* refunds | Saddlebag piece 📦 |
+| Misses "return procedure" (different words) | Finds "return procedure" (same meaning!) | 🫏 On the route |
 
 **This is the key breakthrough of RAG:** It finds relevant documents by meaning, not
 by keywords. A user asking "How do I get my money back?" will find a document titled
@@ -652,12 +660,12 @@ This is the actual AI call. You send the assembled prompt to a Large Language Mo
 
 **What the parameters mean:**
 
-| Parameter | Value | What it does | DE parallel |
-| --- | --- | --- | --- |
-| `modelId` | `anthropic.claude-3-5-sonnet-...` | Which AI model to use | Like choosing which database engine (Postgres vs MySQL) |
-| `maxTokens` | `2048` | Maximum answer length (~1500 words) | Like `LIMIT` on output size |
-| `temperature` | `0.1` | How deterministic vs creative (0.0–1.0) | No real parallel — unique to AI |
-| `topP` | `0.9` | Probability threshold for word choices | No real parallel — unique to AI |
+| Parameter | Value | What it does | DE parallel | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| `modelId` | `anthropic.claude-3-5-sonnet-...` | Which AI model to use | Like choosing which database engine (Postgres vs MySQL) | The donkey 🐴 |
+| `maxTokens` | `2048` | Maximum answer length (~1500 words) | Like `LIMIT` on output size | Cargo unit ⚖️ |
+| `temperature` | `0.1` | How deterministic vs creative (0.0–1.0) | No real parallel — unique to AI | 🫏 On the route |
+| `topP` | `0.9` | Probability threshold for word choices | No real parallel — unique to AI | 🫏 On the route |
 
 **Temperature explained:**
 
@@ -862,12 +870,12 @@ sources = [
 
 **What each field means:**
 
-| Field | Example value | Why it's there |
-| --- | --- | --- |
-| `document_name` | `"refund-policy.pdf"` | User can verify *which* document was used |
-| `chunk_text` | `"Refunds are processed within 14 days..."` | User can verify the LLM didn't hallucinate |
-| `relevance_score` | `0.95` | How confident we are this chunk is relevant |
-| `page_number` | `3` | User can go find the original in the PDF |
+| Field | Example value | Why it's there | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `document_name` | `"refund-policy.pdf"` | User can verify *which* document was used | 🫏 On the route |
+| `chunk_text` | `"Refunds are processed within 14 days..."` | User can verify the LLM didn't hallucinate | The donkey 🐴 |
+| `relevance_score` | `0.95` | How confident we are this chunk is relevant | Saddlebag piece 📦 |
+| `page_number` | `3` | User can go find the original in the PDF | 🫏 On the route |
 
 **Why sources matter — the anti-hallucination pattern:**
 
@@ -983,14 +991,16 @@ except Exception:
 
 **Why this matters:**
 
-| Aspect | What it does | DE parallel |
-|---|---|---|
-| **Inline evaluation** | Scores every answer in real-time (< 5ms, no LLM call) | DQ check after every pipeline run |
-| **Failure classification** | Categories: `bad_retrieval`, `hallucination`, `off_topic`, etc. | Error taxonomy in Airflow |
-| **JSONL logging** | One structured record per query in `logs/queries/YYYY-MM-DD.jsonl` | Structured task logs |
-| **Non-fatal** | If logging fails, user still gets their answer | Airflow: logging fails ≠ task fails |
+| Aspect | What it does | DE parallel | 🫏 Donkey |
+|---|---|---| --- |
+| **Inline evaluation** | Scores every answer in real-time (< 5ms, no LLM call) | DQ check after every pipeline run | The donkey 🐴 |
+| **Failure classification** | Categories: `bad_retrieval`, `hallucination`, `off_topic`, etc. | Error taxonomy in Airflow | Memory drift ⚠️ |
+| **JSONL logging** | One structured record per query in `logs/queries/YYYY-MM-DD.jsonl` | Structured task logs | Gate guard 🔐 |
+| **Non-fatal** | If logging fails, user still gets their answer | Airflow: logging fails ≠ task fails | Hoof check 🔧 |
 
 📖 **See:** [Monitoring Reference](../../reference/monitoring.md) · [API Reference → Queries](../../reference/api-reference.md#query-debugging-i30)
+
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
 
 ---
 
@@ -998,15 +1008,15 @@ except Exception:
 
 Here's a breakdown of what one question costs across all 5 steps:
 
-| Step | What happens | AWS cost | Azure cost | Local cost | Time |
-| --- | --- | --- | --- | --- | --- |
-| 1. EMBED | Question → vector | $0.0000003 (Titan) | $0.0000003 (text-embedding-3-small) | **$0** | ~50ms |
-| 2. SEARCH | Find top 5 chunks | ~$0 (OpenSearch, per-OCU) | ~$0 (AI Search, per-tier) | **$0** | ~30ms |
-| 3. BUILD | Assemble prompt | $0 | $0 | $0 | <1ms |
-| 4. GENERATE | LLM generates answer | **$0.0065** (Claude) | **$0.005** (GPT-4o) | **$0** (llama3.2) | ~350ms |
-| 5. BUILD | Format response | $0 | $0 | $0 | <1ms |
-| **Total per query** | | **~$0.0065** | **~$0.005** | **$0** | **~430ms** |
-| **Monthly infra** | | ~$350 (OpenSearch 2 OCU) | ~$75 (AI Search Basic) | **$0** | — |
+| Step | What happens | AWS cost | Azure cost | Local cost | Time | 🫏 Donkey |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1. EMBED | Question → vector | $0.0000003 (Titan) | $0.0000003 (text-embedding-3-small) | **$0** | ~50ms | GPS stamp 📍 |
+| 2. SEARCH | Find top 5 chunks | ~$0 (OpenSearch, per-OCU) | ~$0 (AI Search, per-tier) | **$0** | ~30ms | AWS search hub 🔍 |
+| 3. BUILD | Assemble prompt | $0 | $0 | $0 | <1ms | Delivery note 📋 |
+| 4. GENERATE | LLM generates answer | **$0.0065** (Claude) | **$0.005** (GPT-4o) | **$0** (llama3.2) | ~350ms | The donkey 🐴 |
+| 5. BUILD | Format response | $0 | $0 | $0 | <1ms | Free hay 🌿 |
+| **Total per query** | | **~$0.0065** | **~$0.005** | **$0** | **~430ms** | Feed bill 🌾 |
+| **Monthly infra** | | ~$350 (OpenSearch 2 OCU) | ~$75 (AI Search Basic) | **$0** | — | AWS search hub 🔍 |
 
 **Key insight:** 99.9% of the cost is in Step 4 (the LLM call). The embedding is
 essentially free. Optimising costs means reducing what you send to the LLM:
@@ -1016,35 +1026,41 @@ essentially free. Optimising costs means reducing what you send to the LLM:
 
 See [Cost Analysis](../ai-engineering/cost-analysis.md) for cost optimisation techniques.
 
+- 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
+
 ---
 
 ## DE vs AI Engineer
 
 What does each role see when they look at this endpoint?
 
-| Aspect | DE sees | AI engineer sees |
-| --- | --- | --- |
-| `rag_chain.query()` | "Async service call" | "What embedding model? Is 1024 dimensions enough? Should I use cosine or dot product?" |
-| `top_k=5` | "Like LIMIT 5" | "Is 5 optimal? Should I use 3 for simple questions and 10 for complex ones?" |
-| `sources` | "List of dicts" | "Are low-scoring chunks diluting the context? Should I filter below 0.5 before sending to the LLM?" |
-| `token_usage: 1250 input` | "A counter" | "That's 5 chunks × ~250 tokens each. Can I use 200-token chunks to save 20%?" |
-| `latency_ms: 450` | "Acceptable latency" | "350ms is the LLM. Can I use Claude Haiku ($0.00025/1K) for simple questions?" |
-| `temperature: 0.1` | "A config parameter" | "0.1 is good for factual. If we add summarisation, we'd want 0.3-0.5" |
-| Error handling | "Standard try/except" | "If the LLM hallucinates despite context, how do I detect and prevent that?" |
+| Aspect | DE sees | AI engineer sees | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `rag_chain.query()` | "Async service call" | "What embedding model? Is 1024 dimensions enough? Should I use cosine or dot product?" | GPS stamp 📍 |
+| `top_k=5` | "Like LIMIT 5" | "Is 5 optimal? Should I use 3 for simple questions and 10 for complex ones?" | 🫏 On the route |
+| `sources` | "List of dicts" | "Are low-scoring chunks diluting the context? Should I filter below 0.5 before sending to the LLM?" | The donkey 🐴 |
+| `token_usage: 1250 input` | "A counter" | "That's 5 chunks × ~250 tokens each. Can I use 200-token chunks to save 20%?" | Cargo unit ⚖️ |
+| `latency_ms: 450` | "Acceptable latency" | "350ms is the LLM. Can I use Claude Haiku ($0.00025/1K) for simple questions?" | The donkey 🐴 |
+| `temperature: 0.1` | "A config parameter" | "0.1 is good for factual. If we add summarisation, we'd want 0.3-0.5" | 🫏 On the route |
+| Error handling | "Standard try/except" | "If the LLM hallucinates despite context, how do I detect and prevent that?" | The donkey 🐴 |
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
 ## What Could Go Wrong
 
-| Error scenario | What happens | HTTP status |
-| --- | --- | --- |
-| Invalid question (empty or >5000 chars) | Pydantic rejects it before the route runs | `422` |
-| RAG chain not initialised | Route returns error immediately (no AI call) | `500` |
-| Embedding API fails (Bedrock / Azure OpenAI / Ollama down) | Exception in Step 1 → caught by try/except | `500` |
-| Vector store empty (no documents) | Step 2 returns [] → friendly "upload docs first" message | `200` (not an error) |
-| LLM API fails (Bedrock / Azure OpenAI / Ollama down) | Exception in Step 4 → caught by try/except | `500` |
-| LLM generates bad answer | Returns successfully — no way to detect this automatically | `200` |
-| LLM exceeds maxTokens | Answer is truncated (Claude stops at 2048 tokens) | `200` |
+| Error scenario | What happens | HTTP status | 🫏 Donkey |
+| --- | --- | --- | --- |
+| Invalid question (empty or >5000 chars) | Pydantic rejects it before the route runs | `422` | Stable door 🚪 |
+| RAG chain not initialised | Route returns error immediately (no AI call) | `500` | Saddlebag check 🫏 |
+| Embedding API fails (Bedrock / Azure OpenAI / Ollama down) | Exception in Step 1 → caught by try/except | `500` | The donkey 🐴 |
+| Vector store empty (no documents) | Step 2 returns [] → friendly "upload docs first" message | `200` (not an error) | GPS warehouse 🗺️ |
+| LLM API fails (Bedrock / Azure OpenAI / Ollama down) | Exception in Step 4 → caught by try/except | `500` | The donkey 🐴 |
+| LLM generates bad answer | Returns successfully — no way to detect this automatically | `200` | The donkey 🐴 |
+| LLM exceeds maxTokens | Answer is truncated (Claude stops at 2048 tokens) | `200` | The donkey 🐴 |
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -1074,3 +1090,4 @@ What does each role see when they look at this endpoint?
 - [ ] How would you detect if the LLM hallucinated despite having good context?
 - [ ] When would you use a cheaper/faster model (like Claude Haiku) vs the full model?
 
+- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.

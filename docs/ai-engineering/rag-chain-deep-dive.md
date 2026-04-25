@@ -29,13 +29,15 @@
 
 This is the **most important file in the entire application**. Every other file is a component — this file wires them all together. If the LLM interface is an engine and the vector store is a database, `chain.py` is the **assembly line** that connects engine, database, embeddings, prompts, and chunking into a working RAG pipeline.
 
-| What you'll learn | DE parallel |
-|---|---|
-| Factory pattern for multi-provider setup | Database connection factory (`get_engine('postgres')` vs `get_engine('mysql')`) |
-| Ingestion pipeline orchestration | ETL pipeline — extract, transform, load |
-| Query pipeline orchestration | Read-path pipeline — query, join, format, return |
-| Cost estimation per provider | Cloud cost monitoring per service |
-| Dependency injection | Airflow's `provide_session` decorator |
+| What you'll learn | DE parallel | 🫏 Donkey |
+|---|---| --- |
+| Factory pattern for multi-provider setup | Database connection factory (`get_engine('postgres')` vs `get_engine('mysql')`) | Parcel shelf 📦 |
+| Ingestion pipeline orchestration | ETL pipeline — extract, transform, load | Pre-sort 📮 |
+| Query pipeline orchestration | Read-path pipeline — query, join, format, return | Robot hand 🤖 |
+| Cost estimation per provider | Cloud cost monitoring per service | Tachograph 📊 |
+| Dependency injection | Airflow's `provide_session` decorator | Trip log 📒 |
+
+- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -58,6 +60,8 @@ The DAG doesn't do the work —              The chain doesn't do the work —
 ```
 
 **Key insight:** Just as an Airflow DAG is useless without operators, `RAGChain` is useless without its components. It coordinates the workflow — it doesn't implement any AI logic itself.
+
+- 🫏 **Donkey:** The donkey checks its saddlebag full of retrieved document chunks before answering — no guessing from memory.
 
 ---
 
@@ -85,6 +89,8 @@ The class takes three dependencies:
 - **`llm`** — any class implementing `BaseLLM` (generate + embed)
 - **`vector_store`** — any class implementing `BaseVectorStore` (store + search)
 - **`settings`** — the Pydantic Settings object with all configuration
+
+- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the saddlebags are loaded, and which route it takes to the customer.
 
 ---
 
@@ -130,6 +136,8 @@ def get_engine(db_type: str):
 
 # Same pattern. Different backends, same interface.
 ```
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -192,17 +200,19 @@ def _create_local_backends(settings: Settings) -> tuple[BaseLLM, BaseVectorStore
 
 **Complete configuration comparison:**
 
-| Setting | AWS | AWS (cheap) | Azure | Local |
-|---|---|---|---|---|
-| **Env var** | `CLOUD_PROVIDER=aws` | `CLOUD_PROVIDER=aws` | `CLOUD_PROVIDER=azure` | `CLOUD_PROVIDER=local` |
-| **Extra env** | — | `VECTOR_STORE_TYPE=dynamodb` | — | — |
-| **LLM class** | `BedrockLLM` | `BedrockLLM` | `AzureOpenAILLM` | `OllamaLLM` |
-| **LLM model** | Claude 3.5 Sonnet | Claude 3.5 Sonnet | GPT-4o | llama3.2 |
-| **Vector store** | `OpenSearchVectorStore` | `DynamoDBVectorStore` | `AzureAISearchVectorStore` | `ChromaDBVectorStore` |
-| **Vector cost** | ~$350/month | **~$0/month** | $0–75/month | $0 |
-| **Embedding source** | Amazon Titan | Amazon Titan | Azure text-embedding-3 | nomic-embed-text |
-| **Auth** | IAM (SigV4) | IAM (SigV4) | API key | None |
-| **Cost** | ~$0.0065/query | ~$0.0065/query | ~$0.005/query | **$0** |
+| Setting | AWS | AWS (cheap) | Azure | Local | 🫏 Donkey |
+|---|---|---|---|---| --- |
+| **Env var** | `CLOUD_PROVIDER=aws` | `CLOUD_PROVIDER=aws` | `CLOUD_PROVIDER=azure` | `CLOUD_PROVIDER=local` | AWS depot 🏭 |
+| **Extra env** | — | `VECTOR_STORE_TYPE=dynamodb` | — | — | AWS depot 🏭 |
+| **LLM class** | `BedrockLLM` | `BedrockLLM` | `AzureOpenAILLM` | `OllamaLLM` | The donkey 🐴 |
+| **LLM model** | Claude 3.5 Sonnet | Claude 3.5 Sonnet | GPT-4o | llama3.2 | The donkey 🐴 |
+| **Vector store** | `OpenSearchVectorStore` | `DynamoDBVectorStore` | `AzureAISearchVectorStore` | `ChromaDBVectorStore` | AWS search hub 🔍 |
+| **Vector cost** | ~$350/month | **~$0/month** | $0–75/month | $0 | Feed bill 🌾 |
+| **Embedding source** | Amazon Titan | Amazon Titan | Azure text-embedding-3 | nomic-embed-text | GPS stamp 📍 |
+| **Auth** | IAM (SigV4) | IAM (SigV4) | API key | None | Stable door 🚪 |
+| **Cost** | ~$0.0065/query | ~$0.0065/query | ~$0.005/query | **$0** | Feed bill 🌾 |
+
+- 🫏 **Donkey:** Choosing which stable to work with — AWS Bedrock, Azure OpenAI, or a local Ollama barn each offer different donkeys at different prices.
 
 ---
 
@@ -251,14 +261,16 @@ PDF file → [Read] → plain text → [Chunk] → 50 chunks → [Embed] → 50 
 CSV file → [Extract] → raw rows → [Transform] → cleaned rows → [Load] → Data warehouse
 ```
 
-| Ingestion step | DE parallel | What it does |
-|---|---|---|
-| `read_document()` | `pandas.read_csv()` | Extracts raw text from PDF/TXT |
-| `chunk_document()` | Data partitioning / windowing | Splits text into 500-char windows with 50-char overlap |
-| `get_embeddings_batch()` | `df.apply(transform_fn)` | Converts each chunk to a 1536-dim vector |
-| `store_vectors()` | `df.to_sql(warehouse)` | Indexes vectors for similarity search |
+| Ingestion step | DE parallel | What it does | 🫏 Donkey |
+|---|---|---| --- |
+| `read_document()` | `pandas.read_csv()` | Extracts raw text from PDF/TXT | 🫏 On the route |
+| `chunk_document()` | Data partitioning / windowing | Splits text into 500-char windows with 50-char overlap | Saddlebag piece 📦 |
+| `get_embeddings_batch()` | `df.apply(transform_fn)` | Converts each chunk to a 1536-dim vector | Saddlebag piece 📦 |
+| `store_vectors()` | `df.to_sql(warehouse)` | Indexes vectors for similarity search | GPS warehouse 🗺️ |
 
 **Why batch embeddings?** One API call for 50 chunks is faster and cheaper than 50 separate calls. This is the same principle as batch `INSERT` vs row-by-row `INSERT`.
+
+- 🫏 **Donkey:** Post office pre-sorting: mail is split into saddlebag-sized chunks, stamped with GPS coordinates (embeddings), and shelved in the warehouse before the donkey ever arrives.
 
 ---
 
@@ -333,13 +345,15 @@ async def query(
 
 **DE parallel — read query pipeline:**
 
-| Query step | DE parallel | What it does |
-|---|---|---|
-| Embed question | Build query parameters | Convert question to searchable format |
-| Vector search | `SELECT * WHERE similarity > threshold ORDER BY score LIMIT 5` | Find relevant data |
-| Build context | JOIN results into a single payload | Combine search results |
-| LLM generate | Apply business logic / stored procedure | Transform data into answer |
-| Build response | Format as API response | Package result for caller |
+| Query step | DE parallel | What it does | 🫏 Donkey |
+|---|---|---| --- |
+| Embed question | Build query parameters | Convert question to searchable format | 🫏 On the route |
+| Vector search | `SELECT * WHERE similarity > threshold ORDER BY score LIMIT 5` | Find relevant data | GPS warehouse 🗺️ |
+| Build context | JOIN results into a single payload | Combine search results | 🫏 On the route |
+| LLM generate | Apply business logic / stored procedure | Transform data into answer | The donkey 🐴 |
+| Build response | Format as API response | Package result for caller | Stable door 🚪 |
+
+- 🫏 **Donkey:** The warehouse robot dispatched to find the right saddlebag shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -363,11 +377,11 @@ def _estimate_cost(self, input_tokens: int, output_tokens: int) -> float:
 
 **Cost per 1000 tokens:**
 
-| Provider | Input | Output | Typical query cost (~845 input, ~200 output) |
-|---|---|---|---|
-| AWS (Claude 3.5 Sonnet) | $0.003 | $0.015 | **$0.0055** |
-| Azure (GPT-4o) | $0.0025 | $0.010 | **$0.0041** |
-| Local (Ollama) | $0.000 | $0.000 | **$0.0000** |
+| Provider | Input | Output | Typical query cost (~845 input, ~200 output) | 🫏 Donkey |
+|---|---|---|---| --- |
+| AWS (Claude 3.5 Sonnet) | $0.003 | $0.015 | **$0.0055** | The donkey 🐴 |
+| Azure (GPT-4o) | $0.0025 | $0.010 | **$0.0041** | The donkey 🐴 |
+| Local (Ollama) | $0.000 | $0.000 | **$0.0000** | The donkey 🐴 |
 
 **Monthly cost projection at 1000 queries/day:**
 
@@ -378,6 +392,8 @@ Local: 1000 × $0.0000 × 30 = $0/month (but you pay for the hardware)
 ```
 
 **Output tokens cost 3-5x more than input tokens.** That's why prompt rules like "be concise" and "under 500 words" save real money.
+
+- 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
 
 ---
 
@@ -405,6 +421,8 @@ chain.ingest_document()              chain.query()
 ```
 
 **The chain is the hub.** Every route goes through it. Every component is accessed through it. Change the chain, and you change the entire application's behaviour.
+
+- 🫏 **Donkey:** The step-by-step route map showing every checkpoint the donkey passes from question intake to answer delivery.
 
 ---
 
@@ -456,19 +474,23 @@ CHROMA_PERSIST_DIRECTORY=./data/chromadb
 # 3. pip install chromadb
 ```
 
+- 🫏 **Donkey:** Adjusting the saddle fit and route preferences so the donkey delivers to the right address every time.
+
 ---
 
 ## What Goes Wrong — Common Failure Modes
 
-| Problem | Symptom | Cause | Fix |
-|---|---|---|---|
-| `ValueError: Unsupported cloud provider` | App crashes on startup | `CLOUD_PROVIDER` not set or misspelled | Set `CLOUD_PROVIDER=local` in `.env` |
-| `ConnectionRefusedError` (local) | Ingestion fails | Ollama not running | `ollama serve` in a separate terminal |
-| Empty search results | "I don't have enough information" | Documents not ingested yet | Upload documents first via `POST /documents` |
-| High latency (>5s) | Slow responses | LLM is slow (especially local) | Use a smaller model or increase hardware |
-| Token limit exceeded | API error from LLM | Too many chunks in context (`top_k` too high) | Reduce `top_k` from 5 to 3 |
-| Zero cost in metrics | Metrics show $0.000 | Using local provider | Expected — local is free |
-| Stale embeddings | Old documents still returned | Vectors not deleted after re-upload | Implement delete + re-ingest flow |
+| Problem | Symptom | Cause | Fix | 🫏 Donkey |
+|---|---|---|---| --- |
+| `ValueError: Unsupported cloud provider` | App crashes on startup | `CLOUD_PROVIDER` not set or misspelled | Set `CLOUD_PROVIDER=local` in `.env` | Hoof check 🔧 |
+| `ConnectionRefusedError` (local) | Ingestion fails | Ollama not running | `ollama serve` in a separate terminal | The donkey 🐴 |
+| Empty search results | "I don't have enough information" | Documents not ingested yet | Upload documents first via `POST /documents` | Pre-sort 📮 |
+| High latency (>5s) | Slow responses | LLM is slow (especially local) | Use a smaller model or increase hardware | The donkey 🐴 |
+| Token limit exceeded | API error from LLM | Too many chunks in context (`top_k` too high) | Reduce `top_k` from 5 to 3 | The donkey 🐴 |
+| Zero cost in metrics | Metrics show $0.000 | Using local provider | Expected — local is free | Feed bill 🌾 |
+| Stale embeddings | Old documents still returned | Vectors not deleted after re-upload | Implement delete + re-ingest flow | Pre-sort 📮 |
+
+- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and saddle inspection checklist to find what went wrong.
 
 ---
 
@@ -495,6 +517,8 @@ CHROMA_PERSIST_DIRECTORY=./data/chromadb
 - [ ] If output tokens cost 5x more than input, what architectural decisions reduce output?
 - [ ] How would you implement streaming responses (show answer as it generates)?
 
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+
 ---
 
 ## What to Study Next
@@ -511,3 +535,4 @@ You now understand the central orchestrator. Next:
 - [Ingestion Pipeline Deep Dive (#11)](ingestion-pipeline-deep-dive.md) — deeper look at chunking
 - [Cost Analysis](cost-analysis.md)
 
+- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

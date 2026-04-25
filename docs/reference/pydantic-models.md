@@ -60,23 +60,27 @@ def chat(body: ChatRequest):
     print(body.question)  # Safe — always a valid string
 ```
 
+- 🫏 **Donkey:** The cargo manifest template — every field is typed and validated before the donkey is loaded, preventing mispackaged deliveries.
+
 ---
 
 ## How Pydantic is used in this project
 
 Pydantic models appear in **three roles**:
 
-| Role | Example | What it does |
-| --- | --- | --- |
-| **Request model** | `ChatRequest` | Validates incoming JSON from the client |
-| **Response model** | `ChatResponse` | Defines the shape of the JSON we return |
-| **Settings model** | `Settings` | Reads and validates environment variables |
+| Role | Example | What it does | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **Request model** | `ChatRequest` | Validates incoming JSON from the client | Manifest template 📋 |
+| **Response model** | `ChatResponse` | Defines the shape of the JSON we return | Manifest template 📋 |
+| **Settings model** | `Settings` | Reads and validates environment variables | Manifest template 📋 |
 
 When FastAPI sees `def chat(body: ChatRequest)`:
 1. It reads the raw JSON from the HTTP request body
 2. It creates a `ChatRequest` object (running all validators)
 3. If validation fails → automatic 422 response with details
 4. If validation passes → your function receives a clean, typed object
+
+- 🫏 **Donkey:** The cargo manifest template — every field is typed and validated before the donkey is loaded, preventing mispackaged deliveries.
 
 ---
 
@@ -94,36 +98,36 @@ class Settings(BaseSettings):
 - `BaseModel` only accepts data you pass explicitly
 - `BaseSettings` automatically reads from environment variables
 
-| Field | Type | Default | Env Variable | Purpose |
-| --- | --- | --- | --- | --- |
-| `cloud_provider` | `CloudProvider` | `local` | `CLOUD_PROVIDER` | Controls which cloud backends to use |
-| `app_name` | `str` | `rag-chatbot` | `APP_NAME` | Service name in logs |
-| `app_env` | `AppEnvironment` | `dev` | `APP_ENV` | Environment (affects logging) |
-| `app_port` | `int` | `8000` | `APP_PORT` | Server port |
-| `log_level` | `str` | `INFO` | `LOG_LEVEL` | Logging verbosity |
-| `rag_top_k` | `int` | `5` | `RAG_TOP_K` | Chunks retrieved per query |
-| `rag_chunk_size` | `int` | `1000` | `RAG_CHUNK_SIZE` | Max characters per chunk |
-| `rag_chunk_overlap` | `int` | `200` | `RAG_CHUNK_OVERLAP` | Overlap between chunks |
-| `aws_region` | `str` | `eu-central-1` | `AWS_REGION` | AWS region |
-| `aws_bedrock_model_id` | `str` | Claude 3.5 Sonnet | `AWS_BEDROCK_MODEL_ID` | Bedrock model |
-| `aws_opensearch_endpoint` | `str` | `""` | `AWS_OPENSEARCH_ENDPOINT` | OpenSearch URL |
-| `aws_s3_bucket_name` | `str` | `rag-chatbot-documents` | `AWS_S3_BUCKET_NAME` | S3 bucket |
-| `aws_dynamodb_table_name` | `str` | `rag-chatbot-conversations` | `AWS_DYNAMODB_TABLE_NAME` | DynamoDB table (history) |
-| `aws_dynamodb_vector_table_name` | `str` | `rag-chatbot-vectors` | `AWS_DYNAMODB_VECTOR_TABLE_NAME` | DynamoDB table (vector store — cheap alternative to OpenSearch) |
-| `vector_store_type` | `VectorStoreType` | `auto` | `VECTOR_STORE_TYPE` | Override vector store: `auto` (default for provider) or `dynamodb` ($0/month) |
-| `azure_openai_endpoint` | `str` | `""` | `AZURE_OPENAI_ENDPOINT` | Azure OpenAI URL |
-| `azure_openai_api_key` | `str` | `""` | `AZURE_OPENAI_API_KEY` | Azure OpenAI key |
-| `azure_openai_deployment_name` | `str` | `gpt-4o` | `AZURE_OPENAI_DEPLOYMENT_NAME` | Model deployment |
-| `azure_search_endpoint` | `str` | `""` | `AZURE_SEARCH_ENDPOINT` | AI Search URL |
-| `azure_search_api_key` | `str` | `""` | `AZURE_SEARCH_API_KEY` | AI Search key |
-| `ollama_base_url` | `str` | `http://localhost:11434` | `OLLAMA_BASE_URL` | Ollama REST API URL |
-| `ollama_model` | `str` | `llama3.2` | `OLLAMA_MODEL` | Ollama chat model |
-| `ollama_embedding_model` | `str` | `nomic-embed-text` | `OLLAMA_EMBEDDING_MODEL` | Ollama embedding model |
-| `chroma_collection_name` | `str` | `rag-chatbot` | `CHROMA_COLLECTION_NAME` | ChromaDB collection |
-| `chroma_persist_directory` | `str` | `""` | `CHROMA_PERSIST_DIRECTORY` | ChromaDB storage path (empty = in-memory) |
-| `enable_tracing` | `bool` | `False` | `ENABLE_TRACING` | OpenTelemetry tracing |
-| `query_log_enabled` | `bool` | `True` | `QUERY_LOG_ENABLED` | Structured per-query JSONL logging (I30) |
-| `query_log_dir` | `str` | `logs/queries` | `QUERY_LOG_DIR` | Directory for daily JSONL log files |
+| Field | Type | Default | Env Variable | Purpose | 🫏 Donkey |
+| --- | --- | --- | --- | --- | --- |
+| `cloud_provider` | `CloudProvider` | `local` | `CLOUD_PROVIDER` | Controls which cloud backends to use | Local barn 🏚️ |
+| `app_name` | `str` | `rag-chatbot` | `APP_NAME` | Service name in logs | Saddlebag check 🫏 |
+| `app_env` | `AppEnvironment` | `dev` | `APP_ENV` | Environment (affects logging) | Gate guard 🔐 |
+| `app_port` | `int` | `8000` | `APP_PORT` | Server port | 🫏 On the route |
+| `log_level` | `str` | `INFO` | `LOG_LEVEL` | Logging verbosity | Gate guard 🔐 |
+| `rag_top_k` | `int` | `5` | `RAG_TOP_K` | Chunks retrieved per query | Saddlebag piece 📦 |
+| `rag_chunk_size` | `int` | `1000` | `RAG_CHUNK_SIZE` | Max characters per chunk | Saddlebag piece 📦 |
+| `rag_chunk_overlap` | `int` | `200` | `RAG_CHUNK_OVERLAP` | Overlap between chunks | Saddlebag piece 📦 |
+| `aws_region` | `str` | `eu-central-1` | `AWS_REGION` | AWS region | AWS depot 🏭 |
+| `aws_bedrock_model_id` | `str` | Claude 3.5 Sonnet | `AWS_BEDROCK_MODEL_ID` | Bedrock model | The donkey 🐴 |
+| `aws_opensearch_endpoint` | `str` | `""` | `AWS_OPENSEARCH_ENDPOINT` | OpenSearch URL | AWS search hub 🔍 |
+| `aws_s3_bucket_name` | `str` | `rag-chatbot-documents` | `AWS_S3_BUCKET_NAME` | S3 bucket | Parcel shelf 📦 |
+| `aws_dynamodb_table_name` | `str` | `rag-chatbot-conversations` | `AWS_DYNAMODB_TABLE_NAME` | DynamoDB table (history) | AWS depot 🏭 |
+| `aws_dynamodb_vector_table_name` | `str` | `rag-chatbot-vectors` | `AWS_DYNAMODB_VECTOR_TABLE_NAME` | DynamoDB table (vector store — cheap alternative to OpenSearch) | AWS search hub 🔍 |
+| `vector_store_type` | `VectorStoreType` | `auto` | `VECTOR_STORE_TYPE` | Override vector store: `auto` (default for provider) or `dynamodb` ($0/month) | AWS depot 🏭 |
+| `azure_openai_endpoint` | `str` | `""` | `AZURE_OPENAI_ENDPOINT` | Azure OpenAI URL | The donkey 🐴 |
+| `azure_openai_api_key` | `str` | `""` | `AZURE_OPENAI_API_KEY` | Azure OpenAI key | The donkey 🐴 |
+| `azure_openai_deployment_name` | `str` | `gpt-4o` | `AZURE_OPENAI_DEPLOYMENT_NAME` | Model deployment | The donkey 🐴 |
+| `azure_search_endpoint` | `str` | `""` | `AZURE_SEARCH_ENDPOINT` | AI Search URL | Azure hub ☁️ |
+| `azure_search_api_key` | `str` | `""` | `AZURE_SEARCH_API_KEY` | AI Search key | Azure hub ☁️ |
+| `ollama_base_url` | `str` | `http://localhost:11434` | `OLLAMA_BASE_URL` | Ollama REST API URL | The donkey 🐴 |
+| `ollama_model` | `str` | `llama3.2` | `OLLAMA_MODEL` | Ollama chat model | The donkey 🐴 |
+| `ollama_embedding_model` | `str` | `nomic-embed-text` | `OLLAMA_EMBEDDING_MODEL` | Ollama embedding model | The donkey 🐴 |
+| `chroma_collection_name` | `str` | `rag-chatbot` | `CHROMA_COLLECTION_NAME` | ChromaDB collection | Local barn 🏚️ |
+| `chroma_persist_directory` | `str` | `""` | `CHROMA_PERSIST_DIRECTORY` | ChromaDB storage path (empty = in-memory) | Local barn 🏚️ |
+| `enable_tracing` | `bool` | `False` | `ENABLE_TRACING` | OpenTelemetry tracing | 🫏 On the route |
+| `query_log_enabled` | `bool` | `True` | `QUERY_LOG_ENABLED` | Structured per-query JSONL logging (I30) | Gate guard 🔐 |
+| `query_log_dir` | `str` | `logs/queries` | `QUERY_LOG_DIR` | Directory for daily JSONL log files | 🫏 On the route |
 
 **How it works:**
 
@@ -138,6 +142,8 @@ settings.cloud_provider  # → CloudProvider.LOCAL
 settings.app_port        # → 8000
 settings.rag_top_k       # → 5
 ```
+
+- 🫏 **Donkey:** Adjusting the saddle fit and route preferences so the donkey delivers to the right address every time.
 
 ---
 
@@ -154,11 +160,11 @@ class ChatRequest(BaseModel):
 
 **What it is:** The JSON body sent by the client to `POST /api/chat`.
 
-| Field | Type | Required? | Validation | Purpose |
-| --- | --- | --- | --- | --- |
-| `question` | `str` | **Yes** | 1–5000 chars | The user's question |
-| `session_id` | `str` or `None` | No | None | Links follow-up questions together |
-| `top_k` | `int` or `None` | No | 1–20 if provided | Override default chunk count |
+| Field | Type | Required? | Validation | Purpose | 🫏 Donkey |
+| --- | --- | --- | --- | --- | --- |
+| `question` | `str` | **Yes** | 1–5000 chars | The user's question | 🫏 On the route |
+| `session_id` | `str` or `None` | No | None | Links follow-up questions together | Trip log 📒 |
+| `top_k` | `int` or `None` | No | 1–20 if provided | Override default chunk count | Saddlebag piece 📦 |
 
 **What happens on invalid input:**
 
@@ -176,6 +182,8 @@ class ChatRequest(BaseModel):
   }]
 }
 ```
+
+- 🫏 **Donkey:** The cargo manifest template — every field is typed and validated before the donkey is loaded, preventing mispackaged deliveries.
 
 ---
 
@@ -196,15 +204,17 @@ class ChatResponse(BaseModel):
 
 **What it is:** The JSON returned to the client after a chat query.
 
-| Field | Type | Purpose |
-| --- | --- | --- |
-| `answer` | `str` | The AI-generated answer |
-| `sources` | `list[SourceChunk]` | Which document chunks were used (citations) |
-| `session_id` | `str` | Session ID for follow-up questions |
-| `request_id` | `UUID` | Unique ID for debugging/tracing |
-| `cloud_provider` | `CloudProvider` | Which cloud processed this request |
-| `latency_ms` | `int` | Total processing time |
-| `token_usage` | `TokenUsage` or `None` | Token counts for cost tracking |
+| Field | Type | Purpose | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `answer` | `str` | The AI-generated answer | 🫏 On the route |
+| `sources` | `list[SourceChunk]` | Which document chunks were used (citations) | Saddlebag piece 📦 |
+| `session_id` | `str` | Session ID for follow-up questions | Trip log 📒 |
+| `request_id` | `UUID` | Unique ID for debugging/tracing | Hoof check 🔧 |
+| `cloud_provider` | `CloudProvider` | Which cloud processed this request | 🫏 On the route |
+| `latency_ms` | `int` | Total processing time | Feed bill 🌾 |
+| `token_usage` | `TokenUsage` or `None` | Token counts for cost tracking | Cargo unit ⚖️ |
+
+- 🫏 **Donkey:** The cargo manifest template — every field is typed and validated before the donkey is loaded, preventing mispackaged deliveries.
 
 ---
 
@@ -212,12 +222,14 @@ class ChatResponse(BaseModel):
 
 **What it is:** A single piece of evidence that the LLM used. This is what makes RAG transparent.
 
-| Field | Type | Purpose |
-| --- | --- | --- |
-| `document_name` | `str` | Which file this chunk came from |
-| `chunk_text` | `str` | The actual text content |
-| `relevance_score` | `float` (0.0–1.0) | How similar to the question (1.0 = perfect) |
-| `page_number` | `int` or `None` | Page in original PDF |
+| Field | Type | Purpose | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `document_name` | `str` | Which file this chunk came from | Saddlebag piece 📦 |
+| `chunk_text` | `str` | The actual text content | Saddlebag piece 📦 |
+| `relevance_score` | `float` (0.0–1.0) | How similar to the question (1.0 = perfect) | Right address 🎯 |
+| `page_number` | `int` or `None` | Page in original PDF | 🫏 On the route |
+
+- 🫏 **Donkey:** Saddlebag-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
 
 ---
 
@@ -225,12 +237,12 @@ class ChatResponse(BaseModel):
 
 **What it is:** How many tokens the LLM consumed. Critical for cost tracking.
 
-| Field | Type | Purpose |
-| --- | --- | --- |
-| `input_tokens` | `int` | Tokens in the prompt (question + context) |
-| `output_tokens` | `int` | Tokens in the generated answer |
-| `total_tokens` | `int` | Sum of input + output |
-| `estimated_cost_usd` | `float` | Estimated cost based on model pricing |
+| Field | Type | Purpose | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `input_tokens` | `int` | Tokens in the prompt (question + context) | Cargo unit ⚖️ |
+| `output_tokens` | `int` | Tokens in the generated answer | Cargo unit ⚖️ |
+| `total_tokens` | `int` | Sum of input + output | Cargo unit ⚖️ |
+| `estimated_cost_usd` | `float` | Estimated cost based on model pricing | Feed bill 🌾 |
 
 **Why this matters:**
 
@@ -242,19 +254,23 @@ Example cost calculation (Claude 3.5 Sonnet):
 - Total per query = **$0.0135**
 - 100 queries/day = **$1.35/day**
 
+- 🫏 **Donkey:** The cargo manifest template — every field is typed and validated before the donkey is loaded, preventing mispackaged deliveries.
+
 ---
 
 ## Model 6: DocumentUploadResponse
 
 **What it is:** Returned after uploading a document.
 
-| Field | Type | Purpose |
-| --- | --- | --- |
-| `document_id` | `str` | Unique ID for this document |
-| `filename` | `str` | Original filename |
-| `status` | `DocumentStatus` | pending / processing / ready / failed |
-| `chunk_count` | `int` | How many searchable chunks were created |
-| `message` | `str` | Human-readable status |
+| Field | Type | Purpose | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `document_id` | `str` | Unique ID for this document | 🫏 On the route |
+| `filename` | `str` | Original filename | 🫏 On the route |
+| `status` | `DocumentStatus` | pending / processing / ready / failed | Hoof check 🔧 |
+| `chunk_count` | `int` | How many searchable chunks were created | Saddlebag piece 📦 |
+| `message` | `str` | Human-readable status | 🫏 On the route |
+
+- 🫏 **Donkey:** The parcels being ingested — split into saddlebag-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.
 
 ---
 
@@ -303,6 +319,8 @@ class Settings(BaseSettings):
     # Reads APP_PORT from env, falls back to 8000
 ```
 
+- 🫏 **Donkey:** The cargo manifest template — every field is typed and validated before the donkey is loaded, preventing mispackaged deliveries.
+
 ---
 
 ## How FastAPI uses Pydantic
@@ -319,3 +337,5 @@ This means you get:
 - Automatic request validation
 - Automatic response serialization
 - Type-safe code (your IDE knows every field)
+
+- 🫏 **Donkey:** The stable's front door — defined entry points where questions arrive and answers depart.

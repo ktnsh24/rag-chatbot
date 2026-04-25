@@ -32,18 +32,20 @@ Phase 1 measured the donkey. Phase 2 asked if it's useful and safe. Phase 3 is a
 **making the donkey get better over time** — and preparing for when the whole
 village starts using it.
 
-| Concept | Donkey version | What it really means | How it's calculated |
-| --- | --- | --- | --- |
-| **data flywheel** | A customer asks for "remote work policy" but the donkey has no such package on the shelf. It delivers the wrong thing. You **notice the failure**, go buy the right package, put it on the shelf, and next time the donkey delivers it perfectly. Each fix makes the system smarter. Repeat forever. | Detect bad answer → diagnose root cause → fix (add document, tune prompt) → verify with evaluation → lock with golden dataset → repeat. | Not a formula — it's a process loop. Detect (overall < 0.70) → diagnose (which sub-score failed?) → fix (add doc, tune prompt, adjust top_k) → evaluate (re-run same query) → lock (add to golden dataset). Each cycle = one flywheel turn. |
-| **before/after scores** | Before you added the remote work policy package: overall = 0.46 (❌ FAIL). After adding it: overall = 0.87 (✅ PASS). That delta IS the flywheel turning. If the score didn't improve — your fix didn't work. | Run the same evaluation before and after a change. The score delta proves your fix worked (or didn't). | `delta = score_after - score_before`. Positive = improvement. E.g. before: overall=0.46, after: overall=0.87 → **delta = +0.41**. Run the exact same question with the exact same evaluator to get a fair comparison. |
-| **golden dataset** | A **checklist of test deliveries** you run every morning. "Deliver refund policy — did it arrive? ✅. Deliver remote work policy — did it arrive? ✅." If tomorrow a delivery fails that passed yesterday — something broke overnight. | A curated set of question/expected-answer pairs that you run as regression tests. Like `dbt test` for your AI system. | `pass_count / total_cases × 100`. Run all golden questions through the pipeline, evaluate each. E.g. 18 of 20 pass → **90% pass rate**. If a case that passed yesterday now fails → regression detected. |
-| **RLHF (human feedback)** | After each delivery, the customer gives a **thumbs up 👍 or thumbs down 👎**. Over time, you learn: the donkey is great at refund questions but terrible at HR questions. You focus training on HR. | Reinforcement Learning from Human Feedback — collecting user ratings to identify weak spots and prioritise improvements. | `positive / (positive + negative) × 100` per category. E.g. refund questions: 45👍 / 50 total = **90%** satisfaction. HR questions: 3👍 / 20 total = **15%**. Focus improvement effort on lowest-rated categories. |
-| **scaling** | One donkey serves 10 villagers. What about 10,000? You need: **more donkeys** (horizontal scaling), **faster routes** (caching), **a traffic cop** (load balancer), and **a warehouse manager** (queue system). This is where your DE skills shine — ECS, SQS, auto-scaling are the same patterns. | Horizontal scaling (ECS tasks), caching (reduce redundant LLM calls), load balancing, queue-based processing — all standard DE infrastructure. | Throughput = `successful_requests / time_seconds`. Capacity test: increase concurrent users until p95 latency exceeds SLA. E.g. 50 concurrent → p95=2s ✅. 200 concurrent → p95=12s ❌. Scale trigger found at ~100 concurrent. |
+| Concept | Donkey version | What it really means | How it's calculated | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| **data flywheel** | A customer asks for "remote work policy" but the donkey has no such package on the shelf. It delivers the wrong thing. You **notice the failure**, go buy the right package, put it on the shelf, and next time the donkey delivers it perfectly. Each fix makes the system smarter. Repeat forever. | Detect bad answer → diagnose root cause → fix (add document, tune prompt) → verify with evaluation → lock with golden dataset → repeat. | Not a formula — it's a process loop. Detect (overall < 0.70) → diagnose (which sub-score failed?) → fix (add doc, tune prompt, adjust top_k) → evaluate (re-run same query) → lock (add to golden dataset). Each cycle = one flywheel turn. | Delivery note 📋 |
+| **before/after scores** | Before you added the remote work policy package: overall = 0.46 (❌ FAIL). After adding it: overall = 0.87 (✅ PASS). That delta IS the flywheel turning. If the score didn't improve — your fix didn't work. | Run the same evaluation before and after a change. The score delta proves your fix worked (or didn't). | `delta = score_after - score_before`. Positive = improvement. E.g. before: overall=0.46, after: overall=0.87 → **delta = +0.41**. Run the exact same question with the exact same evaluator to get a fair comparison. | Report card 📝 |
+| **golden dataset** | A **checklist of test deliveries** you run every morning. "Deliver refund policy — did it arrive? ✅. Deliver remote work policy — did it arrive? ✅." If tomorrow a delivery fails that passed yesterday — something broke overnight. | A curated set of question/expected-answer pairs that you run as regression tests. Like `dbt test` for your AI system. | `pass_count / total_cases × 100`. Run all golden questions through the pipeline, evaluate each. E.g. 18 of 20 pass → **90% pass rate**. If a case that passed yesterday now fails → regression detected. | Feed bill 🌾 |
+| **RLHF (human feedback)** | After each delivery, the customer gives a **thumbs up 👍 or thumbs down 👎**. Over time, you learn: the donkey is great at refund questions but terrible at HR questions. You focus training on HR. | Reinforcement Learning from Human Feedback — collecting user ratings to identify weak spots and prioritise improvements. | `positive / (positive + negative) × 100` per category. E.g. refund questions: 45👍 / 50 total = **90%** satisfaction. HR questions: 3👍 / 20 total = **15%**. Focus improvement effort on lowest-rated categories. | Feed bill 🌾 |
+| **scaling** | One donkey serves 10 villagers. What about 10,000? You need: **more donkeys** (horizontal scaling), **faster routes** (caching), **a traffic cop** (load balancer), and **a warehouse manager** (queue system). This is where your DE skills shine — ECS, SQS, auto-scaling are the same patterns. | Horizontal scaling (ECS tasks), caching (reduce redundant LLM calls), load balancing, queue-based processing — all standard DE infrastructure. | Throughput = `successful_requests / time_seconds`. Capacity test: increase concurrent users until p95 latency exceeds SLA. E.g. 50 concurrent → p95=2s ✅. 200 concurrent → p95=12s ❌. Scale trigger found at ~100 concurrent. | The donkey 🐴 |
 
 **The Phase 3 insight:** Building a chatbot is a weekend project. **Continuously
 improving** a chatbot — detect regression, fix it, lock the fix, scale it — that's
 what makes you an AI engineer. The donkey doesn't get smarter on its own. You turn
 the flywheel.
+
+- 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
 
 ---
 
@@ -84,12 +86,12 @@ In **Swagger UI** → `POST /api/evaluate`, enter:
 
 📝 **Record the failing scores:**
 
-| Score | Value |
-|---|---|
-| retrieval | ___ |
-| faithfulness | ___ |
-| overall | ___ |
-| passed | ___ |
+| Score | Value | 🫏 Donkey |
+|---|---| --- |
+| retrieval | ___ | 🫏 On the route |
+| faithfulness | ___ | Saddlebag match 🫏 |
+| overall | ___ | 🫏 On the route |
+| passed | ___ | 🫏 On the route |
 
 > **What to expect (local):** retrieval 0.40–0.60 (found something but not about remote work), faithfulness near 0.0 (answer not grounded), overall below 0.5 (FAIL). This is the correct failure — the document doesn't exist yet.
 
@@ -141,12 +143,12 @@ In **Swagger UI** → `POST /api/evaluate`, enter the same question again:
 
 📝 **Compare before and after:**
 
-| Score | Before (6a) | After (6c) | Improved? |
-|---|---|---|---|
-| retrieval | ___ | ___ | ___ |
-| faithfulness | ___ | ___ | ___ |
-| overall | ___ | ___ | ___ |
-| passed | ___ | ___ | ___ |
+| Score | Before (6a) | After (6c) | Improved? | 🫏 Donkey |
+|---|---|---|---| --- |
+| retrieval | ___ | ___ | ___ | 🫏 On the route |
+| faithfulness | ___ | ___ | ___ | Saddlebag match 🫏 |
+| overall | ___ | ___ | ___ | 🫏 On the route |
+| passed | ___ | ___ | ___ | 🫏 On the route |
 
 > **What to expect (local):** retrieval should improve modestly, faithfulness should jump dramatically (from near 0 to near 1.0), overall should go from FAIL to PASS. The biggest change is faithfulness — the LLM now has real source material to cite.
 
@@ -281,6 +283,8 @@ The data flywheel is a continuous improvement loop:
 > categories (policy, logistics, contact, product, multi_turn, edge_case, pii) — see
 > [Phase 5 Labs](hands-on-labs-phase-5.md) → Lab 16 for the full regression testing workflow.---
 
+- 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
+
 ## Lab 7: Reinforcement from Human Feedback (Conceptual)
 
 **Skill:** Understanding RLHF loops, user feedback integration
@@ -365,12 +369,12 @@ Your design: ___
 
 The feedback system is the **automated version** of what you did manually in Lab 6:
 
-| Lab 6 (manual) | Production (automated) |
-|---|---|
-| You noticed a question failed | Monitoring alerts on low scores |
-| You uploaded a missing document | Content team adds documents |
-| You re-evaluated | CI/CD re-runs evaluation suite |
-| You added to golden dataset | Script auto-adds 👎 cases to golden dataset |
+| Lab 6 (manual) | Production (automated) | 🫏 Donkey |
+|---|---| --- |
+| You noticed a question failed | Monitoring alerts on low scores | Tachograph 📊 |
+| You uploaded a missing document | Content team adds documents | 🫏 On the route |
+| You re-evaluated | CI/CD re-runs evaluation suite | Report card 📝 |
+| You added to golden dataset | Script auto-adds 👎 cases to golden dataset | Test delivery 🧪 |
 
 The human feedback replaces your manual observation. The flywheel spins automatically.
 
@@ -397,6 +401,8 @@ This is what companies mean by "reinforcement learning loops" for RAG systems. Y
 > (retrieval problem? hallucination? content gap?) → fix the system (add docs, tune prompts,
 > adjust chunking). No model retraining needed. This is the RAG advantage over fine-tuning.
 
+- 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
+
 ---
 
 ## Lab 8: Infrastructure Scaling (Your DE Superpower)
@@ -417,28 +423,28 @@ This is what companies mean by "reinforcement learning loops" for RAG systems. Y
 
 📝 **Fill in the "Your DE skill" column from your own experience:**
 
-| Scaling challenge | AI system need | Your DE skill that solves it |
-|---|---|---|
-| 1000 concurrent users | Horizontal scaling | ___ |
-| LLM calls are slow (2-5s) | Async processing | ___ |
-| Repeated questions | Caching | ___ |
-| Embedding 10,000 docs | Batch processing | ___ |
-| Vector store overload | Read replicas | ___ |
-| Cost explosion | Rate limiting | ___ |
-| Multi-region | Low latency globally | ___ |
+| Scaling challenge | AI system need | Your DE skill that solves it | 🫏 Donkey |
+|---|---|---| --- |
+| 1000 concurrent users | Horizontal scaling | ___ | 🫏 On the route |
+| LLM calls are slow (2-5s) | Async processing | ___ | The donkey 🐴 |
+| Repeated questions | Caching | ___ | 🫏 On the route |
+| Embedding 10,000 docs | Batch processing | ___ | GPS warehouse 🗺️ |
+| Vector store overload | Read replicas | ___ | GPS warehouse 🗺️ |
+| Cost explosion | Rate limiting | ___ | Feed bill 🌾 |
+| Multi-region | Low latency globally | ___ | 🫏 On the route |
 
 <details>
 <summary>Click to reveal the mapping</summary>
 
-| Scaling challenge | AI system need | Your DE skill that solves it |
-|---|---|---|
-| 1000 concurrent users | Horizontal scaling | ECS auto-scaling (you configure this daily) |
-| LLM calls are slow (2-5s) | Async processing | SQS queues + Lambda workers (you built this in proxy) |
-| Repeated questions | Caching | DynamoDB/ElastiCache — cache answer by question hash |
-| Embedding 10,000 docs | Batch processing | Kinesis/SQS batching (you built Kinesis in proxy) |
-| Vector store overload | Read replicas | OpenSearch replicas (same as RDS read replicas) |
-| Cost explosion | Rate limiting | API Gateway throttling (you configured this) |
-| Multi-region | Low latency globally | CloudFront + regional deployments (standard infra) |
+| Scaling challenge | AI system need | Your DE skill that solves it | 🫏 Donkey |
+|---|---|---| --- |
+| 1000 concurrent users | Horizontal scaling | ECS auto-scaling (you configure this daily) | 🫏 On the route |
+| LLM calls are slow (2-5s) | Async processing | SQS queues + Lambda workers (you built this in proxy) | The donkey 🐴 |
+| Repeated questions | Caching | DynamoDB/ElastiCache — cache answer by question hash | AWS depot 🏭 |
+| Embedding 10,000 docs | Batch processing | Kinesis/SQS batching (you built Kinesis in proxy) | GPS warehouse 🗺️ |
+| Vector store overload | Read replicas | OpenSearch replicas (same as RDS read replicas) | AWS search hub 🔍 |
+| Cost explosion | Rate limiting | API Gateway throttling (you configured this) | Feed bill 🌾 |
+| Multi-region | Low latency globally | CloudFront + regional deployments (standard infra) | Robot hand 🤖 |
 
 </details>
 
@@ -510,57 +516,61 @@ Everything else — ECS, SQS, DynamoDB, API Gateway, CloudWatch, Terraform — y
 > the database. S3 Vectors doesn't support filterable metadata. Neptune is for graph data, not
 > vector search.
 
+- 🫏 **Donkey:** Blueprints for building the stable — run one command and the whole building appears, fences and all.
+
 ---
 
 ## Phase 3 Labs — Skills Checklist
 
 After completing Labs 6, 7, and 8, check off:
 
-| # | Skill | Lab | Can you explain it? |
-|---|---|---|---|
-| 1 | Data flywheel (detect → fix → evaluate → lock → repeat) | Lab 6 | [ ] Yes |
-| 2 | Golden dataset growth from real usage | Lab 6 | [ ] Yes |
-| 3 | RLHF in RAG context (user feedback loops) | Lab 7 | [ ] Yes |
-| 4 | Feedback system design | Lab 7 | [ ] Yes |
-| 5 | Connection between feedback and data flywheel | Lab 7 | [ ] Yes |
-| 6 | Infrastructure scaling for AI (your DE superpower) | Lab 8 | [ ] Yes |
-| 7 | AI-specific scaling concerns (embeddings, tokens, async LLM) | Lab 8 | [ ] Yes |
+| # | Skill | Lab | Can you explain it? | 🫏 Donkey |
+|---|---|---|---| --- |
+| 1 | Data flywheel (detect → fix → evaluate → lock → repeat) | Lab 6 | [ ] Yes | Report card 📝 |
+| 2 | Golden dataset growth from real usage | Lab 6 | [ ] Yes | Test delivery 🧪 |
+| 3 | RLHF in RAG context (user feedback loops) | Lab 7 | [ ] Yes | Saddlebag check 🫏 |
+| 4 | Feedback system design | Lab 7 | [ ] Yes | Feed bill 🌾 |
+| 5 | Connection between feedback and data flywheel | Lab 7 | [ ] Yes | Feed bill 🌾 |
+| 6 | Infrastructure scaling for AI (your DE superpower) | Lab 8 | [ ] Yes | Stable blueprint 🏗️ |
+| 7 | AI-specific scaling concerns (embeddings, tokens, async LLM) | Lab 8 | [ ] Yes | The donkey 🐴 |
+
+- 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
 
 ---
 
 ## All Labs Complete — Full Skills Summary
 
-| # | Skill | Phase | Lab |
-|---|---|---|---|
-| 1 | Retrieval quality measurement | Phase 1 | Lab 1 |
-| 2 | Retrieval-faithfulness trade-off | Phase 1 | Lab 1 |
-| 3 | top_k tuning and its impact | Phase 1 | Lab 1 |
-| 4 | Hallucination detection | Phase 1 | Lab 2 |
-| 5 | Faithfulness scoring and weight | Phase 1 | Lab 2 |
-| 6 | Diagnosing retrieval vs generation problems | Phase 1 | Lab 2 |
-| 7 | Business-aligned metrics | Phase 2 | Lab 3 |
-| 8 | Translating AI metrics to business language | Phase 2 | Lab 3 |
-| 9 | Guardrails design (4 layers) | Phase 2 | Lab 4 |
-| 10 | Prompt injection awareness | Phase 2 | Lab 4 |
-| 11 | AI observability | Phase 2 | Lab 5 |
-| 12 | Dashboard and alert design for AI | Phase 2 | Lab 5 |
-| 13 | Data flywheel | Phase 3 | Lab 6 |
-| 14 | Golden dataset growth from real usage | Phase 3 | Lab 6 |
-| 15 | RLHF in RAG context | Phase 3 | Lab 7 |
-| 16 | Feedback system design | Phase 3 | Lab 7 |
-| 17 | Infrastructure scaling for AI | Phase 3 | Lab 8 |
-| 18 | AI-specific scaling concerns | Phase 3 | Lab 8 |
+| # | Skill | Phase | Lab | 🫏 Donkey |
+|---|---|---|---| --- |
+| 1 | Retrieval quality measurement | Phase 1 | Lab 1 | Saddlebag fetch 🎒 |
+| 2 | Retrieval-faithfulness trade-off | Phase 1 | Lab 1 | Saddlebag match 🫏 |
+| 3 | top_k tuning and its impact | Phase 1 | Lab 1 | 🫏 On the route |
+| 4 | Hallucination detection | Phase 1 | Lab 2 | Memory drift ⚠️ |
+| 5 | Faithfulness scoring and weight | Phase 1 | Lab 2 | Report card 📝 |
+| 6 | Diagnosing retrieval vs generation problems | Phase 1 | Lab 2 | 🫏 On the route |
+| 7 | Business-aligned metrics | Phase 2 | Lab 3 | Tachograph 📊 |
+| 8 | Translating AI metrics to business language | Phase 2 | Lab 3 | Tachograph 📊 |
+| 9 | Guardrails design (4 layers) | Phase 2 | Lab 4 | Gate rule 🚧 |
+| 10 | Prompt injection awareness | Phase 2 | Lab 4 | Delivery note 📋 |
+| 11 | AI observability | Phase 2 | Lab 5 | 🫏 On the route |
+| 12 | Dashboard and alert design for AI | Phase 2 | Lab 5 | 🫏 On the route |
+| 13 | Data flywheel | Phase 3 | Lab 6 | 🫏 On the route |
+| 14 | Golden dataset growth from real usage | Phase 3 | Lab 6 | Test delivery 🧪 |
+| 15 | RLHF in RAG context | Phase 3 | Lab 7 | Saddlebag check 🫏 |
+| 16 | Feedback system design | Phase 3 | Lab 7 | Feed bill 🌾 |
+| 17 | Infrastructure scaling for AI | Phase 3 | Lab 8 | Stable blueprint 🏗️ |
+| 18 | AI-specific scaling concerns | Phase 3 | Lab 8 | 🫏 On the route |
 
 **Additional skills not covered in the rag-chatbot but important to know about:**
 
-| # | Skill | What it is | Covered in future projects? | Where to learn it |
-| --- | --- | --- | --- | --- |
-| 19 | **A/B testing for AI** | Deploy two prompt versions, measure which performs better | ✅ Yes — when deploying to AWS/Azure, you'll set up traffic splitting with API Gateway / Azure Front Door | Same as A/B testing in web — split traffic, compare metrics |
-| 20 | **Model versioning** | Track which model version produced which answers | ✅ Yes — V2 of rag-chatbot will add MLflow integration for experiment tracking | MLflow, Weights & Biases, or simple git tags |
-| 21 | **Embedding drift detection** | New documents change the vector space — old embeddings may become stale | ✅ Partially — Lab 5's retrieval monitoring concept extends directly to drift alerts. Full implementation in V2 with scheduled re-evaluation | Monitor average retrieval scores over time (Lab 5 concept) |
-| 22 | **Cost optimisation** | Prompt compression, caching, model routing (cheap model for easy questions, expensive for hard) | ✅ Yes — when deploying to AWS Bedrock or Azure OpenAI, cost tracking becomes real (see [Cost Estimation](hands-on-labs-phase-1.md#cost-estimation--local-vs-cloud)) | Extend `src/rag/chain.py` with model routing logic |
-| 23 | **Multi-modal RAG** | Images, tables, PDFs with charts — not just text | ⬜ Future project — requires a separate repo with vision models (GPT-4o, Claude 3.5 Sonnet) | Not in current rag-chatbot scope |
-| 24 | **Compliance & audit logging** | Log every AI decision for regulatory compliance | ✅ Partially — the logging middleware already captures request/response. Full audit trail (immutable, tamper-proof) is a V2 feature | Extend `src/api/middleware/` to log full request/response |
+| # | Skill | What it is | Covered in future projects? | Where to learn it | 🫏 Donkey |
+| --- | --- | --- | --- | --- | --- |
+| 19 | **A/B testing for AI** | Deploy two prompt versions, measure which performs better | ✅ Yes — when deploying to AWS/Azure, you'll set up traffic splitting with API Gateway / Azure Front Door | Same as A/B testing in web — split traffic, compare metrics | Delivery note 📋 |
+| 20 | **Model versioning** | Track which model version produced which answers | ✅ Yes — V2 of rag-chatbot will add MLflow integration for experiment tracking | MLflow, Weights & Biases, or simple git tags | Saddlebag check 🫏 |
+| 21 | **Embedding drift detection** | New documents change the vector space — old embeddings may become stale | ✅ Partially — Lab 5's retrieval monitoring concept extends directly to drift alerts. Full implementation in V2 with scheduled re-evaluation | Monitor average retrieval scores over time (Lab 5 concept) | Saddlebag fetch 🎒 |
+| 22 | **Cost optimisation** | Prompt compression, caching, model routing (cheap model for easy questions, expensive for hard) | ✅ Yes — when deploying to AWS Bedrock or Azure OpenAI, cost tracking becomes real (see [Cost Estimation](hands-on-labs-phase-1.md#cost-estimation--local-vs-cloud)) | Extend `src/rag/chain.py` with model routing logic | The donkey 🐴 |
+| 23 | **Multi-modal RAG** | Images, tables, PDFs with charts — not just text | ⬜ Future project — requires a separate repo with vision models (GPT-4o, Claude 3.5 Sonnet) | Not in current rag-chatbot scope | The donkey 🐴 |
+| 24 | **Compliance & audit logging** | Log every AI decision for regulatory compliance | ✅ Partially — the logging middleware already captures request/response. Full audit trail (immutable, tamper-proof) is a V2 feature | Extend `src/api/middleware/` to log full request/response | Stable door 🚪 |
 
 > ### 📋 Skills Coverage Summary
 >
@@ -578,6 +588,8 @@ After completing Labs 6, 7, and 8, check off:
 >
 > **Not yet covered:** Skill 23 (multi-modal RAG) requires a different architecture
 > and vision-capable models. This would be a separate project/repo.
+
+- 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
 
 ---
 

@@ -27,13 +27,15 @@
 
 This is the file where **your DE skills apply most directly.** The ingestion pipeline is an **ETL pipeline** — it reads data (Extract), transforms it (chunk + embed), and loads it (store vectors). The only difference from your daily DE work is *what* the transform does.
 
-| What you'll learn | DE parallel |
-|---|---|
-| Reading multiple file formats | Reading CSV, JSON, Parquet |
-| Chunking text into pieces | Partitioning data into batches |
-| Why chunk size matters | Why partition size matters |
-| Why overlap exists | Why you keep boundary records in adjacent partitions |
-| The full ingest pipeline | The full ETL pipeline |
+| What you'll learn | DE parallel | 🫏 Donkey |
+|---|---| --- |
+| Reading multiple file formats | Reading CSV, JSON, Parquet | 🫏 On the route |
+| Chunking text into pieces | Partitioning data into batches | Saddlebag piece 📦 |
+| Why chunk size matters | Why partition size matters | Saddlebag piece 📦 |
+| Why overlap exists | Why you keep boundary records in adjacent partitions | Saddlebag piece 📦 |
+| The full ingest pipeline | The full ETL pipeline | Pre-sort 📮 |
+
+- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -59,6 +61,8 @@ LOAD                                         LOAD
 
 **The pattern is identical.** The domain is different.
 
+- 🫏 **Donkey:** Running multiple donkeys on the same route to confirm that AI engineering and data engineering practices mirror each other.
+
 ---
 
 ## The Three Stages: Read → Chunk → Embed
@@ -76,6 +80,8 @@ LOAD                                         LOAD
   read_document()         chunk_document()        get_embeddings_batch()   store_vectors()
   (this file)             (this file)             (llm provider)           (vectorstore/)
 ```
+
+- 🫏 **Donkey:** Saddlebag-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
 
 ---
 
@@ -100,11 +106,11 @@ def read_document(filename: str, content: bytes) -> str:
 
 Takes raw file bytes and extracts plain text. That's it.
 
-| File type | How it's read | DE parallel |
-|---|---|---|
-| `.pdf` | `pypdf` library → extracts text per page | Like reading Parquet → extract columns |
-| `.txt`, `.md`, `.csv` | `content.decode("utf-8")` | Like reading a CSV as text |
-| `.docx` | `python-docx` library → extracts paragraphs | Like reading Excel → extract cells |
+| File type | How it's read | DE parallel | 🫏 Donkey |
+|---|---|---| --- |
+| `.pdf` | `pypdf` library → extracts text per page | Like reading Parquet → extract columns | 🫏 On the route |
+| `.txt`, `.md`, `.csv` | `content.decode("utf-8")` | Like reading a CSV as text | 🫏 On the route |
+| `.docx` | `python-docx` library → extracts paragraphs | Like reading Excel → extract cells | Saddlebag check 🫏 |
 
 **DE parallel:** This is your "source connector." In DE work, you have connectors for Kinesis, DynamoDB, S3. Here, you have connectors for PDF, Word, text. Same pattern — abstract away the source format, output a standard format (plain text / rows).
 
@@ -122,6 +128,8 @@ def _read_pdf(content: bytes) -> str:
 ```
 
 **Key detail:** It adds `[Page N]` markers. This means chunks will carry page references — so the LLM can cite "according to Page 3" in its answer.
+
+- 🫏 **Donkey:** The parcels being ingested — split into saddlebag-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.
 
 ---
 
@@ -167,6 +175,8 @@ OUTPUT: List of smaller strings (e.g., 18 chunks of ~1000 characters each)
  Chunk 18: "...for international orders, processing may take longer."    (~600 chars)
 ```
 
+- 🫏 **Donkey:** Saddlebag-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
+
 ---
 
 ## Concept 1: Why Chunking Matters — The Core AI Decision
@@ -199,15 +209,17 @@ Reason 3: COST
 
 ### Chunk size — the most important AI tuning parameter
 
-| chunk_size | Effect on retrieval | Effect on answers | Effect on cost |
-|---|---|---|---|
-| 200 | Very precise — finds exact sentences | May lose context (split between chunks) | Cheapest per query |
-| 500 | Precise — paragraph-level | Usually enough context | Cheap |
-| **1000** | **Good balance (this repo's default)** | **Full paragraphs with context** | **Moderate** |
-| 2000 | Less precise — section-level | Always has full context | More expensive |
-| 5000 | Imprecise — chapter-level | Too much noise | Expensive |
+| chunk_size | Effect on retrieval | Effect on answers | Effect on cost | 🫏 Donkey |
+|---|---|---|---| --- |
+| 200 | Very precise — finds exact sentences | May lose context (split between chunks) | Cheapest per query | Saddlebag piece 📦 |
+| 500 | Precise — paragraph-level | Usually enough context | Cheap | Saddlebag check 🫏 |
+| **1000** | **Good balance (this repo's default)** | **Full paragraphs with context** | **Moderate** | Saddlebag check 🫏 |
+| 2000 | Less precise — section-level | Always has full context | More expensive | 🫏 On the route |
+| 5000 | Imprecise — chapter-level | Too much noise | Expensive | 🫏 On the route |
 
 **There is no universally correct chunk_size.** An AI engineer experiments with different values and measures the impact using the [Evaluation Framework](evaluation-framework-deep-dive.md).
+
+- 🫏 **Donkey:** Saddlebag-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
 
 ---
 
@@ -241,6 +253,8 @@ The overlap means the last 200 characters of chunk N appear again at the start o
 **Trade-off:** More overlap = more chunks = more vectors = more storage + embedding cost. But `200/1000 = 20%` overhead is a good balance.
 
 **DE parallel:** This is like partition overlap in streaming systems. When processing time windows, you often include events from the edge of the previous window to avoid missing events that span the boundary.
+
+- 🫏 **Donkey:** Saddlebag-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
 
 ---
 
@@ -280,6 +294,8 @@ Step 5: Split on "" (characters) — emergency fallback
 
 **Why "recursive"?** Because it tries each separator in order, recursing to the next one if the chunks are still too big. It's a hierarchy of split strategies, not a single rule.
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## The Full Pipeline: End to End
@@ -316,28 +332,32 @@ Later, when user asks "What is the refund policy?":
 
 ### The numbers for a real scenario
 
-| Metric | Value |
-|---|---|
-| Document size | 15,000 characters (5 pages) |
-| Chunks created | 18 (chunk_size=1000, overlap=200) |
-| Vectors stored | 18 × 1024 floats = 18,432 numbers |
-| Embedding cost | $0.00009 |
-| Storage size | ~74 KB (18 × 4096 bytes per vector) |
-| Ingestion time | ~3 seconds |
-| If 500 documents | 500 × 18 = 9,000 vectors, ~$0.045 total, ~25 minutes |
+| Metric | Value | 🫏 Donkey |
+|---|---| --- |
+| Document size | 15,000 characters (5 pages) | 🫏 On the route |
+| Chunks created | 18 (chunk_size=1000, overlap=200) | Saddlebag piece 📦 |
+| Vectors stored | 18 × 1024 floats = 18,432 numbers | GPS warehouse 🗺️ |
+| Embedding cost | $0.00009 | Feed bill 🌾 |
+| Storage size | ~74 KB (18 × 4096 bytes per vector) | Saddlebag check 🫏 |
+| Ingestion time | ~3 seconds | Pre-sort 📮 |
+| If 500 documents | 500 × 18 = 9,000 vectors, ~$0.045 total, ~25 minutes | Feed bill 🌾 |
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
 ## Self-Test Questions
 
-| Question | Answer | Concept it tests |
-|---|---|---|
-| "Why chunk_size=1000 and not 500 or 2000?" | Trade-off: 500 is more precise but loses context. 2000 has more context but less precise retrieval. 1000 is the default balance — but you should TEST with your data. | Chunk size tuning |
-| "What happens if chunk_overlap=0?" | Sentences at chunk boundaries get cut in half. The LLM gets incomplete information. Answers degrade at boundary points. | Overlap purpose |
-| "Why use RecursiveCharacterTextSplitter instead of just slicing every 1000 chars?" | Blind slicing cuts words and sentences in half. Recursive splitter finds natural boundaries (paragraphs → sentences → words). | Smart splitting |
-| "What happens if a PDF has tables?" | `pypdf` extracts table text as plain text — rows become lines, columns become spaces. Structure is mostly lost. This is a known limitation. | Document parsing |
-| "How is this different from an ETL pipeline?" | It's NOT different in structure. Extract (read file) → Transform (chunk + embed) → Load (store vectors). Only the transform step is AI-specific. | DE → AI bridge |
-| "What's the most expensive step?" | Embedding is cheap ($0.00002/1K tokens). The expensive part is storing in OpenSearch (~$350/month minimum) and later sending chunks to the LLM for generation. | Cost awareness |
+| Question | Answer | Concept it tests | 🫏 Donkey |
+|---|---|---| --- |
+| "Why chunk_size=1000 and not 500 or 2000?" | Trade-off: 500 is more precise but loses context. 2000 has more context but less precise retrieval. 1000 is the default balance — but you should TEST with your data. | Chunk size tuning | Saddlebag piece 📦 |
+| "What happens if chunk_overlap=0?" | Sentences at chunk boundaries get cut in half. The LLM gets incomplete information. Answers degrade at boundary points. | Overlap purpose | The donkey 🐴 |
+| "Why use RecursiveCharacterTextSplitter instead of just slicing every 1000 chars?" | Blind slicing cuts words and sentences in half. Recursive splitter finds natural boundaries (paragraphs → sentences → words). | Smart splitting | Saddlebag check 🫏 |
+| "What happens if a PDF has tables?" | `pypdf` extracts table text as plain text — rows become lines, columns become spaces. Structure is mostly lost. This is a known limitation. | Document parsing | 🫏 On the route |
+| "How is this different from an ETL pipeline?" | It's NOT different in structure. Extract (read file) → Transform (chunk + embed) → Load (store vectors). Only the transform step is AI-specific. | DE → AI bridge | Saddlebag piece 📦 |
+| "What's the most expensive step?" | Embedding is cheap ($0.00002/1K tokens). The expensive part is storing in OpenSearch (~$350/month minimum) and later sending chunks to the LLM for generation. | Cost awareness | The donkey 🐴 |
+
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -365,3 +385,5 @@ You've now completed all 5 Phase 2 "bridge" files. You understand:
 - [Documents Endpoint](../architecture-and-design/api-routes/documents-endpoint-explained.md)
 - [The LLM Interface (file #7)](llm-interface-deep-dive.md)
 - [The Vector Store Interface (file #9)](vectorstore-interface-deep-dive.md)
+
+- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

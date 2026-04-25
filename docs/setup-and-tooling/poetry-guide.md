@@ -26,20 +26,24 @@ Poetry is a **package manager for Python**. It does three things:
 
 Think of it as npm/yarn for Python.
 
+- 🫏 **Donkey:** The supply shed manifest — every tool and library is pinned to an exact version so any stable can reproduce the same setup.
+
 ---
 
 ## Poetry vs pip — what is different
 
-| Task | pip (old way) | Poetry (this project) |
-| --- | --- | --- |
-| Define dependencies | `requirements.txt` (manual) | `pyproject.toml` (structured) |
-| Lock exact versions | `pip freeze > requirements.txt` (fragile) | `poetry.lock` (automatic) |
-| Install dependencies | `pip install -r requirements.txt` | `poetry install` |
-| Add a package | Edit requirements.txt + `pip install` | `poetry add <package>` |
-| Remove a package | Edit requirements.txt + `pip uninstall` | `poetry remove <package>` |
-| Create venv | `python -m venv .venv` (manual) | `poetry install` (automatic) |
-| Run a command in venv | `source .venv/bin/activate && python` | `poetry run python` |
-| Separate dev deps | Multiple requirements files | `[tool.poetry.group.dev.dependencies]` |
+| Task | pip (old way) | Poetry (this project) | 🫏 Donkey |
+| --- | --- | --- | --- |
+| Define dependencies | `requirements.txt` (manual) | `pyproject.toml` (structured) | 🫏 On the route |
+| Lock exact versions | `pip freeze > requirements.txt` (fragile) | `poetry.lock` (automatic) | Saddlebag check 🫏 |
+| Install dependencies | `pip install -r requirements.txt` | `poetry install` | Supply manifest 📜 |
+| Add a package | Edit requirements.txt + `pip install` | `poetry add <package>` | Supply manifest 📜 |
+| Remove a package | Edit requirements.txt + `pip uninstall` | `poetry remove <package>` | Supply manifest 📜 |
+| Create venv | `python -m venv .venv` (manual) | `poetry install` (automatic) | Supply manifest 📜 |
+| Run a command in venv | `source .venv/bin/activate && python` | `poetry run python` | Supply manifest 📜 |
+| Separate dev deps | Multiple requirements files | `[tool.poetry.group.dev.dependencies]` | Supply manifest 📜 |
+
+- 🫏 **Donkey:** The supply shed manifest — every tool and library is pinned to an exact version so any stable can reproduce the same setup.
 
 ---
 
@@ -90,6 +94,8 @@ This is the virtual environment. It contains:
 └── pyvenv.cfg
 ```
 
+- 🫏 **Donkey:** The supply shed manifest — every tool and library is pinned to an exact version so any stable can reproduce the same setup.
+
 ---
 
 ## pyproject.toml explained
@@ -127,6 +133,8 @@ ruff = "^0.6.0"               # Linter — not needed in production
 [tool.poetry.scripts]
 start = "src.main:run"        # `poetry run start` calls src/main.py → run()
 ```
+
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
 
 ---
 
@@ -230,6 +238,8 @@ poetry show --tree
 poetry check
 ```
 
+- 🫏 **Donkey:** The supply shed manifest — every tool and library is pinned to an exact version so any stable can reproduce the same setup.
+
 ---
 
 ## How Poetry manages the virtual environment
@@ -260,6 +270,8 @@ poetry run python -c "import fastapi; print(fastapi.__version__)"
 
 `poetry run` automatically uses the correct Python from `.venv/` without needing to activate.
 
+- 🫏 **Donkey:** The supply shed manifest — every tool and library is pinned to an exact version so any stable can reproduce the same setup.
+
 ---
 
 ## Adding a new package
@@ -284,6 +296,8 @@ poetry add redis
 git add pyproject.toml poetry.lock
 git commit -m "feat: add Redis support"
 ```
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -321,3 +335,5 @@ poetry install
 poetry cache clear --all pypi
 poetry install
 ```
+
+- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and saddle inspection checklist to find what went wrong.

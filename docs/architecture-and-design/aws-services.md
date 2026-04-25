@@ -15,17 +15,19 @@
 
 ## Overview
 
-| Service | Purpose in this project | Cost model |
-| --- | --- | --- |
-| **Bedrock** | LLM inference (Claude) + embeddings (Titan) | Pay per token |
-| **S3** | Store uploaded documents | Pay per GB stored |
-| **DynamoDB** | Conversation history + **vector store** (cheap mode) | Pay per request |
-| **OpenSearch Serverless** | Vector store for embeddings (production) | Pay per OCU-hour |
-| **ECS Fargate** | Host the FastAPI container | Pay per vCPU/memory-hour |
-| **ECR** | Docker image registry | Pay per GB stored |
-| **Lambda** | Event-driven document ingestion | Pay per invocation |
-| **CloudWatch** | Logs, metrics, dashboards, alerts | Free tier generous |
-| **IAM** | Permissions and roles | Free |
+| Service | Purpose in this project | Cost model | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **Bedrock** | LLM inference (Claude) + embeddings (Titan) | Pay per token | The donkey 🐴 |
+| **S3** | Store uploaded documents | Pay per GB stored | Parcel shelf 📦 |
+| **DynamoDB** | Conversation history + **vector store** (cheap mode) | Pay per request | AWS depot 🏭 |
+| **OpenSearch Serverless** | Vector store for embeddings (production) | Pay per OCU-hour | AWS search hub 🔍 |
+| **ECS Fargate** | Host the FastAPI container | Pay per vCPU/memory-hour | Stable stall 🐎 |
+| **ECR** | Docker image registry | Pay per GB stored | Stable address 🏷️ |
+| **Lambda** | Event-driven document ingestion | Pay per invocation | Pre-sort 📮 |
+| **CloudWatch** | Logs, metrics, dashboards, alerts | Free tier generous | Tachograph 📊 |
+| **IAM** | Permissions and roles | Free | Free hay 🌿 |
+
+- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -59,12 +61,12 @@ response = self._runtime_client.converse(
 
 ### Models available
 
-| Model | Use case | Input cost | Output cost |
-| --- | --- | --- | --- |
-| Claude 3.5 Sonnet v2 | Best for RAG (accurate, fast) | $0.003/1K | $0.015/1K |
-| Claude 3 Haiku | Cheaper, faster, less accurate | $0.00025/1K | $0.00125/1K |
-| Titan Text Embeddings v2 | Convert text to vectors | $0.00002/1K | N/A |
-| Llama 3.1 70B | Open source alternative | $0.00099/1K | $0.00099/1K |
+| Model | Use case | Input cost | Output cost | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| Claude 3.5 Sonnet v2 | Best for RAG (accurate, fast) | $0.003/1K | $0.015/1K | The donkey 🐴 |
+| Claude 3 Haiku | Cheaper, faster, less accurate | $0.00025/1K | $0.00125/1K | The donkey 🐴 |
+| Titan Text Embeddings v2 | Convert text to vectors | $0.00002/1K | N/A | Free hay 🌿 |
+| Llama 3.1 70B | Open source alternative | $0.00099/1K | $0.00099/1K | The donkey 🐴 |
 
 ### IAM permissions needed
 
@@ -82,6 +84,8 @@ response = self._runtime_client.converse(
 ### How to enable model access
 
 Bedrock models are opt-in. Go to AWS Console → Bedrock → Model access → Request access to Claude and Titan.
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -118,6 +122,8 @@ Features enabled:
 - Free tier: 5 GB for 12 months
 - For this project: essentially free (documents are small)
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## Amazon DynamoDB
@@ -139,13 +145,13 @@ Sort Key: timestamp (String)
 TTL: expires_at (auto-delete old conversations)
 ```
 
-| Field | Type | Purpose |
-| --- | --- | --- |
-| `session_id` | String (PK) | Groups messages in a conversation |
-| `timestamp` | String (SK) | Orders messages chronologically |
-| `role` | String | "user" or "assistant" |
-| `content` | String | The message text |
-| `expires_at` | Number | TTL — auto-delete after 7 days |
+| Field | Type | Purpose | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `session_id` | String (PK) | Groups messages in a conversation | Trip log 📒 |
+| `timestamp` | String (SK) | Orders messages chronologically | 🫏 On the route |
+| `role` | String | "user" or "assistant" | 🫏 On the route |
+| `content` | String | The message text | 🫏 On the route |
+| `expires_at` | Number | TTL — auto-delete after 7 days | 🫏 On the route |
 
 ### Why DynamoDB and not PostgreSQL?
 
@@ -159,6 +165,8 @@ TTL: expires_at (auto-delete old conversations)
 
 - On-demand: $1.25 per million writes, $0.25 per million reads
 - Free tier covers most personal use
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -209,6 +217,8 @@ Only deploy OpenSearch Serverless when you need cloud-based vector search.
 }
 ```
 
+- 🫏 **Donkey:** The warehouse robot dispatched to find the right saddlebag shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+
 ---
 
 ## Amazon ECS Fargate
@@ -223,16 +233,18 @@ Host the FastAPI application in production.
 
 ### Fargate vs EC2
 
-| | Fargate (our choice) | EC2 |
-| --- | --- | --- |
-| Server management | None | You manage instances |
-| Scaling | Automatic | Configure auto-scaling groups |
-| Cost | Pay per vCPU/memory-hour | Pay per instance-hour |
-| Minimum | ~$30/month (0.25 vCPU) | ~$10/month (t3.micro) |
+| | Fargate (our choice) | EC2 | 🫏 Donkey |
+| --- | --- | --- | --- |
+| Server management | None | You manage instances | 🫏 On the route |
+| Scaling | Automatic | Configure auto-scaling groups | 🫏 On the route |
+| Cost | Pay per vCPU/memory-hour | Pay per instance-hour | Feed bill 🌾 |
+| Minimum | ~$30/month (0.25 vCPU) | ~$10/month (t3.micro) | 🫏 On the route |
 
 ### Why Fargate
 
 For a single container app, Fargate is simpler. No SSH, no patches, no instance management.
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -258,6 +270,8 @@ AWS's monitoring service — logs, metrics, dashboards, and alarms.
 
 Generous enough for personal use.
 
+- 🫏 **Donkey:** Running the donkey on rented pasture — AWS or Azure provides the stable so you only pay for the hay consumed.
+
 ---
 
 ## AWS IAM
@@ -270,12 +284,14 @@ Identity and Access Management — controls who can do what in AWS.
 
 The ECS task has an IAM role with these permissions:
 
-| Permission | Resource | Why |
-| --- | --- | --- |
-| `s3:GetObject`, `s3:PutObject` | Documents bucket | Read/write documents |
-| `dynamodb:GetItem`, `dynamodb:PutItem`, `dynamodb:Query` | Conversations table | Read/write history |
-| `bedrock:InvokeModel` | All models | Call Claude and Titan |
+| Permission | Resource | Why | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `s3:GetObject`, `s3:PutObject` | Documents bucket | Read/write documents | Parcel shelf 📦 |
+| `dynamodb:GetItem`, `dynamodb:PutItem`, `dynamodb:Query` | Conversations table | Read/write history | AWS depot 🏭 |
+| `bedrock:InvokeModel` | All models | Call Claude and Titan | The donkey 🐴 |
 
 ### Principle of least privilege
 
 Each permission is scoped to the specific resource (bucket ARN, table ARN). The role can't access any other S3 buckets or DynamoDB tables.
+
+- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.

@@ -31,13 +31,15 @@
 
 In data engineering, you monitor pipeline runs, row counts, and job durations. In AI engineering, you monitor **the same things** plus AI-specific metrics: token usage, response latency, estimated cost, and quality scores. This file is the central metrics collector — every route records metrics through it.
 
-| What you'll learn | DE parallel |
-|---|---|
-| Request counting and error rates | Pipeline run counts and failure rates |
-| Latency tracking (P50/P95/P99) | Job duration monitoring |
-| Token usage tracking | Row count / byte count tracking |
-| Cost estimation per request | Cloud cost per pipeline run |
-| In-memory metrics collection | StatsD / Prometheus client |
+| What you'll learn | DE parallel | 🫏 Donkey |
+|---|---| --- |
+| Request counting and error rates | Pipeline run counts and failure rates | Robot hand 🤖 |
+| Latency tracking (P50/P95/P99) | Job duration monitoring | Tachograph 📊 |
+| Token usage tracking | Row count / byte count tracking | Cargo unit ⚖️ |
+| Cost estimation per request | Cloud cost per pipeline run | Feed bill 🌾 |
+| In-memory metrics collection | StatsD / Prometheus client | Tachograph 📊 |
+
+- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -59,6 +61,8 @@ Pipeline monitoring:                       RAG monitoring:
 Monitored via:                             Monitored via:
   CloudWatch / Datadog / Grafana             GET /health (this file's output)
 ```
+
+- 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
 
 ---
 
@@ -89,6 +93,8 @@ src/monitoring/metrics.py
       ├── record_document_ingestion() ← Called after every document upload
       └── get_summary()            ← Called by GET /health
 ```
+
+- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the saddlebags are loaded, and which route it takes to the customer.
 
 ---
 
@@ -121,6 +127,8 @@ CREATE TABLE metrics (
 
 **In practice,** `MetricPoint` isn't heavily used in this codebase — the `MetricsCollector` aggregates directly. But the dataclass exists for future export to external systems (CloudWatch, Application Insights, Prometheus).
 
+- 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
+
 ---
 
 ## The `MetricsCollector` Class
@@ -149,6 +157,8 @@ class MetricsCollector:
 # In-memory (this file)          # Persistent (production)
 rows_processed += 1              cursor.execute("UPDATE metrics SET count = count + 1")
 ```
+
+- 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
 
 ---
 
@@ -182,13 +192,15 @@ metrics.record_chat_request(
 
 **What gets tracked:**
 
-| Counter | What it measures | Why it matters |
-|---|---|---|
-| `_chat_requests` | Total queries served | Throughput — are people using the system? |
-| `_latencies` | Response time in ms | UX — are responses fast enough? |
-| `_total_input_tokens` | Cumulative tokens sent to LLM | Cost driver — input tokens are cheaper |
-| `_total_output_tokens` | Cumulative tokens received from LLM | Cost driver — output tokens are 3-5x more expensive |
-| `_total_estimated_cost` | Running cost total | Budget tracking — are we within SLA? |
+| Counter | What it measures | Why it matters | 🫏 Donkey |
+|---|---|---| --- |
+| `_chat_requests` | Total queries served | Throughput — are people using the system? | Feed bill 🌾 |
+| `_latencies` | Response time in ms | UX — are responses fast enough? | 🫏 On the route |
+| `_total_input_tokens` | Cumulative tokens sent to LLM | Cost driver — input tokens are cheaper | The donkey 🐴 |
+| `_total_output_tokens` | Cumulative tokens received from LLM | Cost driver — output tokens are 3-5x more expensive | The donkey 🐴 |
+| `_total_estimated_cost` | Running cost total | Budget tracking — are we within SLA? | Feed bill 🌾 |
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -206,13 +218,15 @@ def record_chat_error(self) -> None:
 error_rate = _chat_errors / _chat_requests
 ```
 
-| Error rate | Status | Action |
-|---|---|---|
-| < 1% | ✅ Healthy | Normal operation |
-| 1-5% | ⚠️ Warning | Investigate — LLM timeouts? |
-| > 5% | 🔴 Critical | Page on-call — system is degraded |
+| Error rate | Status | Action | 🫏 Donkey |
+|---|---|---| --- |
+| < 1% | ✅ Healthy | Normal operation | Donkey check ✅ |
+| 1-5% | ⚠️ Warning | Investigate — LLM timeouts? | The donkey 🐴 |
+| > 5% | 🔴 Critical | Page on-call — system is degraded | 🫏 On the route |
 
 **DE parallel:** Same as pipeline failure rate. If more than 5% of Airflow DAG runs fail, something is wrong.
+
+- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and saddle inspection checklist to find what went wrong.
 
 ---
 
@@ -234,6 +248,8 @@ metrics.record_document_ingestion(chunk_count=200)
 ```
 
 **Why track chunk count?** Because it directly correlates to vector store size and search performance. 10,000 chunks search faster than 1,000,000 chunks.
+
+- 🫏 **Donkey:** Post office pre-sorting: mail is split into saddlebag-sized chunks, stamped with GPS coordinates (embeddings), and shelved in the warehouse before the donkey ever arrives.
 
 ---
 
@@ -297,6 +313,8 @@ def get_summary(self) -> dict:
 }
 ```
 
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+
 ---
 
 ## Percentile Calculations
@@ -336,6 +354,8 @@ SELECT
     PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY duration) AS p99
 FROM pipeline_runs;
 ```
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -385,17 +405,19 @@ metrics = request.app.state.metrics
 metrics.record_chat_request(...)
 ```
 
+- 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
+
 ---
 
 ## Cloud vs Local — Export Targets
 
 The `MetricsCollector` stores metrics in-memory. To make them persistent, you'd export to an external system:
 
-| Provider | Export target | How | Cost |
-|---|---|---|---|
-| **AWS** | CloudWatch Metrics | `boto3.client('cloudwatch').put_metric_data()` | ~$0.30/metric/month |
-| **Azure** | Application Insights | `opencensus` or `azure-monitor-opentelemetry` | ~$2.30/GB ingested |
-| **Local** | Console / Prometheus | `print()` or Prometheus client library | **$0** |
+| Provider | Export target | How | Cost | 🫏 Donkey |
+|---|---|---|---| --- |
+| **AWS** | CloudWatch Metrics | `boto3.client('cloudwatch').put_metric_data()` | ~$0.30/metric/month | Tachograph 📊 |
+| **Azure** | Application Insights | `opencensus` or `azure-monitor-opentelemetry` | ~$2.30/GB ingested | Pre-sort 📮 |
+| **Local** | Console / Prometheus | `print()` or Prometheus client library | **$0** | Tachograph 📊 |
 
 ### 🏠 Local development — console export
 
@@ -436,20 +458,22 @@ exporter = metrics_exporter.new_metrics_exporter(
 
 **The in-memory approach works for development and single-instance deployments.** For production with multiple ECS tasks or Azure Container Instances, you'd need external storage.
 
+- 🫏 **Donkey:** Running the donkey on rented pasture — AWS or Azure provides the stable so you only pay for the hay consumed.
+
 ---
 
 ## AI-Specific Metrics — What to Watch
 
 These are metrics that **don't exist in traditional software** but are critical for AI applications:
 
-| Metric | What it measures | Alert threshold | Why |
-|---|---|---|---|
-| **Token usage / request** | How much context + answer per query | > 2000 tokens/request | Cost growth |
-| **Cost per query** | $ per chat interaction | > $0.02/query | Budget overrun |
-| **Input/output ratio** | Input tokens ÷ output tokens | > 10:1 means verbose context | Over-retrieval |
-| **Latency P99** | Worst-case response time | > 10s | UX degradation |
-| **Error rate** | Failures / total requests | > 5% | System reliability |
-| **Chunks per document** | Average chunk count | > 500/doc | Storage bloat |
+| Metric | What it measures | Alert threshold | Why | 🫏 Donkey |
+|---|---|---|---| --- |
+| **Token usage / request** | How much context + answer per query | > 2000 tokens/request | Cost growth | Cargo unit ⚖️ |
+| **Cost per query** | $ per chat interaction | > $0.02/query | Budget overrun | Feed bill 🌾 |
+| **Input/output ratio** | Input tokens ÷ output tokens | > 10:1 means verbose context | Over-retrieval | Cargo unit ⚖️ |
+| **Latency P99** | Worst-case response time | > 10s | UX degradation | 🫏 On the route |
+| **Error rate** | Failures / total requests | > 5% | System reliability | Feed bill 🌾 |
+| **Chunks per document** | Average chunk count | > 500/doc | Storage bloat | Saddlebag piece 📦 |
 
 ### Cost monitoring formula
 
@@ -483,6 +507,8 @@ Total                      960ms      890ms      2130ms
 
 **Key insight:** Local is free but 2x slower. For development this doesn't matter. For production, cloud models are faster.
 
+- 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
+
 ---
 
 ## Self-Test Questions
@@ -507,6 +533,8 @@ Total                      960ms      890ms      2130ms
 - [ ] How would you add evaluation scores (faithfulness, relevance) to the metrics? → **Done in I31:** `GET /api/metrics` now includes `rag_queries_pass_rate_percent`, `rag_queries_avg_faithfulness`, and failure category breakdowns.
 - [ ] Design a CloudWatch dashboard for this application — what widgets would you add?
 - [ ] At what point do you need Prometheus + Grafana instead of in-memory metrics? → **Done in I31:** `GET /api/metrics` returns Prometheus text format, ready for scraping.
+
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -557,3 +585,4 @@ Here's a summary of every component covered across the docs:
 - [Cost Analysis](cost-analysis.md) — detailed cost breakdown
 - [Architecture Overview](../architecture-and-design/architecture.md)
 
+- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

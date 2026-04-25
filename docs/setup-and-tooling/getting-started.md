@@ -26,16 +26,16 @@
 
 ## What you need before starting
 
-| Tool | Version | Why you need it |
-| --- | --- | --- |
-| **Python** | 3.12+ | The app is written in Python |
-| **Poetry** | 1.8+ | Package manager (manages dependencies + virtual environment) |
-| **Git** | 2.40+ | Version control |
-| **AWS CLI** | 2.x | Connect to AWS services |
-| **Azure CLI** | 2.x | Connect to Azure services |
-| **Docker** | 24+ | Build container images (optional, for deployment) |
-| **Terraform** | 1.5+ | Deploy infrastructure (optional, for deployment) |
-| **VS Code** or **PyCharm** | Latest | IDE with debugger |
+| Tool | Version | Why you need it | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **Python** | 3.12+ | The app is written in Python | 🫏 On the route |
+| **Poetry** | 1.8+ | Package manager (manages dependencies + virtual environment) | Supply manifest 📜 |
+| **Git** | 2.40+ | Version control | 🫏 On the route |
+| **AWS CLI** | 2.x | Connect to AWS services | AWS depot 🏭 |
+| **Azure CLI** | 2.x | Connect to Azure services | Azure hub ☁️ |
+| **Docker** | 24+ | Build container images (optional, for deployment) | Robot hand 🤖 |
+| **Terraform** | 1.5+ | Deploy infrastructure (optional, for deployment) | Robot hand 🤖 |
+| **VS Code** or **PyCharm** | Latest | IDE with debugger | Test delivery 🧪 |
 
 ### Check what is already installed
 
@@ -50,6 +50,8 @@ az --version           # Need 2.x
 docker --version       # Optional
 terraform --version    # Optional
 ```
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -82,6 +84,8 @@ python3.12 --version
 - Latest stable version with full type hint support
 - Better error messages than older versions
 - Required by some dependencies (Pydantic v2 works best on 3.12+)
+
+- 🫏 **Donkey:** Loading up the donkey for the first time — installing the saddle, attaching the saddlebags, and confirming the GPS coordinates before the first run.
 
 ---
 
@@ -134,6 +138,8 @@ Why this matters:
 
 See [Poetry Guide](poetry-guide.md) for the full deep dive on how Poetry works in this project.
 
+- 🫏 **Donkey:** The supply shed manifest — every tool and library is pinned to an exact version so any stable can reproduce the same setup.
+
 ---
 
 ## Step 3 — Clone the repository
@@ -143,6 +149,8 @@ cd ~/projects  # or wherever you keep your projects
 git clone <your-repo-url> rag-chatbot
 cd rag-chatbot
 ```
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -168,6 +176,8 @@ Why?
 - Project A needs `pydantic==2.9` and Project B needs `pydantic==1.10`
 - Without venvs, you can only have one version installed
 - With venvs, each project has its own isolated packages
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -209,6 +219,8 @@ To deactivate later:
 ```bash
 deactivate
 ```
+
+- 🫏 **Donkey:** Loading up the donkey for the first time — installing the saddle, attaching the saddlebags, and confirming the GPS coordinates before the first run.
 
 ---
 
@@ -276,6 +288,8 @@ The app loads `.env` automatically via Pydantic Settings. But if you need the va
 ```bash
 set -a && source .env && set +a
 ```
+
+- 🫏 **Donkey:** Adjusting the saddle fit and route preferences so the donkey delivers to the right address every time.
 
 ---
 
@@ -407,16 +421,18 @@ poetry run uvicorn src.main:app --reload --port 8000
 
 ### Hardware requirements
 
-| Component | Minimum | Recommended |
-| --- | --- | --- |
-| **RAM** | 8 GB | 16 GB |
-| **Disk** | 5 GB (for models) | 10 GB |
-| **GPU** | Not required (CPU works) | NVIDIA GPU (faster inference) |
+| Component | Minimum | Recommended | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **RAM** | 8 GB | 16 GB | 🫏 On the route |
+| **Disk** | 5 GB (for models) | 10 GB | Manifest template 📋 |
+| **GPU** | Not required (CPU works) | NVIDIA GPU (faster inference) | 🫏 On the route |
 
 > **Tip:** `llama3.2` is an 8B parameter model and runs well on CPU. For faster
 > responses with a GPU, Ollama auto-detects CUDA if available.
 
 📖 **Full deep dives:** [LLM Providers (incl. Ollama)](../ai-engineering/llm-providers-deep-dive.md) · [Vector Store Providers (incl. ChromaDB)](../ai-engineering/vectorstore-providers-deep-dive.md) — architecture, code walkthrough, and comparison with cloud providers.
+
+- 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
 
 ---
 
@@ -578,6 +594,8 @@ terraform destroy -var="cost_limit_eur=5" -var="alert_email=you@example.com"
 
 **Results location (manual run):** `scripts/lab_results/aws/` — same directory as automated mode.
 
+- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
+
 ---
 
 ## Step 9 — Connect to Azure (and run on Azure)
@@ -668,13 +686,13 @@ curl -X POST "https://your-resource.openai.azure.com/openai/deployments/gpt-4o/c
 
 ### Azure troubleshooting
 
-| Error | Cause | Fix |
-| --- | --- | --- |
-| `DeploymentNotFound` (404) | Embedding model not deployed on the same Azure OpenAI resource as the LLM | Deploy `text-embedding-3-small` on the **same** resource as `gpt-4o`. Both must share one `AZURE_OPENAI_ENDPOINT`. |
-| `content_filter` (400) | Azure blocking prompt injection test prompts | Expected in Phase 4 guardrails labs. Azure's built-in content filter blocks jailbreak attempts. |
-| `RAG chain not initialized` | `.env` still has `<your-resource>` placeholder values | Check all `AZURE_*` values in `.env` — replace every `<your-resource>` with real values. |
-| `Port already in use` | Old server process still running | Run `pkill -f uvicorn` then retry. |
-| `Region not supported` | Model not available in chosen Azure region | Use **East US**, **East US 2**, or **Sweden Central** for both `gpt-4o` and `text-embedding-3-small`. |
+| Error | Cause | Fix | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `DeploymentNotFound` (404) | Embedding model not deployed on the same Azure OpenAI resource as the LLM | Deploy `text-embedding-3-small` on the **same** resource as `gpt-4o`. Both must share one `AZURE_OPENAI_ENDPOINT`. | The donkey 🐴 |
+| `content_filter` (400) | Azure blocking prompt injection test prompts | Expected in Phase 4 guardrails labs. Azure's built-in content filter blocks jailbreak attempts. | Delivery note 📋 |
+| `RAG chain not initialized` | `.env` still has `<your-resource>` placeholder values | Check all `AZURE_*` values in `.env` — replace every `<your-resource>` with real values. | Saddlebag check 🫏 |
+| `Port already in use` | Old server process still running | Run `pkill -f uvicorn` then retry. | 🫏 On the route |
+| `Region not supported` | Model not available in chosen Azure region | Use **East US**, **East US 2**, or **Sweden Central** for both `gpt-4o` and `text-embedding-3-small`. | The donkey 🐴 |
 
 ### Pre-flight checklist (before running cloud labs)
 
@@ -839,6 +857,8 @@ terraform destroy -var="cost_limit_eur=5" -var="alert_email=you@example.com"
 
 **Results location (manual run):** `scripts/lab_results/azure/`
 
+- 🫏 **Donkey:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for donkeys on the Azure route.
+
 ---
 
 ## Step 10 — Run the tests
@@ -866,11 +886,11 @@ tests/test_ingestion.py::TestChunkDocument::test_large_document_multiple_chunks 
 
 ### What the tests cover
 
-| Test file | Tests | What it verifies |
-| --- | --- | --- |
-| `test_chat.py` | 8 | API endpoints: health, chat validation, document list/delete |
-| `test_evaluation.py` | 12 | RAG evaluation: retrieval scoring, faithfulness, relevance, golden dataset |
-| `test_ingestion.py` | 8 | Document parsing (TXT/MD/CSV), text chunking, overlap, edge cases |
+| Test file | Tests | What it verifies | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `test_chat.py` | 8 | API endpoints: health, chat validation, document list/delete | Donkey check ✅ |
+| `test_evaluation.py` | 12 | RAG evaluation: retrieval scoring, faithfulness, relevance, golden dataset | Saddlebag check 🫏 |
+| `test_ingestion.py` | 8 | Document parsing (TXT/MD/CSV), text chunking, overlap, edge cases | Saddlebag piece 📦 |
 
 > **Note:** These tests use mocks and don't require Ollama to be running.
 > They verify that the application logic is correct without making actual LLM calls.
@@ -878,6 +898,8 @@ tests/test_ingestion.py::TestChunkDocument::test_large_document_multiple_chunks 
 If any tests fail, fix them before proceeding. Common issues:
 - `ModuleNotFoundError` → run `poetry install --extras local`
 - `ImportError` → check that your venv is activated (`source .venv/bin/activate`)
+
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -910,6 +932,8 @@ Open in your browser:
 - **Swagger docs**: http://localhost:8000/docs
 - **Health check**: http://localhost:8000/api/health
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## Step 12 — Upload your first document
@@ -932,6 +956,8 @@ Expected response:
   "message": "Successfully ingested document.pdf into 45 searchable chunks."
 }
 ```
+
+- 🫏 **Donkey:** The parcels being ingested — split into saddlebag-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.
 
 ---
 
@@ -972,6 +998,8 @@ Expected response:
   }
 }
 ```
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -1016,13 +1044,13 @@ The response includes the answer AND quality scores:
 
 **Reading the scores:**
 
-| Score | What it means | Healthy range |
-|---|---|---|
-| `retrieval` | Did vector search find relevant chunks? | ≥ 0.7 |
-| `faithfulness` | Does the answer stick to the context? | ≥ 0.8 |
-| `answer_relevance` | Does the answer address the question? | ≥ 0.6 |
-| `overall` | Weighted average (retrieval 30% + faithfulness 40% + relevance 30%) | ≥ 0.7 |
-| `passed` | Overall ≥ 0.7 | `true` |
+| Score | What it means | Healthy range | 🫏 Donkey |
+|---|---|---| --- |
+| `retrieval` | Did vector search find relevant chunks? | ≥ 0.7 | Saddlebag piece 📦 |
+| `faithfulness` | Does the answer stick to the context? | ≥ 0.8 | Saddlebag match 🫏 |
+| `answer_relevance` | Does the answer address the question? | ≥ 0.6 | Right address 🎯 |
+| `overall` | Weighted average (retrieval 30% + faithfulness 40% + relevance 30%) | ≥ 0.7 | Saddlebag check 🫏 |
+| `passed` | Overall ≥ 0.7 | `true` | 🫏 On the route |
 
 ### 14b. Run the golden dataset suite
 
@@ -1056,6 +1084,8 @@ The response shows pass/fail for each test case:
 > [Evaluation Framework](../ai-engineering/evaluation-framework-deep-dive.md) ·
 > [Golden Dataset](../ai-engineering/golden-dataset-deep-dive.md)
 
+- 🫏 **Donkey:** The donkey's report card — did it grab the right saddlebags and write an accurate answer?
+
 ---
 
 ## Step 15 — Run all hands-on labs automatically
@@ -1066,13 +1096,13 @@ These hands-on labs are **not tutorials** — they're **production skill-builder
 the engineering practices companies look for when hiring AI/ML engineers. Each phase builds
 a specific competency:
 
-| Phase | What it teaches | AI engineering skill |
-| --- | --- | --- |
-| **Phase 1** — Foundation (Labs 1–2) | Retrieval quality, faithfulness scoring, hallucination detection, top_k tuning | You learn to **measure** AI system quality — the foundation of every production AI system. Without evaluation, you're deploying blind. |
-| **Phase 2** — Bridge (Labs 3–5) | Business metrics, prompt injection guardrails, AI observability dashboards | You learn to **translate** technical scores into business language, **protect** against adversarial inputs, and **monitor** AI systems in production. |
-| **Phase 3** — Production (Labs 6–8) | Data flywheel, RLHF feedback loops, infrastructure scaling | You learn the **continuous improvement loop** that separates production AI from demos — detect bad answers, fix them, lock the fix with golden datasets, repeat. |
-| **Phase 4** — Advanced RAG (Labs 9–13) | Guardrails, re-ranking, hybrid search, bulk operations | You learn to **harden** a RAG system — block prompt injection, improve retrieval with re-ranking and hybrid search, and manage documents at scale. |
-| **Phase 5** — Observability (Labs 14–16) | Query logs, failure analysis, Prometheus metrics, golden dataset regression | You learn to **operate** a RAG system in production — structured logging, failure categorisation, metrics dashboards, and automated regression testing. |
+| Phase | What it teaches | AI engineering skill | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **Phase 1** — Foundation (Labs 1–2) | Retrieval quality, faithfulness scoring, hallucination detection, top_k tuning | You learn to **measure** AI system quality — the foundation of every production AI system. Without evaluation, you're deploying blind. | Saddlebag fetch 🎒 |
+| **Phase 2** — Bridge (Labs 3–5) | Business metrics, prompt injection guardrails, AI observability dashboards | You learn to **translate** technical scores into business language, **protect** against adversarial inputs, and **monitor** AI systems in production. | Delivery note 📋 |
+| **Phase 3** — Production (Labs 6–8) | Data flywheel, RLHF feedback loops, infrastructure scaling | You learn the **continuous improvement loop** that separates production AI from demos — detect bad answers, fix them, lock the fix with golden datasets, repeat. | Feed bill 🌾 |
+| **Phase 4** — Advanced RAG (Labs 9–13) | Guardrails, re-ranking, hybrid search, bulk operations | You learn to **harden** a RAG system — block prompt injection, improve retrieval with re-ranking and hybrid search, and manage documents at scale. | Delivery note 📋 |
+| **Phase 5** — Observability (Labs 14–16) | Query logs, failure analysis, Prometheus metrics, golden dataset regression | You learn to **operate** a RAG system in production — structured logging, failure categorisation, metrics dashboards, and automated regression testing. | Saddlebag check 🫏 |
 
 **How this helps you in practice:**
 
@@ -1083,6 +1113,8 @@ a specific competency:
 > **The key insight:** Building a chatbot is the easy part (everyone can do it).
 > **Evaluating, monitoring, and continuously improving** a chatbot is what makes
 > you an AI engineer. These labs teach exactly that.
+
+- 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
 
 ---
 
@@ -1124,12 +1156,12 @@ Make sure the server is running (Step 11), then:
 python scripts/run_all_labs.py
 ```
 
-| Environment | Expected time | Why |
-| --- | --- | --- |
-| **Local (Ollama CPU)** | ~20–25 min | Each query takes 5–60 s on CPU |
-| **Local (Ollama GPU)** | ~10–15 min | NVIDIA GPU speeds up inference ~2× |
-| **AWS (Bedrock/Claude)** | ~3–5 min | Cloud LLMs respond in 1–5 s per query |
-| **Azure (GPT-4o)** | ~3–5 min | Cloud LLMs respond in 1–5 s per query |
+| Environment | Expected time | Why | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **Local (Ollama CPU)** | ~20–25 min | Each query takes 5–60 s on CPU | The donkey 🐴 |
+| **Local (Ollama GPU)** | ~10–15 min | NVIDIA GPU speeds up inference ~2× | The donkey 🐴 |
+| **AWS (Bedrock/Claude)** | ~3–5 min | Cloud LLMs respond in 1–5 s per query | The donkey 🐴 |
+| **Azure (GPT-4o)** | ~3–5 min | Cloud LLMs respond in 1–5 s per query | The donkey 🐴 |
 
 ### Run against AWS or Azure
 
@@ -1159,15 +1191,15 @@ python scripts/run_all_labs.py --timeout 1200
 
 ### What the script runs
 
-| Phase | Experiments | API calls |
-| --- | --- | --- |
-| **Phase 1** — Foundation | 1a, 1b (top_k=1,5,10), 1c, 2a, 2b, 2c | 8 evaluate calls |
-| **Phase 2** — Bridge | 3a (x2), 4a (3 injections + 1 eval), 5a, 5b (x5) | 12 evaluate + 3 chat calls |
-| **Phase 3** — Production | 6a, 6b (upload), 6c, 6d (suite) | 2 evaluate + 1 upload + 1 suite call |
-| **Phase 4** — Advanced RAG | 9a (injection ×3), 9b (PII ×3), 9c, 10a (×3), 10b (×3), 11a-c (×8), 12a-b, 13a-d (×6) | 7 chat + 22 evaluate + 1 upload-batch |
-| **Phase 5** — Observability | 14a (query stats), 14b (failures), 15a (metrics), 16a (golden suite) | 1 stats + 1 failures + 1 metrics + 1 suite call |
-| **Thinking exercises** | 3b, 4b, 5c, 7a, 7b, 8a, 8b | 0 (skipped — these are design exercises) |
-| **Total** | 50 API experiments + 7 thinking | 47 API calls + 7 skipped |
+| Phase | Experiments | API calls | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **Phase 1** — Foundation | 1a, 1b (top_k=1,5,10), 1c, 2a, 2b, 2c | 8 evaluate calls | Report card 📝 |
+| **Phase 2** — Bridge | 3a (x2), 4a (3 injections + 1 eval), 5a, 5b (x5) | 12 evaluate + 3 chat calls | Report card 📝 |
+| **Phase 3** — Production | 6a, 6b (upload), 6c, 6d (suite) | 2 evaluate + 1 upload + 1 suite call | Report card 📝 |
+| **Phase 4** — Advanced RAG | 9a (injection ×3), 9b (PII ×3), 9c, 10a (×3), 10b (×3), 11a-c (×8), 12a-b, 13a-d (×6) | 7 chat + 22 evaluate + 1 upload-batch | Saddlebag check 🫏 |
+| **Phase 5** — Observability | 14a (query stats), 14b (failures), 15a (metrics), 16a (golden suite) | 1 stats + 1 failures + 1 metrics + 1 suite call | Tachograph 📊 |
+| **Thinking exercises** | 3b, 4b, 5c, 7a, 7b, 8a, 8b | 0 (skipped — these are design exercises) | 🫏 On the route |
+| **Total** | 50 API experiments + 7 thinking | 47 API calls + 7 skipped | Feed bill 🌾 |
 
 ### Output
 
@@ -1242,23 +1274,25 @@ The RAG Chatbot exposes **11 endpoints** across 6 route files. Here is a quick
 reference — for full code walkthroughs, see
 [API Routes Explained](../architecture-and-design/api-routes-explained.md).
 
-| Endpoint | Method | What it does |
-| --- | --- | --- |
-| `/api/health` | GET | Checks if the RAG chain is initialised. No AI calls. |
-| `/api/chat` | POST | Send a question, get an AI answer with sources and token usage (the full RAG pipeline). |
-| `/api/documents/upload` | POST | Upload a single document — the app chunks, embeds, and stores it. |
-| `/api/documents/upload-batch` | POST | Upload multiple documents in one request. |
-| `/api/documents` | GET | List all uploaded documents and their chunk counts. |
-| `/api/documents/{id}` | DELETE | Remove a document and its vector embeddings. |
-| `/api/evaluate` | POST | Run a question through the RAG pipeline AND score the answer quality (RAGAS metrics). |
-| `/api/evaluate/suite` | POST | Run the full golden dataset — like `dbt test` for your AI system. |
-| `/api/queries/stats` | GET | Aggregate pass rate and failure breakdown from query logs. |
-| `/api/queries/failures` | GET | Recent failed queries with failure categories (bad_retrieval, hallucination, etc.). |
-| `/api/metrics` | GET | Prometheus-compatible counters and gauges for monitoring dashboards. |
+| Endpoint | Method | What it does | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `/api/health` | GET | Checks if the RAG chain is initialised. No AI calls. | Saddlebag check 🫏 |
+| `/api/chat` | POST | Send a question, get an AI answer with sources and token usage (the full RAG pipeline). | Cargo unit ⚖️ |
+| `/api/documents/upload` | POST | Upload a single document — the app chunks, embeds, and stores it. | Saddlebag piece 📦 |
+| `/api/documents/upload-batch` | POST | Upload multiple documents in one request. | Stable door 🚪 |
+| `/api/documents` | GET | List all uploaded documents and their chunk counts. | Saddlebag piece 📦 |
+| `/api/documents/{id}` | DELETE | Remove a document and its vector embeddings. | Stable door 🚪 |
+| `/api/evaluate` | POST | Run a question through the RAG pipeline AND score the answer quality (RAGAS metrics). | Saddlebag check 🫏 |
+| `/api/evaluate/suite` | POST | Run the full golden dataset — like `dbt test` for your AI system. | Report card 📝 |
+| `/api/queries/stats` | GET | Aggregate pass rate and failure breakdown from query logs. | Stable door 🚪 |
+| `/api/queries/failures` | GET | Recent failed queries with failure categories (bad_retrieval, hallucination, etc.). | Memory drift ⚠️ |
+| `/api/metrics` | GET | Prometheus-compatible counters and gauges for monitoring dashboards. | Tachograph 📊 |
 
 > 📖 **Deep dive:** [API Routes Explained](../architecture-and-design/api-routes-explained.md) —
 > overview of how routes are wired, middleware, `app.state` pattern, and links to
 > per-endpoint deep dives.
+
+- 🫏 **Donkey:** The stable's front door — defined entry points where questions arrive and answers depart.
 
 ---
 
@@ -1278,17 +1312,17 @@ To use your own document, you only need to **copy and edit that YAML file** — 
 
 These parts are **document-agnostic** — they work with any uploaded document:
 
-| Component | Why it just works |
-| --- | --- |
-| `POST /api/chat` | Asks questions against whatever is in the vector store |
-| `POST /api/documents/upload` | Accepts any PDF, TXT, MD, CSV, or DOCX |
-| `GET /api/documents` | Lists whatever you've uploaded |
-| `POST /api/evaluate` (with your own questions) | Scores any question/answer pair |
-| `src/rag/` (chain, ingestion, prompts) | Generic RAG pipeline — not tied to any document |
-| `src/llm/`, `src/vectorstore/`, `src/storage/` | Provider implementations — fully generic |
-| `src/config.py`, `src/main.py` | App configuration — no document references |
-| `Dockerfile`, `.github/workflows/` | Build and deploy — no document references |
-| `tests/test_ingestion.py` | Tests chunking mechanics — not content-specific |
+| Component | Why it just works | 🫏 Donkey |
+| --- | --- | --- |
+| `POST /api/chat` | Asks questions against whatever is in the vector store | Stable door 🚪 |
+| `POST /api/documents/upload` | Accepts any PDF, TXT, MD, CSV, or DOCX | Stable door 🚪 |
+| `GET /api/documents` | Lists whatever you've uploaded | Stable door 🚪 |
+| `POST /api/evaluate` (with your own questions) | Scores any question/answer pair | Report card 📝 |
+| `src/rag/` (chain, ingestion, prompts) | Generic RAG pipeline — not tied to any document | Delivery note 📋 |
+| `src/llm/`, `src/vectorstore/`, `src/storage/` | Provider implementations — fully generic | The donkey 🐴 |
+| `src/config.py`, `src/main.py` | App configuration — no document references | 🫏 On the route |
+| `Dockerfile`, `.github/workflows/` | Build and deploy — no document references | Robot hand 🤖 |
+| `tests/test_ingestion.py` | Tests chunking mechanics — not content-specific | Saddlebag piece 📦 |
 
 ### How to switch documents (3 steps)
 
@@ -1301,14 +1335,14 @@ cp test-policy.yaml my-document.yaml
 
 Edit `my-document.yaml` and update these sections:
 
-| Section | What to change |
-| --- | --- |
-| `document.name` | Your document's filename (e.g., `employee-handbook.pdf`) |
-| `golden_dataset` | Rewrite the 25 Q&A test cases to match your document (questions, expected keywords, context chunks) |
-| `lab_questions.phase1` | Baseline + retrieval questions about your document |
-| `lab_questions.phase2` | Business questions, injection prompts, dashboard queries |
-| `lab_questions.phase3` | Gap question + a "gap document" your knowledge base does NOT have |
-| `lab_questions.phase4` | Safe questions, reranker questions, ambiguous queries |
+| Section | What to change | 🫏 Donkey |
+| --- | --- | --- |
+| `document.name` | Your document's filename (e.g., `employee-handbook.pdf`) | Parcel shelf 📦 |
+| `golden_dataset` | Rewrite the 25 Q&A test cases to match your document (questions, expected keywords, context chunks) | Saddlebag piece 📦 |
+| `lab_questions.phase1` | Baseline + retrieval questions about your document | 🫏 On the route |
+| `lab_questions.phase2` | Business questions, injection prompts, dashboard queries | Delivery note 📋 |
+| `lab_questions.phase3` | Gap question + a "gap document" your knowledge base does NOT have | 🫏 On the route |
+| `lab_questions.phase4` | Safe questions, reranker questions, ambiguous queries | Quality sort 📊 |
 
 #### 2. Place your document in the test data folder
 
@@ -1361,21 +1395,21 @@ print(f'Loaded: {c[\"document\"][\"name\"]} with {len(c[\"golden_dataset\"])} go
 
 These are **not** covered by the YAML config and need manual editing if you switch documents:
 
-| File | What to change | Impact if skipped |
-| --- | --- | --- |
-| `tests/test_evaluation.py` | Mock fixtures reference hardcoded golden dataset entries (questions, answers, chunks) | Unit tests will fail |
-| `tests/test_chat.py` | Mock answers and source filenames reference `test-policy.txt` | Unit tests will fail |
-| `scripts/run_all_labs.py` (Phase 4 Labs 11–13) | A few hardcoded structural questions remain — mostly generic but review if your doc is very different | May produce odd results |
+| File | What to change | Impact if skipped | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `tests/test_evaluation.py` | Mock fixtures reference hardcoded golden dataset entries (questions, answers, chunks) | Unit tests will fail | Saddlebag piece 📦 |
+| `tests/test_chat.py` | Mock answers and source filenames reference `test-policy.txt` | Unit tests will fail | Test delivery 🧪 |
+| `scripts/run_all_labs.py` (Phase 4 Labs 11–13) | A few hardcoded structural questions remain — mostly generic but review if your doc is very different | May produce odd results | 🫏 On the route |
 
 ### Files you SHOULD update (but won't break anything)
 
-| File | What's there | Impact if skipped |
-| --- | --- | --- |
-| `docs/hands-on-labs/hands-on-labs-phase-1.md` | Lab walkthroughs reference refund policy questions | Labs won't match your results |
-| `docs/hands-on-labs/hands-on-labs-phase-2.md` | Dashboard questions reference refunds | Cosmetic only |
-| `docs/hands-on-labs/hands-on-labs-phase-3.md` | Data flywheel uses remote-work-policy as gap doc | Scenario won't make sense |
-| `src/evaluation/evaluator.py` (docstrings) | Examples use `"What is the refund policy?"` | Swagger examples show refund text |
-| `src/api/models.py` (field examples) | `example="What is the refund policy?"` | Swagger UI placeholder |
+| File | What's there | Impact if skipped | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `docs/hands-on-labs/hands-on-labs-phase-1.md` | Lab walkthroughs reference refund policy questions | Labs won't match your results | 🫏 On the route |
+| `docs/hands-on-labs/hands-on-labs-phase-2.md` | Dashboard questions reference refunds | Cosmetic only | 🫏 On the route |
+| `docs/hands-on-labs/hands-on-labs-phase-3.md` | Data flywheel uses remote-work-policy as gap doc | Scenario won't make sense | 🫏 On the route |
+| `src/evaluation/evaluator.py` (docstrings) | Examples use `"What is the refund policy?"` | Swagger examples show refund text | Report card 📝 |
+| `src/api/models.py` (field examples) | `example="What is the refund policy?"` | Swagger UI placeholder | Stable door 🚪 |
 
 ### Quick-start checklist
 
@@ -1393,6 +1427,8 @@ These are **not** covered by the YAML config and need manual editing if you swit
 > is 100% document-agnostic. The YAML config system means you can swap documents
 > by editing one file and passing `--test-config` — no Python code changes needed
 > for running labs and evaluations.
+
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -1442,3 +1478,5 @@ kill -9 <PID>
 # Or use a different port
 poetry run uvicorn src.main:app --reload --port 9000
 ```
+
+- 🫏 **Donkey:** Checking the donkey's hooves, saddle straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.

@@ -53,6 +53,8 @@ Returns rows/records                    - LLM (to generate an answer)
 **Key insight:** The routes themselves are almost identical in complexity. The
 intelligence lives in `rag_chain`, not in the routes. Routes are just the front door.
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## How main.py Wires Everything
@@ -89,11 +91,11 @@ def create_app() -> FastAPI:
 
 ### What to notice
 
-| Line | What it does | DE parallel |
-| --- | --- | --- |
-| `lifespan=lifespan` | Runs startup/shutdown code (initialise RAG chain, close connections) | Like `@app.on_event("startup")` in shared-proxy |
-| `prefix="/api"` | All routes get `/api` prefix → `/chat` becomes `/api/chat` | Same as any FastAPI app |
-| `tags=["Chat"]` | Groups endpoints in Swagger UI | Same as any FastAPI app |
+| Line | What it does | DE parallel | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `lifespan=lifespan` | Runs startup/shutdown code (initialise RAG chain, close connections) | Like `@app.on_event("startup")` in shared-proxy | Saddlebag check 🫏 |
+| `prefix="/api"` | All routes get `/api` prefix → `/chat` becomes `/api/chat` | Same as any FastAPI app | Stable door 🚪 |
+| `tags=["Chat"]` | Groups endpoints in Swagger UI | Same as any FastAPI app | Stable door 🚪 |
 
 ### The Lifespan — Where the AI Engine Gets Created
 
@@ -117,6 +119,8 @@ PostgreSQL connection per request.
 
 The difference: instead of a DB connection, you're storing an AI engine that knows
 how to embed questions, search vectors, and call an LLM.
+
+- 🫏 **Donkey:** The mechanics of the stable — understanding how each piece fits so you can maintain and extend the system.
 
 ---
 
@@ -186,6 +190,8 @@ RequestLoggingMiddleware
 Response sent to browser
 ```
 
+- 🫏 **Donkey:** The modular saddlery — each layer handles one job so you can swap saddles without touching the donkey.
+
 ---
 
 ## The Route Files
@@ -193,14 +199,14 @@ Response sent to browser
 This app has 6 route files, each with different AI complexity. Each has its own
 detailed deep-dive document:
 
-| Route file | Endpoint(s) | AI complexity | Deep dive |
-| --- | --- | --- | --- |
-| `health.py` | `GET /api/health` | ★☆☆☆☆ — nothing new | 📖 [Health Endpoint Deep Dive](api-routes/health-endpoint-explained.md) |
-| `chat.py` | `POST /api/chat` | ★★★★★ — the RAG query pipeline | 📖 [Chat Endpoint Deep Dive](api-routes/chat-endpoint-explained.md) |
-| `documents.py` | `POST /api/documents/upload`, `GET /api/documents`, `DELETE /api/documents/{id}` | ★★★★☆ — the ingestion pipeline | 📖 [Documents Endpoint Deep Dive](api-routes/documents-endpoint-explained.md) |
-| `evaluate.py` | `POST /api/evaluate`, `POST /api/evaluate/suite` | ★★★★★ — the AI quality pipeline | 📖 [Evaluate Endpoint Deep Dive](api-routes/evaluate-endpoint-explained.md) |
-| `queries.py` | `GET /api/queries/stats`, `GET /api/queries/failures` | ★★★☆☆ — production debugging | 📖 [Queries Endpoint Deep Dive](api-routes/queries-endpoint-explained.md) |
-| `metrics.py` | `GET /api/metrics` | ★★☆☆☆ — Prometheus metrics | 📖 [Metrics Endpoint Deep Dive](api-routes/metrics-endpoint-explained.md) |
+| Route file | Endpoint(s) | AI complexity | Deep dive | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| `health.py` | `GET /api/health` | ★☆☆☆☆ — nothing new | 📖 [Health Endpoint Deep Dive](api-routes/health-endpoint-explained.md) | Donkey check ✅ |
+| `chat.py` | `POST /api/chat` | ★★★★★ — the RAG query pipeline | 📖 [Chat Endpoint Deep Dive](api-routes/chat-endpoint-explained.md) | Saddlebag check 🫏 |
+| `documents.py` | `POST /api/documents/upload`, `GET /api/documents`, `DELETE /api/documents/{id}` | ★★★★☆ — the ingestion pipeline | 📖 [Documents Endpoint Deep Dive](api-routes/documents-endpoint-explained.md) | Pre-sort 📮 |
+| `evaluate.py` | `POST /api/evaluate`, `POST /api/evaluate/suite` | ★★★★★ — the AI quality pipeline | 📖 [Evaluate Endpoint Deep Dive](api-routes/evaluate-endpoint-explained.md) | Report card 📝 |
+| `queries.py` | `GET /api/queries/stats`, `GET /api/queries/failures` | ★★★☆☆ — production debugging | 📖 [Queries Endpoint Deep Dive](api-routes/queries-endpoint-explained.md) | Stable door 🚪 |
+| `metrics.py` | `GET /api/metrics` | ★★☆☆☆ — Prometheus metrics | 📖 [Metrics Endpoint Deep Dive](api-routes/metrics-endpoint-explained.md) | Tachograph 📊 |
 
 ### Quick summary of each
 
@@ -239,6 +245,8 @@ scrape this endpoint. DE parallel: exposing Airflow/ECS metrics for Prometheus.
 4. **Evaluate** (15 min) — understand how to measure AI quality
 5. **Queries** (10 min) — understand production debugging via structured logs
 6. **Metrics** (10 min) — understand Prometheus metrics for dashboards & alerting
+
+- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
 
 ---
 
@@ -303,6 +311,8 @@ If the RAG chain failed to initialise at startup (bad credentials, cloud service
 down), `app.state.rag_chain` is set to `None`. Using `getattr(..., None)` prevents
 an `AttributeError` crash and lets the route return a clean 500 error instead.
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## Comparing: Shared-Proxy Routes vs RAG Routes
@@ -310,21 +320,23 @@ an `AttributeError` crash and lets the route return a clean 500 error instead.
 You work on the shared-proxy daily. Here's a side-by-side comparison to show what's
 the same and what's different:
 
-| Aspect | A Typical FastAPI API | RAG Chatbot |
-| --- | --- | --- |
-| **Framework** | FastAPI | FastAPI |
-| **Router pattern** | `APIRouter()` + `include_router()` | `APIRouter()` + `include_router()` |
-| **Middleware** | `BnaEventMiddleware` | `RequestLoggingMiddleware` |
-| **Request validation** | Pydantic models | Pydantic models |
-| **Dependency injection** | `app.state` or FastAPI `Depends()` | `app.state` (for rag_chain) |
-| **Error handling** | `HTTPException` | `HTTPException` |
-| **Logging** | Loguru | Loguru |
-| **What routes call** | Service classes → DynamoDB/S3 | `rag_chain` → LLM + Vector Store + Storage |
-| **Response contains** | Data records | Answer + sources + token usage |
-| **New concepts** | None | Embeddings, semantic search, token costs |
+| Aspect | A Typical FastAPI API | RAG Chatbot | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **Framework** | FastAPI | FastAPI | Stable door 🚪 |
+| **Router pattern** | `APIRouter()` + `include_router()` | `APIRouter()` + `include_router()` | Stable door 🚪 |
+| **Middleware** | `BnaEventMiddleware` | `RequestLoggingMiddleware` | Gate guard 🔐 |
+| **Request validation** | Pydantic models | Pydantic models | Manifest template 📋 |
+| **Dependency injection** | `app.state` or FastAPI `Depends()` | `app.state` (for rag_chain) | Saddlebag check 🫏 |
+| **Error handling** | `HTTPException` | `HTTPException` | Stable door 🚪 |
+| **Logging** | Loguru | Loguru | Gate guard 🔐 |
+| **What routes call** | Service classes → DynamoDB/S3 | `rag_chain` → LLM + Vector Store + Storage | The donkey 🐴 |
+| **Response contains** | Data records | Answer + sources + token usage | Cargo unit ⚖️ |
+| **New concepts** | None | Embeddings, semantic search, token costs | Cargo unit ⚖️ |
 
 **Bottom line:** The routes layer is 90% identical. The 10% difference is *what they
 call* and *what comes back*. The AI lives in `rag_chain`, not in the routes.
+
+- 🫏 **Donkey:** The donkey checks its saddlebag full of retrieved document chunks before answering — no guessing from memory.
 
 ---
 
@@ -353,6 +365,8 @@ Use this as your self-check. Can you answer each question?
 - [ ] 📖 [Chat Endpoint](api-routes/chat-endpoint-explained.md) — full 5-step RAG query pipeline with DE parallels
 - [ ] 📖 [Documents Endpoint](api-routes/documents-endpoint-explained.md) — full 4-step ingestion pipeline as ETL
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## What to Study Next
@@ -363,3 +377,4 @@ Now that you understand the routes layer, here's the recommended path:
 - **The bridge:** Phase 2 files (`src/llm/`, `src/vectorstore/`, `src/rag/`) — where the AI concepts you just learned (embeddings, chunks, tokens) are implemented in actual code
 - **Deep reference:** [How Services Work](how-services-work.md) — what happens on the cloud side when `rag_chain.query()` calls Bedrock/OpenSearch
 
+- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

@@ -32,13 +32,15 @@ You can't improve what you can't measure. The golden dataset is a **fixed set of
 
 Without a golden dataset, you'd have to manually test every change — ask questions, read answers, judge quality. That doesn't scale. This file makes evaluation **automated, repeatable, and objective**.
 
-| What you'll learn | DE parallel |
-|---|---|
-| Fixed test inputs with expected outputs | Seed data / test fixtures |
-| Categories of test cases (happy path, edge case) | Test pyramid: happy path → edge cases → error cases |
-| Score thresholds per test case | SLA definitions per data pipeline |
-| Context chunks pre-loaded (no search needed) | Mock data for integration tests |
-| Negative test cases | `expected_not_in_answer` = forbidden values |
+| What you'll learn | DE parallel | 🫏 Donkey |
+|---|---| --- |
+| Fixed test inputs with expected outputs | Seed data / test fixtures | Test delivery 🧪 |
+| Categories of test cases (happy path, edge case) | Test pyramid: happy path → edge cases → error cases | Test delivery 🧪 |
+| Score thresholds per test case | SLA definitions per data pipeline | Test delivery 🧪 |
+| Context chunks pre-loaded (no search needed) | Mock data for integration tests | Saddlebag piece 📦 |
+| Negative test cases | `expected_not_in_answer` = forbidden values | Test delivery 🧪 |
+
+- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -61,6 +63,8 @@ When do you run this?                      When do you run this?
   ✅ After changing transformations           ✅ After changing prompts/models
   ✅ In CI/CD                                ✅ In CI/CD
 ```
+
+- 🫏 **Donkey:** The 25 standard test deliveries the donkey must pass every release — a fixed benchmark that never changes so you can compare runs fairly.
 
 ---
 
@@ -96,23 +100,27 @@ User question → [Embed] → [Search] → [Context] → [LLM] → [Evaluate]
                                     Tested by golden dataset
 ```
 
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+
 ---
 
 ## The 25 Test Cases Across 7 Categories
 
-| Category | Count | Purpose |
-|---|---|---|
-| `policy` | 4 | Refund, digital refund, exchange, warranty |
-| `logistics` | 3 | Return shipping, delivery time, order tracking |
-| `contact` | 3 | Support channels, hours, escalation |
-| `product` | 2 | Compatibility, specifications |
-| `multi_turn` | 3 | Follow-up questions needing context |
-| `edge_case` | 6 | Ambiguous, out-of-scope, prompt injection, negation, multi-topic |
-| `pii` | 4 | PII in input, PII request, phone number, GDPR deletion |
+| Category | Count | Purpose | 🫏 Donkey |
+|---|---|---| --- |
+| `policy` | 4 | Refund, digital refund, exchange, warranty | 🫏 On the route |
+| `logistics` | 3 | Return shipping, delivery time, order tracking | 🫏 On the route |
+| `contact` | 3 | Support channels, hours, escalation | 🫏 On the route |
+| `product` | 2 | Compatibility, specifications | 🫏 On the route |
+| `multi_turn` | 3 | Follow-up questions needing context | 🫏 On the route |
+| `edge_case` | 6 | Ambiguous, out-of-scope, prompt injection, negation, multi-topic | Delivery note 📋 |
+| `pii` | 4 | PII in input, PII request, phone number, GDPR deletion | Gate rule 🚧 |
 
 The cases below are representative examples. See [`golden_dataset.py`](../../src/evaluation/golden_dataset.py) for all 25.
 
 ### Key cases by category
+
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -141,16 +149,18 @@ The cases below are representative examples. See [`golden_dataset.py`](../../src
 
 **What this tests:**
 
-| Aspect | Check | Why |
-|---|---|---|
-| **Keywords present** | "14", "days", "refund", "email" | Core facts must appear in the answer |
-| **Keywords absent** | "cryptocurrency", "bitcoin" | The LLM must not invent payment methods |
-| **Retrieval scores** | 0.95, 0.88, 0.82 (avg 0.88) | All chunks are relevant — high quality retrieval |
-| **Faithfulness** | ≥ 0.8 | Answer must be grounded in the 3 chunks |
+| Aspect | Check | Why | 🫏 Donkey |
+|---|---|---| --- |
+| **Keywords present** | "14", "days", "refund", "email" | Core facts must appear in the answer | 🫏 On the route |
+| **Keywords absent** | "cryptocurrency", "bitcoin" | The LLM must not invent payment methods | The donkey 🐴 |
+| **Retrieval scores** | 0.95, 0.88, 0.82 (avg 0.88) | All chunks are relevant — high quality retrieval | Saddlebag fetch 🎒 |
+| **Faithfulness** | ≥ 0.8 | Answer must be grounded in the 3 chunks | Saddlebag piece 📦 |
 
 **A passing answer:** *"According to the documents, customers can request a full refund within 14 business days. Send an email to support@example.com with your order number. Refunds are returned to the original payment method within 3-5 business days. [Document chunk 1]"*
 
 **A failing answer:** *"Refunds take 14 days. You can also get a refund via Bitcoin."* — mentions "bitcoin" (in `expected_not_in_answer`) and hallucinated payment method.
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -179,6 +189,8 @@ The cases below are representative examples. See [`golden_dataset.py`](../../src
 
 **DE parallel:** This is like testing that your pipeline filters correctly — the `WHERE category = 'digital'` should NOT return physical product rules.
 
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+
 ---
 
 ## Case 3: `shipping_return` — Cross-Topic
@@ -204,6 +216,8 @@ The cases below are representative examples. See [`golden_dataset.py`](../../src
 ```
 
 **Why lower `min_retrieval_score` (0.65)?** The third chunk (0.78) is about return fees, not the return process itself. The question is about *how* to return, and the fee chunk is tangential. A lower threshold acknowledges that not every chunk will be perfectly relevant.
+
+- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -235,6 +249,8 @@ The cases below are representative examples. See [`golden_dataset.py`](../../src
 
 **Why `min_faithfulness` is 0.9 (highest of all cases):** When context is irrelevant, the faithfulness test is actually testing the *refusal detector*. A refusal gets a 1.0 faithfulness score. If the LLM tries to answer instead of refusing, faithfulness drops below 0.9.
 
+- 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
+
 ---
 
 ## Case 5: `ambiguous_question` — Edge Case, Vague Query
@@ -257,15 +273,17 @@ The cases below are representative examples. See [`golden_dataset.py`](../../src
 
 **Why relaxed thresholds?**
 
-| Threshold | Value | Why |
-|---|---|---|
-| `min_retrieval_score` | 0.3 | "How long?" is vague — chunks will have low relevance |
-| `min_faithfulness` | 0.6 | The LLM might mention both refunds AND shipping — hard to ground precisely |
-| `expected_keywords` | `[]` | Can't predict what the LLM will say for a vague question |
+| Threshold | Value | Why | 🫏 Donkey |
+|---|---|---| --- |
+| `min_retrieval_score` | 0.3 | "How long?" is vague — chunks will have low relevance | Saddlebag piece 📦 |
+| `min_faithfulness` | 0.6 | The LLM might mention both refunds AND shipping — hard to ground precisely | The donkey 🐴 |
+| `expected_keywords` | `[]` | Can't predict what the LLM will say for a vague question | The donkey 🐴 |
 
 **What a good answer looks like:** *"Your question 'How long?' is ambiguous. Based on the documents: refund processing takes 14 business days, and shipping takes 5-7 business days."*
 
 **What Prompt Rule #6 says:** *"If the question is ambiguous, state your interpretation before answering."*
+
+- 🫏 **Donkey:** The warehouse robot dispatched to find the right saddlebag shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -309,14 +327,14 @@ for case in GOLDEN_DATASET:
 
 **When to run this:**
 
-| Trigger | Why |
-|---|---|
-| Changed a prompt template | Prompts affect every answer — regression test ALL cases |
-| Switched LLM model | Different models behave differently — baseline them |
-| Changed chunking strategy | Affects retrieval quality — test #1, #2, #3 |
-| Changed `top_k` or `chunk_size` | Affects context quality — test all cases |
-| Before deploying to production | Final sanity check |
-| In CI/CD pipeline | Automated regression on every PR |
+| Trigger | Why | 🫏 Donkey |
+|---|---| --- |
+| Changed a prompt template | Prompts affect every answer — regression test ALL cases | Delivery note 📋 |
+| Switched LLM model | Different models behave differently — baseline them | The donkey 🐴 |
+| Changed chunking strategy | Affects retrieval quality — test #1, #2, #3 | Saddlebag fetch 🎒 |
+| Changed `top_k` or `chunk_size` | Affects context quality — test all cases | Saddlebag piece 📦 |
+| Before deploying to production | Final sanity check | Robot hand 🤖 |
+| In CI/CD pipeline | Automated regression on every PR | Robot hand 🤖 |
 
 ### Running the Golden Dataset via the API
 
@@ -342,19 +360,21 @@ The suite runs each golden dataset case through the **live RAG pipeline** (not m
 
 📖 **See:** [Evaluate Endpoint Deep Dive](../architecture-and-design/api-routes/evaluate-endpoint-explained.md) · [API Reference → Evaluation](../reference/api-reference.md)
 
+- 🫏 **Donkey:** The 25 standard test deliveries the donkey must pass every release — a fixed benchmark that never changes so you can compare runs fairly.
+
 ---
 
 ## Cloud vs Local — Same Dataset, Different Baselines
 
 The golden dataset is **identical** across providers. The test cases, questions, expected keywords, and context chunks don't change. But the **scores will differ** because models behave differently:
 
-| Test case | Claude 3.5 (AWS) | GPT-4o (Azure) | llama3.2 (Local) |
-|---|---|---|---|
-| `refund_basic` | ~0.92 | ~0.90 | ~0.80 |
-| `refund_digital` | ~0.91 | ~0.88 | ~0.75 |
-| `shipping_return` | ~0.88 | ~0.86 | ~0.78 |
-| `no_context_available` | ~0.95 | ~0.93 | ~0.70 ⚠️ |
-| `ambiguous_question` | ~0.80 | ~0.78 | ~0.60 |
+| Test case | Claude 3.5 (AWS) | GPT-4o (Azure) | llama3.2 (Local) | 🫏 Donkey |
+|---|---|---|---| --- |
+| `refund_basic` | ~0.92 | ~0.90 | ~0.80 | 🫏 On the route |
+| `refund_digital` | ~0.91 | ~0.88 | ~0.75 | 🫏 On the route |
+| `shipping_return` | ~0.88 | ~0.86 | ~0.78 | 🫏 On the route |
+| `no_context_available` | ~0.95 | ~0.93 | ~0.70 ⚠️ | 🫏 On the route |
+| `ambiguous_question` | ~0.80 | ~0.78 | ~0.60 | 🫏 On the route |
 
 ⚠️ **Local models may struggle with case #4** — smaller models sometimes try to answer instead of refusing. If `no_context_available` fails locally:
 - Lower `min_faithfulness` to 0.7 for local testing
@@ -372,6 +392,8 @@ CLOUD_PROVIDER=aws python -m pytest tests/test_golden_dataset.py
 
 # 3. Deploy only if cloud tests pass
 ```
+
+- 🫏 **Donkey:** Running the donkey on rented pasture — AWS or Azure provides the stable so you only pay for the hay consumed.
 
 ---
 
@@ -398,13 +420,15 @@ When you encounter a bug in production (e.g., the LLM gives a wrong answer), add
 
 **Guidelines for new cases:**
 
-| Guideline | Why |
-|---|---|
-| At least 1 happy path per category | Baseline behaviour |
-| At least 1 edge case | Boundary behaviour |
-| Put previous hallucinations in `expected_not_in_answer` | Regression-proof the fix |
-| Use realistic similarity scores (0.4–0.95) | Don't use 1.0 — real search is never perfect |
-| Set thresholds based on cloud model performance | Don't set to 0.99 — allow natural variation |
+| Guideline | Why | 🫏 Donkey |
+|---|---| --- |
+| At least 1 happy path per category | Baseline behaviour | 🫏 On the route |
+| At least 1 edge case | Boundary behaviour | 🫏 On the route |
+| Put previous hallucinations in `expected_not_in_answer` | Regression-proof the fix | Memory drift ⚠️ |
+| Use realistic similarity scores (0.4–0.95) | Don't use 1.0 — real search is never perfect | Compass bearing 🧭 |
+| Set thresholds based on cloud model performance | Don't set to 0.99 — allow natural variation | Manifest template 📋 |
+
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -431,6 +455,8 @@ When you encounter a bug in production (e.g., the LLM gives a wrong answer), add
 - [ ] How would you weight test case failures? (Is `no_context_available` failing worse than `ambiguous_question`?)
 - [ ] How would you version golden datasets alongside model versions?
 
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+
 ---
 
 ## What to Study Next
@@ -444,3 +470,4 @@ You now understand how to build test suites for AI systems. Last file:
 - [RAG Chain Deep Dive (#13)](rag-chain-deep-dive.md) — the pipeline being tested
 - [CI/CD Explained](../architecture-and-design/cicd-explained.md) — where golden dataset tests run automatically
 
+- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

@@ -32,43 +32,43 @@ here's what it costs:
 
 ### Local (current setup) — FREE
 
-| Component | Tool | Cost |
-| --- | --- | --- |
-| LLM | Ollama + llama3.2 (3B) | **$0** — runs on your CPU |
-| Embeddings | nomic-embed-text (137M) | **$0** — runs on your CPU |
-| Vector store | ChromaDB (local file) | **$0** — local SQLite |
-| API server | Uvicorn (local) | **$0** — runs on your machine |
-| **Total for all labs** | | **$0** |
+| Component | Tool | Cost | 🫏 Donkey |
+| --- | --- | --- | --- |
+| LLM | Ollama + llama3.2 (3B) | **$0** — runs on your CPU | The donkey 🐴 |
+| Embeddings | nomic-embed-text (137M) | **$0** — runs on your CPU | Free hay 🌿 |
+| Vector store | ChromaDB (local file) | **$0** — local SQLite | Local barn 🏚️ |
+| API server | Uvicorn (local) | **$0** — runs on your machine | Stable door 🚪 |
+| **Total for all labs** | | **$0** | Feed bill 🌾 |
 
 ### AWS — Estimated cost for running these labs
 
-| Component | AWS Service | Cost per lab session (~50 queries) | Monthly if left running |
-| --- | --- | --- | --- |
-| LLM | Bedrock (Claude 3 Haiku) | ~$0.02 (input+output tokens) | Pay per use only |
-| Embeddings | Bedrock (Titan Embed v2) | ~$0.001 | Pay per use only |
-| Vector store | OpenSearch Serverless | ⚠️ **~$350/month minimum** (4 OCUs) | Avoid for portfolio |
-| Vector store (alt) | DynamoDB + local embeddings | ~$0 (free tier: 25GB + 25 RCU/WCU) | $0 in free tier |
-| API server | ECS Fargate (0.25 vCPU, 0.5GB) | ~$0.01/hour when running | ~$7/month if 24/7 |
-| API server (alt) | Lambda + API Gateway | ~$0 for lab traffic | $0 in free tier |
-| Logs | CloudWatch | ~$0 | $0 in free tier |
-| **Total (cheapest path)** | Bedrock + DynamoDB + Lambda | **~$0.03 per lab session** | **~$1/month** |
-| **Total (full stack)** | Bedrock + OpenSearch + ECS | **~$0.03 per lab session** | **⚠️ ~$360/month** |
+| Component | AWS Service | Cost per lab session (~50 queries) | Monthly if left running | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| LLM | Bedrock (Claude 3 Haiku) | ~$0.02 (input+output tokens) | Pay per use only | The donkey 🐴 |
+| Embeddings | Bedrock (Titan Embed v2) | ~$0.001 | Pay per use only | The donkey 🐴 |
+| Vector store | OpenSearch Serverless | ⚠️ **~$350/month minimum** (4 OCUs) | Avoid for portfolio | AWS search hub 🔍 |
+| Vector store (alt) | DynamoDB + local embeddings | ~$0 (free tier: 25GB + 25 RCU/WCU) | $0 in free tier | AWS depot 🏭 |
+| API server | ECS Fargate (0.25 vCPU, 0.5GB) | ~$0.01/hour when running | ~$7/month if 24/7 | Stable stall 🐎 |
+| API server (alt) | Lambda + API Gateway | ~$0 for lab traffic | $0 in free tier | Stable door 🚪 |
+| Logs | CloudWatch | ~$0 | $0 in free tier | Tachograph 📊 |
+| **Total (cheapest path)** | Bedrock + DynamoDB + Lambda | **~$0.03 per lab session** | **~$1/month** | The donkey 🐴 |
+| **Total (full stack)** | Bedrock + OpenSearch + ECS | **~$0.03 per lab session** | **⚠️ ~$360/month** | The donkey 🐴 |
 
 > **Recommendation:** Use Bedrock (pay-per-use) + DynamoDB (free tier) + Lambda (free tier).
 > Avoid OpenSearch Serverless for portfolio work — the $350/month minimum is not justified.
 
 ### Azure — Estimated cost for running these labs
 
-| Component | Azure Service | Cost per lab session (~50 queries) | Monthly if left running |
-| --- | --- | --- | --- |
-| LLM | Azure OpenAI (GPT-4o mini) | ~$0.01 (input+output tokens) | Pay per use only |
-| Embeddings | Azure OpenAI (text-embedding-3-small) | ~$0.001 | Pay per use only |
-| Vector store | Azure AI Search (Free tier) | **$0** | $0 (free tier: 3 indexes, 50MB) |
-| Vector store (paid) | Azure AI Search (Basic) | ~$0 for lab traffic | ~$75/month |
-| API server | Azure Container Apps | ~$0 (free tier: 180K vCPU-sec/month) | $0 in free tier |
-| Logs | Azure Monitor | ~$0 | $0 in free tier |
-| **Total (cheapest path)** | OpenAI + AI Search free + Container Apps free | **~$0.01 per lab session** | **~$0/month** |
-| **Total (paid tier)** | OpenAI + AI Search Basic + Container Apps | **~$0.01 per lab session** | **~$75/month** |
+| Component | Azure Service | Cost per lab session (~50 queries) | Monthly if left running | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| LLM | Azure OpenAI (GPT-4o mini) | ~$0.01 (input+output tokens) | Pay per use only | The donkey 🐴 |
+| Embeddings | Azure OpenAI (text-embedding-3-small) | ~$0.001 | Pay per use only | The donkey 🐴 |
+| Vector store | Azure AI Search (Free tier) | **$0** | $0 (free tier: 3 indexes, 50MB) | Azure hub ☁️ |
+| Vector store (paid) | Azure AI Search (Basic) | ~$0 for lab traffic | ~$75/month | Azure hub ☁️ |
+| API server | Azure Container Apps | ~$0 (free tier: 180K vCPU-sec/month) | $0 in free tier | Stable stall 🐎 |
+| Logs | Azure Monitor | ~$0 | $0 in free tier | Free hay 🌿 |
+| **Total (cheapest path)** | OpenAI + AI Search free + Container Apps free | **~$0.01 per lab session** | **~$0/month** | The donkey 🐴 |
+| **Total (paid tier)** | OpenAI + AI Search Basic + Container Apps | **~$0.01 per lab session** | **~$75/month** | The donkey 🐴 |
 
 > **Recommendation:** Azure's free tiers are more generous for this use case. AI Search
 > free tier (3 indexes, 50MB) is enough for all labs. Container Apps free tier handles
@@ -76,13 +76,15 @@ here's what it costs:
 
 ### Summary
 
-| Stack | Per lab session | Monthly (always on) | Best for |
-| --- | --- | --- | --- |
-| **Local (Ollama)** | $0 | $0 | Learning, experimenting (current) |
-| **AWS (cheapest)** | ~$0.03 | ~$1 | Proving cloud deployment skills |
-| **Azure (cheapest)** | ~$0.01 | ~$0 | Best free tier for portfolio |
-| **AWS (full)** | ~$0.03 | ~$360 | ⚠️ Production only |
-| **Azure (paid)** | ~$0.01 | ~$75 | Production staging |
+| Stack | Per lab session | Monthly (always on) | Best for | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| **Local (Ollama)** | $0 | $0 | Learning, experimenting (current) | The donkey 🐴 |
+| **AWS (cheapest)** | ~$0.03 | ~$1 | Proving cloud deployment skills | Robot hand 🤖 |
+| **Azure (cheapest)** | ~$0.01 | ~$0 | Best free tier for portfolio | Free hay 🌿 |
+| **AWS (full)** | ~$0.03 | ~$360 | ⚠️ Production only | Free hay 🌿 |
+| **Azure (paid)** | ~$0.01 | ~$75 | Production staging | Free hay 🌿 |
+
+- 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
 
 ---
 
@@ -118,6 +120,8 @@ Upload it via **Swagger UI** (`http://localhost:8000/docs`):
 
 You'll use this document for all Phase 1 labs.
 
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+
 ---
 
 ## 🫏 The Donkey Analogy — Understanding Phase 1 Metrics
@@ -126,14 +130,14 @@ Imagine you own a donkey that delivers packages in a village. You give the donke
 an address, it walks to a shelf of packages, picks some, and delivers them to the
 customer. Phase 1 metrics measure **how well the donkey does its job:**
 
-| Metric | Donkey version | What it really measures | How it's calculated |
-| --- | --- | --- | --- |
-| **retrieval** | Did the donkey grab the **right packages** from the shelf? If you asked for "refund policy" and it brought back 3 refund-related packages out of 5 total, that's decent retrieval. If it brought back 5 packages about office furniture — terrible retrieval. | How relevant are the chunks the vector store returned for your question. | `avg(cosine_similarity)` of all retrieved chunks. Each chunk gets a 0.0–1.0 similarity score from the vector store. E.g. 5 chunks scoring [0.92, 0.85, 0.71, 0.45, 0.19] → retrieval = 3.12/5 = **0.624**. That's why top_k=1 scores higher (only the best chunk counts). |
-| **faithfulness** | Did the donkey **only deliver what it picked up**, or did it add random items from its own pocket? If the customer opens the delivery and finds exactly what was on the shelf — faithful. If the donkey added a sandwich it found on the road — hallucination. | Does the LLM answer contain ONLY information from the retrieved chunks, or did it make things up? | Split answer into sentences → extract keywords per sentence (skip stop words) → check if ≥50% of keywords exist in the retrieved chunks. `grounded_sentences / total_sentences`. E.g. 3 of 4 sentences have keywords in context → **0.750**. Score of 0.000 = every sentence was hallucinated. |
-| **answer_relevance** | Did the customer **get what they actually asked for?** The donkey might faithfully deliver the right packages from the shelf, but if the customer asked "what's the return window?" and the answer talks about shipping costs — irrelevant. | Does the answer actually address the question that was asked? | Extract keywords from the question → count how many appear in the answer. `found_keywords / total_keywords`. E.g. question "What is the refund policy?" has keywords [refund, policy], both found in answer → **1.000**. |
-| **overall** | The donkey's **performance review** — a weighted average: 30% right packages (retrieval) + 40% didn't add extras (faithfulness) + 30% customer got what they asked for (relevance). A score of 0.70+ means the donkey gets to keep its job. | Weighted combination: retrieval x 0.3 + faithfulness x 0.4 + relevance x 0.3. | `(retrieval × 0.3) + (faithfulness × 0.4) + (relevance × 0.3)`. Faithfulness gets highest weight because hallucinated answers LOOK correct but are WRONG — most dangerous. E.g. (0.624×0.3)+(0.750×0.4)+(1.0×0.3) = **0.787** ✅ PASS (≥0.70). |
-| **latency** | **How long** did the donkey take to walk to the shelf, pick packages, and deliver? A village donkey (local Ollama) takes 10–60 seconds. A racing donkey (cloud GPU) takes 1–3 seconds. | Total time from question to answer, including embedding, retrieval, and LLM generation. | Wall-clock time in milliseconds: `time_end - time_start`. Includes embedding (~50ms local, ~200ms cloud), vector search (~10ms), and LLM generation (dominates — local Ollama 10-60s, cloud GPU 1-3s). |
-| **top_k** | How many packages you **told the donkey to grab** from the shelf. `top_k=1` means "bring me only the single best match" (fast, precise, but risky if the answer spans multiple sections). `top_k=10` means "bring 10 packages" (slower, noisier, but the right one is probably in there somewhere). | Number of document chunks retrieved from the vector store per query. | Config parameter (not calculated). Passed to vector store: `vectorstore.similarity_search(query, k=top_k)`. Directly affects retrieval score — higher top_k pulls in lower-relevance chunks, dragging the average down. |
+| Metric | Donkey version | What it really measures | How it's calculated | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| **retrieval** | Did the donkey grab the **right packages** from the shelf? If you asked for "refund policy" and it brought back 3 refund-related packages out of 5 total, that's decent retrieval. If it brought back 5 packages about office furniture — terrible retrieval. | How relevant are the chunks the vector store returned for your question. | `avg(cosine_similarity)` of all retrieved chunks. Each chunk gets a 0.0–1.0 similarity score from the vector store. E.g. 5 chunks scoring [0.92, 0.85, 0.71, 0.45, 0.19] → retrieval = 3.12/5 = **0.624**. That's why top_k=1 scores higher (only the best chunk counts). | Saddlebag piece 📦 |
+| **faithfulness** | Did the donkey **only deliver what it picked up**, or did it add random items from its own pocket? If the customer opens the delivery and finds exactly what was on the shelf — faithful. If the donkey added a sandwich it found on the road — hallucination. | Does the LLM answer contain ONLY information from the retrieved chunks, or did it make things up? | Split answer into sentences → extract keywords per sentence (skip stop words) → check if ≥50% of keywords exist in the retrieved chunks. `grounded_sentences / total_sentences`. E.g. 3 of 4 sentences have keywords in context → **0.750**. Score of 0.000 = every sentence was hallucinated. | The donkey 🐴 |
+| **answer_relevance** | Did the customer **get what they actually asked for?** The donkey might faithfully deliver the right packages from the shelf, but if the customer asked "what's the return window?" and the answer talks about shipping costs — irrelevant. | Does the answer actually address the question that was asked? | Extract keywords from the question → count how many appear in the answer. `found_keywords / total_keywords`. E.g. question "What is the refund policy?" has keywords [refund, policy], both found in answer → **1.000**. | Feed bill 🌾 |
+| **overall** | The donkey's **performance review** — a weighted average: 30% right packages (retrieval) + 40% didn't add extras (faithfulness) + 30% customer got what they asked for (relevance). A score of 0.70+ means the donkey gets to keep its job. | Weighted combination: retrieval x 0.3 + faithfulness x 0.4 + relevance x 0.3. | `(retrieval × 0.3) + (faithfulness × 0.4) + (relevance × 0.3)`. Faithfulness gets highest weight because hallucinated answers LOOK correct but are WRONG — most dangerous. E.g. (0.624×0.3)+(0.750×0.4)+(1.0×0.3) = **0.787** ✅ PASS (≥0.70). | Saddlebag check 🫏 |
+| **latency** | **How long** did the donkey take to walk to the shelf, pick packages, and deliver? A village donkey (local Ollama) takes 10–60 seconds. A racing donkey (cloud GPU) takes 1–3 seconds. | Total time from question to answer, including embedding, retrieval, and LLM generation. | Wall-clock time in milliseconds: `time_end - time_start`. Includes embedding (~50ms local, ~200ms cloud), vector search (~10ms), and LLM generation (dominates — local Ollama 10-60s, cloud GPU 1-3s). | The donkey 🐴 |
+| **top_k** | How many packages you **told the donkey to grab** from the shelf. `top_k=1` means "bring me only the single best match" (fast, precise, but risky if the answer spans multiple sections). `top_k=10` means "bring 10 packages" (slower, noisier, but the right one is probably in there somewhere). | Number of document chunks retrieved from the vector store per query. | Config parameter (not calculated). Passed to vector store: `vectorstore.similarity_search(query, k=top_k)`. Directly affects retrieval score — higher top_k pulls in lower-relevance chunks, dragging the average down. | Saddlebag fetch 🎒 |
 
 **The key trade-off you'll discover in Lab 1:**
 
@@ -146,6 +150,8 @@ top_k=10: 🫏 grabs 10 packages → slow, noisy, but nothing is missed
 The donkey's dilemma: grab fewer packages (high retrieval score, risk missing info)
 or grab more (low retrieval score, but safer for complex questions). This is the
 **retrieval-faithfulness trade-off** — the foundation of every RAG system.
+
+- 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
 
 ---
 
@@ -175,13 +181,13 @@ Click **"Execute"**.
 
 📝 **Write down your baseline:**
 
-| Score | Your value | Quality label |
-|---|---|---|
-| retrieval | ___ | ___ |
-| faithfulness | ___ | ___ |
-| answer_relevance | ___ | ___ |
-| overall | ___ | ___ |
-| latency | ___s | ___ |
+| Score | Your value | Quality label | 🫏 Donkey |
+|---|---|---| --- |
+| retrieval | ___ | ___ | 🫏 On the route |
+| faithfulness | ___ | ___ | Saddlebag match 🫏 |
+| answer_relevance | ___ | ___ | Right address 🎯 |
+| overall | ___ | ___ | 🫏 On the route |
+| latency | ___s | ___ | 🫏 On the route |
 
 > **What to expect (local):** retrieval 0.55–0.70, faithfulness 0.70–0.85, answer_relevance 0.90–1.0, overall 0.70–0.85, latency 10–60s on CPU.
 
@@ -242,21 +248,21 @@ In **Swagger UI** → `POST /api/evaluate` → **"Try it out"**:
 
 📝 **Record your results:**
 
-| top_k | retrieval | faithfulness | overall | latency | What happened? |
-|---|---|---|---|---|---|
-| 1 | ___ | ___ | ___ | ___s | ___ |
-| 5 (default) | ___ | ___ | ___ | ___s | ___ |
-| 10 | ___ | ___ | ___ | ___s | ___ |
+| top_k | retrieval | faithfulness | overall | latency | What happened? | 🫏 Donkey |
+|---|---|---|---|---|---| --- |
+| 1 | ___ | ___ | ___ | ___s | ___ | 🫏 On the route |
+| 5 (default) | ___ | ___ | ___ | ___s | ___ | 🫏 On the route |
+| 10 | ___ | ___ | ___ | ___s | ___ | 🫏 On the route |
 
 > **What to expect (local):** top_k=1 typically scores highest retrieval (0.70–0.80) but risks missing multi-section context. top_k=10 dilutes retrieval (0.45–0.60) but provides more context. Latency scales roughly linearly with top_k.
 
 **Expected pattern:**
 
-| top_k | Expected retrieval | Your result | Expected faithfulness | Your result | Why |
-|---|---|---|---|---|---|
-| 1 | Higher (only best chunk) | ___ | May drop (missing context) | ___ | Only 1 chunk → focused answer, no filler sentences |
-| 5 | Balanced | ___ | Balanced | ___ | Middle ground — LLM may add disclaimer |
-| 10 | Lower (diluted by weak chunks) | ___ | May improve (more context) | ___ | All context available → confident answer |
+| top_k | Expected retrieval | Your result | Expected faithfulness | Your result | Why | 🫏 Donkey |
+|---|---|---|---|---|---| --- |
+| 1 | Higher (only best chunk) | ___ | May drop (missing context) | ___ | Only 1 chunk → focused answer, no filler sentences | Saddlebag piece 📦 |
+| 5 | Balanced | ___ | Balanced | ___ | Middle ground — LLM may add disclaimer | The donkey 🐴 |
+| 10 | Lower (diluted by weak chunks) | ___ | May improve (more context) | ___ | All context available → confident answer | Saddlebag piece 📦 |
 
 > ### 📊 What These Results Reveal — The Three Trade-offs
 >
@@ -308,14 +314,14 @@ In **Swagger UI** → `POST /api/evaluate`, enter:
 
 📝 **Results:**
 
-| Metric | Value | Interpretation |
-| --- | --- | --- |
-| retrieval | ___ | ChromaDB returned *something* — but nothing relevant |
-| faithfulness | ___ | Evaluator flagged sentences as "not from context" |
-| has_hallucination | ___ | Check the analysis below |
-| answer_relevance | ___ | ___ |
-| overall | ___ | ___ |
-| evaluation_notes | ___ | ___ |
+| Metric | Value | Interpretation | 🫏 Donkey |
+| --- | --- | --- | --- |
+| retrieval | ___ | ChromaDB returned *something* — but nothing relevant | Local barn 🏚️ |
+| faithfulness | ___ | Evaluator flagged sentences as "not from context" | Report card 📝 |
+| has_hallucination | ___ | Check the analysis below | Memory drift ⚠️ |
+| answer_relevance | ___ | ___ | Right address 🎯 |
+| overall | ___ | ___ | 🫏 On the route |
+| evaluation_notes | ___ | ___ | Report card 📝 |
 
 > **What to expect (local):** retrieval 0.40–0.60 (irrelevant chunks returned), faithfulness near 0.0 (refusal gets flagged), overall below 0.5 (FAIL). The failure is correct — see analysis below.
 
@@ -391,6 +397,8 @@ This trade-off is the first thing an AI engineer checks when debugging a bad ans
 > new documents. Fine-tuning is for when you need the model to behave differently (tone, format).
 > Your Lab 1 experience: upload `test-policy.txt` → instantly answerable. No training needed.
 
+- 🫏 **Donkey:** Saddlebag-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
+
 ---
 
 ## Lab 2: Faithfulness & Hallucination — "Is the AI making things up?"
@@ -425,13 +433,13 @@ In **Swagger UI** → `POST /api/evaluate`, enter:
 
 📝 **Results:**
 
-| Metric | Value | Interpretation |
-| --- | --- | --- |
-| retrieval | ___ | ___ |
-| faithfulness | ___ | ___ |
-| has_hallucination | ___ | ___ |
-| answer_relevance | ___ | ___ |
-| overall | ___ | ___ |
+| Metric | Value | Interpretation | 🫏 Donkey |
+| --- | --- | --- | --- |
+| retrieval | ___ | ___ | 🫏 On the route |
+| faithfulness | ___ | ___ | Saddlebag match 🫏 |
+| has_hallucination | ___ | ___ | Memory drift ⚠️ |
+| answer_relevance | ___ | ___ | Right address 🎯 |
+| overall | ___ | ___ | 🫏 On the route |
 
 > **What to expect (local):** retrieval 0.55–0.70 (found the right section), faithfulness 0.60–0.85, has_hallucination may be true (see analysis below). The LLM may correctly say "14 days" while quoting "30 days" from the question — which the evaluator flags.
 
@@ -458,25 +466,25 @@ In **Swagger UI** → `POST /api/evaluate`, enter:
 
 📝 **Results:**
 
-| Metric | Value | Interpretation |
-| --- | --- | --- |
-| retrieval | ___ | ___ |
-| faithfulness | ___ | ___ |
-| has_hallucination | ___ | ___ |
-| answer_relevance | ___ | ___ |
-| overall | ___ | ___ |
-| latency | ___s | ___ |
+| Metric | Value | Interpretation | 🫏 Donkey |
+| --- | --- | --- | --- |
+| retrieval | ___ | ___ | 🫏 On the route |
+| faithfulness | ___ | ___ | Saddlebag match 🫏 |
+| has_hallucination | ___ | ___ | Memory drift ⚠️ |
+| answer_relevance | ___ | ___ | Right address 🎯 |
+| overall | ___ | ___ | 🫏 On the route |
+| latency | ___s | ___ | 🫏 On the route |
 
 > **What to expect (local):** retrieval 0.65–0.80 (direct keyword match helps), faithfulness near 1.0 (answer comes straight from document), overall should pass comfortably.
 
 📝 **Compare:**
 
-| | Experiment 2a (trick) | Experiment 2b (truthful) | Gap |
-| --- | --- | --- | --- |
-| faithfulness | ___ | ___ | The gap IS the hallucination signal |
-| has_hallucination | ___ | ___ | 2a may be flagged because LLM quoted "30 days" from the question |
-| retrieval | ___ | ___ | "How many days" matches the document better than "after 30 days" |
-| latency | ___s | ___s | Shorter answers = fewer output tokens = faster |
+| | Experiment 2a (trick) | Experiment 2b (truthful) | Gap | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| faithfulness | ___ | ___ | The gap IS the hallucination signal | Memory drift ⚠️ |
+| has_hallucination | ___ | ___ | 2a may be flagged because LLM quoted "30 days" from the question | The donkey 🐴 |
+| retrieval | ___ | ___ | "How many days" matches the document better than "after 30 days" | 🫏 On the route |
+| latency | ___s | ___s | Shorter answers = fewer output tokens = faster | Cargo unit ⚖️ |
 
 ### Experiment 2c — Edge case: ambiguous question
 
@@ -492,13 +500,13 @@ In **Swagger UI** → `POST /api/evaluate`, enter:
 
 📝 **Results:**
 
-| Metric | Value | Interpretation |
-| --- | --- | --- |
-| retrieval | ___ | Lowest retrieval — "how long?" is too vague for precise vector search |
-| faithfulness | ___ | ___ |
-| has_hallucination | ___ | ___ |
-| answer_relevance | ___ | ___ |
-| overall | ___ | ___ |
+| Metric | Value | Interpretation | 🫏 Donkey |
+| --- | --- | --- | --- |
+| retrieval | ___ | Lowest retrieval — "how long?" is too vague for precise vector search | GPS warehouse 🗺️ |
+| faithfulness | ___ | ___ | Saddlebag match 🫏 |
+| has_hallucination | ___ | ___ | Memory drift ⚠️ |
+| answer_relevance | ___ | ___ | Right address 🎯 |
+| overall | ___ | ___ | 🫏 On the route |
 
 > **What to expect (local):** retrieval 0.40–0.55 (vague query = poor embedding match), faithfulness may be high if the model refuses to guess. overall may surprise you — see analysis below.
 
@@ -534,12 +542,12 @@ The evaluator catches hallucination by: splitting the answer into sentences → 
 
 **Your experiments revealed three patterns:**
 
-| Pattern | Evidence | Lesson |
-| --- | --- | --- |
-| Correct answer flagged as hallucination | 2a: LLM may say "No, not after 30 days" — correct, but flagged | Heuristic evaluators have false positives |
-| Direct quote = perfect faithfulness | 2b: LLM quoted "14 business days" directly → high faithfulness | Faithfulness rewards sticking to source text |
-| Refusal beats risky correctness | 2c may score higher than 2a | "I don't know" is the safest answer for evaluation |
-| Vague question = retrieval problem | 2c: retrieval dropped significantly | Ambiguity hurts retrieval, not generation |
+| Pattern | Evidence | Lesson | 🫏 Donkey |
+| --- | --- | --- | --- |
+| Correct answer flagged as hallucination | 2a: LLM may say "No, not after 30 days" — correct, but flagged | Heuristic evaluators have false positives | The donkey 🐴 |
+| Direct quote = perfect faithfulness | 2b: LLM quoted "14 business days" directly → high faithfulness | Faithfulness rewards sticking to source text | The donkey 🐴 |
+| Refusal beats risky correctness | 2c may score higher than 2a | "I don't know" is the safest answer for evaluation | Report card 📝 |
+| Vague question = retrieval problem | 2c: retrieval dropped significantly | Ambiguity hurts retrieval, not generation | 🫏 On the route |
 
 **✅ Skill unlocked:** You can detect hallucination, understand the faithfulness score, and explain why it gets 40% weight. You can tell the difference between a retrieval problem (wrong chunks) and a generation problem (hallucinated from good chunks). You can also identify when the *evaluator itself* is wrong — a critical skill for AI engineering.
 
@@ -568,20 +576,24 @@ The evaluator catches hallucination by: splitting the answer into sentences → 
 > In production, you'd use LLM-as-judge (a second model evaluating the first) or Bedrock Guardrails
 > grounding checks — both understand context better than keyword overlap.
 
+- 🫏 **Donkey:** When the donkey ignores the saddlebag and invents an answer from memory — RAG is the cure.
+
 ---
 
 ## Phase 1 Labs — Skills Checklist
 
 After completing Labs 1 and 2, check off:
 
-| # | Skill | Lab | Can you explain it? |
-|---|---|---|---|
-| 1 | Retrieval quality measurement | Lab 1 | [ ] Yes |
-| 2 | Retrieval-faithfulness trade-off | Lab 1 | [ ] Yes |
-| 3 | top_k tuning and its impact | Lab 1 | [ ] Yes |
-| 4 | Hallucination detection | Lab 2 | [ ] Yes |
-| 5 | Faithfulness scoring and weight | Lab 2 | [ ] Yes |
-| 6 | Diagnosing retrieval vs generation problems | Lab 2 | [ ] Yes |
+| # | Skill | Lab | Can you explain it? | 🫏 Donkey |
+|---|---|---|---| --- |
+| 1 | Retrieval quality measurement | Lab 1 | [ ] Yes | Saddlebag fetch 🎒 |
+| 2 | Retrieval-faithfulness trade-off | Lab 1 | [ ] Yes | Saddlebag match 🫏 |
+| 3 | top_k tuning and its impact | Lab 1 | [ ] Yes | 🫏 On the route |
+| 4 | Hallucination detection | Lab 2 | [ ] Yes | Memory drift ⚠️ |
+| 5 | Faithfulness scoring and weight | Lab 2 | [ ] Yes | Report card 📝 |
+| 6 | Diagnosing retrieval vs generation problems | Lab 2 | [ ] Yes | 🫏 On the route |
+
+- 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
 
 ---
 

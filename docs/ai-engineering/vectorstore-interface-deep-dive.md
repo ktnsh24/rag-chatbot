@@ -30,12 +30,14 @@ The vector store is the **"database" of the RAG system**. But unlike a regular D
 
 > **Fun twist:** One of our implementations (`aws_dynamodb.py`) actually *uses* DynamoDB as a vector store by storing embeddings as JSON and computing cosine similarity in Python. It proves that any database can be a vector store — the difference is performance (brute-force vs HNSW indexing). See the [DynamoDB deep dive](vectorstore-providers-deep-dive.md#aws-dynamodb-the-cheap-alternative--0month-vector-store).
 
-| What you'll learn | DE parallel |
-|---|---|
-| How embeddings are stored | How rows are inserted into DynamoDB |
-| How semantic search works (conceptually) | How key-based or index-based lookups work |
-| What a similarity score means | What a query result set means |
-| How documents are managed (store + delete) | How records are managed (put + delete) |
+| What you'll learn | DE parallel | 🫏 Donkey |
+|---|---| --- |
+| How embeddings are stored | How rows are inserted into DynamoDB | AWS depot 🏭 |
+| How semantic search works (conceptually) | How key-based or index-based lookups work | 🫏 On the route |
+| What a similarity score means | What a query result set means | Compass bearing 🧭 |
+| How documents are managed (store + delete) | How records are managed (put + delete) | 🫏 On the route |
+
+- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -58,6 +60,8 @@ The vector store is the **"database" of the RAG system**. But unlike a regular D
 
 The interface pattern is identical — ABC with abstract methods for CRUD operations. The *data* it stores and the *way* it searches are what's new.
 
+- 🫏 **Donkey:** Running multiple donkeys on the same route to confirm that AI engineering and data engineering practices mirror each other.
+
 ---
 
 ## Concept 1: VectorSearchResult — What Comes Back from a Semantic Search
@@ -75,13 +79,13 @@ class VectorSearchResult:
 
 ### What each field means
 
-| Field | What it is | DE parallel |
-|---|---|---|
-| `text` | The actual chunk text — what the LLM will read | The row data |
-| `document_name` | Source document (e.g., "refund-policy.pdf") | The table or source name |
-| `score` | How similar this chunk is to the query (0.0–1.0) | ❌ **No DE parallel** — this is new |
-| `page_number` | Where in the original document | Like a row number or partition |
-| `metadata` | Anything extra (document_id, chunk_index) | Additional attributes |
+| Field | What it is | DE parallel | 🫏 Donkey |
+|---|---|---| --- |
+| `text` | The actual chunk text — what the LLM will read | The row data | The donkey 🐴 |
+| `document_name` | Source document (e.g., "refund-policy.pdf") | The table or source name | 🫏 On the route |
+| `score` | How similar this chunk is to the query (0.0–1.0) | ❌ **No DE parallel** — this is new | Saddlebag piece 📦 |
+| `page_number` | Where in the original document | Like a row number or partition | 🫏 On the route |
+| `metadata` | Anything extra (document_id, chunk_index) | Additional attributes | Saddlebag piece 📦 |
 
 ### The `score` field — the new concept
 
@@ -96,14 +100,16 @@ Results:
   Chunk 3:  "We offer free shipping on all orders..."               score: 0.31  ← barely relevant
 ```
 
-| Score range | Meaning | Action |
-|---|---|---|
-| 0.85–1.0 | Highly relevant — almost certainly the right chunk | Send to LLM ✅ |
-| 0.70–0.85 | Relevant — probably useful context | Send to LLM ✅ |
-| 0.50–0.70 | Marginal — might add noise | Consider filtering ⚠️ |
-| 0.0–0.50 | Irrelevant — wastes tokens and confuses the LLM | Filter out ❌ |
+| Score range | Meaning | Action | 🫏 Donkey |
+|---|---|---| --- |
+| 0.85–1.0 | Highly relevant — almost certainly the right chunk | Send to LLM ✅ | The donkey 🐴 |
+| 0.70–0.85 | Relevant — probably useful context | Send to LLM ✅ | The donkey 🐴 |
+| 0.50–0.70 | Marginal — might add noise | Consider filtering ⚠️ | 🫏 On the route |
+| 0.0–0.50 | Irrelevant — wastes tokens and confuses the LLM | Filter out ❌ | The donkey 🐴 |
 
 **Key insight:** Score thresholds are not universal — they depend on your data, your embedding model, and your use case. An AI engineer experiments with different thresholds and measures the impact using the [Evaluation Framework](evaluation-framework-deep-dive.md).
+
+- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -139,6 +145,8 @@ What's stored:                           What's stored:
 **DE parallel:** This is a batch insert — one call stores multiple "rows" (vectors). Like DynamoDB's `batch_write_item` but for embedding vectors instead of key-value pairs.
 
 **Key insight:** The `texts` and `embeddings` lists are paired by index. `texts[0]` is the original text, `embeddings[0]` is its vector representation. Both are stored together so that when you search and find a matching vector, you can return the original text to the LLM.
+
+- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -190,11 +198,13 @@ search(query_embedding=[0.12, -0.45, 0.78, ...], top_k=2)
 
 **Trade-offs:**
 
-| top_k | Pros | Cons |
-|---|---|---|
-| 3 | Less noise, cheaper (fewer tokens to LLM) | Might miss relevant context |
-| **5** | **Good balance (this repo's default)** | **Some noise possible** |
-| 10 | More context, less likely to miss relevant info | More tokens = more cost + noise |
+| top_k | Pros | Cons | 🫏 Donkey |
+|---|---|---| --- |
+| 3 | Less noise, cheaper (fewer tokens to LLM) | Might miss relevant context | The donkey 🐴 |
+| **5** | **Good balance (this repo's default)** | **Some noise possible** | 🫏 On the route |
+| 10 | More context, less likely to miss relevant info | More tokens = more cost + noise | Cargo unit ⚖️ |
+
+- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -213,6 +223,8 @@ async def delete_document(self, document_id: str) -> int:
 2. Re-ingest the new version (chunk → embed → store)
 
 Same pattern as deleting old records before re-loading in an ETL pipeline.
+
+- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -243,6 +255,8 @@ if results[0].score < 0.5:
     return "I don't have relevant information about that"  # Low confidence
 ```
 
+- 🫏 **Donkey:** The warehouse robot dispatched to find the right saddlebag shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+
 ---
 
 ## Where `base.py` Sits in the RAG Pipeline
@@ -265,17 +279,21 @@ QUERY (every user question):                    │
                            Top K chunks → generate() → Answer
 ```
 
+- 🫏 **Donkey:** The donkey checks its saddlebag full of retrieved document chunks before answering — no guessing from memory.
+
 ---
 
 ## Self-Test Questions
 
-| Question | Answer | Concept it tests |
-|---|---|---|
-| "What does a score of 0.3 mean?" | The chunk is semantically far from the query — probably not relevant. It's like a SQL query returning a row that doesn't match your intent. | Similarity scores |
-| "Why does `search()` always return K results even when nothing is relevant?" | Vector search finds the K **nearest** vectors regardless. "Nearest" doesn't mean "relevant" — just closest in the vector space. | Semantic search vs exact match |
-| "Why store the original `text` alongside the `embedding`?" | Embeddings are one-way (can't reverse vector → text). You need the original text to send as context to the LLM. | Embedding properties |
-| "What happens if `texts` and `embeddings` have different lengths?" | Bug — they must be paired by index. text[i] matches embedding[i]. | Store contract |
-| "Why is `document_id` important?" | It lets you delete all vectors for a document when re-ingesting. Without it, you'd have orphaned old vectors. | Document management |
+| Question | Answer | Concept it tests | 🫏 Donkey |
+|---|---|---| --- |
+| "What does a score of 0.3 mean?" | The chunk is semantically far from the query — probably not relevant. It's like a SQL query returning a row that doesn't match your intent. | Similarity scores | Saddlebag piece 📦 |
+| "Why does `search()` always return K results even when nothing is relevant?" | Vector search finds the K **nearest** vectors regardless. "Nearest" doesn't mean "relevant" — just closest in the vector space. | Semantic search vs exact match | Stable door 🚪 |
+| "Why store the original `text` alongside the `embedding`?" | Embeddings are one-way (can't reverse vector → text). You need the original text to send as context to the LLM. | Embedding properties | The donkey 🐴 |
+| "What happens if `texts` and `embeddings` have different lengths?" | Bug — they must be paired by index. text[i] matches embedding[i]. | Store contract | GPS warehouse 🗺️ |
+| "Why is `document_id` important?" | It lets you delete all vectors for a document when re-ingesting. Without it, you'd have orphaned old vectors. | Document management | Pre-sort 📮 |
+
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -287,3 +305,5 @@ Now that you understand the **interface**, study the **implementations**:
 
 📖 **Related docs:**
 - [Deep Dive: Vector Store Providers (AWS OpenSearch + Azure AI Search + Local ChromaDB)](vectorstore-providers-deep-dive.md)
+
+- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

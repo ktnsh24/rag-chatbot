@@ -42,31 +42,35 @@ In file #9 you learned the **interface** for storing and searching vectors. Thes
 
 You may have used OpenSearch for log aggregation in your DE work. Here both platforms are used for a completely different purpose: **finding document chunks that are semantically similar to a question.**
 
-| What you'll learn | DE parallel |
-| --- | --- |
-| How to create a vector index on both platforms | How to create an OpenSearch index for logs |
-| How HNSW (vector search algorithm) works | How an inverted index works for text search |
-| How k-NN / vector queries find similar vectors | How Elasticsearch `match` queries find matching documents |
-| Cost differences between managed vector stores | Cost differences between DynamoDB on-demand vs provisioned |
+| What you'll learn | DE parallel | 🫏 Donkey |
+| --- | --- | --- |
+| How to create a vector index on both platforms | How to create an OpenSearch index for logs | AWS search hub 🔍 |
+| How HNSW (vector search algorithm) works | How an inverted index works for text search | GPS warehouse 🗺️ |
+| How k-NN / vector queries find similar vectors | How Elasticsearch `match` queries find matching documents | GPS warehouse 🗺️ |
+| Cost differences between managed vector stores | Cost differences between DynamoDB on-demand vs provisioned | AWS depot 🏭 |
+
+- 🫏 **Donkey:** Understanding why the stable was built this way — every architectural choice is a trade-off the head groom made deliberately.
 
 ---
 
 ## The Providers Side by Side
 
-| Aspect | AWS OpenSearch Serverless | AWS DynamoDB (cheap) | Azure AI Search |
-| --- | --- | --- | --- |
-| **SDK** | `opensearchpy` | `boto3` (already installed) | `azure-search-documents` |
-| **Auth** | AWS SigV4 (IAM roles) | AWS SigV4 (IAM roles) | API key (`AzureKeyCredential`) |
-| **Index creation** | JSON mappings (OpenSearch native) | DynamoDB table (PK/SK) | Python objects (`SearchIndex`, `SearchField`) |
-| **Vector field type** | `knn_vector` | JSON string (embedding) | `SearchFieldDataType.Collection(Edm.Single)` |
-| **Dimensions** | 1024 (matches Titan) | Any (auto, stored as JSON) | 1536 (matches text-embedding-3-small) |
-| **Algorithm** | HNSW via `nmslib` engine | **Brute-force cosine** (in Python) | HNSW via `HnswAlgorithmConfiguration` |
-| **Distance metric** | `cosinesimil` | Cosine (numpy) | Cosine (default) |
-| **Store operation** | `index()` one at a time | `batch_writer()` | `upload_documents()` in batches of 1000 |
-| **Search operation** | `knn` query in JSON body | Query all + numpy cosine | `VectorizedQuery` object |
-| **Delete operation** | `delete_by_query()` (native) | GSI query + `batch_writer()` | Search + `delete_documents()` (two-step) |
-| **Minimum cost** | **~$350/month** | **~$0/month** (free tier) | **~$75/month** (Basic), Free tier available |
-| **Best for** | Production (>10K chunks) | Portfolio / dev (<10K chunks) | Production + dev |
+| Aspect | AWS OpenSearch Serverless | AWS DynamoDB (cheap) | Azure AI Search | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| **SDK** | `opensearchpy` | `boto3` (already installed) | `azure-search-documents` | AWS search hub 🔍 |
+| **Auth** | AWS SigV4 (IAM roles) | AWS SigV4 (IAM roles) | API key (`AzureKeyCredential`) | Stable door 🚪 |
+| **Index creation** | JSON mappings (OpenSearch native) | DynamoDB table (PK/SK) | Python objects (`SearchIndex`, `SearchField`) | AWS search hub 🔍 |
+| **Vector field type** | `knn_vector` | JSON string (embedding) | `SearchFieldDataType.Collection(Edm.Single)` | GPS warehouse 🗺️ |
+| **Dimensions** | 1024 (matches Titan) | Any (auto, stored as JSON) | 1536 (matches text-embedding-3-small) | GPS stamp 📍 |
+| **Algorithm** | HNSW via `nmslib` engine | **Brute-force cosine** (in Python) | HNSW via `HnswAlgorithmConfiguration` | Compass bearing 🧭 |
+| **Distance metric** | `cosinesimil` | Cosine (numpy) | Cosine (default) | Tachograph 📊 |
+| **Store operation** | `index()` one at a time | `batch_writer()` | `upload_documents()` in batches of 1000 | 🫏 On the route |
+| **Search operation** | `knn` query in JSON body | Query all + numpy cosine | `VectorizedQuery` object | GPS warehouse 🗺️ |
+| **Delete operation** | `delete_by_query()` (native) | GSI query + `batch_writer()` | Search + `delete_documents()` (two-step) | 🫏 On the route |
+| **Minimum cost** | **~$350/month** | **~$0/month** (free tier) | **~$75/month** (Basic), Free tier available | Feed bill 🌾 |
+| **Best for** | Production (>10K chunks) | Portfolio / dev (<10K chunks) | Production + dev | Saddlebag piece 📦 |
+
+- 🫏 **Donkey:** Choosing which stable to work with — AWS Bedrock, Azure OpenAI, or a local Ollama barn each offer different donkeys at different prices.
 
 ---
 
@@ -101,6 +105,8 @@ You may have used OpenSearch for log aggregation in your DE work. Here both plat
 │                                          │   │  Search type: SEMANTIC                    │
 └──────────────────────────────────────────┘   └──────────────────────────────────────────┘
 ```
+
+- 🫏 **Donkey:** Running multiple donkeys on the same route to confirm that AI engineering and data engineering practices mirror each other.
 
 ---
 
@@ -143,12 +149,14 @@ With HNSW (indexed):         Navigate the graph to the right area → fast (mill
 
 Both providers implement HNSW but configure it differently:
 
-| Config | AWS OpenSearch | Azure AI Search |
-| --- | --- | --- |
-| Algorithm | `"name": "hnsw"` in JSON | `HnswAlgorithmConfiguration()` object |
-| Engine | `nmslib` | Azure-managed (not configurable) |
-| Search accuracy | `ef_search: 512` | Default (auto-tuned) |
-| Distance metric | `"cosinesimil"` | Cosine (default, not specified) |
+| Config | AWS OpenSearch | Azure AI Search | 🫏 Donkey |
+| --- | --- | --- | --- |
+| Algorithm | `"name": "hnsw"` in JSON | `HnswAlgorithmConfiguration()` object | 🫏 On the route |
+| Engine | `nmslib` | Azure-managed (not configurable) | Azure hub ☁️ |
+| Search accuracy | `ef_search: 512` | Default (auto-tuned) | 🫏 On the route |
+| Distance metric | `"cosinesimil"` | Cosine (default, not specified) | Tachograph 📊 |
+
+- 🫏 **Donkey:** The compass bearing between two GPS coordinates — donkeys pointed the same direction are talking about the same topic.
 
 ---
 
@@ -190,13 +198,15 @@ def _ensure_index(self):
 
 ### What each setting means
 
-| Setting | Value | What it does | DE parallel |
-| --- | --- | --- | --- |
-| `"knn": True` | Enable | Turns on vector search for this index | Like enabling full-text search |
-| `"dimension": 1024` | 1024 | The vector size — MUST match Titan | Like column length (`VARCHAR(1024)`) |
-| `"hnsw"` | Algorithm | The search algorithm | Like B-tree for regular indexes |
-| `"cosinesimil"` | Distance | Measures angle between vectors | Like matching function in text search |
-| `"ef_search": 512` | Accuracy | Nodes to check during search | Like scan depth in a tree index |
+| Setting | Value | What it does | DE parallel | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| `"knn": True` | Enable | Turns on vector search for this index | Like enabling full-text search | GPS warehouse 🗺️ |
+| `"dimension": 1024` | 1024 | The vector size — MUST match Titan | Like column length (`VARCHAR(1024)`) | GPS warehouse 🗺️ |
+| `"hnsw"` | Algorithm | The search algorithm | Like B-tree for regular indexes | 🫏 On the route |
+| `"cosinesimil"` | Distance | Measures angle between vectors | Like matching function in text search | GPS warehouse 🗺️ |
+| `"ef_search": 512` | Accuracy | Nodes to check during search | Like scan depth in a tree index | 🫏 On the route |
+
+- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
 
 ---
 
@@ -231,6 +241,8 @@ async def store_vectors(self, document_id, document_name, texts, embeddings, met
 - Indexes **one at a time** in a loop — like `put_item()` in a loop
 - `indices.refresh()` forces immediate searchability (without it, up to 1 second delay)
 - For production, you'd use the `_bulk` API — same as DynamoDB's `batch_write_item`
+
+- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -282,6 +294,8 @@ Finds documents containing "error"          Finds vectors closest to your vector
 Scoring: TF-IDF (word frequency)            Scoring: cosine similarity (meaning closeness)
 ```
 
+- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
+
 ---
 
 ## AWS: `delete_document()` — Delete by Query
@@ -297,6 +311,8 @@ async def delete_document(self, document_id: str) -> int:
 ```
 
 **Simple and native.** OpenSearch has a built-in `delete_by_query` — one call deletes all matching documents. This is the same API you'd use for log cleanup.
+
+- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
 
 ---
 
@@ -319,13 +335,15 @@ def __init__(self, endpoint: str, index_name: str, region: str):
     )
 ```
 
-| Aspect | Value |
-| --- | --- |
-| Auth | AWS SigV4 via IAM roles (`AWSV4SignerAuth`) |
-| Service code | `"aoss"` (not `"es"`) |
-| Scaling | Auto-scales with OCUs (OpenSearch Compute Units) |
-| Minimum OCUs | 4 (2 indexing + 2 search) |
-| Minimum cost | **~$350/month** ($0.24/hr × 4 OCUs × 730 hrs) |
+| Aspect | Value | 🫏 Donkey |
+| --- | --- | --- |
+| Auth | AWS SigV4 via IAM roles (`AWSV4SignerAuth`) | AWS depot 🏭 |
+| Service code | `"aoss"` (not `"es"`) | 🫏 On the route |
+| Scaling | Auto-scales with OCUs (OpenSearch Compute Units) | AWS search hub 🔍 |
+| Minimum OCUs | 4 (2 indexing + 2 search) | 🫏 On the route |
+| Minimum cost | **~$350/month** ($0.24/hr × 4 OCUs × 730 hrs) | Feed bill 🌾 |
+
+- 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
 
 ---
 
@@ -382,13 +400,13 @@ return results[:top_k]
 
 ### Performance characteristics
 
-| Chunks in collection | Search latency | Acceptable? |
-| --- | --- | --- |
-| 100 | ~10ms | ✅ Instant |
-| 1,000 | ~50ms | ✅ Fast |
-| 5,000 | ~200ms | ✅ Acceptable |
-| 10,000 | ~500ms | ⚠️ Noticeable |
-| 50,000+ | ~2–5s | ❌ Use OpenSearch instead |
+| Chunks in collection | Search latency | Acceptable? | 🫏 Donkey |
+| --- | --- | --- | --- |
+| 100 | ~10ms | ✅ Instant | 🫏 On the route |
+| 1,000 | ~50ms | ✅ Fast | 🫏 On the route |
+| 5,000 | ~200ms | ✅ Acceptable | 🫏 On the route |
+| 10,000 | ~500ms | ⚠️ Noticeable | 🫏 On the route |
+| 50,000+ | ~2–5s | ❌ Use OpenSearch instead | AWS search hub 🔍 |
 
 ### How to enable it
 
@@ -403,14 +421,16 @@ The factory in `chain.py` creates the DynamoDB vector store instead of OpenSearc
 
 ### Cost comparison
 
-| | OpenSearch Serverless | DynamoDB Vector Store |
-| --- | --- | --- |
-| Monthly cost | ~$350 | ~$0 (free tier) |
-| Search speed | ~5ms (HNSW) | ~50ms (brute-force, 1K chunks) |
-| Search accuracy | Approximate (HNSW) | **Exact** (checks every vector) |
-| Max practical size | Millions of chunks | ~10,000 chunks |
-| New dependency | `opensearch-py` | **None** (boto3 already installed) |
-| Best for | Production at scale | Portfolio, development, testing |
+| | OpenSearch Serverless | DynamoDB Vector Store | 🫏 Donkey |
+| --- | --- | --- | --- |
+| Monthly cost | ~$350 | ~$0 (free tier) | Feed bill 🌾 |
+| Search speed | ~5ms (HNSW) | ~50ms (brute-force, 1K chunks) | Saddlebag piece 📦 |
+| Search accuracy | Approximate (HNSW) | **Exact** (checks every vector) | GPS warehouse 🗺️ |
+| Max practical size | Millions of chunks | ~10,000 chunks | Saddlebag piece 📦 |
+| New dependency | `opensearch-py` | **None** (boto3 already installed) | AWS search hub 🔍 |
+| Best for | Production at scale | Portfolio, development, testing | Test delivery 🧪 |
+
+- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -446,14 +466,14 @@ def _ensure_index(self):
 
 ### Side-by-side: AWS vs Azure index creation
 
-| Aspect | AWS OpenSearch | Azure AI Search |
-| --- | --- | --- |
-| **Style** | JSON mappings (dict) | Python objects (`SearchField`, `SearchIndex`) |
-| **Vector field** | `"type": "knn_vector"` | `SearchFieldDataType.Collection(Edm.Single)` |
-| **Dimensions** | `"dimension": 1024` | `vector_search_dimensions=1536` |
-| **Algorithm config** | Inline in field mapping | Separate `VectorSearch` + `VectorSearchProfile` |
-| **Key field** | Auto-generated `_id` | Explicit `key=True` field |
-| **Create method** | `indices.create(name, body)` | `create_or_update_index(index_obj)` |
+| Aspect | AWS OpenSearch | Azure AI Search | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **Style** | JSON mappings (dict) | Python objects (`SearchField`, `SearchIndex`) | 🫏 On the route |
+| **Vector field** | `"type": "knn_vector"` | `SearchFieldDataType.Collection(Edm.Single)` | GPS warehouse 🗺️ |
+| **Dimensions** | `"dimension": 1024` | `vector_search_dimensions=1536` | GPS warehouse 🗺️ |
+| **Algorithm config** | Inline in field mapping | Separate `VectorSearch` + `VectorSearchProfile` | GPS warehouse 🗺️ |
+| **Key field** | Auto-generated `_id` | Explicit `key=True` field | 🫏 On the route |
+| **Create method** | `indices.create(name, body)` | `create_or_update_index(index_obj)` | 🫏 On the route |
 
 **DE parallel:** AWS OpenSearch is like defining a DynamoDB table with raw CloudFormation JSON. Azure AI Search is like using Terraform resource objects — more structured, more typed, but conceptually the same thing: "create an index with these fields and this algorithm."
 
@@ -465,6 +485,8 @@ Azure: dimensions: 1536 ← because text-embedding-3-small produces 1536 floats
 ```
 
 The vector store dimensions **must** match the embedding model. If you use Azure's text-embedding-3-small (1536-dim) but point at an OpenSearch index (1024-dim), indexing fails. **You cannot mix providers.**
+
+- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -498,16 +520,18 @@ async def store_vectors(self, document_id, document_name, texts, embeddings, met
 
 ### Key differences from AWS
 
-| Aspect | AWS OpenSearch | Azure AI Search |
-| --- | --- | --- |
-| **Approach** | Index one at a time in a loop | Build a list, then upload in batches |
-| **API call** | `client.index()` per document | `upload_documents(batch)` per 1000 docs |
-| **23 chunks** | 23 API calls + 1 refresh | 1 API call (all 23 in one batch) |
-| **Refresh** | Manual `indices.refresh()` needed | Automatic (no refresh call) |
+| Aspect | AWS OpenSearch | Azure AI Search | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **Approach** | Index one at a time in a loop | Build a list, then upload in batches | 🫏 On the route |
+| **API call** | `client.index()` per document | `upload_documents(batch)` per 1000 docs | Stable door 🚪 |
+| **23 chunks** | 23 API calls + 1 refresh | 1 API call (all 23 in one batch) | Saddlebag piece 📦 |
+| **Refresh** | Manual `indices.refresh()` needed | Automatic (no refresh call) | 🫏 On the route |
 
 **DE parallel:** AWS OpenSearch's `index()` in a loop is like DynamoDB's `put_item()` in a loop. Azure's `upload_documents(batch)` is like DynamoDB's `batch_write_item()` but with a 1000-item limit instead of 25.
 
 **Azure is more efficient here** — fewer network round trips for the same number of chunks.
+
+- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -567,14 +591,16 @@ for hit in response["hits"]["hits"]:            for result in results:
 
 **Key differences:**
 
-| Aspect | AWS OpenSearch | Azure AI Search |
-| --- | --- | --- |
-| **Query style** | JSON body dict | Python objects (`VectorizedQuery`) |
-| **Text search** | Separate query type (`match`) | `search_text=None` disables text search |
-| **Score field** | `hit["_score"]` | `result["@search.score"]` |
-| **Response parsing** | `response["hits"]["hits"]` → `["_source"]` | Direct field access on result object |
+| Aspect | AWS OpenSearch | Azure AI Search | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **Query style** | JSON body dict | Python objects (`VectorizedQuery`) | GPS warehouse 🗺️ |
+| **Text search** | Separate query type (`match`) | `search_text=None` disables text search | 🫏 On the route |
+| **Score field** | `hit["_score"]` | `result["@search.score"]` | 🫏 On the route |
+| **Response parsing** | `response["hits"]["hits"]` → `["_source"]` | Direct field access on result object | 🫏 On the route |
 
 **Azure is more Pythonic** — typed objects instead of nested dicts. AWS is more "raw JSON" — same style as regular OpenSearch queries.
+
+- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -604,13 +630,15 @@ async def delete_document(self, document_id: str) -> int:
 
 ### Key difference: two-step vs one-step delete
 
-| | AWS OpenSearch | Azure AI Search |
-| --- | --- | --- |
-| **Method** | `delete_by_query(filter)` — one call | Search → collect IDs → `delete_documents(ids)` — two calls |
-| **Why?** | OpenSearch has native `delete_by_query` | Azure AI Search requires explicit document IDs for deletion |
-| **DE parallel** | `DELETE FROM table WHERE doc_id = 'x'` | `SELECT id FROM table WHERE doc_id = 'x'` then `DELETE FROM table WHERE id IN (...)` |
+| | AWS OpenSearch | Azure AI Search | 🫏 Donkey |
+| --- | --- | --- | --- |
+| **Method** | `delete_by_query(filter)` — one call | Search → collect IDs → `delete_documents(ids)` — two calls | 🫏 On the route |
+| **Why?** | OpenSearch has native `delete_by_query` | Azure AI Search requires explicit document IDs for deletion | AWS search hub 🔍 |
+| **DE parallel** | `DELETE FROM table WHERE doc_id = 'x'` | `SELECT id FROM table WHERE doc_id = 'x'` then `DELETE FROM table WHERE id IN (...)` | 🫏 On the route |
 
 This is a design limitation of Azure AI Search — there's no `delete_by_filter` API. You must find the IDs first, then delete them explicitly.
+
+- 🫏 **Donkey:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for donkeys on the Azure route.
 
 ---
 
@@ -635,10 +663,10 @@ def __init__(self, endpoint: str, api_key: str, index_name: str):
 
 ### Two clients, one service
 
-| Client | Purpose | DE parallel |
-| --- | --- | --- |
-| `SearchClient` | Data operations (search, upload, delete) | DynamoDB `Table` resource (read/write) |
-| `SearchIndexClient` | Management operations (create/update index) | DynamoDB `client` (create table) |
+| Client | Purpose | DE parallel | 🫏 Donkey |
+| --- | --- | --- | --- |
+| `SearchClient` | Data operations (search, upload, delete) | DynamoDB `Table` resource (read/write) | AWS depot 🏭 |
+| `SearchIndexClient` | Management operations (create/update index) | DynamoDB `client` (create table) | AWS depot 🏭 |
 
 ### Authentication: simple API key
 
@@ -654,23 +682,25 @@ auth = AWSV4SignerAuth(credentials, region, "aoss")
 
 ### Cost tiers
 
-| Tier | Cost | Storage | Replicas |
-| --- | --- | --- | --- |
-| **Free** | $0/month | 50 MB, 3 indexes | None |
-| **Basic** | ~$75/month | 2 GB | Up to 3 |
-| **Standard S1** | ~$250/month | 25 GB | Up to 12 |
+| Tier | Cost | Storage | Replicas | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| **Free** | $0/month | 50 MB, 3 indexes | None | Free hay 🌿 |
+| **Basic** | ~$75/month | 2 GB | Up to 3 | 🫏 On the route |
+| **Standard S1** | ~$250/month | 25 GB | Up to 12 | 🫏 On the route |
+
+- 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
 
 ---
 
 ## Cost Comparison — All Three Providers
 
-| | AWS OpenSearch Serverless | Azure AI Search (Basic) | **Local ChromaDB** |
-| --- | --- | --- | --- |
-| **Minimum cost** | **~$350/month** | **~$75/month** | **$0/month** |
-| **Free tier** | ❌ No | ✅ Yes (50 MB, 3 indexes) | ✅ Always free |
-| **Scaling** | Auto (OCUs) | Manual (tier upgrade) | Single machine only |
-| **For learning/dev** | Expensive — paying for idle | Cheap — free tier works | **Best — zero cost, zero setup** |
-| **For production** | Good if already on AWS | Good if already on Azure | Not suitable (no HA, no scaling) |
+| | AWS OpenSearch Serverless | Azure AI Search (Basic) | **Local ChromaDB** | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| **Minimum cost** | **~$350/month** | **~$75/month** | **$0/month** | Feed bill 🌾 |
+| **Free tier** | ❌ No | ✅ Yes (50 MB, 3 indexes) | ✅ Always free | Free hay 🌿 |
+| **Scaling** | Auto (OCUs) | Manual (tier upgrade) | Single machine only | 🫏 On the route |
+| **For learning/dev** | Expensive — paying for idle | Cheap — free tier works | **Best — zero cost, zero setup** | Feed bill 🌾 |
+| **For production** | Good if already on AWS | Good if already on Azure | Not suitable (no HA, no scaling) | AWS depot 🏭 |
 
 ### Why this matters more than LLM cost
 
@@ -688,6 +718,8 @@ From doc #8 (LLM Providers), the LLM cost difference is ~$30/month at 1000 queri
 │  Local is free — perfect for development.              │
 └────────────────────────────────────────────────────────┘
 ```
+
+- 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
 
 ---
 
@@ -723,16 +755,18 @@ class ChromaDBVectorStore(BaseVectorStore):
 
 ### Comparison with cloud providers
 
-| Aspect | AWS OpenSearch | Azure AI Search | **Local ChromaDB** |
-| --- | --- | --- | --- |
-| **Client setup** | `OpenSearch(hosts, auth, ssl)` | `SearchClient(endpoint, credential)` | `chromadb.PersistentClient(path, settings)` |
-| **Auth** | SigV4 (IAM roles) | API key | **None** |
-| **Index creation** | JSON mappings, explicit dimensions | Python objects, explicit dimensions | **Auto-detect dimensions** |
-| **Algorithm** | HNSW (nmslib engine) | HNSW (Azure-managed) | HNSW (built-in) |
-| **Distance** | `cosinesimil` | Cosine (default) | `cosine` (configured via metadata) |
-| **Persistence** | Always (cloud) | Always (cloud) | Optional (in-memory or SQLite) |
+| Aspect | AWS OpenSearch | Azure AI Search | **Local ChromaDB** | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| **Client setup** | `OpenSearch(hosts, auth, ssl)` | `SearchClient(endpoint, credential)` | `chromadb.PersistentClient(path, settings)` | AWS search hub 🔍 |
+| **Auth** | SigV4 (IAM roles) | API key | **None** | Stable door 🚪 |
+| **Index creation** | JSON mappings, explicit dimensions | Python objects, explicit dimensions | **Auto-detect dimensions** | 🫏 On the route |
+| **Algorithm** | HNSW (nmslib engine) | HNSW (Azure-managed) | HNSW (built-in) | Azure hub ☁️ |
+| **Distance** | `cosinesimil` | Cosine (default) | `cosine` (configured via metadata) | Compass bearing 🧭 |
+| **Persistence** | Always (cloud) | Always (cloud) | Optional (in-memory or SQLite) | Trip log 📒 |
 
 **DE parallel:** ChromaDB is like SQLite — in-memory for speed, persistent for durability. No server to install, no auth to configure. Just `chromadb.PersistentClient(path)` and go.
+
+- 🫏 **Donkey:** Your own backyard barn — no cloud costs, full control, ChromaDB SQLite under the floor.
 
 ---
 
@@ -759,13 +793,15 @@ self._collection.upsert(
 
 ### Side-by-side: all three providers
 
-| Aspect | AWS OpenSearch | Azure AI Search | **Local ChromaDB** |
-| --- | --- | --- | --- |
-| **Method** | `client.index()` per doc | `upload_documents(batch)` | `collection.upsert()` |
-| **23 chunks** | 23 API calls + refresh | 1 API call (batch 1000) | **1 Python call** |
-| **Upsert** | Manual (index with same ID) | Manual (upload overwrites) | **Native** — `upsert()` |
-| **Refresh** | Manual `indices.refresh()` | Automatic | **Instant** (in-memory) |
-| **Network** | 23 HTTP requests | 1 HTTP request | **0 HTTP requests** |
+| Aspect | AWS OpenSearch | Azure AI Search | **Local ChromaDB** | 🫏 Donkey |
+| --- | --- | --- | --- | --- |
+| **Method** | `client.index()` per doc | `upload_documents(batch)` | `collection.upsert()` | 🫏 On the route |
+| **23 chunks** | 23 API calls + refresh | 1 API call (batch 1000) | **1 Python call** | Saddlebag piece 📦 |
+| **Upsert** | Manual (index with same ID) | Manual (upload overwrites) | **Native** — `upsert()` | 🫏 On the route |
+| **Refresh** | Manual `indices.refresh()` | Automatic | **Instant** (in-memory) | Trip log 📒 |
+| **Network** | 23 HTTP requests | 1 HTTP request | **0 HTTP requests** | Stable door 🚪 |
+
+- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -789,11 +825,11 @@ score = 1.0 - distance    # ChromaDB returns distance, we want similarity
 
 ChromaDB returns **distances** (lower = more similar), but our `VectorSearchResult` expects a **similarity score** (higher = more similar). The conversion: `score = 1.0 - distance`.
 
-| Provider | Returns | Score meaning |
-| --- | --- | --- |
-| AWS OpenSearch | `_score` (similarity) | Higher = more similar (0.0–1.0) |
-| Azure AI Search | `@search.score` (similarity) | Higher = more similar |
-| **ChromaDB** | `distances` (distance) | **Lower** = more similar → we convert: `1 - distance` |
+| Provider | Returns | Score meaning | 🫏 Donkey |
+| --- | --- | --- | --- |
+| AWS OpenSearch | `_score` (similarity) | Higher = more similar (0.0–1.0) | AWS search hub 🔍 |
+| Azure AI Search | `@search.score` (similarity) | Higher = more similar | Azure hub ☁️ |
+| **ChromaDB** | `distances` (distance) | **Lower** = more similar → we convert: `1 - distance` | Local barn 🏚️ |
 
 ### Side-by-side: search queries
 
@@ -818,6 +854,8 @@ results = self._collection.query(
 
 **ChromaDB is the most Pythonic** — no JSON to build, no typed query objects. Just pass the embedding and number of results.
 
+- 🫏 **Donkey:** The warehouse robot dispatched to find the right saddlebag shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+
 ---
 
 ## Local: `delete_document()` — Metadata Filtering
@@ -836,13 +874,15 @@ if results["ids"]:
 
 ### Comparison: deletion patterns
 
-| Provider | Approach | Steps |
-| --- | --- | --- |
-| AWS OpenSearch | `delete_by_query(filter)` | **1 call** — native filter-delete |
-| Azure AI Search | `search(filter)` → `delete_documents(ids)` | **2 calls** — find then delete |
-| **ChromaDB** | `get(where)` → `delete(ids)` | **2 calls** — find then delete |
+| Provider | Approach | Steps | 🫏 Donkey |
+| --- | --- | --- | --- |
+| AWS OpenSearch | `delete_by_query(filter)` | **1 call** — native filter-delete | AWS search hub 🔍 |
+| Azure AI Search | `search(filter)` → `delete_documents(ids)` | **2 calls** — find then delete | Azure hub ☁️ |
+| **ChromaDB** | `get(where)` → `delete(ids)` | **2 calls** — find then delete | Local barn 🏚️ |
 
 ChromaDB follows the same two-step pattern as Azure AI Search: find the IDs first, then delete by ID.
+
+- 🫏 **Donkey:** The parcels being ingested — split into saddlebag-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.
 
 ---
 
@@ -866,22 +906,26 @@ QUERY:
   All three return the same VectorSearchResult → sent to LLM as context
 ```
 
+- 🫏 **Donkey:** The donkey checks its saddlebag full of retrieved document chunks before answering — no guessing from memory.
+
 ---
 
 ## Self-Test Questions
 
-| Question | Answer | Concept it tests |
-| --- | --- | --- |
-| "What happens if you set dimension: 512 but your embeddings are 1024 floats?" | Indexing fails — dimension mismatch. Both platforms enforce this. | Dimension matching |
-| "What's the difference between `knn` query and `match` query in OpenSearch?" | `match` searches by keywords (text). `knn` searches by vector similarity (meaning). | Semantic vs keyword search |
-| "Why does Azure need two steps to delete but AWS only needs one?" | Azure AI Search has no `delete_by_filter`. You must find IDs first, then delete them explicitly. OpenSearch has native `delete_by_query`. | API design differences |
-| "Why does Azure use `search_text=None` in vector search?" | The `search()` method supports both text and vector search. `search_text=None` disables text search, so only the vector query runs. | Hybrid search capability |
-| "Could you use Azure AI Search with AWS Bedrock embeddings (Titan, 1024-dim)?" | Technically yes — configure the index for 1024 dimensions. But you'd need cross-cloud networking and auth. Not practical. | Provider coupling |
-| "Why is OpenSearch Serverless so much more expensive than Azure AI Search?" | Minimum 4 OCUs (2 indexing + 2 search) at $0.24/hr each. Azure Basic is a fixed $75/month. Different pricing models. | Cost architecture |
-| "Could you replace either with PostgreSQL + pgvector?" | Yes — pgvector adds vector search to PostgreSQL. Same `BaseVectorStore` interface, different implementation. | Strategy pattern |
-| "What happens to ChromaDB data when you restart the app?" | In-memory mode: lost. Persistent mode (`CHROMA_PERSIST_DIRECTORY`): saved to SQLite on disk. | Persistence |
-| "Why does ChromaDB not need a dimension configuration?" | It auto-detects from the first embedding. The first `upsert()` sets the dimension for the collection. | Dimension management |
-| "Why does ChromaDB return distances instead of similarity scores?" | Different convention. Our code converts: `score = 1.0 - distance`. Both OpenSearch and ChromaDB use cosine internally — they just report the result differently. | Score conversion |
+| Question | Answer | Concept it tests | 🫏 Donkey |
+| --- | --- | --- | --- |
+| "What happens if you set dimension: 512 but your embeddings are 1024 floats?" | Indexing fails — dimension mismatch. Both platforms enforce this. | Dimension matching | GPS warehouse 🗺️ |
+| "What's the difference between `knn` query and `match` query in OpenSearch?" | `match` searches by keywords (text). `knn` searches by vector similarity (meaning). | Semantic vs keyword search | AWS search hub 🔍 |
+| "Why does Azure need two steps to delete but AWS only needs one?" | Azure AI Search has no `delete_by_filter`. You must find IDs first, then delete them explicitly. OpenSearch has native `delete_by_query`. | API design differences | AWS search hub 🔍 |
+| "Why does Azure use `search_text=None` in vector search?" | The `search()` method supports both text and vector search. `search_text=None` disables text search, so only the vector query runs. | Hybrid search capability | GPS warehouse 🗺️ |
+| "Could you use Azure AI Search with AWS Bedrock embeddings (Titan, 1024-dim)?" | Technically yes — configure the index for 1024 dimensions. But you'd need cross-cloud networking and auth. Not practical. | Provider coupling | The donkey 🐴 |
+| "Why is OpenSearch Serverless so much more expensive than Azure AI Search?" | Minimum 4 OCUs (2 indexing + 2 search) at $0.24/hr each. Azure Basic is a fixed $75/month. Different pricing models. | Cost architecture | AWS search hub 🔍 |
+| "Could you replace either with PostgreSQL + pgvector?" | Yes — pgvector adds vector search to PostgreSQL. Same `BaseVectorStore` interface, different implementation. | Strategy pattern | GPS warehouse 🗺️ |
+| "What happens to ChromaDB data when you restart the app?" | In-memory mode: lost. Persistent mode (`CHROMA_PERSIST_DIRECTORY`): saved to SQLite on disk. | Persistence | Local barn 🏚️ |
+| "Why does ChromaDB not need a dimension configuration?" | It auto-detects from the first embedding. The first `upsert()` sets the dimension for the collection. | Dimension management | Local barn 🏚️ |
+| "Why does ChromaDB return distances instead of similarity scores?" | Different convention. Our code converts: `score = 1.0 - distance`. Both OpenSearch and ChromaDB use cosine internally — they just report the result differently. | Score conversion | AWS search hub 🔍 |
+
+- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -899,3 +943,5 @@ Now that you've seen how vectors are stored and searched on **all three platform
 - [Cost Analysis](cost-analysis.md)
 - [The Vector Store Interface (file #9)](vectorstore-interface-deep-dive.md)
 - [LLM Providers (file #8)](llm-providers-deep-dive.md)
+
+- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.
