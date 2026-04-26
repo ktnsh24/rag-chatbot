@@ -17,7 +17,6 @@ from loguru import logger
 from src.config import CloudProvider, Settings, VectorStoreType
 from src.llm.base import BaseLLM
 from src.rag.ingestion import chunk_document, read_document
-from src.rag.prompts import RAG_SYSTEM_PROMPT
 from src.rag.reranker import BaseReranker
 from src.vectorstore.base import BaseVectorStore
 
@@ -93,6 +92,7 @@ class RAGChain:
             vector_store = RAGChain._create_dynamodb_vector_store(settings)
         else:
             from src.vectorstore.aws_opensearch import OpenSearchVectorStore
+
             vector_store = OpenSearchVectorStore(
                 endpoint=settings.aws_opensearch_endpoint,
                 index_name=settings.aws_opensearch_index_name,

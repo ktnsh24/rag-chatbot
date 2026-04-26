@@ -5,8 +5,7 @@ Provides:
     GET /api/health — overall app health + individual service checks
 """
 
-import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Request
 
@@ -16,7 +15,7 @@ from src.config import get_settings
 router = APIRouter()
 
 # Track app start time for uptime calculation
-_start_time = datetime.now(timezone.utc)
+_start_time = datetime.now(UTC)
 
 
 @router.get(
@@ -69,7 +68,7 @@ async def health_check(request: Request) -> HealthResponse:
     else:
         overall = HealthStatus.HEALTHY
 
-    uptime = int((datetime.now(timezone.utc) - _start_time).total_seconds())
+    uptime = int((datetime.now(UTC) - _start_time).total_seconds())
 
     return HealthResponse(
         status=overall,

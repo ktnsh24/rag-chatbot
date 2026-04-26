@@ -19,7 +19,6 @@ Cost:
 from __future__ import annotations
 
 import time
-from typing import Any
 
 from loguru import logger
 
@@ -171,7 +170,7 @@ class AWSGuardrails(BaseGuardrails):
                 entities.append(
                     PIIEntity(
                         entity_type=entity["Type"],  # NAME, EMAIL, PHONE, SSN, etc.
-                        text=text[entity["BeginOffset"]:entity["EndOffset"]],
+                        text=text[entity["BeginOffset"] : entity["EndOffset"]],
                         start=entity["BeginOffset"],
                         end=entity["EndOffset"],
                         confidence=entity.get("Score", 0.0),

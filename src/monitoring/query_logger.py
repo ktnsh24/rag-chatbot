@@ -23,14 +23,11 @@ Usage:
     failures = await logger.get_failures(limit=20)
 """
 
-import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from uuid import UUID
 
 from loguru import logger
 from pydantic import BaseModel, Field
-
 
 # =============================================================================
 # Query Log Models
@@ -66,7 +63,7 @@ class QueryLogRecord(BaseModel):
     # Identity
     request_id: str = Field(..., description="Unique request ID")
     session_id: str = Field(..., description="Conversation session ID")
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), description="UTC timestamp")
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC), description="UTC timestamp")
 
     # Input
     question: str = Field(..., description="The user's question")
@@ -127,7 +124,7 @@ class QueryLogger:
 
     def _today_file(self) -> Path:
         """Get today's log file path."""
-        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        today = datetime.now(UTC).strftime("%Y-%m-%d")
         return self._log_dir / f"{today}.jsonl"
 
     @staticmethod
@@ -195,9 +192,11 @@ class QueryLogger:
 
         # Iterate over recent days
         for day_offset in range(days):
-            date = datetime.now(timezone.utc)
-            date = date.replace(day=date.day - day_offset) if day_offset == 0 else datetime(
-                date.year, date.month, date.day - day_offset, tzinfo=timezone.utc
+            date = datetime.now(UTC)
+            date = (
+                date.replace(day=date.day - day_offset)
+                if day_offset == 0
+                else datetime(date.year, date.month, date.day - day_offset, tzinfo=UTC)
             )
             file_path = self._log_dir / f"{date.strftime('%Y-%m-%d')}.jsonl"
 
@@ -236,8 +235,8 @@ class QueryLogger:
         total_faithfulness = 0.0
         total_relevance = 0.0
 
-        for day_offset in range(days):
-            date = datetime.now(timezone.utc)
+        for _day_offset in range(days):
+            date = datetime.now(UTC)
             file_path = self._log_dir / f"{date.strftime('%Y-%m-%d')}.jsonl"
 
             if not file_path.exists():

@@ -37,8 +37,9 @@ Configuration:
 
 from __future__ import annotations
 
-import os
 import logging
+import os
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -49,10 +50,12 @@ def _load_golden_dataset() -> list[dict]:
     try:
         # config/ lives under scripts/ — ensure it's on sys.path
         import sys
+
         _scripts_dir = str(Path(__file__).resolve().parent.parent.parent / "scripts")
         if _scripts_dir not in sys.path:
             sys.path.insert(0, _scripts_dir)
         from config.test_data_loader import golden_dataset_from_config, load_test_config
+
         config = load_test_config(config_path)
         dataset = golden_dataset_from_config(config)
         doc_name = config.get("document", {}).get("name", "unknown")
@@ -210,7 +213,10 @@ _HARDCODED_GOLDEN_DATASET: list[dict] = [
         "expected_not_in_answer": [],
         "context_chunks": [
             ("To escalate a complaint, request to speak with a team manager during your support call.", 0.90),
-            ("Written complaints can be sent to complaints@example.com and will be reviewed within 5 business days.", 0.86),
+            (
+                "Written complaints can be sent to complaints@example.com and will be reviewed within 5 business days.",
+                0.86,
+            ),
             ("If unsatisfied with the resolution, you may contact the Consumer Authority.", 0.78),
         ],
         "min_retrieval_score": 0.7,

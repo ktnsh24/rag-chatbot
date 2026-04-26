@@ -16,7 +16,6 @@ which DAG runs failed and why — instead of digging through Airflow logs manual
 """
 
 from fastapi import APIRouter, HTTPException, Query, Request
-from loguru import logger
 
 from src.monitoring.query_logger import QueryLogRecord
 

@@ -14,7 +14,7 @@ Table schema (created by infra/aws/dynamodb.tf):
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
 
 import boto3
 from boto3.dynamodb.conditions import Key

@@ -229,9 +229,7 @@ class AzureGuardrails(BaseGuardrails):
             violations = []
             for category_result in response.categories_analysis:
                 if category_result.severity >= self._severity_threshold:
-                    violations.append(
-                        f"{category_result.category}={category_result.severity}"
-                    )
+                    violations.append(f"{category_result.category}={category_result.severity}")
 
             if violations:
                 return GuardrailResult(

@@ -152,9 +152,7 @@ class Settings(BaseSettings):
     azure_search_api_key: str = Field(default="", description="Azure AI Search admin API key")
     azure_search_index_name: str = Field(default="rag-chatbot-vectors", description="Azure AI Search index name")
     azure_storage_connection_string: str = Field(default="", description="Azure Blob Storage connection string")
-    azure_storage_container_name: str = Field(
-        default="rag-chatbot-documents", description="Azure Blob container name"
-    )
+    azure_storage_container_name: str = Field(default="rag-chatbot-documents", description="Azure Blob container name")
     azure_cosmos_endpoint: str = Field(default="", description="Azure Cosmos DB endpoint URL")
     azure_cosmos_key: str = Field(default="", description="Azure Cosmos DB primary key")
     azure_cosmos_database_name: str = Field(default="rag-chatbot", description="Cosmos DB database name")
@@ -168,40 +166,24 @@ class Settings(BaseSettings):
     chroma_persist_directory: str = Field(default="", description="ChromaDB persistence path (empty = in-memory)")
 
     # --- Guardrails (I23) ---
-    guardrails_enabled: bool = Field(
-        default=False, description="Enable input/output guardrails on /api/chat"
-    )
-    aws_bedrock_guardrail_id: str = Field(
-        default="", description="Bedrock Guardrails resource ID (AWS only)"
-    )
-    aws_bedrock_guardrail_version: str = Field(
-        default="DRAFT", description="Bedrock Guardrails version (AWS only)"
-    )
-    azure_content_safety_endpoint: str = Field(
-        default="", description="Azure AI Content Safety endpoint (Azure only)"
-    )
-    azure_content_safety_key: str = Field(
-        default="", description="Azure AI Content Safety API key (Azure only)"
-    )
+    guardrails_enabled: bool = Field(default=False, description="Enable input/output guardrails on /api/chat")
+    aws_bedrock_guardrail_id: str = Field(default="", description="Bedrock Guardrails resource ID (AWS only)")
+    aws_bedrock_guardrail_version: str = Field(default="DRAFT", description="Bedrock Guardrails version (AWS only)")
+    azure_content_safety_endpoint: str = Field(default="", description="Azure AI Content Safety endpoint (Azure only)")
+    azure_content_safety_key: str = Field(default="", description="Azure AI Content Safety API key (Azure only)")
     azure_language_endpoint: str = Field(
         default="", description="Azure AI Language endpoint for PII detection (Azure only)"
     )
-    azure_language_key: str = Field(
-        default="", description="Azure AI Language API key (Azure only)"
-    )
+    azure_language_key: str = Field(default="", description="Azure AI Language API key (Azure only)")
 
     # --- Re-ranker (I24) ---
-    reranker_enabled: bool = Field(
-        default=False, description="Enable two-stage retrieval with re-ranking"
-    )
+    reranker_enabled: bool = Field(default=False, description="Enable two-stage retrieval with re-ranking")
     reranker_candidate_count: int = Field(
         default=20, description="Number of candidates to fetch before re-ranking (stage 1)"
     )
 
     # --- Hybrid Search (I25) ---
-    hybrid_search_enabled: bool = Field(
-        default=False, description="Enable hybrid search (BM25 + vector)"
-    )
+    hybrid_search_enabled: bool = Field(default=False, description="Enable hybrid search (BM25 + vector)")
     hybrid_search_alpha: float = Field(
         default=0.7,
         description="Weight for vector results in hybrid search (0.0=BM25 only, 1.0=vector only)",

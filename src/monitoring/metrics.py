@@ -16,12 +16,8 @@ These metrics can be exported to:
 See docs/monitoring.md for dashboards and alerting setup.
 """
 
-import time
-from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-
-from loguru import logger
+from datetime import UTC, datetime
 
 
 @dataclass
@@ -56,7 +52,7 @@ class MetricsCollector:
         self._latencies: list[int] = []
         self._documents_ingested: int = 0
         self._chunks_created: int = 0
-        self._start_time = datetime.now(timezone.utc)
+        self._start_time = datetime.now(UTC)
 
     def record_chat_request(self, latency_ms: int, token_usage=None):
         """Record a successful chat request."""
@@ -86,13 +82,11 @@ class MetricsCollector:
         sorted_latencies = sorted(self._latencies) if self._latencies else [0]
 
         return {
-            "uptime_seconds": int((datetime.now(timezone.utc) - self._start_time).total_seconds()),
+            "uptime_seconds": int((datetime.now(UTC) - self._start_time).total_seconds()),
             "chat": {
                 "total_requests": self._chat_requests,
                 "total_errors": self._chat_errors,
-                "error_rate": (
-                    round(self._chat_errors / max(self._chat_requests, 1) * 100, 2)
-                ),
+                "error_rate": (round(self._chat_errors / max(self._chat_requests, 1) * 100, 2)),
                 "latency_p50_ms": sorted_latencies[len(sorted_latencies) // 2],
                 "latency_p95_ms": sorted_latencies[int(len(sorted_latencies) * 0.95)],
                 "latency_p99_ms": sorted_latencies[int(len(sorted_latencies) * 0.99)],

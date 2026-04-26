@@ -19,8 +19,8 @@ from src.guardrails.base import GuardrailAction
 from src.monitoring.query_logger import (
     EvaluationScores,
     LoggedChunk,
-    QueryLogRecord,
     QueryLogger,
+    QueryLogRecord,
 )
 
 router = APIRouter()
@@ -187,4 +187,4 @@ async def chat(request: Request, body: ChatRequest) -> ChatResponse:
     except Exception as e:
         latency_ms = int((time.time() - start_time) * 1000)
         logger.error(f"[{request_id}] Chat error after {latency_ms}ms: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e

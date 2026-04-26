@@ -35,10 +35,7 @@ def load_test_config(config_path: str | Path | None = None) -> dict[str, Any]:
     Returns:
         Dictionary with keys: document, golden_dataset, lab_questions
     """
-    if config_path is None:
-        config_path = get_default_config_path()
-    else:
-        config_path = Path(config_path)
+    config_path = get_default_config_path() if config_path is None else Path(config_path)
 
     # If path doesn't exist, try resolving as a filename in the test-data/ dir
     if not config_path.exists():

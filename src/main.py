@@ -114,7 +114,7 @@ def create_app() -> FastAPI:
         - Avoids global state issues
         - Standard pattern in production FastAPI apps
     """
-    settings = get_settings()
+    get_settings()
 
     app = FastAPI(
         title="RAG Chatbot API",

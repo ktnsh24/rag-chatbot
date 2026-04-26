@@ -83,9 +83,7 @@ class LocalHybridSearch(BaseHybridSearch):
         from rank_bm25 import BM25Okapi
 
         self._corpus = chunks
-        self._tokenized_corpus = [
-            chunk["text"].lower().split() for chunk in chunks
-        ]
+        self._tokenized_corpus = [chunk["text"].lower().split() for chunk in chunks]
         self._bm25 = BM25Okapi(self._tokenized_corpus)
         logger.info(f"BM25 index built with {len(chunks)} chunks")
 
@@ -138,7 +136,7 @@ class LocalHybridSearch(BaseHybridSearch):
         scores = self._bm25.get_scores(tokenized_query)
 
         # Pair scores with corpus items and sort
-        scored = list(zip(scores, self._corpus))
+        scored = list(zip(scores, self._corpus, strict=False))
         scored.sort(key=lambda x: x[0], reverse=True)
 
         results: list[VectorSearchResult] = []

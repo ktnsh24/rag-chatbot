@@ -11,7 +11,7 @@ Uses mocked vector store — no cloud credentials needed.
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -147,12 +147,17 @@ class TestLocalHybridSearchBM25:
     def hybrid_search(self, mock_vector_store: BaseVectorStore) -> LocalHybridSearch:
         """Create a LocalHybridSearch with BM25 indexed."""
         hs = LocalHybridSearch(vector_store=mock_vector_store)
-        hs.index_corpus([
-            {"text": "The refund policy allows returns within 30 days", "document_name": "policy.txt"},
-            {"text": "Shipping takes 3-5 business days to arrive", "document_name": "shipping.txt"},
-            {"text": "Contact customer support at the help desk", "document_name": "support.txt"},
-            {"text": "The return process requires a receipt and original packaging", "document_name": "returns.txt"},
-        ])
+        hs.index_corpus(
+            [
+                {"text": "The refund policy allows returns within 30 days", "document_name": "policy.txt"},
+                {"text": "Shipping takes 3-5 business days to arrive", "document_name": "shipping.txt"},
+                {"text": "Contact customer support at the help desk", "document_name": "support.txt"},
+                {
+                    "text": "The return process requires a receipt and original packaging",
+                    "document_name": "returns.txt",
+                },
+            ]
+        )
         return hs
 
     def test_bm25_search_keyword_match(self, hybrid_search: LocalHybridSearch):
@@ -197,21 +202,25 @@ class TestLocalHybridSearchFull:
     def mock_vector_store(self) -> BaseVectorStore:
         """Create a mock vector store that returns predictable results."""
         store = AsyncMock(spec=BaseVectorStore)
-        store.search = AsyncMock(return_value=[
-            _make_result("Vector result about refunds and returns", 0.92),
-            _make_result("Vector result about shipping speed", 0.85),
-        ])
+        store.search = AsyncMock(
+            return_value=[
+                _make_result("Vector result about refunds and returns", 0.92),
+                _make_result("Vector result about shipping speed", 0.85),
+            ]
+        )
         return store
 
     @pytest.fixture
     def hybrid_search(self, mock_vector_store: BaseVectorStore) -> LocalHybridSearch:
         """Create a fully configured LocalHybridSearch."""
         hs = LocalHybridSearch(vector_store=mock_vector_store)
-        hs.index_corpus([
-            {"text": "BM25 result about the refund policy details", "document_name": "policy.txt"},
-            {"text": "BM25 result about fast shipping options", "document_name": "shipping.txt"},
-            {"text": "Vector result about refunds and returns", "document_name": "returns.txt"},
-        ])
+        hs.index_corpus(
+            [
+                {"text": "BM25 result about the refund policy details", "document_name": "policy.txt"},
+                {"text": "BM25 result about fast shipping options", "document_name": "shipping.txt"},
+                {"text": "Vector result about refunds and returns", "document_name": "returns.txt"},
+            ]
+        )
         return hs
 
     @pytest.mark.asyncio

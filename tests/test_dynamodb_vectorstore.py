@@ -7,9 +7,6 @@ Tests cover: store, search (cosine similarity), delete, edge cases.
 
 from __future__ import annotations
 
-import json
-
-import numpy as np
 import pytest
 from moto import mock_aws
 
@@ -44,7 +41,7 @@ class TestDynamoDBVectorStoreInit:
     def test_creates_table_if_not_exists(self):
         """Table should be auto-created on first init."""
         with mock_aws():
-            store = DynamoDBVectorStore(
+            DynamoDBVectorStore(
                 table_name=TABLE_NAME,
                 collection_name=COLLECTION,
                 region=REGION,
@@ -113,9 +110,7 @@ class TestStoreVectors:
         assert count == 1
 
         # Verify metadata was stored by searching
-        results = await dynamodb_store.search(
-            query_embedding=[0.1, 0.2, 0.3], top_k=1
-        )
+        results = await dynamodb_store.search(query_embedding=[0.1, 0.2, 0.3], top_k=1)
         assert len(results) == 1
         assert results[0].page_number == 1
 
@@ -138,9 +133,7 @@ class TestSearch:
         )
 
         # Query for something similar to "About refunds" (x-direction)
-        results = await dynamodb_store.search(
-            query_embedding=[0.9, 0.1, 0.0], top_k=2
-        )
+        results = await dynamodb_store.search(query_embedding=[0.9, 0.1, 0.0], top_k=2)
 
         assert len(results) == 2
         assert results[0].text == "About refunds"  # Most similar
@@ -151,9 +144,7 @@ class TestSearch:
     async def test_search_respects_top_k(self, dynamodb_store: DynamoDBVectorStore):
         """Search should return at most top_k results."""
         texts = [f"Chunk {i}" for i in range(10)]
-        embeddings = [
-            [float(i) / 10, float(10 - i) / 10, 0.5] for i in range(10)
-        ]
+        embeddings = [[float(i) / 10, float(10 - i) / 10, 0.5] for i in range(10)]
 
         await dynamodb_store.store_vectors(
             document_id="doc-1",
@@ -162,17 +153,13 @@ class TestSearch:
             embeddings=embeddings,
         )
 
-        results = await dynamodb_store.search(
-            query_embedding=[0.5, 0.5, 0.5], top_k=3
-        )
+        results = await dynamodb_store.search(query_embedding=[0.5, 0.5, 0.5], top_k=3)
         assert len(results) == 3
 
     @pytest.mark.asyncio
     async def test_search_empty_collection(self, dynamodb_store: DynamoDBVectorStore):
         """Searching an empty collection should return an empty list."""
-        results = await dynamodb_store.search(
-            query_embedding=[0.1, 0.2, 0.3], top_k=5
-        )
+        results = await dynamodb_store.search(query_embedding=[0.1, 0.2, 0.3], top_k=5)
         assert results == []
 
     @pytest.mark.asyncio
@@ -185,9 +172,7 @@ class TestSearch:
             embeddings=[[0.1, 0.2, 0.3]],
         )
 
-        results = await dynamodb_store.search(
-            query_embedding=[0.1, 0.2, 0.3], top_k=1
-        )
+        results = await dynamodb_store.search(query_embedding=[0.1, 0.2, 0.3], top_k=1)
 
         assert len(results) == 1
         result = results[0]
@@ -209,21 +194,19 @@ class TestSearch:
             document_name="test.txt",
             texts=["Same direction", "Orthogonal", "Opposite"],
             embeddings=[
-                [1.0, 0.0, 0.0],   # Same as query
-                [0.0, 1.0, 0.0],   # Orthogonal to query
+                [1.0, 0.0, 0.0],  # Same as query
+                [0.0, 1.0, 0.0],  # Orthogonal to query
                 [-1.0, 0.0, 0.0],  # Opposite to query
             ],
         )
 
-        results = await dynamodb_store.search(
-            query_embedding=[1.0, 0.0, 0.0], top_k=3
-        )
+        results = await dynamodb_store.search(query_embedding=[1.0, 0.0, 0.0], top_k=3)
 
         assert results[0].text == "Same direction"
         assert abs(results[0].score - 1.0) < 0.001  # Should be ~1.0
 
         # Find the orthogonal result
-        ortho = [r for r in results if r.text == "Orthogonal"][0]
+        ortho = next(r for r in results if r.text == "Orthogonal")
         assert abs(ortho.score - 0.0) < 0.001  # Should be ~0.0
 
 
@@ -244,9 +227,7 @@ class TestDeleteDocument:
         assert deleted == 2
 
         # Verify chunks are gone
-        results = await dynamodb_store.search(
-            query_embedding=[0.1, 0.2, 0.3], top_k=5
-        )
+        results = await dynamodb_store.search(query_embedding=[0.1, 0.2, 0.3], top_k=5)
         assert len(results) == 0
 
     @pytest.mark.asyncio
@@ -274,8 +255,6 @@ class TestDeleteDocument:
         await dynamodb_store.delete_document("doc-1")
 
         # Doc 2 should still be searchable
-        results = await dynamodb_store.search(
-            query_embedding=[0.4, 0.5, 0.6], top_k=5
-        )
+        results = await dynamodb_store.search(query_embedding=[0.4, 0.5, 0.6], top_k=5)
         assert len(results) == 1
         assert results[0].text == "Doc 2 content"

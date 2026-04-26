@@ -16,7 +16,6 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-
 # =============================================================================
 # Enums
 # =============================================================================
@@ -90,9 +89,7 @@ class SourceChunk(BaseModel):
 
     document_name: str = Field(..., description="Filename of the source document")
     chunk_text: str = Field(..., description="The text content of this chunk")
-    relevance_score: float = Field(
-        ..., ge=0.0, le=1.0, description="Cosine similarity score (1.0 = perfect match)"
-    )
+    relevance_score: float = Field(..., ge=0.0, le=1.0, description="Cosine similarity score (1.0 = perfect match)")
     page_number: int | None = Field(default=None, description="Page number in original document (PDF only)")
 
 
@@ -383,8 +380,12 @@ class EvaluationScoreDetail(BaseModel):
     faithfulness: float = Field(..., ge=0.0, le=1.0, description="Faithfulness score (1.0 = no hallucination)")
     has_hallucination: bool = Field(..., description="True if the answer contains claims not in the context")
     answer_relevance: float = Field(..., ge=0.0, le=1.0, description="Answer relevance score")
-    answer_relevance_quality: str = Field(..., description="Quality label: highly relevant/partially relevant/off-topic")
-    overall: float = Field(..., ge=0.0, le=1.0, description="Weighted overall score (retrieval 30% + faithfulness 40% + relevance 30%)")
+    answer_relevance_quality: str = Field(
+        ..., description="Quality label: highly relevant/partially relevant/off-topic"
+    )
+    overall: float = Field(
+        ..., ge=0.0, le=1.0, description="Weighted overall score (retrieval 30% + faithfulness 40% + relevance 30%)"
+    )
     passed: bool = Field(..., description="True if overall score >= 0.7")
 
 

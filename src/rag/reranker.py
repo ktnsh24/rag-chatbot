@@ -45,9 +45,7 @@ class BaseReranker(ABC):
     """
 
     @abstractmethod
-    async def rerank(
-        self, query: str, results: list[VectorSearchResult], top_k: int = 5
-    ) -> list[VectorSearchResult]:
+    async def rerank(self, query: str, results: list[VectorSearchResult], top_k: int = 5) -> list[VectorSearchResult]:
         """
         Re-rank search results using a cross-encoder model.
 
@@ -79,9 +77,7 @@ class LocalReranker(BaseReranker):
         self._model_name = model_name
         logger.info(f"Local re-ranker initialized: {model_name}")
 
-    async def rerank(
-        self, query: str, results: list[VectorSearchResult], top_k: int = 5
-    ) -> list[VectorSearchResult]:
+    async def rerank(self, query: str, results: list[VectorSearchResult], top_k: int = 5) -> list[VectorSearchResult]:
         """Re-rank using cross-encoder scores."""
         if not results:
             return []
@@ -101,7 +97,7 @@ class LocalReranker(BaseReranker):
         scores = [sigmoid(float(s)) for s in raw_scores]
 
         # Combine scores with original results
-        scored = list(zip(scores, results))
+        scored = list(zip(scores, results, strict=False))
         scored.sort(key=lambda x: x[0], reverse=True)
 
         # Return top_k, updating the score to the normalized re-ranker score
@@ -143,9 +139,7 @@ class AWSReranker(BaseReranker):
         self._client = session.client("bedrock-agent-runtime")
         logger.info(f"AWS re-ranker initialized: {model_id} in {region}")
 
-    async def rerank(
-        self, query: str, results: list[VectorSearchResult], top_k: int = 5
-    ) -> list[VectorSearchResult]:
+    async def rerank(self, query: str, results: list[VectorSearchResult], top_k: int = 5) -> list[VectorSearchResult]:
         """Re-rank using Bedrock Reranker."""
         if not results:
             return []
@@ -170,7 +164,9 @@ class AWSReranker(BaseReranker):
                 rerankingConfiguration={
                     "type": "BEDROCK_RERANKING_MODEL",
                     "bedrockRerankingConfiguration": {
-                        "modelConfiguration": {"modelArn": f"arn:aws:bedrock:{self._region}::foundation-model/{self._model_id}"},
+                        "modelConfiguration": {
+                            "modelArn": f"arn:aws:bedrock:{self._region}::foundation-model/{self._model_id}"
+                        },
                         "numberOfResults": safe_top_k,
                     },
                 },
@@ -217,9 +213,7 @@ class AzureReranker(BaseReranker):
         self._index_name = index_name
         logger.info(f"Azure re-ranker initialized: {endpoint}/{index_name}")
 
-    async def rerank(
-        self, query: str, results: list[VectorSearchResult], top_k: int = 5
-    ) -> list[VectorSearchResult]:
+    async def rerank(self, query: str, results: list[VectorSearchResult], top_k: int = 5) -> list[VectorSearchResult]:
         """
         Re-rank using Azure Semantic Ranker.
 
@@ -233,8 +227,8 @@ class AzureReranker(BaseReranker):
             return []
 
         try:
-            from azure.search.documents import SearchClient
             from azure.core.credentials import AzureKeyCredential
+            from azure.search.documents import SearchClient
 
             client = SearchClient(
                 endpoint=self._endpoint,

@@ -145,7 +145,7 @@ class DynamoDBVectorStore(BaseVectorStore):
             SK = "{document_id}#{chunk_index}" (e.g., "abc123#0")
         """
         with self._table.batch_writer() as batch:
-            for i, (text, embedding) in enumerate(zip(texts, embeddings)):
+            for i, (text, embedding) in enumerate(zip(texts, embeddings, strict=False)):
                 metadata = metadatas[i] if metadatas else {}
                 chunk_id = f"{document_id}#{i}"
 
@@ -181,9 +181,7 @@ class DynamoDBVectorStore(BaseVectorStore):
     # Search (brute-force cosine similarity)
     # ------------------------------------------------------------------ #
 
-    async def search(
-        self, query_embedding: list[float], top_k: int = 5
-    ) -> list[VectorSearchResult]:
+    async def search(self, query_embedding: list[float], top_k: int = 5) -> list[VectorSearchResult]:
         """Find the most similar vectors using brute-force cosine similarity.
 
         Algorithm:
@@ -247,10 +245,7 @@ class DynamoDBVectorStore(BaseVectorStore):
         # Step 5: Convert to VectorSearchResult
         results: list[VectorSearchResult] = []
         for raw_score, item in top_results:
-            if score_range > 0:
-                normalized_score = (raw_score - min_score) / score_range
-            else:
-                normalized_score = 1.0 if top_results else 0.0
+            normalized_score = (raw_score - min_score) / score_range if score_range > 0 else 1.0 if top_results else 0.0
 
             results.append(
                 VectorSearchResult(
@@ -266,8 +261,7 @@ class DynamoDBVectorStore(BaseVectorStore):
             )
 
         logger.debug(
-            "DynamoDB search: scanned {} vectors, returning top {} "
-            "(best_raw={:.3f}, best_normalized={:.3f})",
+            "DynamoDB search: scanned {} vectors, returning top {} " "(best_raw={:.3f}, best_normalized={:.3f})",
             len(all_items),
             len(results),
             top_results[0][0] if top_results else 0.0,
@@ -316,10 +310,7 @@ class DynamoDBVectorStore(BaseVectorStore):
         # Find all chunks for this document via GSI
         response = self._table.query(
             IndexName="document-id-index",
-            KeyConditionExpression=(
-                Key("collection").eq(self._collection_name)
-                & Key("document_id").eq(document_id)
-            ),
+            KeyConditionExpression=(Key("collection").eq(self._collection_name) & Key("document_id").eq(document_id)),
         )
 
         items = response.get("Items", [])

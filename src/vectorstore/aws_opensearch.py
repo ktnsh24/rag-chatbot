@@ -20,9 +20,6 @@ Cost:
 See docs/aws-services.md for deep dive on OpenSearch Serverless.
 """
 
-import json
-from uuid import uuid4
-
 from loguru import logger
 from opensearchpy import AWSV4SignerAuth, OpenSearch, RequestsHttpConnection
 
@@ -139,12 +136,10 @@ class OpenSearchVectorStore(BaseVectorStore):
             {"embedding": [...], "text": "...", ...}
         """
         bulk_body: list[dict] = []
-        for i, (text, embedding) in enumerate(zip(texts, embeddings)):
+        for i, (text, embedding) in enumerate(zip(texts, embeddings, strict=False)):
             metadata = metadatas[i] if metadatas else {}
             # Action line: tells OpenSearch what to do
-            bulk_body.append(
-                {"index": {"_index": self.index_name, "_id": f"{document_id}_{i}"}}
-            )
+            bulk_body.append({"index": {"_index": self.index_name, "_id": f"{document_id}_{i}"}})
             # Document line: the actual data to store
             bulk_body.append(
                 {

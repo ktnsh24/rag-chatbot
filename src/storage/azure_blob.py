@@ -9,7 +9,7 @@ Resources are created by infra/azure/storage.tf.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from azure.storage.blob.aio import BlobServiceClient
 from loguru import logger
@@ -62,7 +62,7 @@ class AzureBlobDocumentStorage(BaseDocumentStorage):
             filename=filename,
             content_type=content_type,
             size_bytes=len(content),
-            uploaded_at=datetime.now(timezone.utc),
+            uploaded_at=datetime.now(UTC),
             storage_path=blob_name,
         )
 
@@ -112,7 +112,7 @@ class AzureBlobDocumentStorage(BaseDocumentStorage):
                     filename=parts[2] if len(parts) > 2 else "",
                     content_type=blob.content_settings.content_type or "application/octet-stream",
                     size_bytes=blob.size or 0,
-                    uploaded_at=blob.last_modified or datetime.now(timezone.utc),
+                    uploaded_at=blob.last_modified or datetime.now(UTC),
                     storage_path=blob.name,
                 )
             )

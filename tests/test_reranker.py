@@ -74,9 +74,7 @@ class TestLocalReranker:
     async def test_rerank_respects_top_k(self, mock_reranker: LocalReranker):
         """Only top_k results should be returned."""
         results = _make_results(10)
-        mock_reranker._model.predict.return_value = [
-            0.1, 0.9, 0.3, 0.7, 0.5, 0.2, 0.4, 0.6, 0.8, 0.0
-        ]
+        mock_reranker._model.predict.return_value = [0.1, 0.9, 0.3, 0.7, 0.5, 0.2, 0.4, 0.6, 0.8, 0.0]
 
         reranked = await mock_reranker.rerank(query="test", results=results, top_k=3)
 

@@ -58,7 +58,10 @@ PII_PATTERNS: list[tuple[str, re.Pattern]] = [
     ("CREDIT_CARD", re.compile(r"\b(?:\d{4}[-.\s]?){3}\d{4}\b")),
     ("IBAN", re.compile(r"\b[A-Z]{2}\d{2}\s?(?:[A-Z0-9]{4}\s?){2,7}[A-Z0-9]{1,4}\b")),
     ("BSN", re.compile(r"\b\d{9}\b")),  # Dutch BSN (Burger Service Nummer)
-    ("DATE_OF_BIRTH", re.compile(r"\b(?:born|dob|date\s+of\s+birth)\s*:?\s*\d{1,2}[-/]\d{1,2}[-/]\d{2,4}\b", re.IGNORECASE)),
+    (
+        "DATE_OF_BIRTH",
+        re.compile(r"\b(?:born|dob|date\s+of\s+birth)\s*:?\s*\d{1,2}[-/]\d{1,2}[-/]\d{2,4}\b", re.IGNORECASE),
+    ),
     ("IP_ADDRESS", re.compile(r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b")),
 ]
 
@@ -187,5 +190,5 @@ class LocalGuardrails(BaseGuardrails):
         result = text
         for entity in sorted(entities, key=lambda e: e.start, reverse=True):
             placeholder = f"[{entity.entity_type}_REDACTED]"
-            result = result[:entity.start] + placeholder + result[entity.end:]
+            result = result[: entity.start] + placeholder + result[entity.end :]
         return result

@@ -23,16 +23,12 @@ import pytest
 
 from src.evaluation.evaluator import (
     RAGEvaluator,
-    RetrievalScore,
-    FaithfulnessScore,
-    AnswerRelevanceScore,
-    EvaluationResult,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def evaluator():
@@ -65,6 +61,7 @@ def poor_chunks():
 # ---------------------------------------------------------------------------
 # Retrieval Quality Tests
 # ---------------------------------------------------------------------------
+
 
 class TestRetrievalEvaluation:
     """
@@ -116,6 +113,7 @@ class TestRetrievalEvaluation:
 # Faithfulness Tests (Hallucination Detection)
 # ---------------------------------------------------------------------------
 
+
 class TestFaithfulnessEvaluation:
     """
     AI Engineer question: "Did the model make anything up?"
@@ -162,6 +160,7 @@ class TestFaithfulnessEvaluation:
 # Answer Relevance Tests
 # ---------------------------------------------------------------------------
 
+
 class TestAnswerRelevanceEvaluation:
     """
     AI Engineer question: "Does the answer address the question?"
@@ -191,6 +190,7 @@ class TestAnswerRelevanceEvaluation:
 # ---------------------------------------------------------------------------
 # Overall Score Tests
 # ---------------------------------------------------------------------------
+
 
 class TestOverallEvaluation:
     """
@@ -238,14 +238,17 @@ class TestOverallEvaluation:
             answer="I don't have enough information in the uploaded documents to answer that question.",
             retrieved_chunks=[("Some unrelated text.", 0.3)],
         )
-        assert any("refused" in note.lower() or "refusal" in note.lower() for note in result.evaluation_notes) or \
-               any("refuse" in note.lower() for note in result.evaluation_notes) or \
-               result.faithfulness.score >= 0.8  # A refusal is always faithful
+        assert (
+            any("refused" in note.lower() or "refusal" in note.lower() for note in result.evaluation_notes)
+            or any("refuse" in note.lower() for note in result.evaluation_notes)
+            or result.faithfulness.score >= 0.8
+        )  # A refusal is always faithful
 
 
 # ---------------------------------------------------------------------------
 # Golden Dataset — Regression Tests
 # ---------------------------------------------------------------------------
+
 
 class TestGoldenDataset:
     """
@@ -309,6 +312,6 @@ class TestGoldenDataset:
             answer=answer,
             retrieved_chunks=case["context_chunks"],
         )
-        assert result.retrieval.avg_relevance_score >= 0.7, (
-            f"Golden case '{case['name']}': retrieval score {result.retrieval.avg_relevance_score} < 0.7"
-        )
+        assert (
+            result.retrieval.avg_relevance_score >= 0.7
+        ), f"Golden case '{case['name']}': retrieval score {result.retrieval.avg_relevance_score} < 0.7"

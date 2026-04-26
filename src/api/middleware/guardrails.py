@@ -60,9 +60,7 @@ def create_guardrails(settings: Settings) -> BaseGuardrails | None:
         return LocalGuardrails()
 
 
-async def apply_input_guardrail(
-    guardrails: BaseGuardrails | None, text: str
-) -> tuple[str, GuardrailResult | None]:
+async def apply_input_guardrail(guardrails: BaseGuardrails | None, text: str) -> tuple[str, GuardrailResult | None]:
     """
     Apply input guardrails to user text.
 

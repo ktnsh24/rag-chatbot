@@ -15,7 +15,7 @@ Container schema (created by infra/azure/cosmosdb.tf):
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 
 from azure.cosmos.aio import CosmosClient
 from loguru import logger
@@ -79,11 +79,7 @@ class CosmosDBConversationHistory(BaseConversationHistory):
     ) -> list[ConversationMessage]:
         """Retrieve the most recent messages for a session (newest last)."""
         container = await self._get_container()
-        query = (
-            "SELECT TOP @limit * FROM c "
-            "WHERE c.session_id = @session_id "
-            "ORDER BY c.timestamp DESC"
-        )
+        query = "SELECT TOP @limit * FROM c " "WHERE c.session_id = @session_id " "ORDER BY c.timestamp DESC"
         parameters = [
             {"name": "@limit", "value": limit},
             {"name": "@session_id", "value": session_id},

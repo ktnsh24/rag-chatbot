@@ -10,19 +10,17 @@ Run with:
     pytest tests/test_evaluate_route.py -v
 """
 
-from unittest.mock import AsyncMock, MagicMock, patch
-from uuid import UUID
+from unittest.mock import AsyncMock
 
 import pytest
 from fastapi.testclient import TestClient
 
-from src.api.models import CloudProvider
 from src.main import create_app
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def app():
@@ -82,6 +80,7 @@ def client_no_rag(app_no_rag):
 # ---------------------------------------------------------------------------
 # POST /api/evaluate — Single Question Evaluation
 # ---------------------------------------------------------------------------
+
 
 class TestEvaluateSingle:
     """Tests for the single question evaluation endpoint."""
@@ -187,6 +186,7 @@ class TestEvaluateSingle:
 # ---------------------------------------------------------------------------
 # POST /api/evaluate/suite — Golden Dataset Suite
 # ---------------------------------------------------------------------------
+
 
 class TestEvaluateSuite:
     """Tests for the golden dataset evaluation suite endpoint."""

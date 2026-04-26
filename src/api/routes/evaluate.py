@@ -29,8 +29,8 @@ from src.api.models import (
     EvaluateSingleResponse,
     EvaluateSuiteRequest,
     EvaluateSuiteResponse,
-    EvaluationScoreDetail,
     EvaluationCaseResult,
+    EvaluationScoreDetail,
 )
 from src.config import get_settings
 from src.evaluation.evaluator import RAGEvaluator
@@ -94,10 +94,7 @@ async def evaluate_single(request: Request, body: EvaluateSingleRequest) -> Eval
         sources = result.get("sources", [])
 
         # Build chunks for evaluator: list of (text, score) tuples
-        retrieved_chunks = [
-            (chunk.get("text", ""), chunk.get("score", 0.0))
-            for chunk in sources
-        ]
+        retrieved_chunks = [(chunk.get("text", ""), chunk.get("score", 0.0)) for chunk in sources]
 
         # Step 2: Evaluate the result
         evaluator = RAGEvaluator()
@@ -140,7 +137,7 @@ async def evaluate_single(request: Request, body: EvaluateSingleRequest) -> Eval
     except Exception as e:
         latency_ms = int((time.time() - start_time) * 1000)
         logger.error(f"[{request_id}] Evaluation error after {latency_ms}ms: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.post(
@@ -224,10 +221,7 @@ async def evaluate_suite(request: Request, body: EvaluateSuiteRequest | None = N
                 answer = result.get("answer", "")
                 sources = result.get("sources", [])
 
-                retrieved_chunks = [
-                    (chunk.get("text", ""), chunk.get("score", 0.0))
-                    for chunk in sources
-                ]
+                retrieved_chunks = [(chunk.get("text", ""), chunk.get("score", 0.0)) for chunk in sources]
 
                 # Evaluate
                 eval_result = evaluator.evaluate(
@@ -296,9 +290,7 @@ async def evaluate_suite(request: Request, body: EvaluateSuiteRequest | None = N
         # Calculate average overall score
         avg_score = 0.0
         if case_results:
-            avg_score = round(
-                sum(r.scores.overall for r in case_results) / len(case_results), 3
-            )
+            avg_score = round(sum(r.scores.overall for r in case_results) / len(case_results), 3)
 
         response = EvaluateSuiteResponse(
             total_cases=total_cases,
@@ -320,4 +312,4 @@ async def evaluate_suite(request: Request, body: EvaluateSuiteRequest | None = N
 
     except Exception as e:
         logger.error(f"[{request_id}] Suite error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e

@@ -77,9 +77,7 @@ class OllamaLLM(BaseLLM):
             "5. Use bullet points for lists\n"
         )
 
-        context_text = "\n\n---\n\n".join(
-            f"[Document chunk {i + 1}]:\n{chunk}" for i, chunk in enumerate(context)
-        )
+        context_text = "\n\n---\n\n".join(f"[Document chunk {i + 1}]:\n{chunk}" for i, chunk in enumerate(context))
 
         user_message = f"Context:\n{context_text}\n\nQuestion: {prompt}"
 
@@ -111,13 +109,11 @@ class OllamaLLM(BaseLLM):
             )
 
         except httpx.ConnectError:
-            logger.error(
-                "Cannot connect to Ollama. Is it running? Start with: ollama serve"
-            )
+            logger.error("Cannot connect to Ollama. Is it running? Start with: ollama serve")
             raise RuntimeError(
                 "Ollama is not running. Start it with: ollama serve "
                 "(or install: curl -fsSL https://ollama.com/install.sh | sh)"
-            )
+            ) from None
         except Exception as e:
             logger.error(f"Ollama generate error: {e}")
             raise
@@ -144,13 +140,11 @@ class OllamaLLM(BaseLLM):
             return data["embeddings"][0]
 
         except httpx.ConnectError:
-            logger.error(
-                "Cannot connect to Ollama. Is it running? Start with: ollama serve"
-            )
+            logger.error("Cannot connect to Ollama. Is it running? Start with: ollama serve")
             raise RuntimeError(
                 "Ollama is not running. Start it with: ollama serve "
                 "(or install: curl -fsSL https://ollama.com/install.sh | sh)"
-            )
+            ) from None
         except Exception as e:
             logger.error(f"Ollama embedding error: {e}")
             raise
@@ -176,13 +170,11 @@ class OllamaLLM(BaseLLM):
             return data["embeddings"]
 
         except httpx.ConnectError:
-            logger.error(
-                "Cannot connect to Ollama. Is it running? Start with: ollama serve"
-            )
+            logger.error("Cannot connect to Ollama. Is it running? Start with: ollama serve")
             raise RuntimeError(
                 "Ollama is not running. Start it with: ollama serve "
                 "(or install: curl -fsSL https://ollama.com/install.sh | sh)"
-            )
+            ) from None
         except Exception as e:
             logger.error(f"Ollama batch embedding error: {e}")
             raise

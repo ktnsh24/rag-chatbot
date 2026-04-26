@@ -79,9 +79,7 @@ class AzureOpenAILLM(BaseLLM):
             "5. Use bullet points for lists\n"
         )
 
-        context_text = "\n\n---\n\n".join(
-            f"[Document chunk {i + 1}]:\n{chunk}" for i, chunk in enumerate(context)
-        )
+        context_text = "\n\n---\n\n".join(f"[Document chunk {i + 1}]:\n{chunk}" for i, chunk in enumerate(context))
 
         user_message = f"Context:\n{context_text}\n\nQuestion: {prompt}"
 

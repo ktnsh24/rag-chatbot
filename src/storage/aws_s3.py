@@ -10,7 +10,7 @@ Bucket is created by infra/aws/s3.tf.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import boto3
 from loguru import logger
@@ -55,7 +55,7 @@ class S3DocumentStorage(BaseDocumentStorage):
             filename=filename,
             content_type=content_type,
             size_bytes=len(content),
-            uploaded_at=datetime.now(timezone.utc),
+            uploaded_at=datetime.now(UTC),
             storage_path=key,
         )
 

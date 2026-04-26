@@ -71,9 +71,7 @@ class BedrockLLM(BaseLLM):
         )
 
         # Format context chunks
-        context_text = "\n\n---\n\n".join(
-            f"[Document chunk {i + 1}]:\n{chunk}" for i, chunk in enumerate(context)
-        )
+        context_text = "\n\n---\n\n".join(f"[Document chunk {i + 1}]:\n{chunk}" for i, chunk in enumerate(context))
 
         # Build the user message
         user_message = f"Context:\n{context_text}\n\nQuestion: {prompt}"

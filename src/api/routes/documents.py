@@ -7,8 +7,7 @@ Provides:
     DELETE /api/documents/{id}    — Remove a document
 """
 
-import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
@@ -22,7 +21,6 @@ from src.api.models import (
     DocumentStatus,
     DocumentUploadResponse,
 )
-from src.config import get_settings
 
 router = APIRouter()
 
@@ -90,7 +88,7 @@ async def upload_document(request: Request, file: UploadFile = File(...)) -> Doc
             filename=filename,
             status=DocumentStatus.READY,
             chunk_count=chunk_count,
-            uploaded_at=datetime.now(timezone.utc),
+            uploaded_at=datetime.now(UTC),
             file_size_bytes=file_size,
         )
         _documents[document_id] = doc_info
@@ -114,10 +112,10 @@ async def upload_document(request: Request, file: UploadFile = File(...)) -> Doc
             filename=filename,
             status=DocumentStatus.FAILED,
             chunk_count=0,
-            uploaded_at=datetime.now(timezone.utc),
+            uploaded_at=datetime.now(UTC),
             file_size_bytes=0,
         )
-        raise HTTPException(status_code=500, detail=f"Document ingestion failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Document ingestion failed: {e}") from e
 
 
 @router.post(
@@ -209,7 +207,7 @@ async def upload_documents_batch(
             filename=filename,
             status=status,
             chunk_count=chunk_count,
-            uploaded_at=datetime.now(timezone.utc),
+            uploaded_at=datetime.now(UTC),
             file_size_bytes=len(file_bytes),
         )
 

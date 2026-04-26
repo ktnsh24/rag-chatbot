@@ -18,12 +18,11 @@ Cost (Basic tier, West Europe):
 See docs/azure-services.md for deep dive.
 """
 
-from uuid import uuid4
-
 from azure.core.credentials import AzureKeyCredential
 from azure.search.documents import SearchClient
 from azure.search.documents.indexes import SearchIndexClient
 from azure.search.documents.indexes.models import (
+    HnswAlgorithmConfiguration,
     SearchableField,
     SearchField,
     SearchFieldDataType,
@@ -31,7 +30,6 @@ from azure.search.documents.indexes.models import (
     SimpleField,
     VectorSearch,
     VectorSearchProfile,
-    HnswAlgorithmConfiguration,
 )
 from azure.search.documents.models import VectorizedQuery
 from loguru import logger
@@ -138,7 +136,7 @@ class AzureAISearchVectorStore(BaseVectorStore):
     ) -> int:
         """Store document chunk embeddings in Azure AI Search."""
         documents = []
-        for i, (text, embedding) in enumerate(zip(texts, embeddings)):
+        for i, (text, embedding) in enumerate(zip(texts, embeddings, strict=False)):
             metadata = metadatas[i] if metadatas else {}
             documents.append(
                 {

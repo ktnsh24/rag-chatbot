@@ -31,7 +31,7 @@ class TestReadDocument:
         """Unsupported file types should raise ValueError."""
         try:
             read_document("image.png", b"binary data")
-            assert False, "Should have raised ValueError"
+            raise AssertionError("Should have raised ValueError")
         except ValueError as e:
             assert ".png" in str(e)
 
@@ -64,7 +64,7 @@ class TestChunkDocument:
         # Check that some text from chunk N appears in chunk N+1
         if len(chunks) >= 2:
             # The end of chunk 0 should appear at the start of chunk 1
-            end_of_first = chunks[0][-30:]
+            chunks[0][-30:]
             # With overlap, some of this text should be in chunk 1
             # (This is a fuzzy check — overlap means shared content)
             assert len(chunks[1]) > 0

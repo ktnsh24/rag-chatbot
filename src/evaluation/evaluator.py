@@ -44,14 +44,14 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from loguru import logger
-
 
 # ---------------------------------------------------------------------------
 # Data classes for evaluation results
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class RetrievalScore:
@@ -61,12 +61,12 @@ class RetrievalScore:
     Except here it's: "Did the vector search return the right chunks?"
     """
 
-    avg_relevance_score: float       # Average cosine similarity of retrieved chunks
-    top_score: float                 # Best chunk's similarity score
-    min_score: float                 # Worst chunk's similarity score
-    chunks_above_threshold: int      # How many chunks scored above the threshold
-    total_chunks: int                # Total chunks retrieved
-    threshold: float = 0.7          # Minimum acceptable relevance
+    avg_relevance_score: float  # Average cosine similarity of retrieved chunks
+    top_score: float  # Best chunk's similarity score
+    min_score: float  # Worst chunk's similarity score
+    chunks_above_threshold: int  # How many chunks scored above the threshold
+    total_chunks: int  # Total chunks retrieved
+    threshold: float = 0.7  # Minimum acceptable relevance
 
     @property
     def quality(self) -> str:
@@ -99,9 +99,9 @@ class FaithfulnessScore:
     A score of 0.5 means half the answer is made up (hallucination!).
     """
 
-    score: float                    # 0.0 (all hallucinated) to 1.0 (fully faithful)
-    claims_in_context: int          # Number of answer sentences found in context
-    claims_not_in_context: int      # Number of answer sentences NOT in context
+    score: float  # 0.0 (all hallucinated) to 1.0 (fully faithful)
+    claims_in_context: int  # Number of answer sentences found in context
+    claims_not_in_context: int  # Number of answer sentences NOT in context
     flagged_sentences: list[str] = field(default_factory=list)  # Suspicious sentences
 
     @property
@@ -117,7 +117,7 @@ class AnswerRelevanceScore:
     DE parallel: "Does the output table have the columns the business asked for?"
     """
 
-    score: float                    # 0.0 (completely off-topic) to 1.0 (perfectly relevant)
+    score: float  # 0.0 (completely off-topic) to 1.0 (perfectly relevant)
     question_keywords_in_answer: int
     question_keywords_total: int
 
@@ -144,7 +144,7 @@ class EvaluationResult:
     faithfulness: FaithfulnessScore
     answer_relevance: AnswerRelevanceScore
     overall_score: float
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
     evaluation_notes: list[str] = field(default_factory=list)
 
     @property
@@ -174,6 +174,7 @@ class EvaluationResult:
 # ---------------------------------------------------------------------------
 # The Evaluator
 # ---------------------------------------------------------------------------
+
 
 class RAGEvaluator:
     """
@@ -253,11 +254,7 @@ class RAGEvaluator:
             notes.append("ℹ️ Model correctly refused to answer (no relevant context)")
 
         # 5. Calculate overall score (weighted average)
-        overall = (
-            retrieval.avg_relevance_score * 0.3 +
-            faithfulness.score * 0.4 +
-            answer_relevance.score * 0.3
-        )
+        overall = retrieval.avg_relevance_score * 0.3 + faithfulness.score * 0.4 + answer_relevance.score * 0.3
 
         result = EvaluationResult(
             question=question,
@@ -397,29 +394,124 @@ class RAGEvaluator:
     @staticmethod
     def _split_sentences(text: str) -> list[str]:
         """Split text into sentences."""
-        sentences = re.split(r'(?<=[.!?])\s+', text.strip())
+        sentences = re.split(r"(?<=[.!?])\s+", text.strip())
         return [s for s in sentences if len(s.strip()) > 10]
 
     @staticmethod
     def _extract_keywords(text: str) -> list[str]:
         """Extract meaningful keywords (skip stop words)."""
         stop_words = {
-            "the", "a", "an", "is", "are", "was", "were", "be", "been",
-            "being", "have", "has", "had", "do", "does", "did", "will",
-            "would", "could", "should", "may", "might", "can", "shall",
-            "to", "of", "in", "for", "on", "with", "at", "by", "from",
-            "as", "into", "through", "during", "before", "after", "above",
-            "below", "between", "and", "but", "or", "not", "no", "nor",
-            "so", "yet", "both", "either", "neither", "each", "every",
-            "all", "any", "few", "more", "most", "other", "some", "such",
-            "than", "too", "very", "just", "about", "also", "this", "that",
-            "these", "those", "it", "its", "i", "me", "my", "we", "our",
-            "you", "your", "he", "him", "his", "she", "her", "they", "them",
-            "their", "what", "which", "who", "whom", "how", "when", "where",
-            "why", "if", "then", "else", "while", "because", "although",
-            "based", "according", "document", "chunk", "context",
+            "the",
+            "a",
+            "an",
+            "is",
+            "are",
+            "was",
+            "were",
+            "be",
+            "been",
+            "being",
+            "have",
+            "has",
+            "had",
+            "do",
+            "does",
+            "did",
+            "will",
+            "would",
+            "could",
+            "should",
+            "may",
+            "might",
+            "can",
+            "shall",
+            "to",
+            "of",
+            "in",
+            "for",
+            "on",
+            "with",
+            "at",
+            "by",
+            "from",
+            "as",
+            "into",
+            "through",
+            "during",
+            "before",
+            "after",
+            "above",
+            "below",
+            "between",
+            "and",
+            "but",
+            "or",
+            "not",
+            "no",
+            "nor",
+            "so",
+            "yet",
+            "both",
+            "either",
+            "neither",
+            "each",
+            "every",
+            "all",
+            "any",
+            "few",
+            "more",
+            "most",
+            "other",
+            "some",
+            "such",
+            "than",
+            "too",
+            "very",
+            "just",
+            "about",
+            "also",
+            "this",
+            "that",
+            "these",
+            "those",
+            "it",
+            "its",
+            "i",
+            "me",
+            "my",
+            "we",
+            "our",
+            "you",
+            "your",
+            "he",
+            "him",
+            "his",
+            "she",
+            "her",
+            "they",
+            "them",
+            "their",
+            "what",
+            "which",
+            "who",
+            "whom",
+            "how",
+            "when",
+            "where",
+            "why",
+            "if",
+            "then",
+            "else",
+            "while",
+            "because",
+            "although",
+            "based",
+            "according",
+            "document",
+            "chunk",
+            "context",
         }
-        words = re.findall(r'\b[a-zA-Z]{3,}\b', text.lower())
+        words = re.findall(r"\b[a-zA-Z]{3,}\b", text.lower())
         return [w for w in words if w not in stop_words]
 
     @staticmethod
