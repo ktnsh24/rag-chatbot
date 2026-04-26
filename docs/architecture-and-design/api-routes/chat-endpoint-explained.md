@@ -76,7 +76,9 @@ Once a request arrives, the handler runs these seven steps. A failure at any ste
 
 #### Step 1 — Availability guard
 
-The handler checks `app.state.rag_chain` is not `None`. If it is: `500`. No further processing.
+The handler checks `app.state.rag_chain` is not `None`. If it is: `500`. No further processing. The RAG chain is set on app state during startup by the Factory Method — if credentials were missing, the wrong endpoint was configured, or the cloud provider was unreachable, the factory failed silently and left `rag_chain` as `None`. Every request from that point on hits this guard and fails immediately.
+
+> **Courier version.** The first thing the front desk does when a customer walks in is check whether there are any couriers on duty. If the depot manager couldn't hire anyone this morning — wrong credentials, wrong city, no van — the board at the entrance says "Depot closed." Every customer gets turned away at the door until someone restarts the depot with the correct setup.
 
 ---
 
@@ -139,6 +141,8 @@ Stage 1 ranked "Payment is processed via Stripe" 3rd because the word "payment" 
 
 If the vector store returns zero chunks (no documents uploaded yet), `rag_chain.query()` short-circuits and returns a fixed message without calling the LLM.
 
+> **Courier version.** Stage 1: the courier runs to the warehouse and asks "which 20 shelves are closest to this question?" — the warehouse answers by measuring distances on a map (vectors). Fast but rough. Stage 2: the courier picks up each of the 20 binders one by one, reads the question and the binder together, and scores "does this actually answer the question?" That joint reading is what the bi-encoder can't do — it never saw the question and the binder at the same time. The 5 highest-scoring binders go forward.
+
 ---
 
 #### Step 4 — LLM generation (grounded generation, single provider, no fallback)
@@ -148,6 +152,8 @@ The top `top_k` chunks and the original question (or the REDACTED version if gua
 The provider is whatever was built at startup — Bedrock, Azure OpenAI, or Ollama. There is **no fallback chain**: if the single provider returns a 5xx, the exception propagates and the user gets a `500`. Unlike the ai-gateway, this chatbot has no router, no retry logic, and no secondary provider.
 
 The LLM response carries: the generated text, input token count, and output token count. Cost is estimated from token counts using hard-coded per-provider pricing — Bedrock Claude 3.5 Sonnet v2 at $0.003/1K input + $0.015/1K output, GPT-4o at $0.0025/1K input + $0.01/1K output. Local Ollama always returns 0.0.
+
+> **Courier version.** The courier sits at her desk with the 5 binders open, the question on top, and a strict instruction: "Write a reply using only what's in these binders. If the answer isn't in there, say so — don't make something up." There's only one courier on duty — if she's sick (provider 5xx), no one else steps in and the customer gets a "sorry, closed" slip. The bill for her work is calculated from how many pages she read and how many she wrote back.
 
 ---
 
@@ -160,6 +166,8 @@ The LLM's answer is passed back through the same guardrail interface via `check_
 #### Step 6 — In-process metrics
 
 If the metrics collector is attached to app state, it records: request count increment, latency in milliseconds, and token usage. These counters are **in-process only** — stored in a plain Python object with no persistence. Every process restart zeroes them. They are exposed in Prometheus text format via `GET /api/metrics`.
+
+> **Courier version.** After the delivery is done, the depot's tachograph records: one more trip completed, how many minutes it took, how heavy the parcel was. The tachograph lives inside the van — if the van is replaced, all the readings start from zero again.
 
 ---
 
