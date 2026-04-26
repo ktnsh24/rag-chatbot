@@ -55,7 +55,7 @@ In plain English:
 - **Search:** Find the 5 most relevant rows in a database (but by *meaning*, not by SQL WHERE)
 - **Writer:** Feed those rows to an AI that writes a human-readable summary
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
@@ -131,7 +131,7 @@ Response: {
 }
 ```
 
-- 🫏 **Donkey:** The step-by-step route map showing every checkpoint the donkey passes from question intake to answer delivery.
+- 🚚 **Courier:** The step-by-step route map showing every checkpoint the courier passes from question intake to answer delivery.
 
 ---
 
@@ -178,14 +178,14 @@ yourself — Pydantic does it.
 
 **What each line does:**
 
-| Line | Purpose | 🫏 Donkey |
+| Line | Purpose | 🚚 Courier |
 | --- | --- | --- |
-| `start_time = time.time()` | Start a stopwatch to measure total latency | Cost of keeping the donkey fed — start_time = time.time(): Start a stopwatch to measure total latency |
-| `settings = get_settings()` | Load config (for default `top_k`, cloud provider, etc.) | How many backpacks the donkey grabs from the warehouse for one delivery |
-| `request_id = uuid4()` | Generate unique ID for this request (for log tracing) | Donkey's trip log — every delivery's details written to disk for later review |
-| `body.question[:100]` | Log only first 100 chars of question (privacy + log size) | Donkey's trip log — every delivery's details written to disk for later review |
-| `getattr(..., None)` | Safely get rag_chain — returns None if it failed to init | Donkey's report card — share of test deliveries that scored above the bar |
-| `raise HTTPException(500)` | If rag_chain is None, tell the user the system is broken | Stable broke down — donkey couldn't complete the trip, customer sees an error |
+| `start_time = time.time()` | Start a stopwatch to measure total latency | Cost of keeping the courier fed — start_time = time.time(): Start a stopwatch to measure total latency |
+| `settings = get_settings()` | Load config (for default `top_k`, cloud provider, etc.) | How many parcels the courier grabs from the warehouse for one delivery |
+| `request_id = uuid4()` | Generate unique ID for this request (for log tracing) | Courier's trip log — every delivery's details written to disk for later review |
+| `body.question[:100]` | Log only first 100 chars of question (privacy + log size) | Courier's trip log — every delivery's details written to disk for later review |
+| `getattr(..., None)` | Safely get rag_chain — returns None if it failed to init | Courier's report card — share of test deliveries that scored above the bar |
+| `raise HTTPException(500)` | If rag_chain is None, tell the user the system is broken | Depot broke down — courier couldn't complete the trip, customer sees an error |
 
 #### 4. Determine session_id and top_k
 
@@ -194,10 +194,10 @@ yourself — Pydantic does it.
     top_k = body.top_k or settings.rag_top_k
 ```
 
-| Variable | If user provided it | If user didn't provide it | 🫏 Donkey |
+| Variable | If user provided it | If user didn't provide it | 🚚 Courier |
 | --- | --- | --- | --- |
 | `session_id` | Use theirs (for multi-turn conversations) | Generate a new UUID (new conversation) | Trip log entry — session_id: Use theirs (for multi-turn conversations) · Generate a new UUID (new conversation) |
-| `top_k` | Use theirs (1–20) | Use default from settings (usually 5) | How many backpacks the donkey grabs from the warehouse for one delivery |
+| `top_k` | Use theirs (1–20) | Use default from settings (usually 5) | How many parcels the courier grabs from the warehouse for one delivery |
 
 **What is `top_k`?** It's how many document chunks to retrieve from the vector store.
 More chunks = more context for the LLM = better answers, but also more tokens = higher cost.
@@ -221,7 +221,7 @@ inside is explained in [Part 2](#part-2-the-ai-pipeline) below.
 function that orchestrates multiple steps (extract, transform, load). Here it's
 embed, search, generate.
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
@@ -234,7 +234,7 @@ trace each step with a concrete example.
 
 **Example question:** *"What is the refund policy?"*
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -284,13 +284,13 @@ Output: [0.023, -0.841, 0.112, 0.567, ..., 0.394]  (1024 numbers)
 uniqueness. A hash function turns data into a fixed-size number for deduplication.
 An embedding turns text into a fixed-size vector for meaning comparison.
 
-| Concept | Hash function | Embedding function | 🫏 Donkey |
+| Concept | Hash function | Embedding function | 🚚 Courier |
 | --- | --- | --- | --- |
-| **Input** | Any data | Text | Donkey-side view of Input — affects how the donkey loads, reads, or delivers the cargo |
-| **Output** | Fixed-size number | Fixed-size vector (1024 numbers) | Embedding always emits the same-length GPS coordinate (1024 numbers) so every backpack lands at a comparable warehouse address. |
-| **Purpose** | Check if two things are identical | Check if two things mean the same | Donkey-side view of Purpose — affects how the donkey loads, reads, or delivers the cargo |
+| **Input** | Any data | Text | Courier-side view of Input — affects how the courier loads, reads, or delivers the parcels |
+| **Output** | Fixed-size number | Fixed-size vector (1024 numbers) | Embedding always emits the same-length GPS coordinate (1024 numbers) so every parcel lands at a comparable warehouse address. |
+| **Purpose** | Check if two things are identical | Check if two things mean the same | Courier-side view of Purpose — affects how the courier loads, reads, or delivers the parcels |
 | **Similar input** | Completely different hash | Similar vector | Two questions with similar meaning land at neighbouring GPS coordinates, which is why the warehouse can find them by proximity. |
-| **Example** | `md5("hello") → 5d41...` | `embed("hello") → [0.1, 0.2, ...]` | Donkey-side view of Example — affects how the donkey loads, reads, or delivers the cargo |
+| **Example** | `md5("hello") → 5d41...` | `embed("hello") → [0.1, 0.2, ...]` | Courier-side view of Example — affects how the courier loads, reads, or delivers the parcels |
 
 **Cost of this step:** Extremely cheap. Titan Embeddings costs $0.00002 per 1K tokens.
 For a 10-word question (~13 tokens), this costs $0.00000026 — essentially free.
@@ -496,12 +496,12 @@ class VectorSearchResult:
 
 **DE parallel:** This is like `SELECT text, document_name, score FROM chunks ORDER BY similarity(embedding, ?) DESC LIMIT 5`. But instead of SQL, it's a vector similarity search. Instead of exact matching (`WHERE column = value`), it's meaning matching ("find rows that *mean* something similar").
 
-| SQL query | Vector search | 🫏 Donkey |
+| SQL query | Vector search | 🚚 Courier |
 | --- | --- | --- |
-| `WHERE title = 'refund policy'` | Find vectors similar to embed("refund policy") | The donkey asks the GPS warehouse for backpacks whose coordinates sit closest to embed('refund policy'), not for an exact title match. |
-| Exact string match | Meaning match | Donkey-side view of Exact string match — affects how the donkey loads, reads, or delivers the cargo |
-| Returns rows where title equals exactly | Returns chunks that are *about* refunds | Returns backpacks whose contents are *about* refunds even when the wording differs — meaning-match instead of label-match. |
-| Misses "return procedure" (different words) | Finds "return procedure" (same meaning!) | Donkey-side view of Misses "return procedure" (different words) — affects how the donkey loads, reads, or delivers the cargo |
+| `WHERE title = 'refund policy'` | Find vectors similar to embed("refund policy") | The courier asks the GPS warehouse for parcels whose coordinates sit closest to embed('refund policy'), not for an exact title match. |
+| Exact string match | Meaning match | Courier-side view of Exact string match — affects how the courier loads, reads, or delivers the parcels |
+| Returns rows where title equals exactly | Returns chunks that are *about* refunds | Returns parcels whose contents are *about* refunds even when the wording differs — meaning-match instead of label-match. |
+| Misses "return procedure" (different words) | Finds "return procedure" (same meaning!) | Courier-side view of Misses "return procedure" (different words) — affects how the courier loads, reads, or delivers the parcels |
 
 **This is the key breakthrough of RAG:** It finds relevant documents by meaning, not
 by keywords. A user asking "How do I get my money back?" will find a document titled
@@ -660,12 +660,12 @@ This is the actual AI call. You send the assembled prompt to a Large Language Mo
 
 **What the parameters mean:**
 
-| Parameter | Value | What it does | DE parallel | 🫏 Donkey |
+| Parameter | Value | What it does | DE parallel | 🚚 Courier |
 | --- | --- | --- | --- | --- |
-| `modelId` | `anthropic.claude-3-5-sonnet-...` | Which AI model to use | Like choosing which database engine (Postgres vs MySQL) | Picks which donkey breed (Claude, Llama, GPT) actually carries the delivery |
-| `maxTokens` | `2048` | Maximum answer length (~1500 words) | Like `LIMIT` on output size | Hard cap on hay the donkey may use writing the answer — 2048 tokens, then it stops mid-sentence. |
-| `temperature` | `0.1` | How deterministic vs creative (0.0–1.0) | No real parallel — unique to AI | How predictable the donkey's writing is — low = same words every trip, high = the donkey gets creative |
-| `topP` | `0.9` | Probability threshold for word choices | No real parallel — unique to AI | How wide a vocabulary the donkey can pick from when writing the answer |
+| `modelId` | `anthropic.claude-3-5-sonnet-...` | Which AI model to use | Like choosing which database engine (Postgres vs MySQL) | Picks which courier breed (Claude, Llama, GPT) actually carries the delivery |
+| `maxTokens` | `2048` | Maximum answer length (~1500 words) | Like `LIMIT` on output size | Hard cap on fuel the courier may use writing the answer — 2048 tokens, then it stops mid-sentence. |
+| `temperature` | `0.1` | How deterministic vs creative (0.0–1.0) | No real parallel — unique to AI | How predictable the courier's writing is — low = same words every trip, high = the courier gets creative |
+| `topP` | `0.9` | Probability threshold for word choices | No real parallel — unique to AI | How wide a vocabulary the courier can pick from when writing the answer |
 
 **Temperature explained:**
 
@@ -870,12 +870,12 @@ sources = [
 
 **What each field means:**
 
-| Field | Example value | Why it's there | 🫏 Donkey |
+| Field | Example value | Why it's there | 🚚 Courier |
 | --- | --- | --- | --- |
-| `document_name` | `"refund-policy.pdf"` | User can verify *which* document was used | Stable keys — only authorised callers may ask the donkey to deliver |
-| `chunk_text` | `"Refunds are processed within 14 days..."` | User can verify the LLM didn't hallucinate | The exact backpack contents shown so customers can verify the donkey didn't invent the answer |
-| `relevance_score` | `0.95` | How confident we are this chunk is relevant | How confidently the warehouse claims this backpack matches the question — 0.95 is a tight GPS hit on the customer's address. |
-| `page_number` | `3` | User can go find the original in the PDF | Which page of the original mail the backpack came from |
+| `document_name` | `"refund-policy.pdf"` | User can verify *which* document was used | Depot keys — only authorised callers may ask the courier to deliver |
+| `chunk_text` | `"Refunds are processed within 14 days..."` | User can verify the LLM didn't hallucinate | The exact parcel contents shown so customers can verify the courier didn't invent the answer |
+| `relevance_score` | `0.95` | How confident we are this chunk is relevant | How confidently the warehouse claims this parcel matches the question — 0.95 is a tight GPS hit on the customer's address. |
+| `page_number` | `3` | User can go find the original in the PDF | Which page of the original mail the parcel came from |
 
 **Why sources matter — the anti-hallucination pattern:**
 
@@ -991,16 +991,16 @@ except Exception:
 
 **Why this matters:**
 
-| Aspect | What it does | DE parallel | 🫏 Donkey |
+| Aspect | What it does | DE parallel | 🚚 Courier |
 |---|---|---| --- |
-| **Inline evaluation** | Scores every answer in real-time (< 5ms, no LLM call) | DQ check after every pipeline run | Quick report card on every delivery without sending the donkey back out for a second opinion |
-| **Failure classification** | Categories: `bad_retrieval`, `hallucination`, `off_topic`, etc. | Error taxonomy in Airflow | Each failed delivery gets a reason code — bad_retrieval, hallucination, off_topic — so the stable knows which fix to apply. |
-| **JSONL logging** | One structured record per query in `logs/queries/YYYY-MM-DD.jsonl` | Structured task logs | Bouncer at the stable door — JSONL logging: One structured record per query in logs/queries/YYYY-MM-DD.jsonl · Structured task logs |
-| **Non-fatal** | If logging fails, user still gets their answer | Airflow: logging fails ≠ task fails | If the trip log can't be written, the donkey still hands the customer their answer — logging failure never blocks delivery |
+| **Inline evaluation** | Scores every answer in real-time (< 5ms, no LLM call) | DQ check after every pipeline run | Quick report card on every delivery without sending the courier back out for a second opinion |
+| **Failure classification** | Categories: `bad_retrieval`, `hallucination`, `off_topic`, etc. | Error taxonomy in Airflow | Each failed delivery gets a reason code — bad_retrieval, hallucination, off_topic — so the depot knows which fix to apply. |
+| **JSONL logging** | One structured record per query in `logs/queries/YYYY-MM-DD.jsonl` | Structured task logs | Bouncer at the depot door — JSONL logging: One structured record per query in logs/queries/YYYY-MM-DD.jsonl · Structured task logs |
+| **Non-fatal** | If logging fails, user still gets their answer | Airflow: logging fails ≠ task fails | If the trip log can't be written, the courier still hands the customer their answer — logging failure never blocks delivery |
 
 📖 **See:** [Monitoring Reference](../../reference/monitoring.md) · [API Reference → Queries](../../reference/api-reference.md#query-debugging-i30)
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
@@ -1008,14 +1008,14 @@ except Exception:
 
 Here's a breakdown of what one question costs across all 5 steps:
 
-| Step | What happens | AWS cost | Azure cost | Local cost | Time | 🫏 Donkey |
+| Step | What happens | AWS cost | Azure cost | Local cost | Time | 🚚 Courier |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1. EMBED | Question → vector | $0.0000003 (Titan) | $0.0000003 (text-embedding-3-small) | **$0** | ~50ms | Coordinates inked on the saddlebag — 1. EMBED: Question → vector · $0.0000003 (Titan) · $0.0000003 (text-embedding-3-small) · $0 · ~50ms |
+| 1. EMBED | Question → vector | $0.0000003 (Titan) | $0.0000003 (text-embedding-3-small) | **$0** | ~50ms | Coordinates inked on the parcel — 1. EMBED: Question → vector · $0.0000003 (Titan) · $0.0000003 (text-embedding-3-small) · $0 · ~50ms |
 | 2. SEARCH | Find top 5 chunks | ~$0 (OpenSearch, per-OCU) | ~$0 (AI Search, per-tier) | **$0** | ~30ms | AWS search hub — 2. SEARCH: Find top 5 chunks · ~$0 (OpenSearch, per-OCU) · ~$0 (AI Search, per-tier) · $0 · ~30ms |
-| 3. BUILD | Assemble prompt | $0 | $0 | $0 | <1ms | Note the donkey carries — 3. BUILD: Assemble prompt · $0 · $0 · $0 · <1ms |
-| 4. GENERATE | LLM generates answer | **$0.0065** (Claude) | **$0.005** (GPT-4o) | **$0** (llama3.2) | ~350ms | The donkey writes the answer — by far the slowest and most expensive step of every trip |
+| 3. BUILD | Assemble prompt | $0 | $0 | $0 | <1ms | Note the courier carries — 3. BUILD: Assemble prompt · $0 · $0 · $0 · <1ms |
+| 4. GENERATE | LLM generates answer | **$0.0065** (Claude) | **$0.005** (GPT-4o) | **$0** (llama3.2) | ~350ms | The courier writes the answer — by far the slowest and most expensive step of every trip |
 | 5. BUILD | Format response | $0 | $0 | $0 | <1ms | Complimentary feed allowance — 5. BUILD: Format response · $0 · $0 · $0 · <1ms |
-| **Total per query** | | **~$0.0065** | **~$0.005** | **$0** | **~430ms** | End-to-end delivery: AWS donkey ~$0.0065, Azure ~$0.005, local llama3.2 free — all in about 430ms door to door. |
+| **Total per query** | | **~$0.0065** | **~$0.005** | **$0** | **~430ms** | End-to-end delivery: AWS courier ~$0.0065, Azure ~$0.005, local llama3.2 free — all in about 430ms door to door. |
 | **Monthly infra** | | ~$350 (OpenSearch 2 OCU) | ~$75 (AI Search Basic) | **$0** | — | OpenSearch sorting office — Monthly infra: ~$350 (OpenSearch 2 OCU) · ~$75 (AI Search Basic) · $0 · — |
 
 **Key insight:** 99.9% of the cost is in Step 4 (the LLM call). The embedding is
@@ -1026,7 +1026,7 @@ essentially free. Optimising costs means reducing what you send to the LLM:
 
 See [Cost Analysis](../ai-engineering/cost-analysis.md) for cost optimisation techniques.
 
-- 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
+- 🚚 **Courier:** The feed bill — how much fuel (tokens) the courier eats per delivery, and how to reduce waste without starving it.
 
 ---
 
@@ -1034,33 +1034,33 @@ See [Cost Analysis](../ai-engineering/cost-analysis.md) for cost optimisation te
 
 What does each role see when they look at this endpoint?
 
-| Aspect | DE sees | AI engineer sees | 🫏 Donkey |
+| Aspect | DE sees | AI engineer sees | 🚚 Courier |
 | --- | --- | --- | --- |
-| `rag_chain.query()` | "Async service call" | "What embedding model? Is 1024 dimensions enough? Should I use cosine or dot product?" | Coordinates inked on the saddlebag — rag_chain.query(): "Async service call" · "What embedding model? Is 1024 dimensions enough? Should I use cosine or dot product?" |
-| `top_k=5` | "Like LIMIT 5" | "Is 5 optimal? Should I use 3 for simple questions and 10 for complex ones?" | How many backpacks the donkey grabs from the warehouse for one delivery |
-| `sources` | "List of dicts" | "Are low-scoring chunks diluting the context? Should I filter below 0.5 before sending to the LLM?" | AI engineer asks if low-score backpack items are diluting what the donkey actually reads |
-| `token_usage: 1250 input` | "A counter" | "That's 5 chunks × ~250 tokens each. Can I use 200-token chunks to save 20%?" | 1250 input tokens of hay equals roughly 5 backpacks at 250 tokens each — shrink the pockets to cut the feed bill. |
-| `latency_ms: 450` | "Acceptable latency" | "350ms is the LLM. Can I use Claude Haiku ($0.00025/1K) for simple questions?" | AI engineer asks if a cheaper, faster donkey breed could handle simpler deliveries |
-| `temperature: 0.1` | "A config parameter" | "0.1 is good for factual. If we add summarisation, we'd want 0.3-0.5" | How predictable the donkey's writing is — low = same words every trip, high = the donkey gets creative |
-| Error handling | "Standard try/except" | "If the LLM hallucinates despite context, how do I detect and prevent that?" | AI engineer asks how to catch a donkey that invents content despite a good backpack |
+| `rag_chain.query()` | "Async service call" | "What embedding model? Is 1024 dimensions enough? Should I use cosine or dot product?" | Coordinates inked on the parcel — rag_chain.query(): "Async service call" · "What embedding model? Is 1024 dimensions enough? Should I use cosine or dot product?" |
+| `top_k=5` | "Like LIMIT 5" | "Is 5 optimal? Should I use 3 for simple questions and 10 for complex ones?" | How many parcels the courier grabs from the warehouse for one delivery |
+| `sources` | "List of dicts" | "Are low-scoring chunks diluting the context? Should I filter below 0.5 before sending to the LLM?" | AI engineer asks if low-score parcel items are diluting what the courier actually reads |
+| `token_usage: 1250 input` | "A counter" | "That's 5 chunks × ~250 tokens each. Can I use 200-token chunks to save 20%?" | 1250 input tokens of fuel equals roughly 5 parcels at 250 tokens each — shrink the pockets to cut the feed bill. |
+| `latency_ms: 450` | "Acceptable latency" | "350ms is the LLM. Can I use Claude Haiku ($0.00025/1K) for simple questions?" | AI engineer asks if a cheaper, faster courier breed could handle simpler deliveries |
+| `temperature: 0.1` | "A config parameter" | "0.1 is good for factual. If we add summarisation, we'd want 0.3-0.5" | How predictable the courier's writing is — low = same words every trip, high = the courier gets creative |
+| Error handling | "Standard try/except" | "If the LLM hallucinates despite context, how do I detect and prevent that?" | AI engineer asks how to catch a courier that invents content despite a good parcel |
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
 ## What Could Go Wrong
 
-| Error scenario | What happens | HTTP status | 🫏 Donkey |
+| Error scenario | What happens | HTTP status | 🚚 Courier |
 | --- | --- | --- | --- |
 | Invalid question (empty or >5000 chars) | Pydantic rejects it before the route runs | `422` | Door the customer knocks on — Invalid question (empty or >5000 chars): Pydantic rejects it before the route runs · 422 |
-| RAG chain not initialised | Route returns error immediately (no AI call) | `500` | Stable's front door — the URL customers use to drop off a question |
-| Embedding API fails (Bedrock / Azure OpenAI / Ollama down) | Exception in Step 1 → caught by try/except | `500` | Donkey can't convert the question into GPS coordinates because the embedding stable is down |
-| Vector store empty (no documents) | Step 2 returns [] → friendly "upload docs first" message | `200` (not an error) | GPS warehouse shelves are empty, so the donkey returns a polite 'upload some documents first' note instead of an error. |
-| LLM API fails (Bedrock / Azure OpenAI / Ollama down) | Exception in Step 4 → caught by try/except | `500` | The writing stable is unreachable — the donkey can't compose an answer at all |
-| LLM generates bad answer | Returns successfully — no way to detect this automatically | `200` | The donkey returns a confident-but-wrong answer — no automatic way to catch it at the gate |
-| LLM exceeds maxTokens | Answer is truncated (Claude stops at 2048 tokens) | `200` | The donkey writes until it hits its 2048-token cargo limit, then stops mid-sentence |
+| RAG chain not initialised | Route returns error immediately (no AI call) | `500` | Depot's front door — the URL customers use to drop off a question |
+| Embedding API fails (Bedrock / Azure OpenAI / Ollama down) | Exception in Step 1 → caught by try/except | `500` | Courier can't convert the question into GPS coordinates because the embedding depot is down |
+| Vector store empty (no documents) | Step 2 returns [] → friendly "upload docs first" message | `200` (not an error) | GPS warehouse shelves are empty, so the courier returns a polite 'upload some documents first' note instead of an error. |
+| LLM API fails (Bedrock / Azure OpenAI / Ollama down) | Exception in Step 4 → caught by try/except | `500` | The writing depot is unreachable — the courier can't compose an answer at all |
+| LLM generates bad answer | Returns successfully — no way to detect this automatically | `200` | The courier returns a confident-but-wrong answer — no automatic way to catch it at the gate |
+| LLM exceeds maxTokens | Answer is truncated (Claude stops at 2048 tokens) | `200` | The courier writes until it hits its 2048-token parcels limit, then stops mid-sentence |
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -1090,4 +1090,4 @@ What does each role see when they look at this endpoint?
 - [ ] How would you detect if the LLM hallucinated despite having good context?
 - [ ] When would you use a cheaper/faster model (like Claude Haiku) vs the full model?
 
-- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.
+- 🚚 **Courier:** A quick quiz for the trainee dispatch clerk — answer these to confirm the key courier delivery concepts have landed.

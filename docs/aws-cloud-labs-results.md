@@ -14,40 +14,40 @@
 
 ## Summary
 
-| Run | LLM Model | Score Normalization | Reranker | Passed | Failed | Total | Pass Rate | 🫏 Donkey |
+| Run | LLM Model | Score Normalization | Reranker | Passed | Failed | Total | Pass Rate | 🚚 Courier |
 |-----|-----------|-------------------|----------|--------|--------|-------|-----------| --- |
-| 1 | Amazon Nova Lite | ❌ Off | ✅ On (crashing) | 10 | 48 | 58 | 17% | Amazon's house donkey breed — cheap and AWS-native |
-| 2 | Claude Haiku 4.5 | ❌ Off | ✅ On (crashing) | 12 | 46 | 58 | 21% | A faster, lighter Anthropic donkey — quicker hooves but only marginally better deliveries |
-| 3 | Claude Sonnet 4.6 | ❌ Off | ✅ On (crashing) | 13 | 45 | 58 | 22% | The premium Anthropic donkey — strongest writer, but the broken road still wasted its talent |
-| **4** | **Claude Sonnet 4.6** | **✅ On** | **❌ Off** | **25** | **33** | **58** | **43%** | Same premium donkey, paved road this time — nearly doubled deliveries once retrieval scores were normalised |
+| 1 | Amazon Nova Lite | ❌ Off | ✅ On (crashing) | 10 | 48 | 58 | 17% | Amazon's house courier breed — cheap and AWS-native |
+| 2 | Claude Haiku 4.5 | ❌ Off | ✅ On (crashing) | 12 | 46 | 58 | 21% | A faster, lighter Anthropic courier — quicker hooves but only marginally better deliveries |
+| 3 | Claude Sonnet 4.6 | ❌ Off | ✅ On (crashing) | 13 | 45 | 58 | 22% | The premium Anthropic courier — strongest writer, but the broken road still wasted its talent |
+| **4** | **Claude Sonnet 4.6** | **✅ On** | **❌ Off** | **25** | **33** | **58** | **43%** | Same premium courier, paved road this time — nearly doubled deliveries once retrieval scores were normalised |
 
-- 🫏 **Donkey:** The head groom's final checklist — all trade-offs weighed, best bag chosen, donkey ready to dispatch.
+- 🚚 **Courier:** The head groom's final checklist — all trade-offs weighed, best bag chosen, courier ready to dispatch.
 
-## 🐴 The Donkey Analogy
+## 🐴 The Courier Analogy
 
-> *"Don't blame the donkey when the road is broken."*
+> *"Don't blame the courier when the road is broken."*
 
-Imagine a donkey carrying goods across a mountain. You hire **three donkeys** — a cheap one (Nova Lite), a mid-range one (Haiku 4.5), and an expensive champion (Sonnet 4.6). You expect the champion to deliver twice as many goods. Instead:
+Imagine a courier carrying goods across a mountain. You hire **three couriers** — a cheap one (Nova Lite), a mid-range one (Haiku 4.5), and an expensive champion (Sonnet 4.6). You expect the champion to deliver twice as many goods. Instead:
 
-| Donkey | Cost | Goods Delivered | 🫏 Donkey |
+| Courier | Cost | Goods Delivered | 🚚 Courier |
 |--------|------|----------------| --- |
-| Nova Lite (cheap) | €0.03 | 10 packages | Fuel-and-feed bill for keeping the donkey and stable running |
-| Haiku 4.5 (mid) | €0.04 | 12 packages | Fuel-and-feed bill for keeping the donkey and stable running |
-| **Sonnet 4.6 (champion)** | **€0.16** | **13 packages** | Fuel-and-feed bill for keeping the donkey and stable running |
+| Nova Lite (cheap) | €0.03 | 10 packages | Fuel-and-feed bill for keeping the courier and depot running |
+| Haiku 4.5 (mid) | €0.04 | 12 packages | Fuel-and-feed bill for keeping the courier and depot running |
+| **Sonnet 4.6 (champion)** | **€0.16** | **13 packages** | Fuel-and-feed bill for keeping the courier and depot running |
 
-The champion barely outperforms the cheap donkey! Why? Because the **road was broken** — full of potholes (cosine similarities of 0.04–0.37) that no donkey could navigate. Spending 5x more on a better donkey only delivered 3 extra packages.
+The champion barely outperforms the cheap courier! Why? Because the **road was broken** — full of potholes (cosine similarities of 0.04–0.37) that no courier could navigate. Spending 5x more on a better courier only delivered 3 extra packages.
 
 Then you **paved the road** (min-max normalization):
 
-| Donkey | Road | Goods Delivered | 🫏 Donkey |
+| Courier | Road | Goods Delivered | 🚚 Courier |
 |--------|------|----------------| --- |
-| **Sonnet 4.6** | **Paved** ✅ | **25 packages** | Donkey-side view of Sonnet 4.6 — affects how the donkey loads, reads, or delivers the cargo |
+| **Sonnet 4.6** | **Paved** ✅ | **25 packages** | Courier-side view of Sonnet 4.6 — affects how the courier loads, reads, or delivers the parcels |
 
-Same donkey, same mountain, same goods — but with a proper road, deliveries nearly **doubled** from 13 → 25.
+Same courier, same mountain, same goods — but with a proper road, deliveries nearly **doubled** from 13 → 25.
 
-**The lesson for RAG systems:** The LLM is the donkey — it does the heavy lifting. But the **retrieval pipeline is the road**. If your similarity scores are broken (Titan embeddings = 0.04–0.37), even the best model can't compensate. Fix the road first, then upgrade the donkey.
+**The lesson for RAG systems:** The LLM is the courier — it does the heavy lifting. But the **retrieval pipeline is the road**. If your similarity scores are broken (Titan embeddings = 0.04–0.37), even the best model can't compensate. Fix the road first, then upgrade the courier.
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -64,9 +64,9 @@ LLM can't compensate for `ret ≈ 0.03`.
 
 ### 2. Amazon Titan Embeddings Produce Low Cosine Similarities
 
-| Embedding Model | Provider | Typical Cosine Similarity (Related Text) | 🫏 Donkey |
+| Embedding Model | Provider | Typical Cosine Similarity (Related Text) | 🚚 Courier |
 |----------------|----------|----------------------------------------| --- |
-| text-embedding-3-small | Azure/OpenAI | 0.70 – 0.95 | The Azure-hub GPS stamper — produces tightly clustered coordinates so similar cargo lands close in the warehouse |
+| text-embedding-3-small | Azure/OpenAI | 0.70 – 0.95 | The Azure-hub GPS stamper — produces tightly clustered coordinates so similar parcels lands close in the warehouse |
 | nomic-embed-text | Local/Ollama | 0.65 – 0.90 | The local barn GPS stamper — coordinates are nearly as tight as Azure's, surprisingly good for free |
 | **Titan Embed Text v2** | **AWS/Bedrock** | **0.04 – 0.37** | **The AWS-depot GPS stamper — spreads coordinates so widely the warehouse robot struggles to spot which shelves are close** |
 
@@ -123,7 +123,7 @@ fail to bind to port 8000 but don't detect the failure — requests go to the OL
 **Fix applied**: `scripts/run_cloud_labs_personal.sh` — Added `PYTHONDONTWRITEBYTECODE=1` and 
 `__pycache__` cleanup. Future improvement: add `lsof -i :8000` check before starting.
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ## Detailed Run Results
 
@@ -155,47 +155,47 @@ fail to bind to port 8000 but don't detect the failure — requests go to the OL
 - **New passes**: lab-1a, lab-1b (all variants), lab-2b, lab-3a (both), lab-5a, lab-5b_q1, 
   lab-10a-1/2, lab-10b-1/3, lab-11a-3, lab-11c-1, lab-12b, lab-13c, lab-13d
 
-- 🫏 **Donkey:** The delivery receipt from the test run — shows which packages arrived intact and which got lost along the way.
+- 🚚 **Courier:** The delivery receipt from the test run — shows which packages arrived intact and which got lost along the way.
 
 ## Remaining Failures Analysis
 
 Most remaining failures fall into these categories:
 
-| Category | Examples | Root Cause | 🫏 Donkey |
+| Category | Examples | Root Cause | 🚚 Courier |
 |----------|---------|-----------| --- |
 | **Guardrails** | lab-4a (all), lab-9a/b/c | Guardrail tests need AWS Comprehend subscription | Muzzle tests fail because we never bought the AWS Comprehend muzzle subscription — buy it or skip those report-card lines. |
-| **Low faithfulness** | lab-2c, lab-5b_q3/q5 | Model hallucinates or adds context not in chunks | Donkey hallucinated extra hay not present in the backpack pockets — labs 2c, 5b_q3, 5b_q5 caught it. |
-| **Data mismatch** | lab-1c, lab-6a | Golden dataset expects "14 days" but document says "5-7 days" | Donkey delivers '5-7 days' from the chunk; the 25 standard test deliveries expected '14 days' — the golden dataset is wrong, not the donkey. |
-| **Reranker labs** | lab-9, lab-10 (some) | Reranker was disabled for this run | Reranker is the second clerk who re-orders the backpack before the donkey leaves — we ran with that clerk off shift. |
-| **Bulk ops** | lab-14, lab-15, lab-16 | Multi-document operations with timing issues | Donkey-side view of Bulk ops — affects how the donkey loads, reads, or delivers the cargo |
+| **Low faithfulness** | lab-2c, lab-5b_q3/q5 | Model hallucinates or adds context not in chunks | Courier hallucinated extra fuel not present in the parcel pockets — labs 2c, 5b_q3, 5b_q5 caught it. |
+| **Data mismatch** | lab-1c, lab-6a | Golden dataset expects "14 days" but document says "5-7 days" | Courier delivers '5-7 days' from the chunk; the 25 standard test deliveries expected '14 days' — the golden dataset is wrong, not the courier. |
+| **Reranker labs** | lab-9, lab-10 (some) | Reranker was disabled for this run | Reranker is the second clerk who re-orders the parcel before the courier leaves — we ran with that clerk off shift. |
+| **Bulk ops** | lab-14, lab-15, lab-16 | Multi-document operations with timing issues | Courier-side view of Bulk ops — affects how the courier loads, reads, or delivers the parcels |
 
-- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
+- 🚚 **Courier:** When the courier returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
 
 ## Code Changes Summary
 
-| File | Change | Impact | 🫏 Donkey |
+| File | Change | Impact | 🚚 Courier |
 |------|--------|--------| --- |
 | `src/vectorstore/aws_dynamodb.py` | Min-max score normalization | ret: 0.03 → 0.33+ | Amazon's loading dock — src/vectorstore/aws_dynamodb.py: Min-max score normalization · ret: 0.03 → 0.33+ |
-| `src/rag/reranker.py` | `safe_top_k = min(top_k, len(sources))` | Prevents reranker crash | How many backpacks the donkey grabs from the warehouse for one delivery |
-| `src/llm/aws_bedrock.py` | Removed `topP` from inferenceConfig | Fixes Sonnet 4.6 error | The AWS-depot donkey kept tripping on an unsupported parameter — removed it so it runs cleanly |
-| `infra/aws/iam.tf` | Fixed IAM tag values (removed em-dashes) | Terraform apply succeeds | Fixed IAM tag values (em-dashes removed) so the Terraform stable blueprint applies cleanly. |
-| `infra/aws/s3.tf` | Added account ID to bucket name | S3 global uniqueness | Added the AWS account ID into the bucket name so the S3 stable blueprint passes global uniqueness. |
+| `src/rag/reranker.py` | `safe_top_k = min(top_k, len(sources))` | Prevents reranker crash | How many parcels the courier grabs from the warehouse for one delivery |
+| `src/llm/aws_bedrock.py` | Removed `topP` from inferenceConfig | Fixes Sonnet 4.6 error | The AWS-depot courier kept tripping on an unsupported parameter — removed it so it runs cleanly |
+| `infra/aws/iam.tf` | Fixed IAM tag values (removed em-dashes) | Terraform apply succeeds | Fixed IAM tag values (em-dashes removed) so the Terraform depot blueprint applies cleanly. |
+| `infra/aws/s3.tf` | Added account ID to bucket name | S3 global uniqueness | Added the AWS account ID into the bucket name so the S3 depot blueprint passes global uniqueness. |
 | `infra/aws/locals.tf` | Added `data.aws_caller_identity.current` | Supports account ID lookup | Added `data.aws_caller_identity.current` to the blueprint so other resources can read the account ID. |
 | `src/rag/chain.py` | Skip OpenSearch when DynamoDB selected | Prevents empty endpoint error | OpenSearch sorting office — src/rag/chain.py: Skip OpenSearch when DynamoDB selected · Prevents empty endpoint error |
-| `scripts/run_cloud_labs_personal.sh` | Credential isolation + PYTHONDONTWRITEBYTECODE | Safe AWS usage | AWS-side stable yard — scripts/run_cloud_labs_personal.sh: Credential isolation + PYTHONDONTWRITEBYTECODE · Safe AWS usage |
+| `scripts/run_cloud_labs_personal.sh` | Credential isolation + PYTHONDONTWRITEBYTECODE | Safe AWS usage | AWS-side depot yard — scripts/run_cloud_labs_personal.sh: Credential isolation + PYTHONDONTWRITEBYTECODE · Safe AWS usage |
 
-- 🫏 **Donkey:** The head groom's final checklist — all trade-offs weighed, best bag chosen, donkey ready to dispatch.
+- 🚚 **Courier:** The head groom's final checklist — all trade-offs weighed, best bag chosen, courier ready to dispatch.
 
 ## Cost Estimate
 
-| Run | Model | Est. Bedrock Cost | Est. DynamoDB | Est. Total | 🫏 Donkey |
+| Run | Model | Est. Bedrock Cost | Est. DynamoDB | Est. Total | 🚚 Courier |
 |-----|-------|------------------|--------------|-----------| --- |
-| 1 | Nova Lite | ~$0.02 | ~$0.01 | ~€0.03 | Free hay for the donkey — 1: Nova Lite · ~$0.02 · ~$0.01 · ~€0.03 |
+| 1 | Nova Lite | ~$0.02 | ~$0.01 | ~€0.03 | Free fuel for the courier — 1: Nova Lite · ~$0.02 · ~$0.01 · ~€0.03 |
 | 2 | Haiku 4.5 | ~$0.03 | ~$0.01 | ~€0.04 | Complimentary feed allowance — 2: Haiku 4.5 · ~$0.03 · ~$0.01 · ~€0.04 |
-| 3 | Sonnet 4.6 | ~$0.15 | ~$0.01 | ~€0.16 | Stable throws in free fodder — 3: Sonnet 4.6 · ~$0.15 · ~$0.01 · ~€0.16 |
-| 4 | Sonnet 4.6 | ~$0.20 | ~$0.01 | ~€0.21 | No-charge bale from the stable — 4: Sonnet 4.6 · ~$0.20 · ~$0.01 · ~€0.21 |
-| **Total** | | | | **~€0.44** | Stable's monthly feed bill — Total: ~€0.44 |
+| 3 | Sonnet 4.6 | ~$0.15 | ~$0.01 | ~€0.16 | Depot throws in free supplies — 3: Sonnet 4.6 · ~$0.15 · ~$0.01 · ~€0.16 |
+| 4 | Sonnet 4.6 | ~$0.20 | ~$0.01 | ~€0.21 | No-charge bale from the depot — 4: Sonnet 4.6 · ~$0.20 · ~$0.01 · ~€0.21 |
+| **Total** | | | | **~€0.44** | Depot's monthly feed bill — Total: ~€0.44 |
 
 All runs well within the €5 budget. Terraform auto-destroys all resources after each run.
 
-- 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
+- 🚚 **Courier:** The feed bill — how much fuel (tokens) the courier eats per delivery, and how to reduce waste without starving it.

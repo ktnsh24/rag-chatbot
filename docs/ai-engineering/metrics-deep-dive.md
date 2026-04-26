@@ -34,15 +34,15 @@
 
 In data engineering, you monitor pipeline runs, row counts, and job durations. In AI engineering, you monitor **the same things** plus AI-specific metrics: token usage, response latency, estimated cost, and quality scores. This file is the central metrics collector — every route records metrics through it.
 
-| What you'll learn | DE parallel | 🫏 Donkey |
+| What you'll learn | DE parallel | 🚚 Courier |
 |---|---| --- |
 | Request counting and error rates | Pipeline run counts and failure rates | Mechanical groom — Request counting and error rates: Pipeline run counts and failure rates |
-| Latency tracking (P50/P95/P99) | Job duration monitoring | Stopwatch on the donkey's harness — Latency tracking (P50/P95/P99): Job duration monitoring |
-| Token usage tracking | Row count / byte count tracking | Tracks how many hay bales (tokens) the donkey ate per trip — key for cost monitoring |
-| Cost estimation per request | Cloud cost per pipeline run | What the stable charges this month — Cost estimation per request: Cloud cost per pipeline run |
-| In-memory metrics collection | StatsD / Prometheus client | Donkey's odometer dial — In-memory metrics collection: StatsD / Prometheus client |
+| Latency tracking (P50/P95/P99) | Job duration monitoring | Stopwatch on the courier's harness — Latency tracking (P50/P95/P99): Job duration monitoring |
+| Token usage tracking | Row count / byte count tracking | Tracks how many fuel fuel loads (tokens) the courier ate per trip — key for cost monitoring |
+| Cost estimation per request | Cloud cost per pipeline run | What the depot charges this month — Cost estimation per request: Cloud cost per pipeline run |
+| In-memory metrics collection | StatsD / Prometheus client | Courier's odometer dial — In-memory metrics collection: StatsD / Prometheus client |
 
-- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
+- 🚚 **Courier:** Think of this as the orientation briefing given to a new courier before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -65,7 +65,7 @@ Monitored via:                             Monitored via:
   CloudWatch / Datadog / Grafana             GET /health (this file's output)
 ```
 
-- 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
+- 🚚 **Courier:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
 
 ---
 
@@ -97,7 +97,7 @@ src/monitoring/metrics.py
       └── get_summary()            ← Called by GET /health
 ```
 
-- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the backpacks are loaded, and which route it takes to the customer.
+- 🚚 **Courier:** Like a depot floor plan showing where the courier enters, where the parcels are loaded, and which route it takes to the customer.
 
 ---
 
@@ -130,7 +130,7 @@ CREATE TABLE metrics (
 
 **In practice,** `MetricPoint` isn't heavily used in this codebase — the `MetricsCollector` aggregates directly. But the dataclass exists for future export to external systems (CloudWatch, Application Insights, Prometheus).
 
-- 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
+- 🚚 **Courier:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
 
 ---
 
@@ -161,7 +161,7 @@ class MetricsCollector:
 rows_processed += 1              cursor.execute("UPDATE metrics SET count = count + 1")
 ```
 
-- 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
+- 🚚 **Courier:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
 
 ---
 
@@ -195,15 +195,15 @@ metrics.record_chat_request(
 
 **What gets tracked:**
 
-| Counter | What it measures | Why it matters | 🫏 Donkey |
+| Counter | What it measures | Why it matters | 🚚 Courier |
 |---|---|---| --- |
-| `_chat_requests` | Total queries served | Throughput — are people using the system? | Donkey-hire fee — _chat_requests: Total queries served · Throughput — are people using the system? |
-| `_latencies` | Response time in ms | UX — are responses fast enough? | Tachograph reading — how long the donkey took on the round trip |
-| `_total_input_tokens` | Cumulative tokens sent to LLM | Cost driver — input tokens are cheaper | Hay loaded onto the donkey on the way out — cheaper per bale, but it adds up across every trip |
-| `_total_output_tokens` | Cumulative tokens received from LLM | Cost driver — output tokens are 3-5x more expensive | Hay the donkey burns writing the reply — 3–5x pricier than input hay, so verbose answers hurt the budget |
-| `_total_estimated_cost` | Running cost total | Budget tracking — are we within SLA? | Stable's monthly feed bill — _total_estimated_cost: Running cost total · Budget tracking — are we within SLA? |
+| `_chat_requests` | Total queries served | Throughput — are people using the system? | Courier-hire fee — _chat_requests: Total queries served · Throughput — are people using the system? |
+| `_latencies` | Response time in ms | UX — are responses fast enough? | Tachograph reading — how long the courier took on the round trip |
+| `_total_input_tokens` | Cumulative tokens sent to LLM | Cost driver — input tokens are cheaper | fuel loaded onto the courier on the way out — cheaper per bale, but it adds up across every trip |
+| `_total_output_tokens` | Cumulative tokens received from LLM | Cost driver — output tokens are 3-5x more expensive | fuel the courier burns writing the reply — 3–5x pricier than input fuel, so verbose answers hurt the budget |
+| `_total_estimated_cost` | Running cost total | Budget tracking — are we within SLA? | Depot's monthly feed bill — _total_estimated_cost: Running cost total · Budget tracking — are we within SLA? |
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -221,15 +221,15 @@ def record_chat_error(self) -> None:
 error_rate = _chat_errors / _chat_requests
 ```
 
-| Error rate | Status | Action | 🫏 Donkey |
+| Error rate | Status | Action | 🚚 Courier |
 |---|---|---| --- |
-| < 1% | ✅ Healthy | Normal operation | Under 1% failed deliveries means the donkey is healthy and completing almost every trip |
-| 1-5% | ⚠️ Warning | Investigate — LLM timeouts? | Donkey is stumbling on a few trips — check whether the LLM is timing out or the backpack is arriving empty |
-| > 5% | 🔴 Critical | Page on-call — system is degraded | Donkey-side view of > 5% — affects how the donkey loads, reads, or delivers the cargo |
+| < 1% | ✅ Healthy | Normal operation | Under 1% failed deliveries means the courier is healthy and completing almost every trip |
+| 1-5% | ⚠️ Warning | Investigate — LLM timeouts? | Courier is stumbling on a few trips — check whether the LLM is timing out or the parcel is arriving empty |
+| > 5% | 🔴 Critical | Page on-call — system is degraded | Courier-side view of > 5% — affects how the courier loads, reads, or delivers the parcels |
 
 **DE parallel:** Same as pipeline failure rate. If more than 5% of Airflow DAG runs fail, something is wrong.
 
-- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
+- 🚚 **Courier:** When the courier returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
 
 ---
 
@@ -252,7 +252,7 @@ metrics.record_document_ingestion(chunk_count=200)
 
 **Why track chunk count?** Because it directly correlates to vector store size and search performance. 10,000 chunks search faster than 1,000,000 chunks.
 
-- 🫏 **Donkey:** Post office pre-sorting: mail is split into backpack-sized chunks, stamped with GPS coordinates (embeddings), and shelved in the warehouse before the donkey ever arrives.
+- 🚚 **Courier:** Post office pre-sorting: mail is split into parcel-sized chunks, stamped with GPS coordinates (embeddings), and shelved in the warehouse before the courier ever arrives.
 
 ---
 
@@ -316,7 +316,7 @@ def get_summary(self) -> dict:
 }
 ```
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
@@ -358,7 +358,7 @@ SELECT
 FROM pipeline_runs;
 ```
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -408,7 +408,7 @@ metrics = request.app.state.metrics
 metrics.record_chat_request(...)
 ```
 
-- 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
+- 🚚 **Courier:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
 
 ---
 
@@ -416,11 +416,11 @@ metrics.record_chat_request(...)
 
 The `MetricsCollector` stores metrics in-memory. To make them persistent, you'd export to an external system:
 
-| Provider | Export target | How | Cost | 🫏 Donkey |
+| Provider | Export target | How | Cost | 🚚 Courier |
 |---|---|---|---| --- |
 | **AWS** | CloudWatch Metrics | `boto3.client('cloudwatch').put_metric_data()` | ~$0.30/metric/month | Ship the tachograph readings to CloudWatch via boto3 — roughly 30¢ per metric per month. |
 | **Azure** | Application Insights | `opencensus` or `azure-monitor-opentelemetry` | ~$2.30/GB ingested | Ship tachograph readings to Application Insights via OpenTelemetry — billed by the gigabyte of trip logs ingested. |
-| **Local** | Console / Prometheus | `print()` or Prometheus client library | **$0** | Donkey's odometer dial — Local: Console / Prometheus · print() or Prometheus client library · $0 |
+| **Local** | Console / Prometheus | `print()` or Prometheus client library | **$0** | Courier's odometer dial — Local: Console / Prometheus · print() or Prometheus client library · $0 |
 
 ### 🏠 Local development — console export
 
@@ -461,7 +461,7 @@ exporter = metrics_exporter.new_metrics_exporter(
 
 **The in-memory approach works for development and single-instance deployments.** For production with multiple ECS tasks or Azure Container Instances, you'd need external storage.
 
-- 🫏 **Donkey:** Running the donkey on rented pasture — AWS or Azure provides the stable so you only pay for the hay consumed.
+- 🚚 **Courier:** Running the courier on rented pasture — AWS or Azure provides the depot so you only pay for the fuel consumed.
 
 ---
 
@@ -469,14 +469,14 @@ exporter = metrics_exporter.new_metrics_exporter(
 
 These are metrics that **don't exist in traditional software** but are critical for AI applications:
 
-| Metric | What it measures | Alert threshold | Why | 🫏 Donkey |
+| Metric | What it measures | Alert threshold | Why | 🚚 Courier |
 |---|---|---|---| --- |
-| **Token usage / request** | How much context + answer per query | > 2000 tokens/request | Cost growth | Over 2000 hay bales per trip means the donkey is eating too much — review backpack sizes |
-| **Cost per query** | $ per chat interaction | > $0.02/query | Budget overrun | Cost of keeping the donkey fed — Cost per query: $ per chat interaction · > $0.02/query · Budget overrun |
-| **Input/output ratio** | Input tokens ÷ output tokens | > 10:1 means verbose context | Over-retrieval | Input-to-output ratio over 10:1 means backpacks are huge relative to the answer the donkey wrote |
-| **Latency P99** | Worst-case response time | > 10s | UX degradation | Tachograph reading — how long the donkey took on the round trip |
-| **Error rate** | Failures / total requests | > 5% | System reliability | Stable's monthly feed bill — Error rate: Failures / total requests · > 5% · System reliability |
-| **Chunks per document** | Average chunk count | > 500/doc | Storage bloat | Over 500 backpack chunks per document means the post office is slicing cargo too finely |
+| **Token usage / request** | How much context + answer per query | > 2000 tokens/request | Cost growth | Over 2000 fuel fuel loads per trip means the courier is eating too much — review parcel sizes |
+| **Cost per query** | $ per chat interaction | > $0.02/query | Budget overrun | Cost of keeping the courier fed — Cost per query: $ per chat interaction · > $0.02/query · Budget overrun |
+| **Input/output ratio** | Input tokens ÷ output tokens | > 10:1 means verbose context | Over-retrieval | Input-to-output ratio over 10:1 means parcels are huge relative to the answer the courier wrote |
+| **Latency P99** | Worst-case response time | > 10s | UX degradation | Tachograph reading — how long the courier took on the round trip |
+| **Error rate** | Failures / total requests | > 5% | System reliability | Depot's monthly feed bill — Error rate: Failures / total requests · > 5% · System reliability |
+| **Chunks per document** | Average chunk count | > 500/doc | Storage bloat | Over 500 parcel chunks per document means the post office is slicing parcels too finely |
 
 ### Cost monitoring formula
 
@@ -510,7 +510,7 @@ Total                      960ms      890ms      2130ms
 
 **Key insight:** Local is free but 2x slower. For development this doesn't matter. For production, cloud models are faster.
 
-- 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
+- 🚚 **Courier:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
 
 ---
 
@@ -537,7 +537,7 @@ Total                      960ms      890ms      2130ms
 - [ ] Design a CloudWatch dashboard for this application — what widgets would you add?
 - [ ] At what point do you need Prometheus + Grafana instead of in-memory metrics? → **Done in I31:** `GET /api/metrics` returns Prometheus text format, ready for scraping.
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -588,4 +588,4 @@ Here's a summary of every component covered across the docs:
 - [Cost Analysis](cost-analysis.md) — detailed cost breakdown
 - [Architecture Overview](../architecture-and-design/architecture.md)
 
-- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.
+- 🚚 **Courier:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

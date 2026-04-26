@@ -48,7 +48,7 @@ went wrong — bad retrieval, hallucination, or both.
 **`/api/queries/stats`** returns aggregate numbers — total queries, pass rate,
 average scores per dimension, and failure breakdown by category.
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
@@ -56,19 +56,19 @@ average scores per dimension, and failure breakdown by category.
 
 This is identical to building a pipeline monitoring API:
 
-| Concept | Data Engineering | RAG Chatbot | 🫏 Donkey |
+| Concept | Data Engineering | RAG Chatbot | 🚚 Courier |
 | --- | --- | --- | --- |
-| **Log source** | Airflow task logs, DAG run metadata | JSONL query logs from QueryLogger | Donkey's trip log — every delivery's details written to disk for later review |
-| **Failure list** | `/pipeline/failures` — which DAGs failed and why | `/queries/failures` — which queries failed and why | Robot stable hand — Failure list: /pipeline/failures — which DAGs failed and why · /queries/failures — which queries failed and why |
-| **Aggregate stats** | DAG success rate, avg duration, failure reasons | Pass rate, avg scores, failure categories | Stable-wide summary of how many donkey trips passed, average scores, and which reason codes dominated failures |
-| **Triage** | "data_quality", "timeout", "permission_denied" | "bad_retrieval", "hallucination", "both_bad" | Reason codes stamped on failed deliveries so the stable hand knows which donkey-trip failure to investigate first. |
+| **Log source** | Airflow task logs, DAG run metadata | JSONL query logs from QueryLogger | Courier's trip log — every delivery's details written to disk for later review |
+| **Failure list** | `/pipeline/failures` — which DAGs failed and why | `/queries/failures` — which queries failed and why | Robot dispatch clerk — Failure list: /pipeline/failures — which DAGs failed and why · /queries/failures — which queries failed and why |
+| **Aggregate stats** | DAG success rate, avg duration, failure reasons | Pass rate, avg scores, failure categories | Depot-wide summary of how many courier trips passed, average scores, and which reason codes dominated failures |
+| **Triage** | "data_quality", "timeout", "permission_denied" | "bad_retrieval", "hallucination", "both_bad" | Reason codes stamped on failed deliveries so the dispatch clerk knows which courier-trip failure to investigate first. |
 | **Action** | Fix the DAG, re-run, verify | Fix retrieval/prompt, re-evaluate, verify | Instructions tucked in the pannier — Action: Fix the DAG, re-run, verify · Fix retrieval/prompt, re-evaluate, verify |
 
 **Bottom line:** The route code is pure CRUD over structured logs. The AI
 complexity lives in how the logs were *produced* (by the evaluate pipeline), not
 in how they're *served*.
 
-- 🫏 **Donkey:** Running multiple donkeys on the same route to confirm that AI engineering and data engineering practices mirror each other.
+- 🚚 **Courier:** Running multiple couriers on the same route to confirm that AI engineering and data engineering practices mirror each other.
 
 ---
 
@@ -92,10 +92,10 @@ async def list_failures(
 
 ### What each parameter does
 
-| Parameter | Default | What it controls | 🫏 Donkey |
+| Parameter | Default | What it controls | 🚚 Courier |
 | --- | --- | --- | --- |
-| `limit` | 20 | Max results to return (1–100) | Donkey-side view of limit — affects how the donkey loads, reads, or delivers the cargo |
-| `days` | 7 | How far back to search (1–30 days) | Donkey-side view of days — affects how the donkey loads, reads, or delivers the cargo |
+| `limit` | 20 | Max results to return (1–100) | Courier-side view of limit — affects how the courier loads, reads, or delivers the parcels |
+| `days` | 7 | How far back to search (1–30 days) | Courier-side view of days — affects how the courier loads, reads, or delivers the parcels |
 | `category` | None | Filter by failure type: `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`, `marginal` | Filters the trip log to only show deliveries flagged with a chosen failure code such as hallucination or bad_retrieval. |
 
 ### Example response
@@ -128,7 +128,7 @@ score 0.25). The LLM faithfully summarised *what it was given* (faithfulness 0.8
 but the answer is irrelevant (relevance 0.15). Fix: upload the remote work policy
 document, or tune chunk size/overlap.
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
@@ -175,7 +175,7 @@ async def query_stats(
 - **Low avg_faithfulness?** → LLM is hallucinating — consider tighter prompts or guardrails
 - **High bad_retrieval count?** → Vector store needs more/better documents
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
@@ -184,13 +184,13 @@ async def query_stats(
 When a query's overall score falls below 0.70, the QueryLogger assigns a failure
 category based on which dimensions failed:
 
-| Category | Retrieval | Faithfulness | Relevance | What it means | 🫏 Donkey |
+| Category | Retrieval | Faithfulness | Relevance | What it means | 🚚 Courier |
 | --- | --- | --- | --- | --- | --- |
-| `bad_retrieval` | Low | OK | Low | Wrong chunks retrieved — the LLM couldn't answer because it got irrelevant context | Donkey arrived with the wrong backpack — couldn't write a useful note because the cargo had nothing to do with the question |
-| `hallucination` | OK | Low | OK | Right chunks, but the LLM made things up instead of using them | Backpack was correct, but the donkey scribbled extras from memory instead of using what it was carrying |
-| `both_bad` | Low | Low | — | Wrong chunks AND the LLM improvised — worst case | Wrong backpack and the donkey made things up on top — worst possible delivery |
-| `off_topic` | OK | OK | Low | Chunks were relevant, LLM was faithful, but the answer missed the actual question | Right backpack, honest donkey, but the answer never reached the address the customer wrote on the question |
-| `marginal` | — | — | — | Failed overall but no single dimension is terrible — borderline case | Borderline donkey trip — nothing was outright bad, but the report card's overall score still slipped under the bar |
+| `bad_retrieval` | Low | OK | Low | Wrong chunks retrieved — the LLM couldn't answer because it got irrelevant context | Courier arrived with the wrong parcel — couldn't write a useful note because the parcels had nothing to do with the question |
+| `hallucination` | OK | Low | OK | Right chunks, but the LLM made things up instead of using them | Parcel was correct, but the courier scribbled extras from memory instead of using what it was carrying |
+| `both_bad` | Low | Low | — | Wrong chunks AND the LLM improvised — worst case | Wrong parcel and the courier made things up on top — worst possible delivery |
+| `off_topic` | OK | OK | Low | Chunks were relevant, LLM was faithful, but the answer missed the actual question | Right parcel, honest courier, but the answer never reached the address the customer wrote on the question |
+| `marginal` | — | — | — | Failed overall but no single dimension is terrible — borderline case | Borderline courier trip — nothing was outright bad, but the report card's overall score still slipped under the bar |
 
 ### DE parallel for triage
 
@@ -201,7 +201,7 @@ This is the same pattern as categorising pipeline failures:
 - `both_bad` → "cascade_failure" (bad data + bad logic)
 - `off_topic` → "schema_mismatch" (correct processing, wrong target)
 
-- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
+- 🚚 **Courier:** When the courier returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
 
 ---
 
@@ -227,7 +227,7 @@ Log files are stored as JSONL (one JSON record per line) in `data/query_logs/`,
 rotated daily. This is the same pattern as structured application logs — no
 database needed, just append-only files.
 
-- 🫏 **Donkey:** The warehouse robot dispatched to find the right backpack shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+- 🚚 **Courier:** The warehouse robot dispatched to find the right parcel shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -256,7 +256,7 @@ database needed, just append-only files.
 
 This is the **data flywheel** in action: detect failure → diagnose → fix → verify.
 
-- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🚚 **Courier:** Checking the courier's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -279,7 +279,7 @@ This is the **data flywheel** in action: detect failure → diagnose → fix →
 - [ ] How would you add a new failure category (e.g., `token_limit_exceeded`)?
 - [ ] How would you build a Grafana dashboard from `/queries/stats`?
 
-- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.
+- 🚚 **Courier:** A quick quiz for the trainee dispatch clerk — answer these to confirm the key courier delivery concepts have landed.
 
 ---
 
@@ -289,4 +289,4 @@ This is the **data flywheel** in action: detect failure → diagnose → fix →
 - **Next:** [Metrics Endpoint](metrics-endpoint-explained.md) — Prometheus metrics for dashboards
 - **Reference:** [API Routes Overview](../api-routes-explained.md) — how all routes fit together
 
-- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.
+- 🚚 **Courier:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

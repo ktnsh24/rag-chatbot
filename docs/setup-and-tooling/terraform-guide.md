@@ -51,7 +51,7 @@ az login
 az account set --subscription "your-subscription-id"
 ```
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -61,20 +61,20 @@ az account set --subscription "your-subscription-id"
 
 ### Resources Created
 
-| Resource | Purpose | Free Tier? | 🫏 Donkey |
+| Resource | Purpose | Free Tier? | 🚚 Courier |
 |---|---|---| --- |
 | `aws_s3_bucket` | Store uploaded documents | ✅ 5 GB | Amazon's loading dock — aws_s3_bucket: Store uploaded documents · ✅ 5 GB |
-| `aws_dynamodb_table` | Conversation history | ✅ 25 GB | AWS-side stable yard — aws_dynamodb_table: Conversation history · ✅ 25 GB |
-| `aws_ecr_repository` | Docker image registry | ✅ 500 MB | Permanent ECR address where the donkey's Docker image lives — free under 500 MB stored. |
-| `aws_iam_role` | ECS task execution role | ✅ Free | Stable throws in free fodder — aws_iam_role: ECS task execution role · ✅ Free |
-| `aws_iam_role_policy` | Least-privilege policy | ✅ Free | No-charge bale from the stable — aws_iam_role_policy: Least-privilege policy · ✅ Free |
+| `aws_dynamodb_table` | Conversation history | ✅ 25 GB | AWS-side depot yard — aws_dynamodb_table: Conversation history · ✅ 25 GB |
+| `aws_ecr_repository` | Docker image registry | ✅ 500 MB | Permanent ECR address where the courier's Docker image lives — free under 500 MB stored. |
+| `aws_iam_role` | ECS task execution role | ✅ Free | Depot throws in free supplies — aws_iam_role: ECS task execution role · ✅ Free |
+| `aws_iam_role_policy` | Least-privilege policy | ✅ Free | No-charge bale from the depot — aws_iam_role_policy: Least-privilege policy · ✅ Free |
 
 ### Variables
 
-| Variable | Default | Description | 🫏 Donkey |
+| Variable | Default | Description | 🚚 Courier |
 |---|---|---| --- |
-| `project_name` | `"rag-chatbot"` | Prefix for all resource names | The donkey's name tag — every AWS resource is tagged as belonging to this donkey |
-| `environment` | `"dev"` | Environment tag | Which stable the donkey lives in — dev (training), staging (rehearsal), prod (real deliveries) |
+| `project_name` | `"rag-chatbot"` | Prefix for all resource names | The courier's name tag — every AWS resource is tagged as belonging to this courier |
+| `environment` | `"dev"` | Environment tag | Which depot the courier lives in — dev (training), staging (rehearsal), prod (real deliveries) |
 | `aws_region` | `"eu-west-1"` | AWS region | AWS depot — aws_region: "eu-west-1" · AWS region |
 
 ### S3 Bucket
@@ -131,7 +131,7 @@ The ECS task role grants least-privilege access:
 - OpenSearch: `ESHttpGet`, `ESHttpPut`, `ESHttpPost`, `ESHttpDelete`
 - CloudWatch Logs: `CreateLogGroup`, `CreateLogStream`, `PutLogEvents`
 
-- 🫏 **Donkey:** Blueprints for building the stable — run one command and the whole building appears, fences and all.
+- 🚚 **Courier:** Blueprints for building the depot — run one command and the whole building appears, fences and all.
 
 ---
 
@@ -141,23 +141,23 @@ The ECS task role grants least-privilege access:
 
 ### Resources Created
 
-| Resource | Purpose | Free Tier? | 🫏 Donkey |
+| Resource | Purpose | Free Tier? | 🚚 Courier |
 |---|---|---| --- |
-| `azurerm_resource_group` | Resource container | ✅ Free | The plot of land you fence off in Azure — free, but every stable building has to sit inside it. |
-| `azurerm_storage_account` | Document storage | ✅ 5 GB LRS | Azure's document warehouse where the donkey picks up source files for ingestion |
+| `azurerm_resource_group` | Resource container | ✅ Free | The plot of land you fence off in Azure — free, but every depot building has to sit inside it. |
+| `azurerm_storage_account` | Document storage | ✅ 5 GB LRS | Azure's document warehouse where the courier picks up source files for ingestion |
 | `azurerm_storage_container` | Blob container | ✅ Included | The labelled bin inside the warehouse where uploaded documents are sorted |
-| `azurerm_cosmosdb_account` | Conversation history | ✅ 1000 RU/s free | Cosmos trip-log cabinet: 1000 RU/s of free history pages where every donkey conversation gets jotted down. |
+| `azurerm_cosmosdb_account` | Conversation history | ✅ 1000 RU/s free | Cosmos trip-log cabinet: 1000 RU/s of free history pages where every courier conversation gets jotted down. |
 | `azurerm_cosmosdb_sql_database` | Database | ✅ Included | The labelled folder inside the trip-log cabinet — free, just organises the conversation pages. |
 | `azurerm_cosmosdb_sql_container` | Container | ✅ Included | The shelf inside the folder where individual chat messages get filed — free, included with the cabinet. |
-| `azurerm_container_registry` | Docker images | Basic SKU ~€4.20/mo | The locker where Docker images of your donkey wait to be deployed — Basic SKU rents for ~€4.20/mo. |
+| `azurerm_container_registry` | Docker images | Basic SKU ~€4.20/mo | The locker where Docker images of your courier wait to be deployed — Basic SKU rents for ~€4.20/mo. |
 
 ### Variables
 
-| Variable | Default | Description | 🫏 Donkey |
+| Variable | Default | Description | 🚚 Courier |
 |---|---|---| --- |
-| `project_name` | `"ragchatbot"` | Prefix for resource names | The donkey's name tag for the Azure stable (no dashes — Azure naming rules) |
-| `environment` | `"dev"` | Environment tag | Which Azure stable the donkey lives in — dev, staging, or prod |
-| `location` | `"westeurope"` | Azure region | Region of the Azure hub where every Azure resource for this stable will be provisioned. |
+| `project_name` | `"ragchatbot"` | Prefix for resource names | The courier's name tag for the Azure depot (no dashes — Azure naming rules) |
+| `environment` | `"dev"` | Environment tag | Which Azure depot the courier lives in — dev, staging, or prod |
+| `location` | `"westeurope"` | Azure region | Region of the Azure hub where every Azure resource for this depot will be provisioned. |
 
 ### Cosmos DB (Serverless)
 
@@ -187,7 +187,7 @@ resource "azurerm_container_registry" "main" {
 }
 ```
 
-- 🫏 **Donkey:** Blueprints for building the stable — run one command and the whole building appears, fences and all.
+- 🚚 **Courier:** Blueprints for building the depot — run one command and the whole building appears, fences and all.
 
 ---
 
@@ -223,7 +223,7 @@ terraform {
 }
 ```
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -271,7 +271,7 @@ terraform apply -var="environment=staging"
 terraform workspace select default
 ```
 
-- 🫏 **Donkey:** Saddling up the donkey in a new stable — same harness, same route map, different building.
+- 🚚 **Courier:** Saddling up the courier in a new depot — same harness, same route map, different building.
 
 ---
 
@@ -291,7 +291,7 @@ terraform destroy -var="environment=dev"
 
 **Tip:** Always destroy resources when you're not using them to avoid costs.
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -299,29 +299,29 @@ terraform destroy -var="environment=dev"
 
 ### AWS (all free-tier eligible)
 
-| Resource | Monthly Cost | 🫏 Donkey |
+| Resource | Monthly Cost | 🚚 Courier |
 |---|---| --- |
-| S3 (5 GB) | $0.00 | No-charge bale from the stable — S3 (5 GB): $0.00 |
+| S3 (5 GB) | $0.00 | No-charge bale from the depot — S3 (5 GB): $0.00 |
 | DynamoDB (on-demand) | $0.00 | AWS depot — DynamoDB (on-demand): $0.00 |
-| ECR (500 MB) | $0.00 | ECR registry address costs nothing while the donkey image stays under the 500 MB free tier. |
+| ECR (500 MB) | $0.00 | ECR registry address costs nothing while the courier image stays under the 500 MB free tier. |
 | IAM | $0.00 | Complimentary feed allowance — IAM: $0.00 |
-| **Total** | **$0.00** | Hay-and-oats invoice — Total: $0.00 |
+| **Total** | **$0.00** | fuel-and-oats invoice — Total: $0.00 |
 
 ### Azure
 
-| Resource | Monthly Cost | 🫏 Donkey |
+| Resource | Monthly Cost | 🚚 Courier |
 |---|---| --- |
-| Storage Account (5 GB LRS) | ~$0.10 | Cheap warehouse rent — pennies per month to store the donkey's source documents |
+| Storage Account (5 GB LRS) | ~$0.10 | Cheap warehouse rent — pennies per month to store the courier's source documents |
 | Cosmos DB (serverless, free tier) | $0.00 | Azure trip-log — Cosmos DB (serverless, free tier): $0.00 |
-| Container Registry (Basic) | ~$4.20 | Azure Container Registry Basic SKU — a fixed ~$4.20/month address for the donkey's Docker image. |
+| Container Registry (Basic) | ~$4.20 | Azure Container Registry Basic SKU — a fixed ~$4.20/month address for the courier's Docker image. |
 | Resource Group | $0.00 | Complimentary feed allowance — Resource Group: $0.00 |
-| **Total** | **~$4.30** | Donkey-hire fee — Total: ~$4.30 |
+| **Total** | **~$4.30** | Courier-hire fee — Total: ~$4.30 |
 
 > 💡 The Azure Container Registry is the only resource with a meaningful
 > cost. You can skip it during development and push images directly to
 > Azure Container Apps from your local machine.
 
-- 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
+- 🚚 **Courier:** The feed bill — how much fuel (tokens) the courier eats per delivery, and how to reduce waste without starving it.
 
 ---
 
@@ -350,4 +350,4 @@ If a previous `terraform apply` was interrupted:
 terraform force-unlock <LOCK_ID>
 ```
 
-- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
+- 🚚 **Courier:** When the courier returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.

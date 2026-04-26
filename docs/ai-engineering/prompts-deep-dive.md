@@ -34,15 +34,15 @@
 
 This 65-line file controls **100% of the LLM's behaviour**. Change one word in the prompt and every answer the chatbot gives could change. In traditional engineering you write logic; in AI engineering you write *instructions* that a probabilistic model interprets.
 
-| What you'll learn | DE parallel | 🫏 Donkey |
+| What you'll learn | DE parallel | 🚚 Courier |
 |---|---| --- |
-| System prompts that set LLM behaviour | SQL query templates with bind variables | The standing-orders sheet pinned to the stable wall that every donkey reads before any trip |
-| Constraints that prevent hallucination | CHECK constraints that prevent bad data | Guardrails that stop the donkey from inventing facts not found in its loaded backpack chunks |
-| Template variables (`{context}`, `{question}`) | Parameterised queries (`?`, `$1`) | Blank slots on the delivery note where the cargo manifest and question get pasted in |
+| System prompts that set LLM behaviour | SQL query templates with bind variables | The shipping manifest pinned to the dispatch board that every courier reads before any trip |
+| Constraints that prevent hallucination | CHECK constraints that prevent bad data | Guardrails that stop the courier from inventing facts not found in its loaded parcel chunks |
+| Template variables (`{context}`, `{question}`) | Parameterised queries (`?`, `$1`) | Blank slots on the shipping manifest where the shipping manifest and question get pasted in |
 | Multi-turn conversation context | Session state management | Trip log entry — Multi-turn conversation context: Session state management |
 | The cost impact of prompt length | The cost of scanning too many rows | Instructions tucked in the pannier — The cost impact of prompt length: The cost of scanning too many rows |
 
-- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
+- 🚚 **Courier:** Think of this as the orientation briefing given to a new courier before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -65,7 +65,7 @@ Bad query = wrong rows.                    Bad prompt = hallucinated answers.
 
 **The key difference:** A SQL template always returns the same result for the same input. A prompt template returns *slightly different* text each time (because LLMs are probabilistic). That's why `temperature=0.1` — to minimise the randomness.
 
-- 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
+- 🚚 **Courier:** The shipping manifest: shipping manifest (system prompt) + shipping manifest (retrieved chunks) + the customer's specific request.
 
 ---
 
@@ -79,7 +79,7 @@ src/rag/prompts.py
 └── SUMMARIZE_PROMPT               ← For document summarisation (future feature).
 ```
 
-- 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
+- 🚚 **Courier:** The shipping manifest: shipping manifest (system prompt) + shipping manifest (retrieved chunks) + the customer's specific request.
 
 ---
 
@@ -110,7 +110,7 @@ USER QUESTION: {question}"""
 
 **Every single line serves a purpose.** Let's break it down.
 
-- 🫏 **Donkey:** The donkey checks its backpack full of retrieved document chunks before answering — no guessing from memory.
+- 🚚 **Courier:** The courier checks its parcel full of retrieved document chunks before answering — no guessing from memory.
 
 ---
 
@@ -132,13 +132,13 @@ The role definition doesn't enforce anything technically — but it shifts the m
 
 **What happens without it:**
 
-| With role definition | Without role definition | 🫏 Donkey |
+| With role definition | Without role definition | 🚚 Courier |
 |---|---| --- |
-| "Based on the documents, refunds take 14 days." | "Generally, refunds take 5-30 business days depending on the company." | Donkey-side view of "Based on the documents, refunds take 14 days." — affects how the donkey loads, reads, or delivers the cargo |
-| Grounded in YOUR documents | Grounded in internet training data | Donkey-side view of Grounded in YOUR documents — affects how the donkey loads, reads, or delivers the cargo |
-| Trustworthy for business use | Dangerous for business use | Donkey-side view of Trustworthy for business use — affects how the donkey loads, reads, or delivers the cargo |
+| "Based on the documents, refunds take 14 days." | "Generally, refunds take 5-30 business days depending on the company." | Courier-side view of "Based on the documents, refunds take 14 days." — affects how the courier loads, reads, or delivers the parcels |
+| Grounded in YOUR documents | Grounded in internet training data | Courier-side view of Grounded in YOUR documents — affects how the courier loads, reads, or delivers the parcels |
+| Trustworthy for business use | Dangerous for business use | Courier-side view of Trustworthy for business use — affects how the courier loads, reads, or delivers the parcels |
 
-- 🫏 **Donkey:** The donkey itself — it carries the question in, consults the backpack, and writes the answer on the way back.
+- 🚚 **Courier:** The courier itself — it carries the question in, consults the parcel, and writes the answer on the way back.
 
 ---
 
@@ -146,19 +146,19 @@ The role definition doesn't enforce anything technically — but it shifts the m
 
 Each rule targets a specific failure mode:
 
-| Rule | What it prevents | DE parallel | 🫏 Donkey |
+| Rule | What it prevents | DE parallel | 🚚 Courier |
 |---|---|---| --- |
-| **Rule 1:** ONLY use context | Hallucination — making up facts | Referential integrity — no orphaned foreign keys | Forces donkey to cite only backpack cargo — no guessing when it can't find the answer |
-| **Rule 2:** Say "I don't know" | Confident wrong answers | `COALESCE(result, 'No data available')` | The donkey honestly admitting it has no matching backpack rather than guessing |
-| **Rule 3:** Cite sources | Untraceable claims | Audit trail — every row has a source system ID | Label on the original mail item the backpack was sliced from |
-| **Rule 4:** Be thorough | Incomplete answers | `SELECT *` vs `SELECT id` — return all relevant columns | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
-| **Rule 5:** Bullet points | Wall-of-text answers | Output formatting — structured JSON vs raw strings | Stable inspector — checks the code is tidy before letting the donkey out |
-| **Rule 6:** Handle ambiguity | Wrong interpretation | Input validation — clarify before processing | Donkey-side view of Rule 6:** Handle ambiguity — affects how the donkey loads, reads, or delivers the cargo |
-| **Rule 7:** Never make up info | Reinforces Rule 1 | Defence in depth — multiple checks for the same risk | Donkey-side view of Rule 7:** Never make up info — affects how the donkey loads, reads, or delivers the cargo |
+| **Rule 1:** ONLY use context | Hallucination — making up facts | Referential integrity — no orphaned foreign keys | Forces courier to cite only parcel parcels — no guessing when it can't find the answer |
+| **Rule 2:** Say "I don't know" | Confident wrong answers | `COALESCE(result, 'No data available')` | The courier honestly admitting it has no matching parcel rather than guessing |
+| **Rule 3:** Cite sources | Untraceable claims | Audit trail — every row has a source system ID | Label on the original mail item the parcel was sliced from |
+| **Rule 4:** Be thorough | Incomplete answers | `SELECT *` vs `SELECT id` — return all relevant columns | How confidently the warehouse says 'this parcel matches' — higher = closer GPS hit |
+| **Rule 5:** Bullet points | Wall-of-text answers | Output formatting — structured JSON vs raw strings | Depot inspector — checks the code is tidy before letting the courier out |
+| **Rule 6:** Handle ambiguity | Wrong interpretation | Input validation — clarify before processing | Courier-side view of Rule 6:** Handle ambiguity — affects how the courier loads, reads, or delivers the parcels |
+| **Rule 7:** Never make up info | Reinforces Rule 1 | Defence in depth — multiple checks for the same risk | Courier-side view of Rule 7:** Never make up info — affects how the courier loads, reads, or delivers the parcels |
 
 **Why Rule 7 repeats Rule 1:** LLMs respond to emphasis. Saying "only use context" (Rule 1) and "never make up information" (Rule 7) at the top AND bottom of the rules creates a "sandwich" effect — the model is less likely to hallucinate.
 
-- 🫏 **Donkey:** When the donkey ignores the backpack and invents an answer from memory — RAG is the cure.
+- 🚚 **Courier:** When the courier ignores the parcel and invents an answer from memory — RAG is the cure.
 
 ---
 
@@ -198,7 +198,7 @@ At $0 (Local) = free
 
 **The cost engineering insight:** The 80-token system prompt is cheap. The 750-token context is where cost grows. Reducing `top_k` from 5 to 3 saves ~300 tokens per query — that's ~$0.001 per query, or $30/month at 1000 queries/day.
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -237,7 +237,7 @@ Without history, the LLM would say *"I don't know what you're referring to"* —
 
 📖 **Related:** [Conversation History Deep Dive](../architecture-and-design/history-explained.md)
 
-- 🫏 **Donkey:** The donkey checks its backpack full of retrieved document chunks before answering — no guessing from memory.
+- 🚚 **Courier:** The courier checks its parcel full of retrieved document chunks before answering — no guessing from memory.
 
 ---
 
@@ -256,7 +256,7 @@ This is a simpler prompt — no context retrieval needed, just summarise a full 
 
 **Key constraints:** "under 500 words" limits output tokens (~670 tokens). Without this limit, the LLM might generate a 2000-word summary that costs 4x more.
 
-- 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
+- 🚚 **Courier:** The shipping manifest: shipping manifest (system prompt) + shipping manifest (retrieved chunks) + the customer's specific request.
 
 ---
 
@@ -284,45 +284,45 @@ RAG_SYSTEM_PROMPT                   query():
                      content:msg}]      content:msg}]        content:msg}]
 ```
 
-| Aspect | AWS (Bedrock/Claude) | Azure (OpenAI/GPT-4o) | Local (Ollama/llama3.2) | 🫏 Donkey |
+| Aspect | AWS (Bedrock/Claude) | Azure (OpenAI/GPT-4o) | Local (Ollama/llama3.2) | 🚚 Courier |
 |---|---|---|---| --- |
-| **System prompt placement** | Separate `system` field | `role: "system"` message | `role: "system"` message | Delivery note pinned to the saddle — System prompt placement: Separate system field · role: "system" message · role: "system" message |
-| **User message** | `content: [{text: ...}]` (nested) | `content: "..."` (flat string) | `content: "..."` (flat string) | The customer's question — written on the delivery note for the donkey to read |
-| **Prompt format** | Identical template text | Identical template text | Identical template text | Note the donkey carries — Prompt format: Identical template text · Identical template text · Identical template text |
-| **Behaviour difference** | Best instruction following | More creative/verbose | Good but less nuanced | How precisely the donkey obeys the standing orders on the delivery note |
+| **System prompt placement** | Separate `system` field | `role: "system"` message | `role: "system"` message | Shipping manifest pinned to the saddle — System prompt placement: Separate system field · role: "system" message · role: "system" message |
+| **User message** | `content: [{text: ...}]` (nested) | `content: "..."` (flat string) | `content: "..."` (flat string) | The customer's question — written on the shipping manifest for the courier to read |
+| **Prompt format** | Identical template text | Identical template text | Identical template text | Note the courier carries — Prompt format: Identical template text · Identical template text · Identical template text |
+| **Behaviour difference** | Best instruction following | More creative/verbose | Good but less nuanced | How precisely the courier obeys the shipping manifest on the shipping manifest |
 | **Cost per prompt** | ~$0.0025 | ~$0.0021 | **$0** | Customer's written brief — Cost per prompt: ~$0.0025 · ~$0.0021 · $0 |
 
 **Key insight:** The prompt text is the same across all providers. Only the API format differs. This is handled by each provider's `generate()` method, not by the prompt itself.
 
-- 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
+- 🚚 **Courier:** The shipping manifest: shipping manifest (system prompt) + shipping manifest (retrieved chunks) + the customer's specific request.
 
 ---
 
 ## What Makes a Good Prompt — The Engineering Rules
 
-| Rule | This prompt's example | Anti-pattern | 🫏 Donkey |
+| Rule | This prompt's example | Anti-pattern | 🚚 Courier |
 |---|---|---| --- |
-| **Be specific** | "ONLY use information from the context" | "Try to use the context" | Stable inspector — checks the code is tidy before letting the donkey out |
-| **Define fallback** | "If context doesn't have the answer, say so" | (no fallback → LLM guesses) | Tell the donkey what to say when the backpack is empty, or it will invent cargo to deliver |
-| **Constrain format** | "Use bullet points" | (no format → wall of text) | Stable inspector — checks the code is tidy before letting the donkey out |
-| **Separate sections** | `---` between context and question | Everything jumbled together | Donkey-side view of Separate sections — affects how the donkey loads, reads, or delivers the cargo |
-| **Limit scope** | "answers questions based on provided documents" | "You are a general-purpose AI" | Donkey-side view of Limit scope — affects how the donkey loads, reads, or delivers the cargo |
+| **Be specific** | "ONLY use information from the context" | "Try to use the context" | Depot inspector — checks the code is tidy before letting the courier out |
+| **Define fallback** | "If context doesn't have the answer, say so" | (no fallback → LLM guesses) | Tell the courier what to say when the parcel is empty, or it will invent parcels to deliver |
+| **Constrain format** | "Use bullet points" | (no format → wall of text) | Depot inspector — checks the code is tidy before letting the courier out |
+| **Separate sections** | `---` between context and question | Everything jumbled together | Courier-side view of Separate sections — affects how the courier loads, reads, or delivers the parcels |
+| **Limit scope** | "answers questions based on provided documents" | "You are a general-purpose AI" | Courier-side view of Limit scope — affects how the courier loads, reads, or delivers the parcels |
 
-- 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
+- 🚚 **Courier:** The shipping manifest: shipping manifest (system prompt) + shipping manifest (retrieved chunks) + the customer's specific request.
 
 ---
 
 ## What Goes Wrong — Common Prompt Failures
 
-| Problem | Cause | Fix | How to detect | 🫏 Donkey |
+| Problem | Cause | Fix | How to detect | 🚚 Courier |
 |---|---|---|---| --- |
-| Hallucination | Rules too weak or model ignores them | Stronger constraints, lower temperature | Faithfulness score < 0.8 in evaluator | Donkey invents facts not in its backpack — tighten prompt rules or lower temperature |
-| Verbose answers | No length constraint | Add "Keep answers under 200 words" | Token count > 500 output tokens | Donkey rambles for 500+ tokens — add word limit to delivery note to control hay waste |
-| Ignores citations | Model doesn't see "[Document chunk N]" pattern | Add example output in prompt | Missing `[Document chunk` in answer | Donkey forgets to label which backpack it read — show citation example on the delivery note |
-| Wrong language | User asks in Dutch, prompt is English | Add "Answer in the same language as the question" | Manual review | Delivery note pinned to the saddle — Wrong language: User asks in Dutch, prompt is English · Add "Answer in the same language as the |
-| Off-topic | Context chunks are irrelevant | Better chunking/retrieval, not a prompt fix | Answer relevance score < 0.5 | Donkey got wrong backpacks from the warehouse — fix GPS search, not the delivery note |
+| Hallucination | Rules too weak or model ignores them | Stronger constraints, lower temperature | Faithfulness score < 0.8 in evaluator | Courier invents facts not in its parcel — tighten prompt rules or lower temperature |
+| Verbose answers | No length constraint | Add "Keep answers under 200 words" | Token count > 500 output tokens | Courier rambles for 500+ tokens — add word limit to shipping manifest to control fuel waste |
+| Ignores citations | Model doesn't see "[Document chunk N]" pattern | Add example output in prompt | Missing `[Document chunk` in answer | Courier forgets to label which parcel it read — show citation example on the shipping manifest |
+| Wrong language | User asks in Dutch, prompt is English | Add "Answer in the same language as the question" | Manual review | Shipping manifest pinned to the saddle — Wrong language: User asks in Dutch, prompt is English · Add "Answer in the same language as the |
+| Off-topic | Context chunks are irrelevant | Better chunking/retrieval, not a prompt fix | Answer relevance score < 0.5 | Courier got wrong parcels from the warehouse — fix GPS search, not the shipping manifest |
 
-- 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
+- 🚚 **Courier:** The shipping manifest: shipping manifest (system prompt) + shipping manifest (retrieved chunks) + the customer's specific request.
 
 ---
 
@@ -330,21 +330,21 @@ RAG_SYSTEM_PROMPT                   query():
 
 The same prompt produces different quality answers depending on the model:
 
-| Aspect | Claude 3.5 Sonnet (AWS) | GPT-4o (Azure) | llama3.2 (Local) | 🫏 Donkey |
+| Aspect | Claude 3.5 Sonnet (AWS) | GPT-4o (Azure) | llama3.2 (Local) | 🚚 Courier |
 |---|---|---|---| --- |
-| **Instruction following** | Excellent — follows rules precisely | Very good — sometimes verbose | Good — occasionally ignores minor rules | How precisely the donkey obeys the standing orders on the delivery note |
-| **Citation accuracy** | Almost always cites correctly | Usually cites, sometimes forgets | May not cite consistently | Receipts the donkey hands over — which backpacks the answer came from |
-| **"I don't know" response** | Reliably says it when context is empty | Usually says it | Sometimes tries to answer anyway | What the donkey wrote and brought back to the customer |
-| **Temperature sensitivity** | Very responsive to 0.1 | Responsive | Less precise control | How predictable the donkey's writing is — low = same words every trip, high = the donkey gets creative |
-| **Recommended for** | Production (highest quality) | Production (good balance) | Development and testing | Practice run for the donkey — Recommended for: Production (highest quality) · Production (good balance) · Development and testing |
-| **Cost per query** | ~$0.0065 | ~$0.005 | **$0** | AWS hay costs $0.0065 a trip, Azure $0.005, your own llama3.2 grazes free in the back yard. |
+| **Instruction following** | Excellent — follows rules precisely | Very good — sometimes verbose | Good — occasionally ignores minor rules | How precisely the courier obeys the shipping manifest on the shipping manifest |
+| **Citation accuracy** | Almost always cites correctly | Usually cites, sometimes forgets | May not cite consistently | Receipts the courier hands over — which parcels the answer came from |
+| **"I don't know" response** | Reliably says it when context is empty | Usually says it | Sometimes tries to answer anyway | What the courier wrote and brought back to the customer |
+| **Temperature sensitivity** | Very responsive to 0.1 | Responsive | Less precise control | How predictable the courier's writing is — low = same words every trip, high = the courier gets creative |
+| **Recommended for** | Production (highest quality) | Production (good balance) | Development and testing | Practice run for the courier — Recommended for: Production (highest quality) · Production (good balance) · Development and testing |
+| **Cost per query** | ~$0.0065 | ~$0.005 | **$0** | AWS fuel costs $0.0065 a trip, Azure $0.005, your own llama3.2 grazes free in the back yard. |
 
 **Practical advice:**
 - **Develop and iterate** with `CLOUD_PROVIDER=local` — test prompt changes for free
 - **Validate** with a cloud provider before deploying — run the evaluation suite (#14)
 - **Monitor** faithfulness scores (#16) — if they drop, the prompt needs adjustment
 
-- 🫏 **Donkey:** The delivery note: standing orders (system prompt) + cargo manifest (retrieved chunks) + the customer's specific request.
+- 🚚 **Courier:** The shipping manifest: shipping manifest (system prompt) + shipping manifest (retrieved chunks) + the customer's specific request.
 
 ---
 
@@ -373,7 +373,7 @@ After reading this, can you answer:
 - [ ] If the faithfulness score drops after changing the prompt, what do you check first?
 - [ ] How does prompt length interact with the model's context window limit?
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -390,4 +390,4 @@ Now you know how the LLM gets its instructions. Next:
 - [Cost Analysis](cost-analysis.md)
 - [LLM Interface Deep Dive (#7)](llm-interface-deep-dive.md)
 
-- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.
+- 🚚 **Courier:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

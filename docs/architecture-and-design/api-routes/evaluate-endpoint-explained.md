@@ -47,7 +47,7 @@ Question → RAG pipeline → Answer   Question → RAG pipeline → Answer
                                                            → Notes (warnings)
 ```
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
@@ -66,7 +66,7 @@ dbt test                                   POST /api/evaluate/suite
   → Shows which tests failed                 → Shows which cases failed + why
 ```
 
-- 🫏 **Donkey:** Running multiple donkeys on the same route to confirm that AI engineering and data engineering practices mirror each other.
+- 🚚 **Courier:** Running multiple couriers on the same route to confirm that AI engineering and data engineering practices mirror each other.
 
 ---
 
@@ -98,20 +98,20 @@ Only `question` is required. `expected_answer` and `top_k` are optional.
 
 **Response structure:**
 
-| Field | Type | What it tells you | 🫏 Donkey |
+| Field | Type | What it tells you | 🚚 Courier |
 |---|---|---| --- |
-| `question` | string | The question you asked | Donkey-side view of question — affects how the donkey loads, reads, or delivers the cargo |
-| `answer` | string | The LLM's generated answer | What the donkey wrote on the delivery note after reading the backpack |
-| `scores.retrieval` | float | Did vector search find relevant chunks? (0.0–1.0) | Score for whether the GPS warehouse handed the donkey backpacks actually about the question — higher means closer-matching cargo. |
-| `scores.faithfulness` | float | Did the LLM stick to context? (0.0–1.0) | Did the donkey use only what was in the backpack, or did it invent things along the way? |
-| `scores.answer_relevance` | float | Did the LLM answer the question? (0.0–1.0) | Did the donkey actually deliver to the address on the question, or drop the parcel somewhere nearby? |
-| `scores.overall` | float | Weighted average (ret 30% + faith 40% + rel 30%) | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
-| `scores.passed` | bool | Overall ≥ 0.7 | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
-| `scores.has_hallucination` | bool | True = answer has claims not in context | Flag raised when the donkey's delivery note contains items it never picked up from any backpack — invented cargo. |
-| `evaluation_notes` | list | Warnings (e.g. "⚠️ RETRIEVAL: Chunks have low relevance") | Notes the report-card grader scribbled — e.g. warning that the backpacks the donkey carried had weak relevance to the question. |
-| `sources_used` | int | How many chunks were retrieved | Count of backpacks the donkey actually opened to write the answer — how many retrieved chunks fed the delivery. |
+| `question` | string | The question you asked | Courier-side view of question — affects how the courier loads, reads, or delivers the parcels |
+| `answer` | string | The LLM's generated answer | What the courier wrote on the shipping manifest after reading the parcel |
+| `scores.retrieval` | float | Did vector search find relevant chunks? (0.0–1.0) | Score for whether the GPS warehouse handed the courier parcels actually about the question — higher means closer-matching parcels. |
+| `scores.faithfulness` | float | Did the LLM stick to context? (0.0–1.0) | Did the courier use only what was in the parcel, or did it invent things along the way? |
+| `scores.answer_relevance` | float | Did the LLM answer the question? (0.0–1.0) | Did the courier actually deliver to the address on the question, or drop the parcel somewhere nearby? |
+| `scores.overall` | float | Weighted average (ret 30% + faith 40% + rel 30%) | How confidently the warehouse says 'this parcel matches' — higher = closer GPS hit |
+| `scores.passed` | bool | Overall ≥ 0.7 | How confidently the warehouse says 'this parcel matches' — higher = closer GPS hit |
+| `scores.has_hallucination` | bool | True = answer has claims not in context | Flag raised when the courier's shipping manifest contains items it never picked up from any parcel — invented parcels. |
+| `evaluation_notes` | list | Warnings (e.g. "⚠️ RETRIEVAL: Chunks have low relevance") | Notes the report-card grader scribbled — e.g. warning that the parcels the courier carried had weak relevance to the question. |
+| `sources_used` | int | How many chunks were retrieved | Count of parcels the courier actually opened to write the answer — how many retrieved chunks fed the delivery. |
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
@@ -144,38 +144,38 @@ Aggregate: total, passed, failed, pass_rate, average_score
 
 **Response structure:**
 
-| Field | Type | What it tells you | 🫏 Donkey |
+| Field | Type | What it tells you | 🚚 Courier |
 |---|---|---| --- |
-| `total_cases` | int | How many cases were run | What the stable charges this month — total_cases: int · How many cases were run |
-| `passed` | int | Cases with overall ≥ 0.7 | Donkey's report card — share of test deliveries that scored above the bar |
+| `total_cases` | int | How many cases were run | What the depot charges this month — total_cases: int · How many cases were run |
+| `passed` | int | Cases with overall ≥ 0.7 | Courier's report card — share of test deliveries that scored above the bar |
 | `failed` | int | Cases with overall < 0.7 | Number of test deliveries that came back below the report-card pass mark — these need investigation |
-| `pass_rate` | float | Percentage passed (e.g. 80.0) | Donkey's report card — share of test deliveries that scored above the bar |
-| `average_overall_score` | float | Average score across all cases | Average overall score across all 25 standard test deliveries — the headline grade on the donkey's batch report card. |
+| `pass_rate` | float | Percentage passed (e.g. 80.0) | Courier's report card — share of test deliveries that scored above the bar |
+| `average_overall_score` | float | Average score across all cases | Average overall score across all 25 standard test deliveries — the headline grade on the courier's batch report card. |
 | `cases` | list | Per-case results (same scores as single evaluate) | One row of the report card per test delivery — same score breakdown you'd get from evaluating a single question |
 
-- 🫏 **Donkey:** The 25 standard test deliveries the donkey must pass every release — a fixed benchmark that never changes so you can compare runs fairly.
+- 🚚 **Courier:** The 25 standard test deliveries the courier must pass every release — a fixed benchmark that never changes so you can compare runs fairly.
 
 ---
 
 ## Reading the Scores — What Good Looks Like
 
-| Score | Excellent | Good | Needs work | Broken | 🫏 Donkey |
+| Score | Excellent | Good | Needs work | Broken | 🚚 Courier |
 |---|---|---|---|---| --- |
-| **Retrieval** | ≥ 0.85 | ≥ 0.70 | ≥ 0.50 | < 0.50 | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
-| **Faithfulness** | ≥ 0.95 | ≥ 0.80 | ≥ 0.60 | < 0.60 | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
-| **Answer Relevance** | ≥ 0.80 | ≥ 0.60 | ≥ 0.40 | < 0.40 | Routing tag on the saddlebag — Answer Relevance: ≥ 0.80 · ≥ 0.60 · ≥ 0.40 · < 0.40 |
-| **Overall** | ≥ 0.85 | ≥ 0.70 | ≥ 0.50 | < 0.50 | Donkey-side view of Overall — affects how the donkey loads, reads, or delivers the cargo |
+| **Retrieval** | ≥ 0.85 | ≥ 0.70 | ≥ 0.50 | < 0.50 | Courier grabs the nearest parcels from the GPS warehouse before writing the answer |
+| **Faithfulness** | ≥ 0.95 | ≥ 0.80 | ≥ 0.60 | < 0.60 | Did the courier stick to the parcels it was carrying, or invent stuff on the way? |
+| **Answer Relevance** | ≥ 0.80 | ≥ 0.60 | ≥ 0.40 | < 0.40 | Routing tag on the parcel — Answer Relevance: ≥ 0.80 · ≥ 0.60 · ≥ 0.40 · < 0.40 |
+| **Overall** | ≥ 0.85 | ≥ 0.70 | ≥ 0.50 | < 0.50 | Courier-side view of Overall — affects how the courier loads, reads, or delivers the parcels |
 
 **If a score is low, here's what to fix:**
 
-| Low score | What to try | 🫏 Donkey |
+| Low score | What to try | 🚚 Courier |
 |---|---| --- |
 | Retrieval < 0.7 | Smaller `chunk_size`, different embedding model, more overlap | GPS stamp on the parcel — Retrieval < 0.7: Smaller chunk_size, different embedding model, more overlap |
-| Faithfulness < 0.8 | Stricter prompt instructions, lower temperature | Note the donkey carries — Faithfulness < 0.8: Stricter prompt instructions, lower temperature |
-| Relevance < 0.6 | Better prompt, check if question is ambiguous | Note the donkey carries — Relevance < 0.6: Better prompt, check if question is ambiguous |
+| Faithfulness < 0.8 | Stricter prompt instructions, lower temperature | Note the courier carries — Faithfulness < 0.8: Stricter prompt instructions, lower temperature |
+| Relevance < 0.6 | Better prompt, check if question is ambiguous | Note the courier carries — Relevance < 0.6: Better prompt, check if question is ambiguous |
 | Overall < 0.7 | Debug each sub-score individually | Whole report card slipped — work through retrieval, faithfulness, and relevance one by one to find the weakest link |
 
-- 🫏 **Donkey:** The quality inspector's stamp — each delivered answer is graded on retrieval accuracy, faithfulness, and relevance before the customer signs.
+- 🚚 **Courier:** The quality inspector's stamp — each delivered answer is graded on retrieval accuracy, faithfulness, and relevance before the customer signs.
 
 ---
 
@@ -205,7 +205,7 @@ After (chunk_size=500):
 → Keep the change.
 ```
 
-- 🫏 **Donkey:** The step-by-step route map showing every checkpoint the donkey passes from question intake to answer delivery.
+- 🚚 **Courier:** The step-by-step route map showing every checkpoint the courier passes from question intake to answer delivery.
 
 ---
 
@@ -249,7 +249,7 @@ async def run_evaluation_suite():
         assert data["pass_rate"] >= 70.0, f"Quality regression: {data['pass_rate']}%"
 ```
 
-- 🫏 **Donkey:** The mechanics of the stable — understanding how each piece fits so you can maintain and extend the system.
+- 🚚 **Courier:** The mechanics of the depot — understanding how each piece fits so you can maintain and extend the system.
 
 ---
 
@@ -275,7 +275,7 @@ async def run_evaluation_suite():
 - [ ] When would rule-based evaluation (current) not be good enough?
 - [ ] How would you add A/B testing support (compare two models)?
 
-- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.
+- 🚚 **Courier:** A quick quiz for the trainee dispatch clerk — answer these to confirm the key courier delivery concepts have landed.
 
 ---
 
@@ -285,4 +285,4 @@ async def run_evaluation_suite():
 - [Golden Dataset Deep Dive](../../ai-engineering/golden-dataset-deep-dive.md) — how to add test cases
 - [Chat Endpoint Deep Dive](chat-endpoint-explained.md) — the RAG pipeline this builds on
 
-- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.
+- 🚚 **Courier:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

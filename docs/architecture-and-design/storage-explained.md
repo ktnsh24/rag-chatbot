@@ -61,7 +61,7 @@ User uploads refund-policy.pdf
 └─────────────────────────────────────────────────────┘
 ```
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -81,9 +81,9 @@ Document uploaded
 
 **Two copies of the data exist, serving different purposes:**
 
-| What | Where | Format | Purpose | 🫏 Donkey |
+| What | Where | Format | Purpose | 🚚 Courier |
 | --- | --- | --- | --- | --- |
-| Original file | S3 / Blob Storage | Raw bytes (PDF, TXT) | Re-download, delete, audit trail | The original parcel kept in the warehouse — needed to re-pack chunks if the donkey's bag size changes |
+| Original file | S3 / Blob Storage | Raw bytes (PDF, TXT) | Re-download, delete, audit trail | The original parcel kept in the warehouse — needed to re-pack chunks if the courier's bag size changes |
 | Chunks + vectors | OpenSearch / AI Search / ChromaDB | Text + vectors | Semantic search during chat | Amazon's index room — Chunks + vectors: OpenSearch / AI Search / ChromaDB · Text + vectors · Semantic search during chat |
 
 **Why not just keep one?** Because:
@@ -94,7 +94,7 @@ Document uploaded
 This is exactly like a data warehouse where you keep raw data in S3 _and_ transformed
 data in Redshift — same principle, different technology.
 
-- 🫏 **Donkey:** Choosing between the local barn (ChromaDB), the AWS depot (DynamoDB/OpenSearch), or the Azure hub (Azure AI Search) to store the GPS-indexed backpacks.
+- 🚚 **Courier:** Choosing between the local barn (ChromaDB), the AWS depot (DynamoDB/OpenSearch), or the Azure hub (Azure AI Search) to store the GPS-indexed parcels.
 
 ---
 
@@ -113,7 +113,7 @@ src/storage/
 > Adding a local storage backend (e.g., local filesystem) would follow the same
 > `BaseStorage` interface.
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -133,17 +133,17 @@ class StoredDocument:
 
 The `BaseDocumentStorage` abstract class defines four operations:
 
-| Method | What it does | DE equivalent | 🫏 Donkey |
+| Method | What it does | DE equivalent | 🚚 Courier |
 | --- | --- | --- | --- |
-| `upload()` | Store file, return metadata | `s3.put_object()` or `INSERT INTO files` | Donkey accepts a parcel from the customer and shelves it in the warehouse with a tracking ID |
-| `download()` | Get file bytes by ID | `s3.get_object()` or `SELECT content FROM files` | Donkey fetches a parcel back from the warehouse using its tracking ID |
-| `delete()` | Remove file by ID | `s3.delete_object()` or `DELETE FROM files` | Donkey throws out a parcel from the warehouse — used when a document is no longer needed |
-| `list_documents()` | List all stored files | `s3.list_objects_v2()` or `SELECT * FROM files` | Donkey reads the warehouse inventory list — every parcel currently on the shelves |
+| `upload()` | Store file, return metadata | `s3.put_object()` or `INSERT INTO files` | Courier accepts a parcel from the customer and shelves it in the warehouse with a tracking ID |
+| `download()` | Get file bytes by ID | `s3.get_object()` or `SELECT content FROM files` | Courier fetches a parcel back from the warehouse using its tracking ID |
+| `delete()` | Remove file by ID | `s3.delete_object()` or `DELETE FROM files` | Courier throws out a parcel from the warehouse — used when a document is no longer needed |
+| `list_documents()` | List all stored files | `s3.list_objects_v2()` or `SELECT * FROM files` | Courier reads the warehouse inventory list — every parcel currently on the shelves |
 
 **Key design decision:** The interface uses `document_id` (a UUID), not `filename`.
 This avoids conflicts when two users upload files with the same name.
 
-- 🫏 **Donkey:** The universal bag fitting — any donkey (AWS, Azure, local) accepts the same harness so you can swap providers without re-training the rider.
+- 🚚 **Courier:** The universal bag fitting — any courier (AWS, Azure, local) accepts the same harness so you can swap providers without re-training the rider.
 
 ---
 
@@ -197,7 +197,7 @@ The class uses **synchronous** boto3 but the methods are declared `async`. This 
 pragmatic choice — FastAPI runs these in a thread pool automatically. True async would
 require `aioboto3`, adding another dependency for minimal benefit in a low-traffic app.
 
-- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
+- 🚚 **Courier:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for couriers running the cloud route.
 
 ---
 
@@ -241,24 +241,24 @@ async for blob in container.list_blobs(name_starts_with=prefix):
 The Azure SDK uses `aio` (async I/O) — each call is a real `await`, not a thread pool
 workaround. For high-traffic apps this matters; for this project, the difference is negligible.
 
-- 🫏 **Donkey:** Choosing between the local barn (ChromaDB), the AWS depot (DynamoDB/OpenSearch), or the Azure hub (Azure AI Search) to store the GPS-indexed backpacks.
+- 🚚 **Courier:** Choosing between the local barn (ChromaDB), the AWS depot (DynamoDB/OpenSearch), or the Azure hub (Azure AI Search) to store the GPS-indexed parcels.
 
 ---
 
 ## AWS vs Azure — Side-by-Side Comparison
 
-| Aspect | AWS S3 | Azure Blob Storage | 🫏 Donkey |
+| Aspect | AWS S3 | Azure Blob Storage | 🚚 Courier |
 | --- | --- | --- | --- |
-| **SDK** | `boto3` (sync) | `azure-storage-blob` (async native) | Donkey can run other errands while waiting for the warehouse to respond |
+| **SDK** | `boto3` (sync) | `azure-storage-blob` (async native) | Courier can run other errands while waiting for the warehouse to respond |
 | **Container concept** | Bucket | Storage Account → Container | Cloud cupboard where raw mail is parked before the post office sorts it |
 | **Object path** | `s3://bucket/key` | `container/blob-name` | Stall that houses the worker — Object path: s3://bucket/key · container/blob-name |
-| **Authentication** | IAM role / access key | Connection string / managed identity | Stable keys — only authorised callers may ask the donkey to deliver |
+| **Authentication** | IAM role / access key | Connection string / managed identity | Depot keys — only authorised callers may ask the courier to deliver |
 | **Upload** | `put_object()` | `upload_blob()` | Same shelving action — different cloud's vocabulary for handing the parcel to the warehouse |
-| **Download** | `get_object()["Body"].read()` | `download_blob()` → `readall()` | Same pickup action — both clouds hand the parcel bytes back to the donkey |
-| **Delete** | `delete_objects()` (batch) | Loop + `delete_blob()` (one by one) | AWS lets the donkey discard many parcels in one trip; Azure makes the donkey go back for each one |
-| **List** | Paginator pattern | `async for` iterator | Donkey can run other errands while waiting for the warehouse to respond |
-| **Encryption** | AES256 / KMS (server-side) | Azure Storage encryption (default on) | Donkey-side view of Encryption — affects how the donkey loads, reads, or delivers the cargo |
-| **Cost (10 GB)** | ~$0.23/month | ~$0.20/month | Both stables charge about 20¢/month to warehouse 10 GB of customer documents — roughly the price of one hay-bale. |
+| **Download** | `get_object()["Body"].read()` | `download_blob()` → `readall()` | Same pickup action — both clouds hand the parcel bytes back to the courier |
+| **Delete** | `delete_objects()` (batch) | Loop + `delete_blob()` (one by one) | AWS lets the courier discard many parcels in one trip; Azure makes the courier go back for each one |
+| **List** | Paginator pattern | `async for` iterator | Courier can run other errands while waiting for the warehouse to respond |
+| **Encryption** | AES256 / KMS (server-side) | Azure Storage encryption (default on) | Courier-side view of Encryption — affects how the courier loads, reads, or delivers the parcels |
+| **Cost (10 GB)** | ~$0.23/month | ~$0.20/month | Both stables charge about 20¢/month to warehouse 10 GB of customer documents — roughly the price of one fuel-bale. |
 
 ### The code patterns side by side
 
@@ -291,7 +291,7 @@ async for blob in container.list_blobs(name_starts_with=prefix):
     await container.get_blob_client(blob.name).delete_blob()
 ```
 
-- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
+- 🚚 **Courier:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for couriers running the cloud route.
 
 ---
 
@@ -333,7 +333,7 @@ result = await storage.upload(document_id, filename, content, content_type)
 The route code never imports S3 or Blob — it works with the abstract type. Switching
 clouds means changing one config variable, not rewriting routes.
 
-- 🫏 **Donkey:** Understanding why the stable was built this way — every architectural choice is a trade-off the head groom made deliberately.
+- 🚚 **Courier:** Understanding why the depot was built this way — every architectural choice is a trade-off the head groom made deliberately.
 
 ---
 
@@ -367,21 +367,21 @@ POST /api/chat
 **Key insight:** The chat endpoint never touches file storage. It only needs the
 vector store — the chunks + embeddings created during ingestion.
 
-- 🫏 **Donkey:** Choosing between the local barn (ChromaDB), the AWS depot (DynamoDB/OpenSearch), or the Azure hub (Azure AI Search) to store the GPS-indexed backpacks.
+- 🚚 **Courier:** Choosing between the local barn (ChromaDB), the AWS depot (DynamoDB/OpenSearch), or the Azure hub (Azure AI Search) to store the GPS-indexed parcels.
 
 ---
 
 ## DE vs AI Engineer — What Each Sees
 
-| Aspect | What a DE sees | What an AI Engineer sees | 🫏 Donkey |
+| Aspect | What a DE sees | What an AI Engineer sees | 🚚 Courier |
 | --- | --- | --- | --- |
-| `StoredDocument` model | Standard metadata DTO | Audit trail for data lineage | Blank cargo manifest — StoredDocument model: Standard metadata DTO · Audit trail for data lineage |
-| `upload()` | S3 put_object, nothing new | Source-of-truth for re-ingestion if chunking strategy changes | S3 keeps the original document so the post office can re-stitch backpack pockets if chunking changes. |
-| `list_documents()` | Paginated list, standard | Knowledge base inventory — what data has the LLM seen? | Roll-call of every backpack the donkey is allowed to read from when answering |
-| `delete()` | Prefix delete, standard | Must delete from BOTH storage AND vector store, or orphan vectors remain | How the warehouse measures which backpacks are nearest to the customer's question |
-| Strategy pattern | Clean architecture | Essential for multi-cloud — can't hardcode providers in AI apps | Stable design — donkey doesn't care which warehouse brand it grabs from |
+| `StoredDocument` model | Standard metadata DTO | Audit trail for data lineage | Blank shipping manifest — StoredDocument model: Standard metadata DTO · Audit trail for data lineage |
+| `upload()` | S3 put_object, nothing new | Source-of-truth for re-ingestion if chunking strategy changes | S3 keeps the original document so the post office can re-stitch parcel pockets if chunking changes. |
+| `list_documents()` | Paginated list, standard | Knowledge base inventory — what data has the LLM seen? | Roll-call of every parcel the courier is allowed to read from when answering |
+| `delete()` | Prefix delete, standard | Must delete from BOTH storage AND vector store, or orphan vectors remain | How the warehouse measures which parcels are nearest to the customer's question |
+| Strategy pattern | Clean architecture | Essential for multi-cloud — can't hardcode providers in AI apps | Depot design — courier doesn't care which warehouse brand it grabs from |
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -405,4 +405,4 @@ Test your understanding:
 5. FastAPI detects that the underlying code is synchronous and runs it in a thread pool via `asyncio.run_in_executor()`. The `async def` lets it integrate with FastAPI's async router.
 6. Create `src/storage/gcp_gcs.py` implementing `BaseDocumentStorage`. No changes to routes needed — just add a new provider option in `main.py`.
 
-- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.
+- 🚚 **Courier:** A quick quiz for the trainee dispatch clerk — answer these to confirm the key courier delivery concepts have landed.

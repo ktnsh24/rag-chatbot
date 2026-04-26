@@ -35,15 +35,15 @@ You can't improve what you can't measure. The golden dataset is a **fixed set of
 
 Without a golden dataset, you'd have to manually test every change — ask questions, read answers, judge quality. That doesn't scale. This file makes evaluation **automated, repeatable, and objective**.
 
-| What you'll learn | DE parallel | 🫏 Donkey |
+| What you'll learn | DE parallel | 🚚 Courier |
 |---|---| --- |
 | Fixed test inputs with expected outputs | Seed data / test fixtures | Dry-run trip to check the harness — Fixed test inputs with expected outputs: Seed data / test fixtures |
 | Categories of test cases (happy path, edge case) | Test pyramid: happy path → edge cases → error cases | Dry-run trip to check the harness — Categories of test cases (happy path, edge case): Test pyramid: happy path → edge cases → error cases |
-| Score thresholds per test case | SLA definitions per data pipeline | Practice run for the donkey — Score thresholds per test case: SLA definitions per data pipeline |
-| Context chunks pre-loaded (no search needed) | Mock data for integration tests | Test case pre-loads three known backpacks so evaluation doesn't depend on warehouse GPS search |
+| Score thresholds per test case | SLA definitions per data pipeline | Practice run for the courier — Score thresholds per test case: SLA definitions per data pipeline |
+| Context chunks pre-loaded (no search needed) | Mock data for integration tests | Test case pre-loads three known parcels so evaluation doesn't depend on warehouse GPS search |
 | Negative test cases | `expected_not_in_answer` = forbidden values | Trial delivery — Negative test cases: expected_not_in_answer = forbidden values |
 
-- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
+- 🚚 **Courier:** Think of this as the orientation briefing given to a new courier before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -67,7 +67,7 @@ When do you run this?                      When do you run this?
   ✅ In CI/CD                                ✅ In CI/CD
 ```
 
-- 🫏 **Donkey:** The 25 standard test deliveries the donkey must pass every release — a fixed benchmark that never changes so you can compare runs fairly.
+- 🚚 **Courier:** The 25 standard test deliveries the courier must pass every release — a fixed benchmark that never changes so you can compare runs fairly.
 
 ---
 
@@ -103,19 +103,19 @@ User question → [Embed] → [Search] → [Context] → [LLM] → [Evaluate]
                                     Tested by golden dataset
 ```
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
 ## The 25 Test Cases Across 7 Categories
 
-| Category | Count | Purpose | 🫏 Donkey |
+| Category | Count | Purpose | 🚚 Courier |
 |---|---|---| --- |
-| `policy` | 4 | Refund, digital refund, exchange, warranty | Stable keys — only authorised callers may ask the donkey to deliver |
-| `logistics` | 3 | Return shipping, delivery time, order tracking | Donkey-side view of logistics — affects how the donkey loads, reads, or delivers the cargo |
-| `contact` | 3 | Support channels, hours, escalation | Donkey-side view of contact — affects how the donkey loads, reads, or delivers the cargo |
-| `product` | 2 | Compatibility, specifications | Donkey-side view of product — affects how the donkey loads, reads, or delivers the cargo |
-| `multi_turn` | 3 | Follow-up questions needing context | Donkey-side view of multi_turn — affects how the donkey loads, reads, or delivers the cargo |
+| `policy` | 4 | Refund, digital refund, exchange, warranty | Depot keys — only authorised callers may ask the courier to deliver |
+| `logistics` | 3 | Return shipping, delivery time, order tracking | Courier-side view of logistics — affects how the courier loads, reads, or delivers the parcels |
+| `contact` | 3 | Support channels, hours, escalation | Courier-side view of contact — affects how the courier loads, reads, or delivers the parcels |
+| `product` | 2 | Compatibility, specifications | Courier-side view of product — affects how the courier loads, reads, or delivers the parcels |
+| `multi_turn` | 3 | Follow-up questions needing context | Courier-side view of multi_turn — affects how the courier loads, reads, or delivers the parcels |
 | `edge_case` | 6 | Ambiguous, out-of-scope, prompt injection, negation, multi-topic | Instructions tucked in the pannier — edge_case: 6 · Ambiguous, out-of-scope, prompt injection, negation, multi-topic |
 | `pii` | 4 | PII in input, PII request, phone number, GDPR deletion | Rule the gate guard enforces — pii: 4 · PII in input, PII request, phone number, GDPR deletion |
 
@@ -123,7 +123,7 @@ The cases below are representative examples. See [`golden_dataset.py`](../../src
 
 ### Key cases by category
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -152,18 +152,18 @@ The cases below are representative examples. See [`golden_dataset.py`](../../src
 
 **What this tests:**
 
-| Aspect | Check | Why | 🫏 Donkey |
+| Aspect | Check | Why | 🚚 Courier |
 |---|---|---| --- |
-| **Keywords present** | "14", "days", "refund", "email" | Core facts must appear in the answer | What the donkey wrote and brought back to the customer |
-| **Keywords absent** | "cryptocurrency", "bitcoin" | The LLM must not invent payment methods | The donkey must never write words that weren't in the backpack — no inventing payment methods |
-| **Retrieval scores** | 0.95, 0.88, 0.82 (avg 0.88) | All chunks are relevant — high quality retrieval | GPS warehouse fetched three highly relevant backpacks — scores near 0.9 mean excellent match |
-| **Faithfulness** | ≥ 0.8 | Answer must be grounded in the 3 chunks | Donkey's answer must cite the three backpacks — 0.8 faithfulness means no invented facts |
+| **Keywords present** | "14", "days", "refund", "email" | Core facts must appear in the answer | What the courier wrote and brought back to the customer |
+| **Keywords absent** | "cryptocurrency", "bitcoin" | The LLM must not invent payment methods | The courier must never write words that weren't in the parcel — no inventing payment methods |
+| **Retrieval scores** | 0.95, 0.88, 0.82 (avg 0.88) | All chunks are relevant — high quality retrieval | GPS warehouse fetched three highly relevant parcels — scores near 0.9 mean excellent match |
+| **Faithfulness** | ≥ 0.8 | Answer must be grounded in the 3 chunks | Courier's answer must cite the three parcels — 0.8 faithfulness means no invented facts |
 
 **A passing answer:** *"According to the documents, customers can request a full refund within 14 business days. Send an email to support@example.com with your order number. Refunds are returned to the original payment method within 3-5 business days. [Document chunk 1]"*
 
 **A failing answer:** *"Refunds take 14 days. You can also get a refund via Bitcoin."* — mentions "bitcoin" (in `expected_not_in_answer`) and hallucinated payment method.
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -192,7 +192,7 @@ The cases below are representative examples. See [`golden_dataset.py`](../../src
 
 **DE parallel:** This is like testing that your pipeline filters correctly — the `WHERE category = 'digital'` should NOT return physical product rules.
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -220,7 +220,7 @@ The cases below are representative examples. See [`golden_dataset.py`](../../src
 
 **Why lower `min_retrieval_score` (0.65)?** The third chunk (0.78) is about return fees, not the return process itself. The question is about *how* to return, and the fee chunk is tangential. A lower threshold acknowledges that not every chunk will be perfectly relevant.
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -252,7 +252,7 @@ The cases below are representative examples. See [`golden_dataset.py`](../../src
 
 **Why `min_faithfulness` is 0.9 (highest of all cases):** When context is irrelevant, the faithfulness test is actually testing the *refusal detector*. A refusal gets a 1.0 faithfulness score. If the LLM tries to answer instead of refusing, faithfulness drops below 0.9.
 
-- 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
+- 🚚 **Courier:** A practice delivery run — the courier completes a structured exercise to build muscle memory before real production routes.
 
 ---
 
@@ -276,17 +276,17 @@ The cases below are representative examples. See [`golden_dataset.py`](../../src
 
 **Why relaxed thresholds?**
 
-| Threshold | Value | Why | 🫏 Donkey |
+| Threshold | Value | Why | 🚚 Courier |
 |---|---|---| --- |
-| `min_retrieval_score` | 0.3 | "How long?" is vague — chunks will have low relevance | Vague question yields low GPS scores — don't expect the backpack to perfectly match ambiguity |
-| `min_faithfulness` | 0.6 | The LLM might mention both refunds AND shipping — hard to ground precisely | Lower the bar — when the question is vague, the donkey may legitimately weave together two backpacks |
-| `expected_keywords` | `[]` | Can't predict what the LLM will say for a vague question | No keyword checklist — for ambiguous orders nobody can predict which words the donkey will choose |
+| `min_retrieval_score` | 0.3 | "How long?" is vague — chunks will have low relevance | Vague question yields low GPS scores — don't expect the parcel to perfectly match ambiguity |
+| `min_faithfulness` | 0.6 | The LLM might mention both refunds AND shipping — hard to ground precisely | Lower the bar — when the question is vague, the courier may legitimately weave together two parcels |
+| `expected_keywords` | `[]` | Can't predict what the LLM will say for a vague question | No keyword checklist — for ambiguous orders nobody can predict which words the courier will choose |
 
 **What a good answer looks like:** *"Your question 'How long?' is ambiguous. Based on the documents: refund processing takes 14 business days, and shipping takes 5-7 business days."*
 
 **What Prompt Rule #6 says:** *"If the question is ambiguous, state your interpretation before answering."*
 
-- 🫏 **Donkey:** The warehouse robot dispatched to find the right backpack shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+- 🚚 **Courier:** The warehouse robot dispatched to find the right parcel shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -330,14 +330,14 @@ for case in GOLDEN_DATASET:
 
 **When to run this:**
 
-| Trigger | Why | 🫏 Donkey |
+| Trigger | Why | 🚚 Courier |
 |---|---| --- |
 | Changed a prompt template | Prompts affect every answer — regression test ALL cases | Instructions tucked in the pannier — Changed a prompt template: Prompts affect every answer — regression test ALL cases |
-| Switched LLM model | Different models behave differently — baseline them | Re-run the 25 standard test deliveries with the new donkey breed to see how its writing differs |
-| Changed chunking strategy | Affects retrieval quality — test #1, #2, #3 | Backpack size changes (chunk_size) affect which cargo pieces the warehouse robot fetches |
-| Changed `top_k` or `chunk_size` | Affects context quality — test all cases | Top_k controls backpack count; chunk_size controls cargo size — both impact donkey's reading material |
+| Switched LLM model | Different models behave differently — baseline them | Re-run the 25 standard test deliveries with the new courier breed to see how its writing differs |
+| Changed chunking strategy | Affects retrieval quality — test #1, #2, #3 | Parcel size changes (chunk_size) affect which parcels pieces the warehouse robot fetches |
+| Changed `top_k` or `chunk_size` | Affects context quality — test all cases | Top_k controls parcel count; chunk_size controls parcels size — both impact courier's reading material |
 | Before deploying to production | Final sanity check | Automated harness rig — Before deploying to production: Final sanity check |
-| In CI/CD pipeline | Automated regression on every PR | Robot stable hand — In CI/CD pipeline: Automated regression on every PR |
+| In CI/CD pipeline | Automated regression on every PR | Robot dispatch clerk — In CI/CD pipeline: Automated regression on every PR |
 
 ### Running the Golden Dataset via the API
 
@@ -363,7 +363,7 @@ The suite runs each golden dataset case through the **live RAG pipeline** (not m
 
 📖 **See:** [Evaluate Endpoint Deep Dive](../architecture-and-design/api-routes/evaluate-endpoint-explained.md) · [API Reference → Evaluation](../reference/api-reference.md)
 
-- 🫏 **Donkey:** The 25 standard test deliveries the donkey must pass every release — a fixed benchmark that never changes so you can compare runs fairly.
+- 🚚 **Courier:** The 25 standard test deliveries the courier must pass every release — a fixed benchmark that never changes so you can compare runs fairly.
 
 ---
 
@@ -371,13 +371,13 @@ The suite runs each golden dataset case through the **live RAG pipeline** (not m
 
 The golden dataset is **identical** across providers. The test cases, questions, expected keywords, and context chunks don't change. But the **scores will differ** because models behave differently:
 
-| Test case | Claude 3.5 (AWS) | GPT-4o (Azure) | llama3.2 (Local) | 🫏 Donkey |
+| Test case | Claude 3.5 (AWS) | GPT-4o (Azure) | llama3.2 (Local) | 🚚 Courier |
 |---|---|---|---| --- |
-| `refund_basic` | ~0.92 | ~0.90 | ~0.80 | Donkey-side view of refund_basic — affects how the donkey loads, reads, or delivers the cargo |
-| `refund_digital` | ~0.91 | ~0.88 | ~0.75 | Donkey-side view of refund_digital — affects how the donkey loads, reads, or delivers the cargo |
-| `shipping_return` | ~0.88 | ~0.86 | ~0.78 | Donkey-side view of shipping_return — affects how the donkey loads, reads, or delivers the cargo |
-| `no_context_available` | ~0.95 | ~0.93 | ~0.70 ⚠️ | Donkey-side view of no_context_available — affects how the donkey loads, reads, or delivers the cargo |
-| `ambiguous_question` | ~0.80 | ~0.78 | ~0.60 | Donkey-side view of ambiguous_question — affects how the donkey loads, reads, or delivers the cargo |
+| `refund_basic` | ~0.92 | ~0.90 | ~0.80 | Courier-side view of refund_basic — affects how the courier loads, reads, or delivers the parcels |
+| `refund_digital` | ~0.91 | ~0.88 | ~0.75 | Courier-side view of refund_digital — affects how the courier loads, reads, or delivers the parcels |
+| `shipping_return` | ~0.88 | ~0.86 | ~0.78 | Courier-side view of shipping_return — affects how the courier loads, reads, or delivers the parcels |
+| `no_context_available` | ~0.95 | ~0.93 | ~0.70 ⚠️ | Courier-side view of no_context_available — affects how the courier loads, reads, or delivers the parcels |
+| `ambiguous_question` | ~0.80 | ~0.78 | ~0.60 | Courier-side view of ambiguous_question — affects how the courier loads, reads, or delivers the parcels |
 
 ⚠️ **Local models may struggle with case #4** — smaller models sometimes try to answer instead of refusing. If `no_context_available` fails locally:
 - Lower `min_faithfulness` to 0.7 for local testing
@@ -396,7 +396,7 @@ CLOUD_PROVIDER=aws python -m pytest tests/test_golden_dataset.py
 # 3. Deploy only if cloud tests pass
 ```
 
-- 🫏 **Donkey:** Running the donkey on rented pasture — AWS or Azure provides the stable so you only pay for the hay consumed.
+- 🚚 **Courier:** Running the courier on rented pasture — AWS or Azure provides the depot so you only pay for the fuel consumed.
 
 ---
 
@@ -423,15 +423,15 @@ When you encounter a bug in production (e.g., the LLM gives a wrong answer), add
 
 **Guidelines for new cases:**
 
-| Guideline | Why | 🫏 Donkey |
+| Guideline | Why | 🚚 Courier |
 |---|---| --- |
-| At least 1 happy path per category | Baseline behaviour | Donkey-side view of At least 1 happy path per category — affects how the donkey loads, reads, or delivers the cargo |
-| At least 1 edge case | Boundary behaviour | Donkey-side view of At least 1 edge case — affects how the donkey loads, reads, or delivers the cargo |
-| Put previous hallucinations in `expected_not_in_answer` | Regression-proof the fix | List forbidden words the donkey invented last time — catch memory drift before it happens again |
-| Use realistic similarity scores (0.4–0.95) | Don't use 1.0 — real search is never perfect | Direction the donkey is pointed — Use realistic similarity scores (0.4–0.95): Don't use 1.0 — real search is never perfect |
+| At least 1 happy path per category | Baseline behaviour | Courier-side view of At least 1 happy path per category — affects how the courier loads, reads, or delivers the parcels |
+| At least 1 edge case | Boundary behaviour | Courier-side view of At least 1 edge case — affects how the courier loads, reads, or delivers the parcels |
+| Put previous hallucinations in `expected_not_in_answer` | Regression-proof the fix | List forbidden words the courier invented last time — catch memory drift before it happens again |
+| Use realistic similarity scores (0.4–0.95) | Don't use 1.0 — real search is never perfect | Direction the courier is pointed — Use realistic similarity scores (0.4–0.95): Don't use 1.0 — real search is never perfect |
 | Set thresholds based on cloud model performance | Don't set to 0.99 — allow natural variation | Pre-printed waybill — Set thresholds based on cloud model performance: Don't set to 0.99 — allow natural variation |
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -458,7 +458,7 @@ When you encounter a bug in production (e.g., the LLM gives a wrong answer), add
 - [ ] How would you weight test case failures? (Is `no_context_available` failing worse than `ambiguous_question`?)
 - [ ] How would you version golden datasets alongside model versions?
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -473,4 +473,4 @@ You now understand how to build test suites for AI systems. Last file:
 - [RAG Chain Deep Dive (#13)](rag-chain-deep-dive.md) — the pipeline being tested
 - [CI/CD Explained](../architecture-and-design/cicd-explained.md) — where golden dataset tests run automatically
 
-- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.
+- 🚚 **Courier:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

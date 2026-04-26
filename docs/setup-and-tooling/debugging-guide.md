@@ -41,7 +41,7 @@ When something goes wrong, `print()` statements won't cut it. You need to:
 - **Step through code line by line** (follow the exact flow)
 - **Evaluate expressions** (what would `result.score > 0.8` return?)
 
-- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🚚 **Courier:** Checking the courier's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -84,11 +84,11 @@ Click the play icon with a bug in the left sidebar (or press `Ctrl+Shift+D`).
 
 In the dropdown at the top, you'll see three options:
 
-| Configuration | What it does | 🫏 Donkey |
+| Configuration | What it does | 🚚 Courier |
 | --- | --- | --- |
-| **RAG Chatbot — Debug Server** | Starts the FastAPI server with debugger attached. Use this for testing endpoints. | Stable manager — receives requests at the front door and dispatches the donkey |
-| **RAG Chatbot — Debug Tests** | Runs all pytest tests with debugger. Use this when a test fails and you want to step through it. | Donkey's report card — share of test deliveries that scored above the bar |
-| **RAG Chatbot — Debug Single Test File** | Runs only the currently open test file. Fastest for debugging one test. | Figuring out which part of the stable, donkey, or warehouse went wrong |
+| **RAG Chatbot — Debug Server** | Starts the FastAPI server with debugger attached. Use this for testing endpoints. | Depot manager — receives requests at the front door and dispatches the courier |
+| **RAG Chatbot — Debug Tests** | Runs all pytest tests with debugger. Use this when a test fails and you want to step through it. | Courier's report card — share of test deliveries that scored above the bar |
+| **RAG Chatbot — Debug Single Test File** | Runs only the currently open test file. Fastest for debugging one test. | Figuring out which part of the depot, courier, or warehouse went wrong |
 
 ### Step 6: Set breakpoints
 
@@ -96,15 +96,15 @@ Click in the **gutter** (the space to the left of line numbers) to set a red dot
 
 **Recommended breakpoints for understanding the flow:**
 
-| File | Line | Why | 🫏 Donkey |
+| File | Line | Why | 🚚 Courier |
 | --- | --- | --- | --- |
-| `src/main.py` | Line inside `lifespan()` | See what happens at startup | Donkey-side view of src/main.py — affects how the donkey loads, reads, or delivers the cargo |
-| `src/api/routes/chat.py` | First line of `chat()` | See every incoming chat request | Where parcels are dropped at the stable — src/api/routes/chat.py: First line of chat() · See every incoming chat request |
-| `src/rag/chain.py` | Inside `query()` | See RAG retrieval + generation | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
-| `src/llm/aws_bedrock.py` | Inside `generate()` | See the Bedrock API call | Inspect the donkey's call to AWS Bedrock — see the raw Converse request and response |
-| `src/llm/azure_openai.py` | Inside `generate()` | See the Azure OpenAI API call | Inspect the donkey's call to Azure OpenAI — see the raw chat.completions request and response |
-| `src/vectorstore/base.py` | Inside `search()` | See vector search results | Breakpoint inside the GPS warehouse query to inspect what coordinates the donkey looked up. |
-| `src/rag/ingestion.py` | Inside `chunk_document()` | See how documents are split | Pause inside the post office to watch how a document is sliced into overlapping backpack pockets. |
+| `src/main.py` | Line inside `lifespan()` | See what happens at startup | Courier-side view of src/main.py — affects how the courier loads, reads, or delivers the parcels |
+| `src/api/routes/chat.py` | First line of `chat()` | See every incoming chat request | Where parcels are dropped at the depot — src/api/routes/chat.py: First line of chat() · See every incoming chat request |
+| `src/rag/chain.py` | Inside `query()` | See RAG retrieval + generation | Courier grabs the nearest parcels from the GPS warehouse before writing the answer |
+| `src/llm/aws_bedrock.py` | Inside `generate()` | See the Bedrock API call | Inspect the courier's call to AWS Bedrock — see the raw Converse request and response |
+| `src/llm/azure_openai.py` | Inside `generate()` | See the Azure OpenAI API call | Inspect the courier's call to Azure OpenAI — see the raw chat.completions request and response |
+| `src/vectorstore/base.py` | Inside `search()` | See vector search results | Breakpoint inside the GPS warehouse query to inspect what coordinates the courier looked up. |
+| `src/rag/ingestion.py` | Inside `chunk_document()` | See how documents are split | Pause inside the post office to watch how a document is sliced into overlapping parcel pockets. |
 
 ### Step 7: Start debugging
 
@@ -141,18 +141,18 @@ If you have a breakpoint in `chat()`, VS Code will:
 
 When the debugger pauses, you can:
 
-| Action | How | Example | 🫏 Donkey |
+| Action | How | Example | 🚚 Courier |
 | --- | --- | --- | --- |
-| **See variable values** | Look at the Variables panel | `body.question = "What is this?"` | The actual cargo text inside the backpack the donkey is carrying |
-| **Hover over a variable** | Move mouse over it in the code | Shows the value in a tooltip | Donkey-side view of Hover over a variable — affects how the donkey loads, reads, or delivers the cargo |
-| **Evaluate an expression** | Type in the Debug Console (bottom) | `len(search_results)` → `5` | An on-route mini report card from the debugger about any in-flight donkey variable |
-| **Step over** | Press `F10` | Execute current line, move to next | Donkey-side view of Step over — affects how the donkey loads, reads, or delivers the cargo |
-| **Step into** | Press `F11` | Go inside the function call | Donkey-side view of Step into — affects how the donkey loads, reads, or delivers the cargo |
-| **Step out** | Press `Shift+F11` | Finish current function, go back to caller | Donkey-side view of Step out — affects how the donkey loads, reads, or delivers the cargo |
-| **Continue** | Press `F5` | Run until next breakpoint | Donkey-side view of Continue — affects how the donkey loads, reads, or delivers the cargo |
-| **Stop** | Press `Shift+F5` | Stop the debugger | Calls the donkey back to the stable mid-route — no more breakpoints fire until you restart debugging |
+| **See variable values** | Look at the Variables panel | `body.question = "What is this?"` | The actual parcels text inside the parcel the courier is carrying |
+| **Hover over a variable** | Move mouse over it in the code | Shows the value in a tooltip | Courier-side view of Hover over a variable — affects how the courier loads, reads, or delivers the parcels |
+| **Evaluate an expression** | Type in the Debug Console (bottom) | `len(search_results)` → `5` | An on-route mini report card from the debugger about any in-flight courier variable |
+| **Step over** | Press `F10` | Execute current line, move to next | Courier-side view of Step over — affects how the courier loads, reads, or delivers the parcels |
+| **Step into** | Press `F11` | Go inside the function call | Courier-side view of Step into — affects how the courier loads, reads, or delivers the parcels |
+| **Step out** | Press `Shift+F11` | Finish current function, go back to caller | Courier-side view of Step out — affects how the courier loads, reads, or delivers the parcels |
+| **Continue** | Press `F5` | Run until next breakpoint | Courier-side view of Continue — affects how the courier loads, reads, or delivers the parcels |
+| **Stop** | Press `Shift+F5` | Stop the debugger | Calls the courier back to the depot mid-route — no more breakpoints fire until you restart debugging |
 
-- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🚚 **Courier:** Checking the courier's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -196,24 +196,24 @@ PyCharm's debugger has the same controls:
 - **Shift+F8** = Step Out
 - **F9** = Resume (Continue)
 
-- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🚚 **Courier:** Checking the courier's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
 ## Debugger quick reference
 
-| Action | VS Code | PyCharm | 🫏 Donkey |
+| Action | VS Code | PyCharm | 🚚 Courier |
 | --- | --- | --- | --- |
-| Start debugging | `F5` | `Shift+F9` | Sends the donkey out with the inspector following — runs the app under the debugger so breakpoints fire |
-| Set breakpoint | Click gutter / `F9` | Click gutter / `Ctrl+F8` | Donkey-side view of Set breakpoint — affects how the donkey loads, reads, or delivers the cargo |
-| Step over | `F10` | `F8` | Donkey-side view of Step over — affects how the donkey loads, reads, or delivers the cargo |
-| Step into | `F11` | `F7` | Donkey-side view of Step into — affects how the donkey loads, reads, or delivers the cargo |
-| Step out | `Shift+F11` | `Shift+F8` | Donkey-side view of Step out — affects how the donkey loads, reads, or delivers the cargo |
-| Continue | `F5` | `F9` | Donkey-side view of Continue — affects how the donkey loads, reads, or delivers the cargo |
-| Stop | `Shift+F5` | `Ctrl+F2` | Donkey-side view of Stop — affects how the donkey loads, reads, or delivers the cargo |
-| Evaluate expression | Debug Console | Alt+F8 | A quick on-route report card from the debugger about any in-flight donkey variable |
+| Start debugging | `F5` | `Shift+F9` | Sends the courier out with the inspector following — runs the app under the debugger so breakpoints fire |
+| Set breakpoint | Click gutter / `F9` | Click gutter / `Ctrl+F8` | Courier-side view of Set breakpoint — affects how the courier loads, reads, or delivers the parcels |
+| Step over | `F10` | `F8` | Courier-side view of Step over — affects how the courier loads, reads, or delivers the parcels |
+| Step into | `F11` | `F7` | Courier-side view of Step into — affects how the courier loads, reads, or delivers the parcels |
+| Step out | `Shift+F11` | `Shift+F8` | Courier-side view of Step out — affects how the courier loads, reads, or delivers the parcels |
+| Continue | `F5` | `F9` | Courier-side view of Continue — affects how the courier loads, reads, or delivers the parcels |
+| Stop | `Shift+F5` | `Ctrl+F2` | Courier-side view of Stop — affects how the courier loads, reads, or delivers the parcels |
+| Evaluate expression | Debug Console | Alt+F8 | A quick on-route report card from the debugger about any in-flight courier variable |
 
-- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🚚 **Courier:** Checking the courier's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -228,13 +228,13 @@ Set them all, press F5, send a chat question from http://localhost:8000/docs, an
 
 This is the central AI orchestrator. Set breakpoints on all 5 steps:
 
-| Step | Line (approx) | Code | What to inspect | AI concept you're seeing | 🫏 Donkey |
+| Step | Line (approx) | Code | What to inspect | AI concept you're seeing | 🚚 Courier |
 | --- | --- | --- | --- | --- | --- |
-| **1. Embed** | 188 | `query_embedding = await self._llm.get_embedding(question)` | Hover `query_embedding` → 768 floats representing your question's meaning | **Text → Vector embedding** | Donkey converts the question into 768 GPS coordinates — your first look at how text becomes meaning |
-| **2. Search** | 191 | `search_results = await self._vector_store.search(` | Hover `search_results` → list of chunks with similarity scores (0.0–1.0) | **HNSW vector similarity search** | Hover `search_results` to inspect the backpack pockets returned with their HNSW similarity scores. |
-| **3. Context** | 204 | `context_texts = [result.text for result in search_results]` | Hover `context_texts` → the actual text chunks the LLM will read | **RAG context building** | Inspect the actual backpack contents the donkey will read before writing the answer |
-| **4. Generate** | 207 | `llm_response = await self._llm.generate(` | After step-over: hover `llm_response` → the LLM's answer + token count | **LLM text generation** | Watch the donkey produce its answer — text plus token count returned from the writing stable |
-| **5. Cost** | 223 | `token_usage = {` | Hover to see input/output tokens + estimated $ cost | **Token counting & cost estimation** | Hover `token_usage` to read the donkey's tachograph — input/output hay counts and dollar cost. |
+| **1. Embed** | 188 | `query_embedding = await self._llm.get_embedding(question)` | Hover `query_embedding` → 768 floats representing your question's meaning | **Text → Vector embedding** | Courier converts the question into 768 GPS coordinates — your first look at how text becomes meaning |
+| **2. Search** | 191 | `search_results = await self._vector_store.search(` | Hover `search_results` → list of chunks with similarity scores (0.0–1.0) | **HNSW vector similarity search** | Hover `search_results` to inspect the parcel pockets returned with their HNSW similarity scores. |
+| **3. Context** | 204 | `context_texts = [result.text for result in search_results]` | Hover `context_texts` → the actual text chunks the LLM will read | **RAG context building** | Inspect the actual parcel contents the courier will read before writing the answer |
+| **4. Generate** | 207 | `llm_response = await self._llm.generate(` | After step-over: hover `llm_response` → the LLM's answer + token count | **LLM text generation** | Watch the courier produce its answer — text plus token count returned from the writing depot |
+| **5. Cost** | 223 | `token_usage = {` | Hover to see input/output tokens + estimated $ cost | **Token counting & cost estimation** | Hover `token_usage` to read the courier's tachograph — input/output fuel counts and dollar cost. |
 
 **What to look for:**
 - **Step 1**: The embedding is a list of ~768 floats (nomic-embed-text). Each number captures a dimension of meaning.
@@ -247,10 +247,10 @@ This is the central AI orchestrator. Set breakpoints on all 5 steps:
 
 Go deeper to see the raw HTTP communication with Ollama:
 
-| Method | Line (approx) | Code | What to inspect | AI concept | 🫏 Donkey |
+| Method | Line (approx) | Code | What to inspect | AI concept | 🚚 Courier |
 | --- | --- | --- | --- | --- | --- |
-| `generate()` | ~87 | `response = await self._client.post(` | Step over → hover `response` → see the raw JSON Ollama returns (model, created_at, response text) | **LLM HTTP API call** | See the raw HTTP call the donkey makes to the local Ollama stable to compose an answer |
-| `get_embedding()` | ~135 | `response = await self._client.post(` | Step over → hover `response` → see the raw embedding array from nomic-embed-text | **Embedding API call** | Where parcels are dropped at the stable — get_embedding(): ~135 · response = await self._client.post( · Step over → hover response → see the raw |
+| `generate()` | ~87 | `response = await self._client.post(` | Step over → hover `response` → see the raw JSON Ollama returns (model, created_at, response text) | **LLM HTTP API call** | See the raw HTTP call the courier makes to the local Ollama depot to compose an answer |
+| `get_embedding()` | ~135 | `response = await self._client.post(` | Step over → hover `response` → see the raw embedding array from nomic-embed-text | **Embedding API call** | Where parcels are dropped at the depot — get_embedding(): ~135 · response = await self._client.post( · Step over → hover response → see the raw |
 | `get_embeddings_batch()` | ~167 | `response = await self._client.post(` | Same as above but for multiple texts at once (used during document upload) | **Batch embedding** | Same coordinate lookup but for many texts at once during upload, batched into the GPS warehouse. |
 
 **What to look for:**
@@ -259,17 +259,17 @@ Go deeper to see the raw HTTP communication with Ollama:
 
 #### File: `src/vectorstore/local_chromadb.py` — Inside vector search
 
-| Method | Line (approx) | Code | What to inspect | AI concept | 🫏 Donkey |
+| Method | Line (approx) | Code | What to inspect | AI concept | 🚚 Courier |
 | --- | --- | --- | --- | --- | --- |
 | `search()` | ~116 | `results = self._collection.query(` | Step over → hover `results` → see `distances`, `documents`, `metadatas` | **ChromaDB HNSW k-NN search** | Step into the local barn's k-NN query and inspect the distances, documents, and metadata ChromaDB returns. |
-| `store_vectors()` | ~104 | `self._collection.upsert(` | See the chunk IDs, texts, and embeddings being stored | **Vector indexing** | Watch chunk IDs, texts, and embeddings being filed into the warehouse as new backpack pockets. |
+| `store_vectors()` | ~104 | `self._collection.upsert(` | See the chunk IDs, texts, and embeddings being stored | **Vector indexing** | Watch chunk IDs, texts, and embeddings being filed into the warehouse as new parcel pockets. |
 
 **What to look for:**
 - `results['distances']` — lower = more similar (ChromaDB uses distance, not similarity score)
 - `results['documents']` — the actual text chunks returned
 - `results['metadatas']` — document name, chunk index, etc.
 
-- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🚚 **Courier:** Checking the courier's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -279,12 +279,12 @@ Set these when uploading a document to see the full ETL-for-AI pipeline:
 
 #### File: `src/rag/chain.py` — `ingest()` method
 
-| Step | Line (approx) | Code | What to inspect | AI concept | 🫏 Donkey |
+| Step | Line (approx) | Code | What to inspect | AI concept | 🚚 Courier |
 | --- | --- | --- | --- | --- | --- |
-| **1. Parse** | 140 | `text = read_document(filename, content)` | Hover `text` → raw text extracted from your PDF/DOCX/TXT | **Document parsing** | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
-| **2. Chunk** | 144 | `chunks = chunk_document(` | Hover `chunks` → list of overlapping text pieces (1000 chars each, 200 overlap) | **Text chunking (RecursiveCharacterTextSplitter)** | Hover `chunks` to see the list of backpack pockets — 1000 chars each with 200-char overlapping edges. |
-| **3. Embed** | ~152 | `embeddings = await self._llm.get_embeddings_batch(chunks)` | Hover `embeddings` → N×768 matrix (N chunks, each with 768-dim vector) | **Batch embedding generation** | Batch step where every chunk is converted into GPS coordinates in one trip to the embedding stable |
-| **4. Store** | ~156 | `stored = await self._vector_store.store_vectors(` | Step over → see how many vectors were indexed in ChromaDB | **Vector storage & HNSW indexing** | Step over to confirm how many backpack pocket vectors were indexed onto the local barn's HNSW shelves. |
+| **1. Parse** | 140 | `text = read_document(filename, content)` | Hover `text` → raw text extracted from your PDF/DOCX/TXT | **Document parsing** | Post office sorting raw mail into GPS-labelled boxes before the courier's first trip |
+| **2. Chunk** | 144 | `chunks = chunk_document(` | Hover `chunks` → list of overlapping text pieces (1000 chars each, 200 overlap) | **Text chunking (RecursiveCharacterTextSplitter)** | Hover `chunks` to see the list of parcel pockets — 1000 chars each with 200-char overlapping edges. |
+| **3. Embed** | ~152 | `embeddings = await self._llm.get_embeddings_batch(chunks)` | Hover `embeddings` → N×768 matrix (N chunks, each with 768-dim vector) | **Batch embedding generation** | Batch step where every chunk is converted into GPS coordinates in one trip to the embedding depot |
+| **4. Store** | ~156 | `stored = await self._vector_store.store_vectors(` | Step over → see how many vectors were indexed in ChromaDB | **Vector storage & HNSW indexing** | Step over to confirm how many parcel pocket vectors were indexed onto the local barn's HNSW shelves. |
 
 **What to look for:**
 - **Step 2**: Check `len(chunks)` — a 10-page PDF might produce 50+ chunks. Check if chunks make sense (not cut mid-sentence).
@@ -293,9 +293,9 @@ Set these when uploading a document to see the full ETL-for-AI pipeline:
 
 #### File: `src/rag/ingestion.py` — Chunking internals
 
-| Function | Line | What to inspect | AI concept | 🫏 Donkey |
+| Function | Line | What to inspect | AI concept | 🚚 Courier |
 | --- | --- | --- | --- | --- |
-| `read_document()` | Start of function | `filename` and `content` → see what format was uploaded | **Multi-format document parsing** | Stable inspector — checks the code is tidy before letting the donkey out |
+| `read_document()` | Start of function | `filename` and `content` → see what format was uploaded | **Multi-format document parsing** | Depot inspector — checks the code is tidy before letting the courier out |
 | `chunk_document()` | After `text_splitter.split_text()` | The `chunks` list → see exactly where the text was split and how overlap works | **Chunking strategy** | Inspect the `chunks` list right after splitting to see exactly where text was torn and how edges overlap. |
 
 **Try in the Debug Console:**
@@ -380,4 +380,4 @@ Set a breakpoint in `src/rag/ingestion.py` → `read_document()`:
 - Is the PDF readable?
 - How many chunks were created?
 
-- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🚚 **Courier:** Checking the courier's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.

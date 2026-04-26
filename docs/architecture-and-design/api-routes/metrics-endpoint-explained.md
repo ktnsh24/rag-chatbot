@@ -46,23 +46,23 @@ rag_chat_latency_p95_ms 1250.0
 
 No JSON. No HTML. Just the Prometheus text format that monitoring tools expect.
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
 ## DE Parallel
 
-| Concept | Data Engineering | RAG Chatbot | 🫏 Donkey |
+| Concept | Data Engineering | RAG Chatbot | 🚚 Courier |
 | --- | --- | --- | --- |
 | **What you expose** | DAG run count, task duration, queue depth | Chat requests, LLM latency, token usage | Tachograph entries — every chat trip's count, latency, and token usage published for scrapers |
-| **Format** | Prometheus text exposition | Prometheus text exposition | Tally board on the stable wall — Format: Prometheus text exposition · Prometheus text exposition |
-| **Scraper** | Prometheus → Grafana | Prometheus → Grafana | Stopwatch on the donkey's harness — Scraper: Prometheus → Grafana · Prometheus → Grafana |
-| **Alert on** | DAG failure rate > 5%, task duration > SLA | Pass rate < 80%, latency p95 > 2s | Stable-owner alarms — wake someone if too few donkey trips pass or the round trips get too slow |
-| **Pattern** | `GET /metrics` on Airflow webserver | `GET /api/metrics` on FastAPI | Tally board on the stable wall — Pattern: GET /metrics on Airflow webserver · GET /api/metrics on FastAPI |
+| **Format** | Prometheus text exposition | Prometheus text exposition | Tally board on the dispatch board — Format: Prometheus text exposition · Prometheus text exposition |
+| **Scraper** | Prometheus → Grafana | Prometheus → Grafana | Stopwatch on the courier's harness — Scraper: Prometheus → Grafana · Prometheus → Grafana |
+| **Alert on** | DAG failure rate > 5%, task duration > SLA | Pass rate < 80%, latency p95 > 2s | Depot-owner alarms — wake someone if too few courier trips pass or the round trips get too slow |
+| **Pattern** | `GET /metrics` on Airflow webserver | `GET /api/metrics` on FastAPI | Tally board on the dispatch board — Pattern: GET /metrics on Airflow webserver · GET /api/metrics on FastAPI |
 
 **Bottom line:** Same infrastructure pattern, different business metrics.
 
-- 🫏 **Donkey:** Running multiple donkeys on the same route to confirm that AI engineering and data engineering practices mirror each other.
+- 🚚 **Courier:** Running multiple couriers on the same route to confirm that AI engineering and data engineering practices mirror each other.
 
 ---
 
@@ -103,7 +103,7 @@ async def prometheus_metrics(request: Request) -> Response:
 3. **Media type** — `text/plain; version=0.0.4` is the Prometheus exposition format MIME type
 4. **No auth** — metrics endpoints are typically unprotected (Prometheus needs to scrape without tokens)
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
@@ -111,36 +111,36 @@ async def prometheus_metrics(request: Request) -> Response:
 
 ### Counters (monotonically increasing)
 
-| Metric | Type | What it measures | 🫏 Donkey |
+| Metric | Type | What it measures | 🚚 Courier |
 | --- | --- | --- | --- |
-| `rag_chat_requests_total` | counter | Total chat requests processed | Tachograph counter — how many deliveries the donkey completed |
-| `rag_chat_errors_total` | counter | Total chat request errors | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
-| `rag_tokens_input_total` | counter | Total input tokens consumed | Tally of every hay bale the donkey chewed reading delivery notes — counts input tokens consumed across all chat trips. |
-| `rag_tokens_output_total` | counter | Total output tokens generated | Tally of hay bales burned writing answers — counts output tokens the donkey produced and acts as a generation-cost proxy. |
-| `rag_documents_uploaded_total` | counter | Total documents ingested | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
-| `rag_queries_total` | counter | Total evaluated queries (from query logs) | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
-| `rag_queries_passed_total` | counter | Queries that passed evaluation | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
-| `rag_queries_failed_total` | counter | Queries that failed evaluation | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
+| `rag_chat_requests_total` | counter | Total chat requests processed | Tachograph counter — how many deliveries the courier completed |
+| `rag_chat_errors_total` | counter | Total chat request errors | Tachograph reading — recorded on every courier trip and shown on the dashboard |
+| `rag_tokens_input_total` | counter | Total input tokens consumed | Tally of every fuel bale the courier chewed reading shipping manifests — counts input tokens consumed across all chat trips. |
+| `rag_tokens_output_total` | counter | Total output tokens generated | Tally of fuel fuel loads burned writing answers — counts output tokens the courier produced and acts as a generation-cost proxy. |
+| `rag_documents_uploaded_total` | counter | Total documents ingested | Post office sorting raw mail into GPS-labelled boxes before the courier's first trip |
+| `rag_queries_total` | counter | Total evaluated queries (from query logs) | Tachograph reading — recorded on every courier trip and shown on the dashboard |
+| `rag_queries_passed_total` | counter | Queries that passed evaluation | Tachograph reading — recorded on every courier trip and shown on the dashboard |
+| `rag_queries_failed_total` | counter | Queries that failed evaluation | Tachograph reading — recorded on every courier trip and shown on the dashboard |
 
 ### Gauges (point-in-time values)
 
-| Metric | Type | What it measures | 🫏 Donkey |
+| Metric | Type | What it measures | 🚚 Courier |
 | --- | --- | --- | --- |
-| `rag_chat_latency_p50_ms` | gauge | Median chat response time | Tachograph reading — how long the donkey took on the round trip |
-| `rag_chat_latency_p95_ms` | gauge | 95th percentile chat response time | Tachograph reading — how long the donkey took on the round trip |
-| `rag_chat_latency_p99_ms` | gauge | 99th percentile chat response time | Tachograph reading — how long the donkey took on the round trip |
-| `rag_query_pass_rate` | gauge | Current pass rate (0.0–1.0) | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
-| `rag_query_avg_retrieval` | gauge | Average retrieval score | Live average of how cleanly the GPS warehouse handed the donkey the right backpacks across recent evaluated trips. |
-| `rag_query_avg_faithfulness` | gauge | Average faithfulness score | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
-| `rag_failures_bad_retrieval` | gauge | Count of bad_retrieval failures (last 24h) | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
-| `rag_failures_hallucination` | gauge | Count of hallucination failures (last 24h) | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
+| `rag_chat_latency_p50_ms` | gauge | Median chat response time | Tachograph reading — how long the courier took on the round trip |
+| `rag_chat_latency_p95_ms` | gauge | 95th percentile chat response time | Tachograph reading — how long the courier took on the round trip |
+| `rag_chat_latency_p99_ms` | gauge | 99th percentile chat response time | Tachograph reading — how long the courier took on the round trip |
+| `rag_query_pass_rate` | gauge | Current pass rate (0.0–1.0) | Tachograph reading — recorded on every courier trip and shown on the dashboard |
+| `rag_query_avg_retrieval` | gauge | Average retrieval score | Live average of how cleanly the GPS warehouse handed the courier the right parcels across recent evaluated trips. |
+| `rag_query_avg_faithfulness` | gauge | Average faithfulness score | How confidently the warehouse says 'this parcel matches' — higher = closer GPS hit |
+| `rag_failures_bad_retrieval` | gauge | Count of bad_retrieval failures (last 24h) | Courier grabs the nearest parcels from the GPS warehouse before writing the answer |
+| `rag_failures_hallucination` | gauge | Count of hallucination failures (last 24h) | Tachograph reading — recorded on every courier trip and shown on the dashboard |
 
 ### Why counters vs gauges?
 
 - **Counters** only go up — Prometheus calculates rates from them (e.g., `rate(rag_chat_requests_total[5m])` = requests per second)
 - **Gauges** can go up or down — they represent current state (e.g., current latency, current pass rate)
 
-- 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
+- 🚚 **Courier:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
 
 ---
 
@@ -160,7 +160,7 @@ scrape_configs:
 For AWS ECS or Azure Container Apps, replace `localhost:8000` with the service
 discovery target.
 
-- 🫏 **Donkey:** Adjusting the bag fit and route preferences so the donkey delivers to the right address every time.
+- 🚚 **Courier:** Adjusting the bag fit and route preferences so the courier delivers to the right address every time.
 
 ---
 
@@ -168,14 +168,14 @@ discovery target.
 
 With the metrics above, you can build panels for:
 
-| Panel | PromQL query | What it shows | 🫏 Donkey |
+| Panel | PromQL query | What it shows | 🚚 Courier |
 | --- | --- | --- | --- |
-| Request rate | `rate(rag_chat_requests_total[5m])` | Requests per second | Tachograph counter — how many deliveries the donkey completed |
-| Error rate | `rate(rag_chat_errors_total[5m]) / rate(rag_chat_requests_total[5m])` | Percentage of errors | Tachograph counter — how many deliveries the donkey completed |
-| Latency (p95) | `rag_chat_latency_p95_ms` | Response time for slow requests | Tachograph reading — how long the donkey took on the round trip |
-| Pass rate | `rag_query_pass_rate` | AI quality over time | Donkey's report card — share of test deliveries that scored above the bar |
-| Token burn | `rate(rag_tokens_output_total[1h])` | Output tokens per hour (cost proxy) | Hay-burn rate per hour — output tokens the donkey is consuming, a live cost-per-trip proxy on the dashboard. |
-| Failure breakdown | `rag_failures_bad_retrieval` / `rag_failures_hallucination` | Which failure types dominate | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
+| Request rate | `rate(rag_chat_requests_total[5m])` | Requests per second | Tachograph counter — how many deliveries the courier completed |
+| Error rate | `rate(rag_chat_errors_total[5m]) / rate(rag_chat_requests_total[5m])` | Percentage of errors | Tachograph counter — how many deliveries the courier completed |
+| Latency (p95) | `rag_chat_latency_p95_ms` | Response time for slow requests | Tachograph reading — how long the courier took on the round trip |
+| Pass rate | `rag_query_pass_rate` | AI quality over time | Courier's report card — share of test deliveries that scored above the bar |
+| Token burn | `rate(rag_tokens_output_total[1h])` | Output tokens per hour (cost proxy) | fuel-burn rate per hour — output tokens the courier is consuming, a live cost-per-trip proxy on the dashboard. |
+| Failure breakdown | `rag_failures_bad_retrieval` / `rag_failures_hallucination` | Which failure types dominate | Courier grabs the nearest parcels from the GPS warehouse before writing the answer |
 
 ### Alert rules
 
@@ -200,7 +200,7 @@ groups:
           summary: "Chat p95 latency exceeds 5 seconds"
 ```
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -223,7 +223,7 @@ groups:
 - [ ] How would you add a histogram for latency distribution?
 - [ ] How would you add custom labels (e.g., per-document-type metrics)?
 
-- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.
+- 🚚 **Courier:** A quick quiz for the trainee dispatch clerk — answer these to confirm the key courier delivery concepts have landed.
 
 ---
 
@@ -233,4 +233,4 @@ groups:
 - **Reference:** [API Routes Overview](../api-routes-explained.md) — how all routes fit together
 - **Hands-on:** [Phase 5 Labs](../../hands-on-labs/hands-on-labs-phase-5.md) — Lab 15 exercises this endpoint
 
-- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.
+- 🚚 **Courier:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

@@ -83,3 +83,10 @@ docs/               # Comprehensive documentation (architecture, AI engineering,
 - When adding a new provider, follow the existing strategy pattern
 - Always add/update tests when changing functionality
 - Use `httpx.AsyncClient` for async HTTP in tests
+
+## Analogy vocabulary
+- Use the **courier / parcel-delivery** analogy for AI/LLM concepts when an analogy aids clarity.
+- LLM = courier; tokens = fuel or parcel weight; prompt = shipping manifest; context = parcels;
+  cache = pickup locker; rate limit = daily dispatch quota; output tokens cost 5× input = express delivery costs 5× standard.
+- **Never** use donkey, pigeon, pigeon-hole, stable, hay, bales, backpack, or "delivery note" vocabulary.
+- Prefer plain English over forced analogies — clarity beats cleverness.

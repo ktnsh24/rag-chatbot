@@ -147,10 +147,10 @@ response = self._runtime_client.converse(
 
 ### AWS API actions used
 
-| boto3 method | AWS API action | When it happens | IAM permission | 🫏 Donkey |
+| boto3 method | AWS API action | When it happens | IAM permission | 🚚 Courier |
 | --- | --- | --- | --- | --- |
-| `converse()` | `bedrock-runtime:Converse` | Every chat query | `bedrock:InvokeModel` | The donkey rings AWS's stable phone via Converse for every chat trip |
-| `invoke_model()` | `bedrock-runtime:InvokeModel` | Every embedding request | `bedrock:InvokeModel` | The donkey rings AWS's stable phone via InvokeModel to convert text into GPS coordinates |
+| `converse()` | `bedrock-runtime:Converse` | Every chat query | `bedrock:InvokeModel` | The courier rings AWS's depot phone via Converse for every chat trip |
+| `invoke_model()` | `bedrock-runtime:InvokeModel` | Every embedding request | `bedrock:InvokeModel` | The courier rings AWS's depot phone via InvokeModel to convert text into GPS coordinates |
 
 ### How the Converse API differs from InvokeModel
 
@@ -164,7 +164,7 @@ Bedrock has two APIs:
 We use `Converse` for chat (universal format) and `InvokeModel` for embeddings
 (because Converse doesn't support embedding models yet).
 
-- 🫏 **Donkey:** The donkey itself — it carries the question in, consults the backpack, and writes the answer on the way back.
+- 🚚 **Courier:** The courier itself — it carries the question in, consults the parcel, and writes the answer on the way back.
 
 ---
 
@@ -239,13 +239,13 @@ a complex combination of many linguistic features.
 - But also: more storage space, slower similarity calculation
 - 1024 is a good balance between quality and efficiency
 
-| Model | Dimensions | Quality | Speed | Storage per chunk | 🫏 Donkey |
+| Model | Dimensions | Quality | Speed | Storage per chunk | 🚚 Courier |
 | --- | --- | --- | --- | --- | --- |
 | Titan Embeddings v2 | 1024 | Good | Fast | 4 KB | Bedrock's Titan v2 turns text into 1024-dimensional GPS coordinates that fit in 4 KB of warehouse shelf. |
 | OpenAI text-embedding-3-small | 1536 | Better | Fast | 6 KB | Slightly richer GPS coordinates (1536 dims) at modest extra storage per chunk |
 | OpenAI text-embedding-3-large | 3072 | Best | Slower | 12 KB | Highest-fidelity GPS coordinates (3072 dims) but slower to compute and triple the storage |
 
-- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
+- 🚚 **Courier:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -397,13 +397,13 @@ response = self._client.search(index=self.index_name, body=body)
 
 ### OpenSearch API actions used in this project
 
-| Python method | OpenSearch action | When it happens | 🫏 Donkey |
+| Python method | OpenSearch action | When it happens | 🚚 Courier |
 | --- | --- | --- | --- |
-| `client.indices.create()` | `PUT /index-name` | Once, at startup (creates the index) | Donkey-side view of client.indices.create() — affects how the donkey loads, reads, or delivers the cargo |
-| `client.index()` | `PUT /index-name/_doc/id` | For each chunk during document ingestion | Files each new backpack pocket into the OpenSearch GPS warehouse during document ingestion. |
+| `client.indices.create()` | `PUT /index-name` | Once, at startup (creates the index) | Courier-side view of client.indices.create() — affects how the courier loads, reads, or delivers the parcels |
+| `client.index()` | `PUT /index-name/_doc/id` | For each chunk during document ingestion | Files each new parcel pocket into the OpenSearch GPS warehouse during document ingestion. |
 | `client.indices.refresh()` | `POST /index-name/_refresh` | After ingestion (makes new docs searchable) | Post office pre-sort — client.indices.refresh(): POST /index-name/_refresh · After ingestion (makes new docs searchable) |
 | `client.search()` | `POST /index-name/_search` | Every chat query (vector similarity search) | Every chat query asks the OpenSearch GPS warehouse for the nearest vector neighbours. |
-| `client.delete_by_query()` | `POST /index-name/_delete_by_query` | When deleting a document | Donkey-side view of client.delete_by_query() — affects how the donkey loads, reads, or delivers the cargo |
+| `client.delete_by_query()` | `POST /index-name/_delete_by_query` | When deleting a document | Courier-side view of client.delete_by_query() — affects how the courier loads, reads, or delivers the parcels |
 
 ### How authentication works
 
@@ -420,7 +420,7 @@ auth = AWSV4SignerAuth(credentials, region, "aoss")  # "aoss" = OpenSearch Serve
 # No API keys needed — uses your IAM role
 ```
 
-- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
+- 🚚 **Courier:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -492,15 +492,15 @@ response = await self._client.chat.completions.create(
 
 ### Bedrock vs Azure OpenAI — side by side
 
-| Aspect | Bedrock (our AWS code) | Azure OpenAI (our Azure code) | 🫏 Donkey |
+| Aspect | Bedrock (our AWS code) | Azure OpenAI (our Azure code) | 🚚 Courier |
 | --- | --- | --- | --- |
-| Python SDK | `boto3` | `openai` (same as OpenAI's SDK!) | Different stable-manager toolkits the donkey uses to call each cloud's stables |
+| Python SDK | `boto3` | `openai` (same as OpenAI's SDK!) | Different depot-manager toolkits the courier uses to call each cloud's stables |
 | Auth | IAM SigV4 (automatic) | API key or Managed Identity | Door the customer knocks on — Auth: IAM SigV4 (automatic) · API key or Managed Identity |
-| API style | `converse()` — universal format | `chat.completions.create()` — OpenAI format | Converse uses one universal cargo manifest; OpenAI uses its own format for every call |
-| Async | ❌ boto3 is sync | ✅ `AsyncAzureOpenAI` | Azure's SDK lets the donkey trot many deliveries concurrently; boto3 makes it wait between trips |
-| Models | Claude, Llama, Titan, Mistral | GPT-4, GPT-4o, GPT-3.5 | Bedrock stables many donkey breeds; Azure stables the GPT family exclusively |
-| Embedding call | `invoke_model()` — separate API | `embeddings.create()` — same SDK | Stable's front door — Embedding call: invoke_model() — separate API · embeddings.create() — same SDK |
-| Streaming | `converse_stream()` | `stream=True` parameter | Donkey-side view of Streaming — affects how the donkey loads, reads, or delivers the cargo |
+| API style | `converse()` — universal format | `chat.completions.create()` — OpenAI format | Converse uses one universal shipping manifest; OpenAI uses its own format for every call |
+| Async | ❌ boto3 is sync | ✅ `AsyncAzureOpenAI` | Azure's SDK lets the courier trot many deliveries concurrently; boto3 makes it wait between trips |
+| Models | Claude, Llama, Titan, Mistral | GPT-4, GPT-4o, GPT-3.5 | Bedrock stables many courier breeds; Azure stables the GPT family exclusively |
+| Embedding call | `invoke_model()` — separate API | `embeddings.create()` — same SDK | Depot's front door — Embedding call: invoke_model() — separate API · embeddings.create() — same SDK |
+| Streaming | `converse_stream()` | `stream=True` parameter | Courier-side view of Streaming — affects how the courier loads, reads, or delivers the parcels |
 
 ### Embedding with Azure OpenAI
 
@@ -518,7 +518,7 @@ embedding = response.data[0].embedding  # → list of 1536 floats
 Note: Azure OpenAI embeddings have **1536 dimensions** vs Titan's **1024**.
 This means they're slightly more expressive but take more storage space.
 
-- 🫏 **Donkey:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for donkeys on the Azure route.
+- 🚚 **Courier:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for couriers on the Azure route.
 
 ---
 
@@ -586,17 +586,17 @@ for result in results:
 
 ### OpenSearch vs Azure AI Search — side by side
 
-| Aspect | OpenSearch Serverless | Azure AI Search | 🫏 Donkey |
+| Aspect | OpenSearch Serverless | Azure AI Search | 🚚 Courier |
 | --- | --- | --- | --- |
 | Vector algorithm | HNSW (open-source) | Proprietary (HNSW-based) | Both warehouses use HNSW stadium signs — OpenSearch open-source, Azure AI Search proprietary HNSW-based. |
 | Dimensions | 1024 (Titan) | 1536 (OpenAI) | Titan writes 1024 GPS coordinates per text, Azure 1536 — the warehouse index must match |
-| Auth | AWS SigV4 | API key or Managed Identity | Where parcels are dropped at the stable — Auth: AWS SigV4 · API key or Managed Identity |
-| Min cost | ~$350/month ⚠️ | **Free tier available** ✅ | What the stable charges this month — Min cost: ~$350/month ⚠️ · Free tier available ✅ |
+| Auth | AWS SigV4 | API key or Managed Identity | Where parcels are dropped at the depot — Auth: AWS SigV4 · API key or Managed Identity |
+| Min cost | ~$350/month ⚠️ | **Free tier available** ✅ | What the depot charges this month — Min cost: ~$350/month ⚠️ · Free tier available ✅ |
 | Refresh needed? | Yes (`_refresh` after indexing) | No (immediate) | How quickly newly-sorted mail shows up on the warehouse shelves |
 | Python SDK | `opensearch-py` | `azure-search-documents` | AWS search hub — Python SDK: opensearch-py · azure-search-documents |
 | Query format | JSON body with `knn` | `VectorizedQuery` object | OpenSearch wants a JSON `knn` body; Azure hub wants a `VectorizedQuery` object — same warehouse lookup, different paperwork. |
 
-- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
+- 🚚 **Courier:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -682,13 +682,13 @@ This is why DynamoDB is called "single-digit millisecond latency"
 
 ### DynamoDB API actions used
 
-| Python method | DynamoDB API action | When it happens | 🫏 Donkey |
+| Python method | DynamoDB API action | When it happens | 🚚 Courier |
 | --- | --- | --- | --- |
-| `table.put_item()` | `PutItem` | Storing each message (user + assistant) | Donkey-side view of table.put_item() — affects how the donkey loads, reads, or delivers the cargo |
+| `table.put_item()` | `PutItem` | Storing each message (user + assistant) | Courier-side view of table.put_item() — affects how the courier loads, reads, or delivers the parcels |
 | `table.query()` | `Query` | Loading conversation history for context | Trip log entry — table.query(): Query · Loading conversation history for context |
-| `table.batch_writer()` | `BatchWriteItem` | Deleting all messages in a session | Stable diary records — table.batch_writer(): BatchWriteItem · Deleting all messages in a session |
+| `table.batch_writer()` | `BatchWriteItem` | Deleting all messages in a session | Depot logbook records — table.batch_writer(): BatchWriteItem · Deleting all messages in a session |
 
-- 🫏 **Donkey:** The mechanics of the stable — understanding how each piece fits so you can maintain and extend the system.
+- 🚚 **Courier:** The mechanics of the depot — understanding how each piece fits so you can maintain and extend the system.
 
 ---
 
@@ -699,13 +699,13 @@ This is why DynamoDB is called "single-digit millisecond latency"
 Cosmos DB and DynamoDB are very similar — both are partitioned NoSQL databases.
 The main difference is terminology and pricing:
 
-| Concept | DynamoDB | Cosmos DB | 🫏 Donkey |
+| Concept | DynamoDB | Cosmos DB | 🚚 Courier |
 | --- | --- | --- | --- |
-| Data unit | Item | Document | Donkey-side view of Data unit — affects how the donkey loads, reads, or delivers the cargo |
-| Primary key | Partition key + Sort key | Partition key + id | Address label on the depot shelf — tells the donkey exactly which row to grab |
-| Throughput | Read/Write Capacity Units | Request Units (RU) | Tachograph counter — how many deliveries the donkey completed |
-| Query language | Key conditions + filters | **SQL syntax** ✅ | The customer's question that goes on the delivery note |
-| Serverless mode | On-demand | Serverless | Donkey-side view of Serverless mode — affects how the donkey loads, reads, or delivers the cargo |
+| Data unit | Item | Document | Courier-side view of Data unit — affects how the courier loads, reads, or delivers the parcels |
+| Primary key | Partition key + Sort key | Partition key + id | Address label on the depot shelf — tells the courier exactly which row to grab |
+| Throughput | Read/Write Capacity Units | Request Units (RU) | Tachograph counter — how many deliveries the courier completed |
+| Query language | Key conditions + filters | **SQL syntax** ✅ | The customer's question that goes on the shipping manifest |
+| Serverless mode | On-demand | Serverless | Courier-side view of Serverless mode — affects how the courier loads, reads, or delivers the parcels |
 | Free tier | 25 GB + 25 RCU/WCU | 1000 RU/s + 25 GB | Complimentary feed allowance — Free tier: 25 GB + 25 RCU/WCU · 1000 RU/s + 25 GB |
 
 ### The big advantage: SQL queries
@@ -742,17 +742,17 @@ When you query WHERE c.session_id = 'abc-123':
 
 Every operation costs RUs:
 
-| Operation | Cost | 🫏 Donkey |
+| Operation | Cost | 🚚 Courier |
 | --- | --- | --- |
-| Read 1 document (1 KB) by id + partition key | 1 RU | Address label on the depot shelf — tells the donkey exactly which row to grab |
-| Write 1 document (1 KB) | 5 RU | Donkey-side view of Write 1 document (1 KB) — affects how the donkey loads, reads, or delivers the cargo |
-| Query returning 5 documents | ~5-10 RU | The customer's question that goes on the delivery note |
-| Cross-partition query | 10-100+ RU ⚠️ | The customer's question that goes on the delivery note |
+| Read 1 document (1 KB) by id + partition key | 1 RU | Address label on the depot shelf — tells the courier exactly which row to grab |
+| Write 1 document (1 KB) | 5 RU | Courier-side view of Write 1 document (1 KB) — affects how the courier loads, reads, or delivers the parcels |
+| Query returning 5 documents | ~5-10 RU | The customer's question that goes on the shipping manifest |
+| Cross-partition query | 10-100+ RU ⚠️ | The customer's question that goes on the shipping manifest |
 
 In serverless mode: $0.25 per million RU. For our conversation history,
 each chat exchange costs ~11 RU (5 RU write user + 5 RU write assistant + 1 RU read).
 
-- 🫏 **Donkey:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for donkeys on the Azure route.
+- 🚚 **Courier:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for couriers on the Azure route.
 
 ---
 
@@ -818,18 +818,18 @@ TOTAL COST: ~$0.004 (less than half a cent per question)
 
 ### Service call summary
 
-| Step | Service | API action | Time | Cost | 🫏 Donkey |
+| Step | Service | API action | Time | Cost | 🚚 Courier |
 | --- | --- | --- | --- | --- | --- |
-| ① Load history | DynamoDB / Cosmos DB | Query | ~5ms | ~$0.000001 | AWS-side stable yard — ① Load history: DynamoDB / Cosmos DB · Query · ~5ms · ~$0.000001 |
+| ① Load history | DynamoDB / Cosmos DB | Query | ~5ms | ~$0.000001 | AWS-side depot yard — ① Load history: DynamoDB / Cosmos DB · Query · ~5ms · ~$0.000001 |
 | ② Embed question | Bedrock Titan / Azure OpenAI | InvokeModel / embeddings.create | ~100ms | ~$0.000002 | Convert the customer's question into GPS coordinates so the warehouse can be searched |
 | ③ Vector search | OpenSearch / AI Search | k-NN search | ~50ms | ~$0.0001 | Amazon's index room — ③ Vector search: OpenSearch / AI Search · k-NN search · ~50ms · ~$0.0001 |
 | ④ Build prompt | (local, no service call) | — | ~1ms | $0 | Customer's written brief — ④ Build prompt: (local, no service call) · — · ~1ms · $0 |
-| ⑤ Generate answer | Bedrock Claude / Azure GPT-4o | Converse / chat.completions | ~2000ms | ~$0.004 | The donkey writes the final answer — slowest and most expensive step of the trip |
+| ⑤ Generate answer | Bedrock Claude / Azure GPT-4o | Converse / chat.completions | ~2000ms | ~$0.004 | The courier writes the final answer — slowest and most expensive step of the trip |
 | ⑥ Save history | DynamoDB / Cosmos DB | PutItem × 2 | ~5ms | ~$0.000003 | Amazon's loading dock — ⑥ Save history: DynamoDB / Cosmos DB · PutItem × 2 · ~5ms · ~$0.000003 |
-| **Total** | | | **~2.2s** | **~$0.004** | Cost of keeping the donkey fed — Total: ~2.2s · ~$0.004 |
+| **Total** | | | **~2.2s** | **~$0.004** | Cost of keeping the courier fed — Total: ~2.2s · ~$0.004 |
 
 > **Key insight:** The LLM generation (step ⑤) takes 90% of the time and 99% of
 > the cost. Everything else is nearly free and nearly instant. This is why
 > choosing the right LLM model matters so much — it's where your money goes.
 
-- 🫏 **Donkey:** The step-by-step route map showing every checkpoint the donkey passes from question intake to answer delivery.
+- 🚚 **Courier:** The step-by-step route map showing every checkpoint the courier passes from question intake to answer delivery.

@@ -77,7 +77,7 @@
 > Queries (I30 — failure debugging) ·
 > Metrics (I31 — Prometheus endpoint).
 
-- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the backpacks are loaded, and which route it takes to the customer.
+- 🚚 **Courier:** Like a depot floor plan showing where the courier enters, where the parcels are loaded, and which route it takes to the customer.
 
 ---
 
@@ -122,7 +122,7 @@ User asks: "What is the refund policy?"
 5. Return JSON response to client
 ```
 
-- 🫏 **Donkey:** The warehouse robot dispatched to find the right backpack shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+- 🚚 **Courier:** The warehouse robot dispatched to find the right parcel shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -161,7 +161,7 @@ User uploads: "refund-policy.pdf" (12 pages)
 3. Return: { document_id: "abc-123", chunk_count: 45, status: "ready" }
 ```
 
-- 🫏 **Donkey:** Post office pre-sorting: mail is split into backpack-sized chunks, stamped with GPS coordinates (embeddings), and shelved in the warehouse before the donkey ever arrives.
+- 🚚 **Courier:** Post office pre-sorting: mail is split into parcel-sized chunks, stamped with GPS coordinates (embeddings), and shelved in the warehouse before the courier ever arrives.
 
 ---
 
@@ -206,42 +206,42 @@ result = await rag_chain.query("What is the refund policy?")
 **Why this matters for your portfolio:**
 This demonstrates that you can design systems that aren't locked into one cloud provider — a key skill for enterprise architecture roles.
 
-- 🫏 **Donkey:** The modular gear room — each layer (LLM, vector store, storage) handles one job, so you can swap any piece out without touching the rest.
+- 🚚 **Courier:** The modular gear room — each layer (LLM, vector store, storage) handles one job, so you can swap any piece out without touching the rest.
 
 ---
 
 ## Project Layer Map
 
-| Layer | Directory | Responsibility | 🫏 Donkey |
+| Layer | Directory | Responsibility | 🚚 Courier |
 | --- | --- | --- | --- |
 | **API** | `src/api/` | HTTP interface (routes, models, middleware) | Door the customer knocks on — API: src/api/ · HTTP interface (routes, models, middleware) |
-| **Guardrails** | `src/api/middleware/` | Input/output safety, PII redaction, prompt injection defense | Note the donkey carries — Guardrails: src/api/middleware/ · Input/output safety, PII redaction, prompt injection defense |
+| **Guardrails** | `src/api/middleware/` | Input/output safety, PII redaction, prompt injection defense | Note the courier carries — Guardrails: src/api/middleware/ · Input/output safety, PII redaction, prompt injection defense |
 | **RAG** | `src/rag/` | RAG pipeline (chain, ingestion, prompts) | Instructions tucked in the pannier — RAG: src/rag/ · RAG pipeline (chain, ingestion, prompts) |
-| **LLM** | `src/llm/` | LLM abstraction + implementations | Where the donkey lives — swap stables (AWS / Azure / Ollama) without touching the rest of the code |
+| **LLM** | `src/llm/` | LLM abstraction + implementations | Where the courier lives — swap stables (AWS / Azure / Ollama) without touching the rest of the code |
 | **Vector Store** | `src/vectorstore/` | Vector DB abstraction + implementations | Abstraction over the GPS warehouse plus concrete implementations for ChromaDB, OpenSearch, and Azure AI Search. |
-| **Storage** | `src/storage/` | Document storage abstraction | Stable design — donkey doesn't care which warehouse brand it grabs from |
+| **Storage** | `src/storage/` | Document storage abstraction | Depot design — courier doesn't care which warehouse brand it grabs from |
 | **History** | `src/history/` | Conversation history abstraction | Trip log entry — History: src/history/ · Conversation history abstraction |
-| **Monitoring** | `src/monitoring/` | Metrics, query logging (JSONL), OpenTelemetry tracing | Tally board on the stable wall — Monitoring: src/monitoring/ · Metrics, query logging (JSONL), OpenTelemetry tracing |
-| **Config** | `src/config.py` | Pydantic Settings (env vars) | The stable's standing orders — Pydantic Settings read env vars once and tell every donkey which barn to work from. |
-| **Entry Point** | `src/main.py` | FastAPI app factory, lifespan | Where parcels are dropped at the stable — Entry Point: src/main.py · FastAPI app factory, lifespan |
-| **Infrastructure** | `infra/` | Terraform (AWS + Azure); Local needs no infra | Terraform stable blueprints for AWS and Azure; the local stable runs without any infra at all. |
-| **CI/CD** | `.github/workflows/` | GitHub Actions | The robot stable hand in `.github/workflows/` — runs tests, builds the crate, and ships the donkey on every push. |
-| **Tests** | `tests/` | Unit + integration tests | The donkey's report card — unit checks every harness, integration runs full deliveries before any customer sees them. |
-| **Docs** | `docs/` | You are here | Donkey-side view of Docs — affects how the donkey loads, reads, or delivers the cargo |
+| **Monitoring** | `src/monitoring/` | Metrics, query logging (JSONL), OpenTelemetry tracing | Tally board on the dispatch board — Monitoring: src/monitoring/ · Metrics, query logging (JSONL), OpenTelemetry tracing |
+| **Config** | `src/config.py` | Pydantic Settings (env vars) | The depot's shipping manifest — Pydantic Settings read env vars once and tell every courier which barn to work from. |
+| **Entry Point** | `src/main.py` | FastAPI app factory, lifespan | Where parcels are dropped at the depot — Entry Point: src/main.py · FastAPI app factory, lifespan |
+| **Infrastructure** | `infra/` | Terraform (AWS + Azure); Local needs no infra | Terraform depot blueprints for AWS and Azure; the local depot runs without any infra at all. |
+| **CI/CD** | `.github/workflows/` | GitHub Actions | The robot dispatch clerk in `.github/workflows/` — runs tests, builds the crate, and ships the courier on every push. |
+| **Tests** | `tests/` | Unit + integration tests | The courier's report card — unit checks every harness, integration runs full deliveries before any customer sees them. |
+| **Docs** | `docs/` | You are here | Courier-side view of Docs — affects how the courier loads, reads, or delivers the parcels |
 
-- 🫏 **Donkey:** The modular gear room — each layer (LLM, vector store, storage) handles one job, so you can swap any piece out without touching the rest.
+- 🚚 **Courier:** The modular gear room — each layer (LLM, vector store, storage) handles one job, so you can swap any piece out without touching the rest.
 
 ---
 
 ## Why this architecture?
 
-| Decision | Reason | 🫏 Donkey |
+| Decision | Reason | 🚚 Courier |
 | --- | --- | --- |
-| **Monolith (single FastAPI app)** | Simpler than microservices for a 1-person project. Can always split later. | Where parcels are dropped at the stable — Monolith (single FastAPI app): Simpler than microservices for a 1-person project. Can always split later. |
-| **Abstract interfaces** | Cloud-agnostic. Can add GCP, local, or mock implementations without changing core logic. | Same interface lets the donkey switch between local barn, AWS depot, Azure hub, or a mock without code changes. |
+| **Monolith (single FastAPI app)** | Simpler than microservices for a 1-person project. Can always split later. | Where parcels are dropped at the depot — Monolith (single FastAPI app): Simpler than microservices for a 1-person project. Can always split later. |
+| **Abstract interfaces** | Cloud-agnostic. Can add GCP, local, or mock implementations without changing core logic. | Same interface lets the courier switch between local barn, AWS depot, Azure hub, or a mock without code changes. |
 | **Factory pattern** | One env variable (`CLOUD_PROVIDER`) switches the entire backend — `aws`, `azure`, or `local`. | Amazon's loading dock — Factory pattern: One env variable (CLOUD_PROVIDER) switches the entire backend — aws, azure, or local. |
-| **Pydantic everywhere** | Type safety, validation, documentation — all from type hints. | Stable gate rule — Pydantic everywhere: Type safety, validation, documentation — all from type hints. |
+| **Pydantic everywhere** | Type safety, validation, documentation — all from type hints. | Depot gate rule — Pydantic everywhere: Type safety, validation, documentation — all from type hints. |
 | **Poetry** | Better dependency management than pip. Lock files prevent "works on my machine" issues. | Supply shed manifest — Poetry: Better dependency management than pip. Lock files prevent "works on my machine" issues. |
-| **FastAPI** | Async, fast, auto-generates API docs, native Pydantic support. | Entry gate to the stable — FastAPI: Async, fast, auto-generates API docs, native Pydantic support. |
+| **FastAPI** | Async, fast, auto-generates API docs, native Pydantic support. | Entry gate to the depot — FastAPI: Async, fast, auto-generates API docs, native Pydantic support. |
 
-- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the backpacks are loaded, and which route it takes to the customer.
+- 🚚 **Courier:** Like a depot floor plan showing where the courier enters, where the parcels are loaded, and which route it takes to the customer.

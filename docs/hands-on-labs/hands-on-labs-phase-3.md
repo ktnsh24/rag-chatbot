@@ -4,7 +4,7 @@
 
 ## Table of Contents
 
-- [🫏 The Donkey Analogy — Understanding Phase 3 Concepts](#-the-donkey-analogy--understanding-phase-3-concepts)
+- [🚚 The Courier Analogy — Understanding Phase 3 Concepts](#-the-courier-analogy--understanding-phase-3-concepts)
 - [Lab 6: Data Flywheel — "How does the system get smarter over time?"](#lab-6-data-flywheel--how-does-the-system-get-smarter-over-time)
   - [The data flywheel concept](#the-data-flywheel-concept)
   - [Experiment 6a — Find a question that gets a bad score](#experiment-6a--find-a-question-that-gets-a-bad-score)
@@ -26,26 +26,26 @@
 
 ---
 
-## 🫏 The Donkey Analogy — Understanding Phase 3 Concepts
+## 🚚 The Courier Analogy — Understanding Phase 3 Concepts
 
-Phase 1 measured the donkey. Phase 2 asked if it's useful and safe. Phase 3 is about
-**making the donkey get better over time** — and preparing for when the whole
+Phase 1 measured the courier. Phase 2 asked if it's useful and safe. Phase 3 is about
+**making the courier get better over time** — and preparing for when the whole
 village starts using it.
 
-| Concept | Donkey version | What it really means | How it's calculated | 🫏 Donkey |
+| Concept | Courier version | What it really means | How it's calculated | 🚚 Courier |
 | --- | --- | --- | --- | --- |
-| **data flywheel** | A customer asks for "remote work policy" but the donkey has no such package on the shelf. It delivers the wrong thing. You **notice the failure**, go buy the right package, put it on the shelf, and next time the donkey delivers it perfectly. Each fix makes the system smarter. Repeat forever. | Detect bad answer → diagnose root cause → fix (add document, tune prompt) → verify with evaluation → lock with golden dataset → repeat. | Not a formula — it's a process loop. Detect (overall < 0.70) → diagnose (which sub-score failed?) → fix (add doc, tune prompt, adjust top_k) → evaluate (re-run same query) → lock (add to golden dataset). Each cycle = one flywheel turn. | Delivery note pinned to the saddle — data flywheel: A customer asks for "remote work policy" but the donkey has no such package on the |
-| **before/after scores** | Before you added the remote work policy package: overall = 0.46 (❌ FAIL). After adding it: overall = 0.87 (✅ PASS). That delta IS the flywheel turning. If the score didn't improve — your fix didn't work. | Run the same evaluation before and after a change. The score delta proves your fix worked (or didn't). | `delta = score_after - score_before`. Positive = improvement. E.g. before: overall=0.46, after: overall=0.87 → **delta = +0.41**. Run the exact same question with the exact same evaluator to get a fair comparison. | Two report cards side by side — yesterday's score versus today's, proving the donkey's fix actually moved the needle |
-| **golden dataset** | A **checklist of test deliveries** you run every morning. "Deliver refund policy — did it arrive? ✅. Deliver remote work policy — did it arrive? ✅." If tomorrow a delivery fails that passed yesterday — something broke overnight. | A curated set of question/expected-answer pairs that you run as regression tests. Like `dbt test` for your AI system. | `pass_count / total_cases × 100`. Run all golden questions through the pipeline, evaluate each. E.g. 18 of 20 pass → **90% pass rate**. If a case that passed yesterday now fails → regression detected. | Cost of keeping the donkey fed — golden dataset: A checklist of test deliveries you run every morning. "Deliver refund policy — did it arrive? |
-| **RLHF (human feedback)** | After each delivery, the customer gives a **thumbs up 👍 or thumbs down 👎**. Over time, you learn: the donkey is great at refund questions but terrible at HR questions. You focus training on HR. | Reinforcement Learning from Human Feedback — collecting user ratings to identify weak spots and prioritise improvements. | `positive / (positive + negative) × 100` per category. E.g. refund questions: 45👍 / 50 total = **90%** satisfaction. HR questions: 3👍 / 20 total = **15%**. Focus improvement effort on lowest-rated categories. | Hay-and-oats invoice — RLHF (human feedback): After each delivery, the customer gives a thumbs up 👍 or thumbs down 👎. Over time, you learn:… |
-| **scaling** | One donkey serves 10 villagers. What about 10,000? You need: **more donkeys** (horizontal scaling), **faster routes** (caching), **a traffic cop** (load balancer), and **a warehouse manager** (queue system). This is where your DE skills shine — ECS, SQS, auto-scaling are the same patterns. | Horizontal scaling (ECS tasks), caching (reduce redundant LLM calls), load balancing, queue-based processing — all standard DE infrastructure. | Throughput = `successful_requests / time_seconds`. Capacity test: increase concurrent users until p95 latency exceeds SLA. E.g. 50 concurrent → p95=2s ✅. 200 concurrent → p95=12s ❌. Scale trigger found at ~100 concurrent. | Adding more donkeys, faster routes, and a traffic cop so one stable can serve thousands of villagers without collapsing |
+| **data flywheel** | A customer asks for "remote work policy" but the courier has no such package on the shelf. It delivers the wrong thing. You **notice the failure**, go buy the right package, put it on the shelf, and next time the courier delivers it perfectly. Each fix makes the system smarter. Repeat forever. | Detect bad answer → diagnose root cause → fix (add document, tune prompt) → verify with evaluation → lock with golden dataset → repeat. | Not a formula — it's a process loop. Detect (overall < 0.70) → diagnose (which sub-score failed?) → fix (add doc, tune prompt, adjust top_k) → evaluate (re-run same query) → lock (add to golden dataset). Each cycle = one flywheel turn. | Shipping manifest pinned to the saddle — data flywheel: A customer asks for "remote work policy" but the courier has no such package on the |
+| **before/after scores** | Before you added the remote work policy package: overall = 0.46 (❌ FAIL). After adding it: overall = 0.87 (✅ PASS). That delta IS the flywheel turning. If the score didn't improve — your fix didn't work. | Run the same evaluation before and after a change. The score delta proves your fix worked (or didn't). | `delta = score_after - score_before`. Positive = improvement. E.g. before: overall=0.46, after: overall=0.87 → **delta = +0.41**. Run the exact same question with the exact same evaluator to get a fair comparison. | Two report cards side by side — yesterday's score versus today's, proving the courier's fix actually moved the needle |
+| **golden dataset** | A **checklist of test deliveries** you run every morning. "Deliver refund policy — did it arrive? ✅. Deliver remote work policy — did it arrive? ✅." If tomorrow a delivery fails that passed yesterday — something broke overnight. | A curated set of question/expected-answer pairs that you run as regression tests. Like `dbt test` for your AI system. | `pass_count / total_cases × 100`. Run all golden questions through the pipeline, evaluate each. E.g. 18 of 20 pass → **90% pass rate**. If a case that passed yesterday now fails → regression detected. | Cost of keeping the courier fed — golden dataset: A checklist of test deliveries you run every morning. "Deliver refund policy — did it arrive? |
+| **RLHF (human feedback)** | After each delivery, the customer gives a **thumbs up 👍 or thumbs down 👎**. Over time, you learn: the courier is great at refund questions but terrible at HR questions. You focus training on HR. | Reinforcement Learning from Human Feedback — collecting user ratings to identify weak spots and prioritise improvements. | `positive / (positive + negative) × 100` per category. E.g. refund questions: 45👍 / 50 total = **90%** satisfaction. HR questions: 3👍 / 20 total = **15%**. Focus improvement effort on lowest-rated categories. | fuel-and-oats invoice — RLHF (human feedback): After each delivery, the customer gives a thumbs up 👍 or thumbs down 👎. Over time, you learn:… |
+| **scaling** | One courier serves 10 villagers. What about 10,000? You need: **more couriers** (horizontal scaling), **faster routes** (caching), **a traffic cop** (load balancer), and **a warehouse manager** (queue system). This is where your DE skills shine — ECS, SQS, auto-scaling are the same patterns. | Horizontal scaling (ECS tasks), caching (reduce redundant LLM calls), load balancing, queue-based processing — all standard DE infrastructure. | Throughput = `successful_requests / time_seconds`. Capacity test: increase concurrent users until p95 latency exceeds SLA. E.g. 50 concurrent → p95=2s ✅. 200 concurrent → p95=12s ❌. Scale trigger found at ~100 concurrent. | Adding more couriers, faster routes, and a traffic cop so one depot can serve thousands of villagers without collapsing |
 
 **The Phase 3 insight:** Building a chatbot is a weekend project. **Continuously
 improving** a chatbot — detect regression, fix it, lock the fix, scale it — that's
-what makes you an AI engineer. The donkey doesn't get smarter on its own. You turn
+what makes you an AI engineer. The courier doesn't get smarter on its own. You turn
 the flywheel.
 
-- 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
+- 🚚 **Courier:** A practice delivery run — the courier completes a structured exercise to build muscle memory before real production routes.
 
 ---
 
@@ -86,12 +86,12 @@ In **Swagger UI** → `POST /api/evaluate`, enter:
 
 📝 **Record the failing scores:**
 
-| Score | Value | 🫏 Donkey |
+| Score | Value | 🚚 Courier |
 |---|---| --- |
-| retrieval | ___ | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
-| faithfulness | ___ | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
-| overall | ___ | Donkey-side view of overall — affects how the donkey loads, reads, or delivers the cargo |
-| passed | ___ | Donkey's report card — share of test deliveries that scored above the bar |
+| retrieval | ___ | Courier grabs the nearest parcels from the GPS warehouse before writing the answer |
+| faithfulness | ___ | Did the courier stick to the parcels it was carrying, or invent stuff on the way? |
+| overall | ___ | Courier-side view of overall — affects how the courier loads, reads, or delivers the parcels |
+| passed | ___ | Courier's report card — share of test deliveries that scored above the bar |
 
 > **What to expect (local):** retrieval 0.40–0.60 (found something but not about remote work), faithfulness near 0.0 (answer not grounded), overall below 0.5 (FAIL). This is the correct failure — the document doesn't exist yet.
 
@@ -143,12 +143,12 @@ In **Swagger UI** → `POST /api/evaluate`, enter the same question again:
 
 📝 **Compare before and after:**
 
-| Score | Before (6a) | After (6c) | Improved? | 🫏 Donkey |
+| Score | Before (6a) | After (6c) | Improved? | 🚚 Courier |
 |---|---|---|---| --- |
-| retrieval | ___ | ___ | ___ | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
-| faithfulness | ___ | ___ | ___ | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
-| overall | ___ | ___ | ___ | Donkey-side view of overall — affects how the donkey loads, reads, or delivers the cargo |
-| passed | ___ | ___ | ___ | Donkey's report card — share of test deliveries that scored above the bar |
+| retrieval | ___ | ___ | ___ | Courier grabs the nearest parcels from the GPS warehouse before writing the answer |
+| faithfulness | ___ | ___ | ___ | Did the courier stick to the parcels it was carrying, or invent stuff on the way? |
+| overall | ___ | ___ | ___ | Courier-side view of overall — affects how the courier loads, reads, or delivers the parcels |
+| passed | ___ | ___ | ___ | Courier's report card — share of test deliveries that scored above the bar |
 
 > **What to expect (local):** retrieval should improve modestly, faithfulness should jump dramatically (from near 0 to near 1.0), overall should go from FAIL to PASS. The biggest change is faithfulness — the LLM now has real source material to cite.
 
@@ -284,7 +284,7 @@ The data flywheel is a continuous improvement loop:
 > categories (policy, logistics, contact, product, multi_turn, edge_case, pii) — see
 > [Phase 5 Labs](hands-on-labs-phase-5.md) → Lab 16 for the full regression testing workflow.---
 
-- 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
+- 🚚 **Courier:** A practice delivery run — the courier completes a structured exercise to build muscle memory before real production routes.
 
 ## Lab 7: Reinforcement from Human Feedback (Conceptual)
 
@@ -370,11 +370,11 @@ Your design: ___
 
 The feedback system is the **automated version** of what you did manually in Lab 6:
 
-| Lab 6 (manual) | Production (automated) | 🫏 Donkey |
+| Lab 6 (manual) | Production (automated) | 🚚 Courier |
 |---|---| --- |
-| You noticed a question failed | Monitoring alerts on low scores | Tally board on the stable wall — You noticed a question failed: Monitoring alerts on low scores |
-| You uploaded a missing document | Content team adds documents | The actual cargo text inside the backpack the donkey is carrying |
-| You re-evaluated | CI/CD re-runs evaluation suite | The robot stable hand re-runs the donkey's report card automatically after every change |
+| You noticed a question failed | Monitoring alerts on low scores | Tally board on the dispatch board — You noticed a question failed: Monitoring alerts on low scores |
+| You uploaded a missing document | Content team adds documents | The actual parcels text inside the parcel the courier is carrying |
+| You re-evaluated | CI/CD re-runs evaluation suite | The robot dispatch clerk re-runs the courier's report card automatically after every change |
 | You added to golden dataset | Script auto-adds 👎 cases to golden dataset | Sandbox delivery — You added to golden dataset: Script auto-adds 👎 cases to golden dataset |
 
 The human feedback replaces your manual observation. The flywheel spins automatically.
@@ -402,7 +402,7 @@ This is what companies mean by "reinforcement learning loops" for RAG systems. Y
 > (retrieval problem? hallucination? content gap?) → fix the system (add docs, tune prompts,
 > adjust chunking). No model retraining needed. This is the RAG advantage over fine-tuning.
 
-- 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
+- 🚚 **Courier:** A practice delivery run — the courier completes a structured exercise to build muscle memory before real production routes.
 
 ---
 
@@ -424,28 +424,28 @@ This is what companies mean by "reinforcement learning loops" for RAG systems. Y
 
 📝 **Fill in the "Your DE skill" column from your own experience:**
 
-| Scaling challenge | AI system need | Your DE skill that solves it | 🫏 Donkey |
+| Scaling challenge | AI system need | Your DE skill that solves it | 🚚 Courier |
 |---|---|---| --- |
-| 1000 concurrent users | Horizontal scaling | ___ | How the stable adds or removes donkeys when delivery volume changes |
-| LLM calls are slow (2-5s) | Async processing | ___ | When the donkey is slow to write, hand the order to a queue and let workers pick it up |
-| Repeated questions | Caching | ___ | Donkey-side view of Repeated questions — affects how the donkey loads, reads, or delivers the cargo |
-| Embedding 10,000 docs | Batch processing | ___ | Pre-sorting 10,000 parcels into GPS-stamped backpacks in one batched run, not one at a time |
-| Vector store overload | Read replicas | ___ | Spin up extra warehouse copies so simultaneous donkeys can browse shelves without bumping into each other |
-| Cost explosion | Rate limiting | ___ | Without a turnstile every customer queues a donkey at once — rate limiting is the gate that stops the hay bill exploding. |
-| Multi-region | Low latency globally | ___ | Tachograph reading — how long the donkey took on the round trip |
+| 1000 concurrent users | Horizontal scaling | ___ | How the depot adds or removes couriers when delivery volume changes |
+| LLM calls are slow (2-5s) | Async processing | ___ | When the courier is slow to write, hand the order to a queue and let workers pick it up |
+| Repeated questions | Caching | ___ | Courier-side view of Repeated questions — affects how the courier loads, reads, or delivers the parcels |
+| Embedding 10,000 docs | Batch processing | ___ | Pre-sorting 10,000 parcels into GPS-stamped parcels in one batched run, not one at a time |
+| Vector store overload | Read replicas | ___ | Spin up extra warehouse copies so simultaneous couriers can browse shelves without bumping into each other |
+| Cost explosion | Rate limiting | ___ | Without a turnstile every customer queues a courier at once — rate limiting is the gate that stops the fuel bill exploding. |
+| Multi-region | Low latency globally | ___ | Tachograph reading — how long the courier took on the round trip |
 
 <details>
 <summary>Click to reveal the mapping</summary>
 
-| Scaling challenge | AI system need | Your DE skill that solves it | 🫏 Donkey |
+| Scaling challenge | AI system need | Your DE skill that solves it | 🚚 Courier |
 |---|---|---| --- |
-| 1000 concurrent users | Horizontal scaling | ECS auto-scaling (you configure this daily) | Always-on donkey stall — container that keeps the stable up 24/7 |
-| LLM calls are slow (2-5s) | Async processing | SQS queues + Lambda workers (you built this in proxy) | Orders queued at the stable so multiple donkeys can write answers in parallel instead of villagers waiting in line |
+| 1000 concurrent users | Horizontal scaling | ECS auto-scaling (you configure this daily) | Always-on courier stall — container that keeps the depot up 24/7 |
+| LLM calls are slow (2-5s) | Async processing | SQS queues + Lambda workers (you built this in proxy) | Orders queued at the depot so multiple couriers can write answers in parallel instead of villagers waiting in line |
 | Repeated questions | Caching | DynamoDB/ElastiCache — cache answer by question hash | Amazon's loading dock — Repeated questions: Caching · DynamoDB/ElastiCache — cache answer by question hash |
 | Embedding 10,000 docs | Batch processing | Kinesis/SQS batching (you built Kinesis in proxy) | Stream batches of parcels through the pre-sorting line so the GPS-stamping happens in bulk, not one-by-one |
 | Vector store overload | Read replicas | OpenSearch replicas (same as RDS read replicas) | OpenSearch sorting office — Vector store overload: Read replicas · OpenSearch replicas (same as RDS read replicas) |
-| Cost explosion | Rate limiting | API Gateway throttling (you configured this) | Stable's monthly feed bill — Cost explosion: Rate limiting · API Gateway throttling (you configured this) |
-| Multi-region | Low latency globally | CloudFront + regional deployments (standard infra) | Stables in every region so the nearest donkey takes the trip — CloudFront points each customer at the closest barn. |
+| Cost explosion | Rate limiting | API Gateway throttling (you configured this) | Depot's monthly feed bill — Cost explosion: Rate limiting · API Gateway throttling (you configured this) |
+| Multi-region | Low latency globally | CloudFront + regional deployments (standard infra) | Stables in every region so the nearest courier takes the trip — CloudFront points each customer at the closest barn. |
 
 </details>
 
@@ -517,7 +517,7 @@ Everything else — ECS, SQS, DynamoDB, API Gateway, CloudWatch, Terraform — y
 > the database. S3 Vectors doesn't support filterable metadata. Neptune is for graph data, not
 > vector search.
 
-- 🫏 **Donkey:** Blueprints for building the stable — run one command and the whole building appears, fences and all.
+- 🚚 **Courier:** Blueprints for building the depot — run one command and the whole building appears, fences and all.
 
 ---
 
@@ -525,53 +525,53 @@ Everything else — ECS, SQS, DynamoDB, API Gateway, CloudWatch, Terraform — y
 
 After completing Labs 6, 7, and 8, check off:
 
-| # | Skill | Lab | Can you explain it? | 🫏 Donkey |
+| # | Skill | Lab | Can you explain it? | 🚚 Courier |
 |---|---|---|---| --- |
-| 1 | Data flywheel (detect → fix → evaluate → lock → repeat) | Lab 6 | [ ] Yes | Each report card cycle teaches the stable which deliveries failed and locks in the fix |
+| 1 | Data flywheel (detect → fix → evaluate → lock → repeat) | Lab 6 | [ ] Yes | Each report card cycle teaches the depot which deliveries failed and locks in the fix |
 | 2 | Golden dataset growth from real usage | Lab 6 | [ ] Yes | Sandbox delivery — 2: Golden dataset growth from real usage · Lab 6 · [ ] Yes |
-| 3 | RLHF in RAG context (user feedback loops) | Lab 7 | [ ] Yes | Fuel-and-feed bill for keeping the donkey and stable running |
-| 4 | Feedback system design | Lab 7 | [ ] Yes | Hay-and-oats invoice — 4: Feedback system design · Lab 7 · [ ] Yes |
-| 5 | Connection between feedback and data flywheel | Lab 7 | [ ] Yes | Cost of keeping the donkey fed — 5: Connection between feedback and data flywheel · Lab 7 · [ ] Yes |
-| 6 | Infrastructure scaling for AI (your DE superpower) | Lab 8 | [ ] Yes | Skill: drawing the stable blueprints — autoscaling, queues, replicas — that let one donkey grow into a fleet |
-| 7 | AI-specific scaling concerns (embeddings, tokens, async LLM) | Lab 8 | [ ] Yes | New stable worries — GPS-stamping cargo, hay budgets, and queueing slow donkey writes |
+| 3 | RLHF in RAG context (user feedback loops) | Lab 7 | [ ] Yes | Fuel-and-feed bill for keeping the courier and depot running |
+| 4 | Feedback system design | Lab 7 | [ ] Yes | fuel-and-oats invoice — 4: Feedback system design · Lab 7 · [ ] Yes |
+| 5 | Connection between feedback and data flywheel | Lab 7 | [ ] Yes | Cost of keeping the courier fed — 5: Connection between feedback and data flywheel · Lab 7 · [ ] Yes |
+| 6 | Infrastructure scaling for AI (your DE superpower) | Lab 8 | [ ] Yes | Skill: drawing the depot blueprints — autoscaling, queues, replicas — that let one courier grow into a fleet |
+| 7 | AI-specific scaling concerns (embeddings, tokens, async LLM) | Lab 8 | [ ] Yes | New depot worries — GPS-stamping parcels, fuel budgets, and queueing slow courier writes |
 
-- 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
+- 🚚 **Courier:** A practice delivery run — the courier completes a structured exercise to build muscle memory before real production routes.
 
 ---
 
 ## All Labs Complete — Full Skills Summary
 
-| # | Skill | Phase | Lab | 🫏 Donkey |
+| # | Skill | Phase | Lab | 🚚 Courier |
 |---|---|---|---| --- |
-| 1 | Retrieval quality measurement | Phase 1 | Lab 1 | Skill: judging whether the donkey grabbed the right backpacks for the customer's question |
-| 2 | Retrieval-faithfulness trade-off | Phase 1 | Lab 1 | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
-| 3 | top_k tuning and its impact | Phase 1 | Lab 1 | How many backpacks the donkey grabs from the warehouse for one delivery |
-| 4 | Hallucination detection | Phase 1 | Lab 2 | Skill: spotting when the donkey slipped extra items into the delivery that were never in any backpack |
-| 5 | Faithfulness scoring and weight | Phase 1 | Lab 2 | The biggest column on the report card — did the donkey use the backpack or invent things? |
-| 6 | Diagnosing retrieval vs generation problems | Phase 1 | Lab 2 | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
-| 7 | Business-aligned metrics | Phase 2 | Lab 3 | Stopwatch on the donkey's harness — 7: Business-aligned metrics · Phase 2 · Lab 3 |
-| 8 | Translating AI metrics to business language | Phase 2 | Lab 3 | Tally board on the stable wall — 8: Translating AI metrics to business language · Phase 2 · Lab 3 |
+| 1 | Retrieval quality measurement | Phase 1 | Lab 1 | Skill: judging whether the courier grabbed the right parcels for the customer's question |
+| 2 | Retrieval-faithfulness trade-off | Phase 1 | Lab 1 | Courier grabs the nearest parcels from the GPS warehouse before writing the answer |
+| 3 | top_k tuning and its impact | Phase 1 | Lab 1 | How many parcels the courier grabs from the warehouse for one delivery |
+| 4 | Hallucination detection | Phase 1 | Lab 2 | Skill: spotting when the courier slipped extra items into the delivery that were never in any parcel |
+| 5 | Faithfulness scoring and weight | Phase 1 | Lab 2 | The biggest column on the report card — did the courier use the parcel or invent things? |
+| 6 | Diagnosing retrieval vs generation problems | Phase 1 | Lab 2 | Courier grabs the nearest parcels from the GPS warehouse before writing the answer |
+| 7 | Business-aligned metrics | Phase 2 | Lab 3 | Stopwatch on the courier's harness — 7: Business-aligned metrics · Phase 2 · Lab 3 |
+| 8 | Translating AI metrics to business language | Phase 2 | Lab 3 | Tally board on the dispatch board — 8: Translating AI metrics to business language · Phase 2 · Lab 3 |
 | 9 | Guardrails design (4 layers) | Phase 2 | Lab 4 | Rule the gate guard enforces — 9: Guardrails design (4 layers) · Phase 2 · Lab 4 |
 | 10 | Prompt injection awareness | Phase 2 | Lab 4 | Instructions tucked in the pannier — 10: Prompt injection awareness · Phase 2 · Lab 4 |
-| 11 | AI observability | Phase 2 | Lab 5 | Practice run — readers play stable hand and put the donkey through its paces |
-| 12 | Dashboard and alert design for AI | Phase 2 | Lab 5 | Dashboard the stable owner watches — flags slow or failing donkey trips |
-| 13 | Data flywheel | Phase 3 | Lab 6 | Practice run — readers play stable hand and put the donkey through its paces |
+| 11 | AI observability | Phase 2 | Lab 5 | Practice run — readers play dispatch clerk and put the courier through its paces |
+| 12 | Dashboard and alert design for AI | Phase 2 | Lab 5 | Dashboard the depot owner watches — flags slow or failing courier trips |
+| 13 | Data flywheel | Phase 3 | Lab 6 | Practice run — readers play dispatch clerk and put the courier through its paces |
 | 14 | Golden dataset growth from real usage | Phase 3 | Lab 6 | Sandbox delivery — 14: Golden dataset growth from real usage · Phase 3 · Lab 6 |
-| 15 | RLHF in RAG context | Phase 3 | Lab 7 | Practice run — readers play stable hand and put the donkey through its paces |
-| 16 | Feedback system design | Phase 3 | Lab 7 | Donkey-hire fee — 16: Feedback system design · Phase 3 · Lab 7 |
-| 17 | Infrastructure scaling for AI | Phase 3 | Lab 8 | Skill: drawing the stable blueprints — autoscaling, queues, replicas — that let one donkey grow into a fleet |
-| 18 | AI-specific scaling concerns | Phase 3 | Lab 8 | How the stable adds or removes donkeys when delivery volume changes |
+| 15 | RLHF in RAG context | Phase 3 | Lab 7 | Practice run — readers play dispatch clerk and put the courier through its paces |
+| 16 | Feedback system design | Phase 3 | Lab 7 | Courier-hire fee — 16: Feedback system design · Phase 3 · Lab 7 |
+| 17 | Infrastructure scaling for AI | Phase 3 | Lab 8 | Skill: drawing the depot blueprints — autoscaling, queues, replicas — that let one courier grow into a fleet |
+| 18 | AI-specific scaling concerns | Phase 3 | Lab 8 | How the depot adds or removes couriers when delivery volume changes |
 
 **Additional skills not covered in the rag-chatbot but important to know about:**
 
-| # | Skill | What it is | Covered in future projects? | Where to learn it | 🫏 Donkey |
+| # | Skill | What it is | Covered in future projects? | Where to learn it | 🚚 Courier |
 | --- | --- | --- | --- | --- | --- |
-| 19 | **A/B testing for AI** | Deploy two prompt versions, measure which performs better | ✅ Yes — when deploying to AWS/Azure, you'll set up traffic splitting with API Gateway / Azure Front Door | Same as A/B testing in web — split traffic, compare metrics | Delivery note pinned to the saddle — 19: A/B testing for AI · Deploy two prompt versions, measure which performs better · ✅ Yes — |
-| 20 | **Model versioning** | Track which model version produced which answers | ✅ Yes — V2 of rag-chatbot will add MLflow integration for experiment tracking | MLflow, Weights & Biases, or simple git tags | Donkey-side view of 20 — affects how the donkey loads, reads, or delivers the cargo |
-| 21 | **Embedding drift detection** | New documents change the vector space — old embeddings may become stale | ✅ Partially — Lab 5's retrieval monitoring concept extends directly to drift alerts. Full implementation in V2 with scheduled re-evaluation | Monitor average retrieval scores over time (Lab 5 concept) | When new parcels arrive the GPS map shifts — old backpack coordinates go stale and the donkey starts missing the right shelf |
-| 22 | **Cost optimisation** | Prompt compression, caching, model routing (cheap model for easy questions, expensive for hard) | ✅ Yes — when deploying to AWS Bedrock or Azure OpenAI, cost tracking becomes real (see [Cost Estimation](hands-on-labs-phase-1.md#cost-estimation--local-vs-cloud)) | Extend `src/rag/chain.py` with model routing logic | Trimming the delivery note and sending easy orders to a cheaper donkey so the hay bill stays small |
-| 23 | **Multi-modal RAG** | Images, tables, PDFs with charts — not just text | ⬜ Future project — requires a separate repo with vision models (GPT-4o, Claude 3.5 Sonnet) | Not in current rag-chatbot scope | Teaching the donkey to also carry pictures, charts, and tables — not just plain text mail |
-| 24 | **Compliance & audit logging** | Log every AI decision for regulatory compliance | ✅ Partially — the logging middleware already captures request/response. Full audit trail (immutable, tamper-proof) is a V2 feature | Extend `src/api/middleware/` to log full request/response | Every donkey trip gets a stamped receipt in the trip-log — V1 records the journey, V2 will lock it tamper-proof for the auditor. |
+| 19 | **A/B testing for AI** | Deploy two prompt versions, measure which performs better | ✅ Yes — when deploying to AWS/Azure, you'll set up traffic splitting with API Gateway / Azure Front Door | Same as A/B testing in web — split traffic, compare metrics | Shipping manifest pinned to the saddle — 19: A/B testing for AI · Deploy two prompt versions, measure which performs better · ✅ Yes — |
+| 20 | **Model versioning** | Track which model version produced which answers | ✅ Yes — V2 of rag-chatbot will add MLflow integration for experiment tracking | MLflow, Weights & Biases, or simple git tags | Courier-side view of 20 — affects how the courier loads, reads, or delivers the parcels |
+| 21 | **Embedding drift detection** | New documents change the vector space — old embeddings may become stale | ✅ Partially — Lab 5's retrieval monitoring concept extends directly to drift alerts. Full implementation in V2 with scheduled re-evaluation | Monitor average retrieval scores over time (Lab 5 concept) | When new parcels arrive the GPS map shifts — old parcel coordinates go stale and the courier starts missing the right shelf |
+| 22 | **Cost optimisation** | Prompt compression, caching, model routing (cheap model for easy questions, expensive for hard) | ✅ Yes — when deploying to AWS Bedrock or Azure OpenAI, cost tracking becomes real (see [Cost Estimation](hands-on-labs-phase-1.md#cost-estimation--local-vs-cloud)) | Extend `src/rag/chain.py` with model routing logic | Trimming the shipping manifest and sending easy orders to a cheaper courier so the fuel bill stays small |
+| 23 | **Multi-modal RAG** | Images, tables, PDFs with charts — not just text | ⬜ Future project — requires a separate repo with vision models (GPT-4o, Claude 3.5 Sonnet) | Not in current rag-chatbot scope | Teaching the courier to also carry pictures, charts, and tables — not just plain text mail |
+| 24 | **Compliance & audit logging** | Log every AI decision for regulatory compliance | ✅ Partially — the logging middleware already captures request/response. Full audit trail (immutable, tamper-proof) is a V2 feature | Extend `src/api/middleware/` to log full request/response | Every courier trip gets a stamped receipt in the trip-log — V1 records the journey, V2 will lock it tamper-proof for the auditor. |
 
 > ### 📋 Skills Coverage Summary
 >
@@ -590,7 +590,7 @@ After completing Labs 6, 7, and 8, check off:
 > **Not yet covered:** Skill 23 (multi-modal RAG) requires a different architecture
 > and vision-capable models. This would be a separate project/repo.
 
-- 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
+- 🚚 **Courier:** A practice delivery run — the courier completes a structured exercise to build muscle memory before real production routes.
 
 ---
 

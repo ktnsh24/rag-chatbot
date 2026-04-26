@@ -33,14 +33,14 @@ The vector store is the **"database" of the RAG system**. But unlike a regular D
 
 > **Fun twist:** One of our implementations (`aws_dynamodb.py`) actually *uses* DynamoDB as a vector store by storing embeddings as JSON and computing cosine similarity in Python. It proves that any database can be a vector store — the difference is performance (brute-force vs HNSW indexing). See the [DynamoDB deep dive](vectorstore-providers-deep-dive.md#aws-dynamodb-the-cheap-alternative--0month-vector-store).
 
-| What you'll learn | DE parallel | 🫏 Donkey |
+| What you'll learn | DE parallel | 🚚 Courier |
 |---|---| --- |
-| How embeddings are stored | How rows are inserted into DynamoDB | AWS-side stable yard — How embeddings are stored: How rows are inserted into DynamoDB |
-| How semantic search works (conceptually) | How key-based or index-based lookups work | Donkey-side view of How semantic search works (conceptually) — affects how the donkey loads, reads, or delivers the cargo |
+| How embeddings are stored | How rows are inserted into DynamoDB | AWS-side depot yard — How embeddings are stored: How rows are inserted into DynamoDB |
+| How semantic search works (conceptually) | How key-based or index-based lookups work | Courier-side view of How semantic search works (conceptually) — affects how the courier loads, reads, or delivers the parcels |
 | What a similarity score means | What a query result set means | Compass bearing — What a similarity score means: What a query result set means |
-| How documents are managed (store + delete) | How records are managed (put + delete) | Donkey-side view of How documents are managed (store + delete) — affects how the donkey loads, reads, or delivers the cargo |
+| How documents are managed (store + delete) | How records are managed (put + delete) | Courier-side view of How documents are managed (store + delete) — affects how the courier loads, reads, or delivers the parcels |
 
-- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
+- 🚚 **Courier:** Think of this as the orientation briefing given to a new courier before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -63,7 +63,7 @@ The vector store is the **"database" of the RAG system**. But unlike a regular D
 
 The interface pattern is identical — ABC with abstract methods for CRUD operations. The *data* it stores and the *way* it searches are what's new.
 
-- 🫏 **Donkey:** Running multiple donkeys on the same route to confirm that AI engineering and data engineering practices mirror each other.
+- 🚚 **Courier:** Running multiple couriers on the same route to confirm that AI engineering and data engineering practices mirror each other.
 
 ---
 
@@ -82,13 +82,13 @@ class VectorSearchResult:
 
 ### What each field means
 
-| Field | What it is | DE parallel | 🫏 Donkey |
+| Field | What it is | DE parallel | 🚚 Courier |
 |---|---|---| --- |
-| `text` | The actual chunk text — what the LLM will read | The row data | The cargo inside the backpack — what the donkey actually reads to write its answer |
-| `document_name` | Source document (e.g., "refund-policy.pdf") | The table or source name | Stable keys — only authorised callers may ask the donkey to deliver |
-| `score` | How similar this chunk is to the query (0.0–1.0) | ❌ **No DE parallel** — this is new | GPS warehouse calculates score by measuring angle between question and backpack coordinates |
-| `page_number` | Where in the original document | Like a row number or partition | Which page of the original mail the backpack came from |
-| `metadata` | Anything extra (document_id, chunk_index) | Additional attributes | Extra labels on the backpack — document ID and chunk position for tracking |
+| `text` | The actual chunk text — what the LLM will read | The row data | The parcels inside the parcel — what the courier actually reads to write its answer |
+| `document_name` | Source document (e.g., "refund-policy.pdf") | The table or source name | Depot keys — only authorised callers may ask the courier to deliver |
+| `score` | How similar this chunk is to the query (0.0–1.0) | ❌ **No DE parallel** — this is new | GPS warehouse calculates score by measuring angle between question and parcel coordinates |
+| `page_number` | Where in the original document | Like a row number or partition | Which page of the original mail the parcel came from |
+| `metadata` | Anything extra (document_id, chunk_index) | Additional attributes | Extra labels on the parcel — document ID and chunk position for tracking |
 
 ### The `score` field — the new concept
 
@@ -103,16 +103,16 @@ Results:
   Chunk 3:  "We offer free shipping on all orders..."               score: 0.31  ← barely relevant
 ```
 
-| Score range | Meaning | Action | 🫏 Donkey |
+| Score range | Meaning | Action | 🚚 Courier |
 |---|---|---| --- |
-| 0.85–1.0 | Highly relevant — almost certainly the right chunk | Send to LLM ✅ | A near-perfect GPS match — load this backpack onto the donkey without hesitation |
-| 0.70–0.85 | Relevant — probably useful context | Send to LLM ✅ | A close-enough GPS match — pack this backpack too, the donkey can probably use it |
-| 0.50–0.70 | Marginal — might add noise | Consider filtering ⚠️ | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
-| 0.0–0.50 | Irrelevant — wastes tokens and confuses the LLM | Filter out ❌ | A wrong-shelf GPS hit — leave this backpack behind or the donkey will eat hay reading junk |
+| 0.85–1.0 | Highly relevant — almost certainly the right chunk | Send to LLM ✅ | A near-perfect GPS match — load this parcel onto the courier without hesitation |
+| 0.70–0.85 | Relevant — probably useful context | Send to LLM ✅ | A close-enough GPS match — pack this parcel too, the courier can probably use it |
+| 0.50–0.70 | Marginal — might add noise | Consider filtering ⚠️ | How confidently the warehouse says 'this parcel matches' — higher = closer GPS hit |
+| 0.0–0.50 | Irrelevant — wastes tokens and confuses the LLM | Filter out ❌ | A wrong-shelf GPS hit — leave this parcel behind or the courier will eat fuel reading junk |
 
 **Key insight:** Score thresholds are not universal — they depend on your data, your embedding model, and your use case. An AI engineer experiments with different thresholds and measures the impact using the [Evaluation Framework](evaluation-framework-deep-dive.md).
 
-- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
+- 🚚 **Courier:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -149,7 +149,7 @@ What's stored:                           What's stored:
 
 **Key insight:** The `texts` and `embeddings` lists are paired by index. `texts[0]` is the original text, `embeddings[0]` is its vector representation. Both are stored together so that when you search and find a matching vector, you can return the original text to the LLM.
 
-- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
+- 🚚 **Courier:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -201,13 +201,13 @@ search(query_embedding=[0.12, -0.45, 0.78, ...], top_k=2)
 
 **Trade-offs:**
 
-| top_k | Pros | Cons | 🫏 Donkey |
+| top_k | Pros | Cons | 🚚 Courier |
 |---|---|---| --- |
-| 3 | Less noise, cheaper (fewer tokens to LLM) | Might miss relevant context | Donkey carries only three backpacks — light load, less hay, but might leave the right one behind |
-| **5** | **Good balance (this repo's default)** | **Some noise possible** | Donkey-side view of 5 — affects how the donkey loads, reads, or delivers the cargo |
-| 10 | More context, less likely to miss relevant info | More tokens = more cost + noise | Ten backpacks is heavy — the donkey might find the right one but wastes hay reading extras |
+| 3 | Less noise, cheaper (fewer tokens to LLM) | Might miss relevant context | Courier carries only three parcels — light load, less fuel, but might leave the right one behind |
+| **5** | **Good balance (this repo's default)** | **Some noise possible** | Courier-side view of 5 — affects how the courier loads, reads, or delivers the parcels |
+| 10 | More context, less likely to miss relevant info | More tokens = more cost + noise | Ten parcels is heavy — the courier might find the right one but wastes fuel reading extras |
 
-- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
+- 🚚 **Courier:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -227,7 +227,7 @@ async def delete_document(self, document_id: str) -> int:
 
 Same pattern as deleting old records before re-loading in an ETL pipeline.
 
-- 🫏 **Donkey:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
+- 🚚 **Courier:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
 
 ---
 
@@ -258,7 +258,7 @@ if results[0].score < 0.5:
     return "I don't have relevant information about that"  # Low confidence
 ```
 
-- 🫏 **Donkey:** The warehouse robot dispatched to find the right backpack shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+- 🚚 **Courier:** The warehouse robot dispatched to find the right parcel shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -282,21 +282,21 @@ QUERY (every user question):                    │
                            Top K chunks → generate() → Answer
 ```
 
-- 🫏 **Donkey:** The donkey checks its backpack full of retrieved document chunks before answering — no guessing from memory.
+- 🚚 **Courier:** The courier checks its parcel full of retrieved document chunks before answering — no guessing from memory.
 
 ---
 
 ## Self-Test Questions
 
-| Question | Answer | Concept it tests | 🫏 Donkey |
+| Question | Answer | Concept it tests | 🚚 Courier |
 |---|---|---| --- |
-| "What does a score of 0.3 mean?" | The chunk is semantically far from the query — probably not relevant. It's like a SQL query returning a row that doesn't match your intent. | Similarity scores | Score 0.3 means the backpack's GPS is far from the question — probably the wrong shelf |
-| "Why does `search()` always return K results even when nothing is relevant?" | Vector search finds the K **nearest** vectors regardless. "Nearest" doesn't mean "relevant" — just closest in the vector space. | Semantic search vs exact match | Where parcels are dropped at the stable — "Why does search() always return K results even when nothing is relevant?": Vector search finds the K |
-| "Why store the original `text` alongside the `embedding`?" | Embeddings are one-way (can't reverse vector → text). You need the original text to send as context to the LLM. | Embedding properties | GPS coordinates can't be unstamped back into cargo, so the warehouse keeps the original text on every shelf |
-| "What happens if `texts` and `embeddings` have different lengths?" | Bug — they must be paired by index. text[i] matches embedding[i]. | Store contract | Every backpack text must have its matching GPS stamp — misaligned lists break the warehouse |
+| "What does a score of 0.3 mean?" | The chunk is semantically far from the query — probably not relevant. It's like a SQL query returning a row that doesn't match your intent. | Similarity scores | Score 0.3 means the parcel's GPS is far from the question — probably the wrong shelf |
+| "Why does `search()` always return K results even when nothing is relevant?" | Vector search finds the K **nearest** vectors regardless. "Nearest" doesn't mean "relevant" — just closest in the vector space. | Semantic search vs exact match | Where parcels are dropped at the depot — "Why does search() always return K results even when nothing is relevant?": Vector search finds the K |
+| "Why store the original `text` alongside the `embedding`?" | Embeddings are one-way (can't reverse vector → text). You need the original text to send as context to the LLM. | Embedding properties | GPS coordinates can't be unstamped back into parcels, so the warehouse keeps the original text on every shelf |
+| "What happens if `texts` and `embeddings` have different lengths?" | Bug — they must be paired by index. text[i] matches embedding[i]. | Store contract | Every parcel text must have its matching GPS stamp — misaligned lists break the warehouse |
 | "Why is `document_id` important?" | It lets you delete all vectors for a document when re-ingesting. Without it, you'd have orphaned old vectors. | Document management | Loading-bay pre-sort — "Why is document_id important?": It lets you delete all vectors for a document when re-ingesting. Without it, you'd have orphaned old vectors.… |
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -309,4 +309,4 @@ Now that you understand the **interface**, study the **implementations**:
 📖 **Related docs:**
 - [Deep Dive: Vector Store Providers (AWS OpenSearch + Azure AI Search + Local ChromaDB)](vectorstore-providers-deep-dive.md)
 
-- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.
+- 🚚 **Courier:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

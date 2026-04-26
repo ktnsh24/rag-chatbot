@@ -50,7 +50,7 @@ Server responds:
 or any microservice. Kubernetes/ECS uses this endpoint to decide whether to send
 traffic to this container or restart it.
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
@@ -93,7 +93,7 @@ JSON response sent to client
 **Notice:** There are NO AI calls here. No embeddings, no LLM, no vector search.
 This route just checks if the RAG chain object exists — it doesn't call it.
 
-- 🫏 **Donkey:** The step-by-step route map showing every checkpoint the donkey passes from question intake to answer delivery.
+- 🚚 **Courier:** The step-by-step route map showing every checkpoint the courier passes from question intake to answer delivery.
 
 ---
 
@@ -120,12 +120,12 @@ _start_time = datetime.now(timezone.utc)
 
 **What each line does:**
 
-| Line | Purpose | DE parallel | 🫏 Donkey |
+| Line | Purpose | DE parallel | 🚚 Courier |
 | --- | --- | --- | --- |
-| `from fastapi import APIRouter, Request` | Create a router, access the request object | Same as shared-proxy | Entry gate to the stable — from fastapi import APIRouter, Request: Create a router, access the request object · Same as shared-proxy |
-| `from src.api.models import ...` | Import Pydantic response models | Same as any FastAPI app | Entry gate to the stable — from src.api.models import ...: Import Pydantic response models · Same as any FastAPI app |
-| `router = APIRouter()` | Create the router that `main.py` will register | Same pattern everywhere | Stable's front door — router = APIRouter(): Create the router that main.py will register · Same pattern everywhere |
-| `_start_time = datetime.now(timezone.utc)` | Record when the module was loaded (= app startup) | Common pattern for uptime tracking | Timestamp stamped on the trip log entry — when the donkey set off or returned |
+| `from fastapi import APIRouter, Request` | Create a router, access the request object | Same as shared-proxy | Entry gate to the depot — from fastapi import APIRouter, Request: Create a router, access the request object · Same as shared-proxy |
+| `from src.api.models import ...` | Import Pydantic response models | Same as any FastAPI app | Entry gate to the depot — from src.api.models import ...: Import Pydantic response models · Same as any FastAPI app |
+| `router = APIRouter()` | Create the router that `main.py` will register | Same pattern everywhere | Depot's front door — router = APIRouter(): Create the router that main.py will register · Same pattern everywhere |
+| `_start_time = datetime.now(timezone.utc)` | Record when the module was loaded (= app startup) | Common pattern for uptime tracking | Timestamp stamped on the trip log entry — when the courier set off or returned |
 
 **Why `_start_time` is module-level:** This line runs once when Python imports the
 module (at app startup). Every subsequent call to the health check uses this same
@@ -145,13 +145,13 @@ async def health_check(request: Request) -> HealthResponse:
 
 **What each part does:**
 
-| Part | Purpose | 🫏 Donkey |
+| Part | Purpose | 🚚 Courier |
 | --- | --- | --- |
-| `@router.get("/health")` | Registers as GET, combined with `prefix="/api"` in main.py → becomes `GET /api/health` | Marks `/api/health` as the doorway villagers knock on to check whether the donkey and warehouse are awake. |
-| `response_model=HealthResponse` | Tells FastAPI to serialise the return value as this model, and to show it in Swagger | Tells the stable manager which shape to pour the health reply into so Swagger and callers see consistent fields. |
-| `summary` and `description` | Shown in Swagger UI (`/docs`) — human-readable documentation | Donkey-side view of summary` and `description — affects how the donkey loads, reads, or delivers the cargo |
-| `request: Request` | Gives access to `request.app.state` where the RAG chain lives | Donkey-side view of request: Request — affects how the donkey loads, reads, or delivers the cargo |
-| `-> HealthResponse` | Type hint for your IDE — autocompletion on the response object | Tells the IDE the exact shape of the donkey's health reply — no runtime effect, just autocomplete on the response object. |
+| `@router.get("/health")` | Registers as GET, combined with `prefix="/api"` in main.py → becomes `GET /api/health` | Marks `/api/health` as the doorway villagers knock on to check whether the courier and warehouse are awake. |
+| `response_model=HealthResponse` | Tells FastAPI to serialise the return value as this model, and to show it in Swagger | Tells the depot manager which shape to pour the health reply into so Swagger and callers see consistent fields. |
+| `summary` and `description` | Shown in Swagger UI (`/docs`) — human-readable documentation | Courier-side view of summary` and `description — affects how the courier loads, reads, or delivers the parcels |
+| `request: Request` | Gives access to `request.app.state` where the RAG chain lives | Courier-side view of request: Request — affects how the courier loads, reads, or delivers the parcels |
+| `-> HealthResponse` | Type hint for your IDE — autocompletion on the response object | Tells the IDE the exact shape of the courier's health reply — no runtime effect, just autocomplete on the response object. |
 
 #### Step 1 — Check if the RAG chain is initialised
 
@@ -279,7 +279,7 @@ external APIs).
 }
 ```
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -323,25 +323,25 @@ class HealthResponse(BaseModel):
 
 See [Pydantic Models Guide](../reference/pydantic-models.md) for full field details.
 
-- 🫏 **Donkey:** The cargo manifest template — every field is typed and validated before the donkey is loaded, preventing mispackaged deliveries.
+- 🚚 **Courier:** The shipping manifest template — every field is typed and validated before the courier is loaded, preventing mispackaged deliveries.
 
 ---
 
 ## DE Comparison
 
-| Aspect | Shared-Proxy Health Check | RAG Chatbot Health Check | 🫏 Donkey |
+| Aspect | Shared-Proxy Health Check | RAG Chatbot Health Check | 🚚 Courier |
 | --- | --- | --- | --- |
-| **Endpoint** | `GET /health` or `GET /api/health` | `GET /api/health` | The exact doorway customers knock on to check the donkey is awake — `GET /api/health` rather than the bare `/health`. |
-| **What it checks** | Database connectivity, upstream APIs | RAG chain (LLM + vector store) | Is the donkey awake and the warehouse reachable? Confirms LLM and vector store are wired up |
-| **Status values** | Usually `"ok"` / `"error"` | `healthy` / `degraded` / `unhealthy` | Three-state donkey verdict — healthy, degraded, or unhealthy — instead of binary ok/error so partial outages stay visible. |
-| **Pattern** | Check deps → worst status wins → return | Check deps → worst status wins → return | Donkey-side view of Pattern — affects how the donkey loads, reads, or delivers the cargo |
-| **Used by** | Kubernetes liveness/readiness probes | Same | The same Kubernetes liveness and readiness probes that poll any other stable also poll this one to decide if the donkey gets restarted. |
-| **AI concepts** | None | None — it only checks if rag_chain is not None | Donkey-side view of AI concepts — affects how the donkey loads, reads, or delivers the cargo |
+| **Endpoint** | `GET /health` or `GET /api/health` | `GET /api/health` | The exact doorway customers knock on to check the courier is awake — `GET /api/health` rather than the bare `/health`. |
+| **What it checks** | Database connectivity, upstream APIs | RAG chain (LLM + vector store) | Is the courier awake and the warehouse reachable? Confirms LLM and vector store are wired up |
+| **Status values** | Usually `"ok"` / `"error"` | `healthy` / `degraded` / `unhealthy` | Three-state courier verdict — healthy, degraded, or unhealthy — instead of binary ok/error so partial outages stay visible. |
+| **Pattern** | Check deps → worst status wins → return | Check deps → worst status wins → return | Courier-side view of Pattern — affects how the courier loads, reads, or delivers the parcels |
+| **Used by** | Kubernetes liveness/readiness probes | Same | The same Kubernetes liveness and readiness probes that poll any other depot also poll this one to decide if the courier gets restarted. |
+| **AI concepts** | None | None — it only checks if rag_chain is not None | Courier-side view of AI concepts — affects how the courier loads, reads, or delivers the parcels |
 
 **Bottom line:** If you can write a health check in shared-proxy, you can write this
 one. There's nothing new to learn here.
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -361,7 +361,7 @@ To understand what the RAG chain actually is and how it works, read:
 - [Chat Endpoint Deep Dive](chat-endpoint-explained.md) — how `rag_chain.query()` works
 - [Documents Endpoint Deep Dive](documents-endpoint-explained.md) — how `rag_chain.ingest_document()` works
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -375,4 +375,4 @@ After reading this, can you answer:
 - [ ] Who calls this endpoint in production? (Kubernetes/ECS health probes)
 - [ ] Is there any AI-specific code in this route? (No — just checking if rag_chain exists)
 
-- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.
+- 🚚 **Courier:** A quick quiz for the trainee dispatch clerk — answer these to confirm the key courier delivery concepts have landed.

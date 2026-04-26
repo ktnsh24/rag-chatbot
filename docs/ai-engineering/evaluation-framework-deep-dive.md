@@ -35,15 +35,15 @@ In traditional software you write unit tests that pass or fail. In AI engineerin
 
 This file implements a rule-based evaluation framework that scores every RAG response on three dimensions. **No LLM is needed for evaluation** — it's pure Python string analysis. This means evaluation is **free, fast, and deterministic**.
 
-| What you'll learn | DE parallel | 🫏 Donkey |
+| What you'll learn | DE parallel | 🚚 Courier |
 |---|---| --- |
-| Retrieval quality scoring | Data freshness and completeness checks | Measures how good the GPS warehouse's backpack retrieval was — did it find the right chunks? |
-| Faithfulness scoring (anti-hallucination) | Referential integrity validation | Checks the donkey only wrote facts from its loaded backpacks — no memory drift or invention |
-| Answer relevance scoring | Output schema validation | A grade on whether the donkey actually answered the question asked, not a different one |
-| Weighted composite scores | Data quality dashboards (Great Expectations) | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
-| Rule-based evaluation (no LLM needed) | SQL-based data quality checks (no ML needed) | Grading the donkey with a stopwatch and checklist instead of hiring a second donkey to judge |
+| Retrieval quality scoring | Data freshness and completeness checks | Measures how good the GPS warehouse's parcel retrieval was — did it find the right chunks? |
+| Faithfulness scoring (anti-hallucination) | Referential integrity validation | Checks the courier only wrote facts from its loaded parcels — no memory drift or invention |
+| Answer relevance scoring | Output schema validation | A grade on whether the courier actually answered the question asked, not a different one |
+| Weighted composite scores | Data quality dashboards (Great Expectations) | How confidently the warehouse says 'this parcel matches' — higher = closer GPS hit |
+| Rule-based evaluation (no LLM needed) | SQL-based data quality checks (no ML needed) | Grading the courier with a stopwatch and checklist instead of hiring a second courier to judge |
 
-- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
+- 🚚 **Courier:** Think of this as the orientation briefing given to a new courier before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -67,7 +67,7 @@ dbt test:                                  Golden dataset test:
 
 **The key difference:** In DE, you check *data* against *rules*. In AI, you check *generated text* against *reference text*. Both answer the same question: **"Is the output good enough?"**
 
-- 🫏 **Donkey:** The donkey's report card — did it grab the right backpacks and write an accurate answer?
+- 🚚 **Courier:** The courier's report card — did it grab the right parcels and write an accurate answer?
 
 ---
 
@@ -120,7 +120,7 @@ class EvaluationResult:      # Combined result
                     └─────────────────────────────┘
 ```
 
-- 🫏 **Donkey:** Like a stable floor plan showing where the donkey enters, where the backpacks are loaded, and which route it takes to the customer.
+- 🚚 **Courier:** Like a depot floor plan showing where the courier enters, where the parcels are loaded, and which route it takes to the customer.
 
 ---
 
@@ -179,7 +179,7 @@ Output: RetrievalScore(
 
 **Why this matters:** If retrieval quality is poor, it doesn't matter how good the LLM is — it's working with irrelevant context. **Fix retrieval before fixing prompts.**
 
-- 🫏 **Donkey:** The warehouse robot dispatched to find the right backpack shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+- 🚚 **Courier:** The warehouse robot dispatched to find the right parcel shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -279,7 +279,7 @@ WHERE c.id IS NULL;
 
 **Why the 0.5 keyword overlap threshold?** A sentence doesn't need to be a word-for-word copy — it just needs to be *about the same thing*. "Refunds are processed within 14 days" and "Refunds take 14 business days" share enough keywords to be considered grounded.
 
-- 🫏 **Donkey:** Checking whether the donkey's answer matches the cargo in its backpack — if it drifts from the documents, it's hallucinating.
+- 🚚 **Courier:** Checking whether the courier's answer matches the parcels in its parcel — if it drifts from the documents, it's hallucinating.
 
 ---
 
@@ -324,7 +324,7 @@ Score: 0/4 = 0.00  ← completely off-topic
 
 **DE parallel:** This is like output schema validation. If the user asks for `customer_id, name, email` and you return `order_id, total, date`, the output is valid SQL but answers the wrong question.
 
-- 🫏 **Donkey:** Verifying the donkey delivered to the right address — the answer should match what the customer actually asked for.
+- 🚚 **Courier:** Verifying the courier delivered to the right address — the answer should match what the customer actually asked for.
 
 ---
 
@@ -368,7 +368,7 @@ Example calculation:
 
 **Why faithfulness gets the highest weight:** A system that says *"I don't know"* is better than one that confidently gives wrong information. In production, hallucination can cause legal, financial, or reputational damage. That's why detecting and preventing it gets 40% of the score.
 
-- 🫏 **Donkey:** The quality inspector's stamp — each delivered answer is graded on retrieval accuracy, faithfulness, and relevance before the customer signs.
+- 🚚 **Courier:** The quality inspector's stamp — each delivered answer is graded on retrieval accuracy, faithfulness, and relevance before the customer signs.
 
 ---
 
@@ -392,7 +392,7 @@ def _is_refusal(self, answer: str) -> bool:
 
 **DE parallel:** This is like a query returning zero rows. The query is correct — there's simply no matching data. You don't flag that as a data quality issue.
 
-- 🫏 **Donkey:** Small utility workers in the stable — they handle sentence-splitting and keyword extraction so the main donkey stays focused on delivery.
+- 🚚 **Courier:** Small utility workers in the depot — they handle sentence-splitting and keyword extraction so the main courier stays focused on delivery.
 
 ---
 
@@ -444,7 +444,7 @@ def _is_meta_sentence(self, sentence: str) -> bool:
 
 Sentences like *"According to [Document chunk 1]..."* are structural — they cite sources, not make claims. They're automatically counted as "in context."
 
-- 🫏 **Donkey:** Small utility workers in the stable — they handle sentence-splitting and keyword extraction so the main donkey stays focused on delivery.
+- 🚚 **Courier:** Small utility workers in the depot — they handle sentence-splitting and keyword extraction so the main courier stays focused on delivery.
 
 ---
 
@@ -484,7 +484,7 @@ The evaluator doesn't block the response — it runs **after** the answer is ret
 
 The evaluation framework is exposed through two API endpoints:
 
-| Endpoint | Purpose | When to use | 🫏 Donkey |
+| Endpoint | Purpose | When to use | 🚚 Courier |
 |---|---|---| --- |
 | `POST /api/evaluate` | Evaluate a single question | Testing specific questions, debugging low scores | Grade one delivery on the spot — useful for diagnosing why a single trip scored badly |
 | `POST /api/evaluate/suite` | Run the full golden dataset | After any setting change, before deploying | Run all 25 standard test deliveries to get a full report card before letting changes ship |
@@ -505,7 +505,7 @@ Or use Swagger UI at `http://localhost:8000/docs` → find the **Evaluation** se
 
 📖 **See:** [Evaluate Endpoint Deep Dive](../architecture-and-design/api-routes/evaluate-endpoint-explained.md) for the full walkthrough.
 
-- 🫏 **Donkey:** The mechanics of the stable — understanding how each piece fits so you can maintain and extend the system.
+- 🚚 **Courier:** The mechanics of the depot — understanding how each piece fits so you can maintain and extend the system.
 
 ---
 
@@ -513,13 +513,13 @@ Or use Swagger UI at `http://localhost:8000/docs` → find the **Evaluation** se
 
 **The evaluator doesn't use any cloud services.** It's pure Python string analysis:
 
-| Component | Uses cloud? | Why | 🫏 Donkey |
+| Component | Uses cloud? | Why | 🚚 Courier |
 |---|---|---| --- |
-| `_evaluate_retrieval()` | ❌ | Just math on similarity scores | The retrieval column on the report card — pure arithmetic on GPS-distance scores, no extra donkey needed |
-| `_evaluate_faithfulness()` | ❌ | Keyword overlap — pure string comparison | The faithfulness column on the report card — string overlap between cargo and answer, no cloud calls |
+| `_evaluate_retrieval()` | ❌ | Just math on similarity scores | The retrieval column on the report card — pure arithmetic on GPS-distance scores, no extra courier needed |
+| `_evaluate_faithfulness()` | ❌ | Keyword overlap — pure string comparison | The faithfulness column on the report card — string overlap between parcels and answer, no cloud calls |
 | `_evaluate_answer_relevance()` | ❌ | Keyword presence check | The relevance column on the report card — checks the answer's keywords match the customer's question |
-| `_split_sentences()` | ❌ | Regex splitting | Donkey-side view of split_sentences() — affects how the donkey loads, reads, or delivers the cargo |
-| `_extract_keywords()` | ❌ | Stop word removal | Donkey-side view of extract_keywords() — affects how the donkey loads, reads, or delivers the cargo |
+| `_split_sentences()` | ❌ | Regex splitting | Courier-side view of split_sentences() — affects how the courier loads, reads, or delivers the parcels |
+| `_extract_keywords()` | ❌ | Stop word removal | Courier-side view of extract_keywords() — affects how the courier loads, reads, or delivers the parcels |
 
 **This means:**
 - Evaluation costs **$0** on all providers
@@ -529,20 +529,20 @@ Or use Swagger UI at `http://localhost:8000/docs` → find the **Evaluation** se
 
 **Trade-off:** Rule-based evaluation is simpler and cheaper than LLM-based evaluation (e.g., using GPT-4 to judge GPT-4's answers), but it's also less nuanced. It can't detect subtle semantic errors — only keyword-level problems.
 
-- 🫏 **Donkey:** Choosing which stable to work with — AWS Bedrock, Azure OpenAI, or a local Ollama barn each offer different donkeys at different prices.
+- 🚚 **Courier:** Choosing which depot to work with — AWS Bedrock, Azure OpenAI, or a local Ollama barn each offer different couriers at different prices.
 
 ---
 
 ## Common Evaluation Failures and How to Debug Them
 
-| Score too low? | Likely cause | How to debug | 🫏 Donkey |
+| Score too low? | Likely cause | How to debug | 🚚 Courier |
 |---|---|---| --- |
-| **Retrieval < 0.5** | Chunks are irrelevant | Check chunk content — is the right document ingested? | GPS warehouse fetched wrong backpacks — verify the source documents are ingested and chunks make sense |
-| **Retrieval < 0.5** | Embedding quality poor | Try different embedding model (local: `nomic-embed-text` → `all-minilm`) | Coordinates inked on the saddlebag — Retrieval < 0.5: Embedding quality poor · Try different embedding model (local: nomic-embed-text → all-minilm) |
-| **Faithfulness < 0.8** | LLM is hallucinating | Tighten prompt rules, lower temperature | The donkey is making things up — tighten the delivery note and make its writing more predictable |
-| **Faithfulness < 0.8** | Keyword extraction too strict | Check if answer uses synonyms not in context | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
-| **Relevance < 0.6** | LLM answered different question | Check if question is ambiguous | The donkey answered a different question than the one on the order — check if the customer was vague |
-| **Relevance < 0.6** | Answer is a refusal | Check if context was empty (correct behaviour) | Routing tag on the saddlebag — Relevance < 0.6: Answer is a refusal · Check if context was empty (correct behaviour) |
+| **Retrieval < 0.5** | Chunks are irrelevant | Check chunk content — is the right document ingested? | GPS warehouse fetched wrong parcels — verify the source documents are ingested and chunks make sense |
+| **Retrieval < 0.5** | Embedding quality poor | Try different embedding model (local: `nomic-embed-text` → `all-minilm`) | Coordinates inked on the parcel — Retrieval < 0.5: Embedding quality poor · Try different embedding model (local: nomic-embed-text → all-minilm) |
+| **Faithfulness < 0.8** | LLM is hallucinating | Tighten prompt rules, lower temperature | The courier is making things up — tighten the shipping manifest and make its writing more predictable |
+| **Faithfulness < 0.8** | Keyword extraction too strict | Check if answer uses synonyms not in context | Did the courier stick to the parcels it was carrying, or invent stuff on the way? |
+| **Relevance < 0.6** | LLM answered different question | Check if question is ambiguous | The courier answered a different question than the one on the order — check if the customer was vague |
+| **Relevance < 0.6** | Answer is a refusal | Check if context was empty (correct behaviour) | Routing tag on the parcel — Relevance < 0.6: Answer is a refusal · Check if context was empty (correct behaviour) |
 | **Overall < 0.7** | Multiple issues | Debug each score individually | Whole report card slipped — work through retrieval, faithfulness, and relevance one by one to find the weakest link |
 
 **Debugging workflow:**
@@ -566,7 +566,7 @@ print(result.to_dict())
 # If relevance is low → fix prompt / chunking
 ```
 
-- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🚚 **Courier:** Checking the courier's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -593,7 +593,7 @@ print(result.to_dict())
 - [ ] How would you use evaluation scores to auto-tune `top_k` or `chunk_size`?
 - [ ] If faithfulness is 0.65 and you need to reach 0.8, what do you try first?
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -608,4 +608,4 @@ You now understand how to measure RAG quality. Next:
 - [RAG Chain Deep Dive (#13)](rag-chain-deep-dive.md) — the pipeline being evaluated
 - [RAG Concepts → Evaluation](rag-concepts.md)
 
-- 🫏 **Donkey:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.
+- 🚚 **Courier:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.

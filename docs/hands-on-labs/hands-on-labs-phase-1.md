@@ -10,7 +10,7 @@
   - [Azure — Estimated cost for running these labs](#azure--estimated-cost-for-running-these-labs)
   - [Summary](#summary)
 - [Setup — Upload a Test Document (Do This First)](#setup--upload-a-test-document-do-this-first)
-- [🫏 The Donkey Analogy — Understanding Phase 1 Metrics](#-the-donkey-analogy--understanding-phase-1-metrics)
+- [🚚 The Courier Analogy — Understanding Phase 1 Metrics](#-the-courier-analogy--understanding-phase-1-metrics)
 - [Lab 1: Retrieval Quality — "Did I find the right chunks?"](#lab-1-retrieval-quality--did-i-find-the-right-chunks)
   - [Experiment 1a — Baseline retrieval](#experiment-1a--baseline-retrieval)
   - [Experiment 1b — Change top_k and see the impact](#experiment-1b--change-top_k-and-see-the-impact)
@@ -32,43 +32,43 @@ here's what it costs:
 
 ### Local (current setup) — FREE
 
-| Component | Tool | Cost | 🫏 Donkey |
+| Component | Tool | Cost | 🚚 Courier |
 | --- | --- | --- | --- |
-| LLM | Ollama + llama3.2 (3B) | **$0** — runs on your CPU | Local donkey lives in your own stable, eats free hay, and never sends a token bill |
-| Embeddings | nomic-embed-text (137M) | **$0** — runs on your CPU | Free hay for the donkey — Embeddings: nomic-embed-text (137M) · $0 — runs on your CPU |
-| Vector store | ChromaDB (local file) | **$0** — local SQLite | Tiny stable barn living in a local SQLite file — the donkey trots a few feet to fetch backpacks, costing nothing. |
+| LLM | Ollama + llama3.2 (3B) | **$0** — runs on your CPU | Local courier lives in your own depot, eats free fuel, and never sends a token bill |
+| Embeddings | nomic-embed-text (137M) | **$0** — runs on your CPU | Free fuel for the courier — Embeddings: nomic-embed-text (137M) · $0 — runs on your CPU |
+| Vector store | ChromaDB (local file) | **$0** — local SQLite | Tiny depot warehouse living in a local SQLite file — the courier trots a few feet to fetch parcels, costing nothing. |
 | API server | Uvicorn (local) | **$0** — runs on your machine | Door the customer knocks on — API server: Uvicorn (local) · $0 — runs on your machine |
-| **Total for all labs** | | **$0** | Hay-and-oats invoice — Total for all labs: $0 |
+| **Total for all labs** | | **$0** | fuel-and-oats invoice — Total for all labs: $0 |
 
 ### AWS — Estimated cost for running these labs
 
-| Component | AWS Service | Cost per lab session (~50 queries) | Monthly if left running | 🫏 Donkey |
+| Component | AWS Service | Cost per lab session (~50 queries) | Monthly if left running | 🚚 Courier |
 | --- | --- | --- | --- | --- |
-| LLM | Bedrock (Claude 3 Haiku) | ~$0.02 (input+output tokens) | Pay per use only | Hire AWS's Claude donkey by the hay-bag — billed per token of cargo carried |
+| LLM | Bedrock (Claude 3 Haiku) | ~$0.02 (input+output tokens) | Pay per use only | Hire AWS's Claude courier by the fuel-bag — billed per token of parcels carried |
 | Embeddings | Bedrock (Titan Embed v2) | ~$0.001 | Pay per use only | Bedrock Titan converts each text into GPS coordinates for the warehouse, charged per token converted |
 | Vector store | OpenSearch Serverless | ⚠️ **~$350/month minimum** (4 OCUs) | Avoid for portfolio | AWS search hub — Vector store: OpenSearch Serverless · ⚠️ ~$350/month minimum (4 OCUs) · Avoid for portfolio |
 | Vector store (alt) | DynamoDB + local embeddings | ~$0 (free tier: 25GB + 25 RCU/WCU) | $0 in free tier | AWS depot — Vector store (alt): DynamoDB + local embeddings · ~$0 (free tier: 25GB + 25 RCU/WCU) · $0 in free tier |
 | API server | ECS Fargate (0.25 vCPU, 0.5GB) | ~$0.01/hour when running | ~$7/month if 24/7 | Stall that houses the worker — API server: ECS Fargate (0.25 vCPU, 0.5GB) · ~$0.01/hour when running · ~$7/month if 24/7 |
-| API server (alt) | Lambda + API Gateway | ~$0 for lab traffic | $0 in free tier | Where parcels are dropped at the stable — API server (alt): Lambda + API Gateway · ~$0 for lab traffic · $0 in free tier |
-| Logs | CloudWatch | ~$0 | $0 in free tier | Stopwatch on the donkey's harness — Logs: CloudWatch · ~$0 · $0 in free tier |
-| **Total (cheapest path)** | Bedrock + DynamoDB + Lambda | **~$0.03 per lab session** | **~$1/month** | Pay-per-trip donkey + free-tier AWS depot + on-demand stable door = pennies a session |
-| **Total (full stack)** | Bedrock + OpenSearch + ECS | **~$0.03 per lab session** | **⚠️ ~$360/month** | Same donkey, but renting a 24/7 OpenSearch warehouse and ECS stall pushes the monthly rent sky-high |
+| API server (alt) | Lambda + API Gateway | ~$0 for lab traffic | $0 in free tier | Where parcels are dropped at the depot — API server (alt): Lambda + API Gateway · ~$0 for lab traffic · $0 in free tier |
+| Logs | CloudWatch | ~$0 | $0 in free tier | Stopwatch on the courier's harness — Logs: CloudWatch · ~$0 · $0 in free tier |
+| **Total (cheapest path)** | Bedrock + DynamoDB + Lambda | **~$0.03 per lab session** | **~$1/month** | Pay-per-trip courier + free-tier AWS depot + on-demand depot door = pennies a session |
+| **Total (full stack)** | Bedrock + OpenSearch + ECS | **~$0.03 per lab session** | **⚠️ ~$360/month** | Same courier, but renting a 24/7 OpenSearch warehouse and ECS stall pushes the monthly rent sky-high |
 
 > **Recommendation:** Use Bedrock (pay-per-use) + DynamoDB (free tier) + Lambda (free tier).
 > Avoid OpenSearch Serverless for portfolio work — the $350/month minimum is not justified.
 
 ### Azure — Estimated cost for running these labs
 
-| Component | Azure Service | Cost per lab session (~50 queries) | Monthly if left running | 🫏 Donkey |
+| Component | Azure Service | Cost per lab session (~50 queries) | Monthly if left running | 🚚 Courier |
 | --- | --- | --- | --- | --- |
-| LLM | Azure OpenAI (GPT-4o mini) | ~$0.01 (input+output tokens) | Pay per use only | Hire Azure's GPT-4o mini donkey by the hay-bag — billed per token of cargo carried |
+| LLM | Azure OpenAI (GPT-4o mini) | ~$0.01 (input+output tokens) | Pay per use only | Hire Azure's GPT-4o mini courier by the fuel-bag — billed per token of parcels carried |
 | Embeddings | Azure OpenAI (text-embedding-3-small) | ~$0.001 | Pay per use only | Azure converts each text into GPS coordinates for the warehouse, charged per token converted |
-| Vector store | Azure AI Search (Free tier) | **$0** | $0 (free tier: 3 indexes, 50MB) | Azure's managed warehouse on the free tier — three indexes and 50MB of GPS-stamped backpack space at zero monthly rent. |
-| Vector store (paid) | Azure AI Search (Basic) | ~$0 for lab traffic | ~$75/month | Azure's managed warehouse on the Basic plan — bigger backpack capacity for production at around $75/month rent. |
-| API server | Azure Container Apps | ~$0 (free tier: 180K vCPU-sec/month) | $0 in free tier | Azure stable for your FastAPI donkey — 180K vCPU-seconds free per month, plenty for a lab afternoon. |
-| Logs | Azure Monitor | ~$0 | $0 in free tier | Free hay for the donkey — Logs: Azure Monitor · ~$0 · $0 in free tier |
-| **Total (cheapest path)** | OpenAI + AI Search free + Container Apps free | **~$0.01 per lab session** | **~$0/month** | Pay-per-trip donkey + free Azure hub + free Container Apps stall — effectively zero monthly rent |
-| **Total (paid tier)** | OpenAI + AI Search Basic + Container Apps | **~$0.01 per lab session** | **~$75/month** | Same donkey, but upgrading to a paid Azure AI Search hub adds a fixed monthly stable rent |
+| Vector store | Azure AI Search (Free tier) | **$0** | $0 (free tier: 3 indexes, 50MB) | Azure's managed warehouse on the free tier — three indexes and 50MB of GPS-stamped parcel space at zero monthly rent. |
+| Vector store (paid) | Azure AI Search (Basic) | ~$0 for lab traffic | ~$75/month | Azure's managed warehouse on the Basic plan — bigger parcel capacity for production at around $75/month rent. |
+| API server | Azure Container Apps | ~$0 (free tier: 180K vCPU-sec/month) | $0 in free tier | Azure depot for your FastAPI courier — 180K vCPU-seconds free per month, plenty for a lab afternoon. |
+| Logs | Azure Monitor | ~$0 | $0 in free tier | Free fuel for the courier — Logs: Azure Monitor · ~$0 · $0 in free tier |
+| **Total (cheapest path)** | OpenAI + AI Search free + Container Apps free | **~$0.01 per lab session** | **~$0/month** | Pay-per-trip courier + free Azure hub + free Container Apps stall — effectively zero monthly rent |
+| **Total (paid tier)** | OpenAI + AI Search Basic + Container Apps | **~$0.01 per lab session** | **~$75/month** | Same courier, but upgrading to a paid Azure AI Search hub adds a fixed monthly depot rent |
 
 > **Recommendation:** Azure's free tiers are more generous for this use case. AI Search
 > free tier (3 indexes, 50MB) is enough for all labs. Container Apps free tier handles
@@ -76,15 +76,15 @@ here's what it costs:
 
 ### Summary
 
-| Stack | Per lab session | Monthly (always on) | Best for | 🫏 Donkey |
+| Stack | Per lab session | Monthly (always on) | Best for | 🚚 Courier |
 | --- | --- | --- | --- | --- |
-| **Local (Ollama)** | $0 | $0 | Learning, experimenting (current) | Local donkey on your laptop — no token bills, slow but free for experiments |
-| **AWS (cheapest)** | ~$0.03 | ~$1 | Proving cloud deployment skills | AWS gives the cheapest cloud trip — three cents per lab session, a buck a month if you forget to shut the stable down. |
-| **Azure (cheapest)** | ~$0.01 | ~$0 | Best free tier for portfolio | Stable throws in free fodder — Azure (cheapest): ~$0.01 · ~$0 · Best free tier for portfolio |
-| **AWS (full)** | ~$0.03 | ~$360 | ⚠️ Production only | No-charge bale from the stable — AWS (full): ~$0.03 · ~$360 · ⚠️ Production only |
-| **Azure (paid)** | ~$0.01 | ~$75 | Production staging | Stable throws in free fodder — Azure (paid): ~$0.01 · ~$75 · Production staging |
+| **Local (Ollama)** | $0 | $0 | Learning, experimenting (current) | Local courier on your laptop — no token bills, slow but free for experiments |
+| **AWS (cheapest)** | ~$0.03 | ~$1 | Proving cloud deployment skills | AWS gives the cheapest cloud trip — three cents per lab session, a buck a month if you forget to shut the depot down. |
+| **Azure (cheapest)** | ~$0.01 | ~$0 | Best free tier for portfolio | Depot throws in free supplies — Azure (cheapest): ~$0.01 · ~$0 · Best free tier for portfolio |
+| **AWS (full)** | ~$0.03 | ~$360 | ⚠️ Production only | No-charge bale from the depot — AWS (full): ~$0.03 · ~$360 · ⚠️ Production only |
+| **Azure (paid)** | ~$0.01 | ~$75 | Production staging | Depot throws in free supplies — Azure (paid): ~$0.01 · ~$75 · Production staging |
 
-- 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
+- 🚚 **Courier:** The feed bill — how much fuel (tokens) the courier eats per delivery, and how to reduce waste without starving it.
 
 ---
 
@@ -120,38 +120,38 @@ Upload it via **Swagger UI** (`http://localhost:8000/docs`):
 
 You'll use this document for all Phase 1 labs.
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
-## 🫏 The Donkey Analogy — Understanding Phase 1 Metrics
+## 🚚 The Courier Analogy — Understanding Phase 1 Metrics
 
-Imagine you own a donkey that delivers packages in a village. You give the donkey
+Imagine you own a courier that delivers packages in a village. You give the courier
 an address, it walks to a shelf of packages, picks some, and delivers them to the
-customer. Phase 1 metrics measure **how well the donkey does its job:**
+customer. Phase 1 metrics measure **how well the courier does its job:**
 
-| Metric | Donkey version | What it really measures | How it's calculated | 🫏 Donkey |
+| Metric | Courier version | What it really measures | How it's calculated | 🚚 Courier |
 | --- | --- | --- | --- | --- |
-| **retrieval** | Did the donkey grab the **right packages** from the shelf? If you asked for "refund policy" and it brought back 3 refund-related packages out of 5 total, that's decent retrieval. If it brought back 5 packages about office furniture — terrible retrieval. | How relevant are the chunks the vector store returned for your question. | `avg(cosine_similarity)` of all retrieved chunks. Each chunk gets a 0.0–1.0 similarity score from the vector store. E.g. 5 chunks scoring [0.92, 0.85, 0.71, 0.45, 0.19] → retrieval = 3.12/5 = **0.624**. That's why top_k=1 scores higher (only the best chunk counts). | Average GPS-match score across every backpack the donkey lugged back — high = right shelf, low = wrong aisle |
-| **faithfulness** | Did the donkey **only deliver what it picked up**, or did it add random items from its own pocket? If the customer opens the delivery and finds exactly what was on the shelf — faithful. If the donkey added a sandwich it found on the road — hallucination. | Does the LLM answer contain ONLY information from the retrieved chunks, or did it make things up? | Split answer into sentences → extract keywords per sentence (skip stop words) → check if ≥50% of keywords exist in the retrieved chunks. `grounded_sentences / total_sentences`. E.g. 3 of 4 sentences have keywords in context → **0.750**. Score of 0.000 = every sentence was hallucinated. | Did the donkey deliver only what was in the backpack, or invent extras between stops? |
-| **answer_relevance** | Did the customer **get what they actually asked for?** The donkey might faithfully deliver the right packages from the shelf, but if the customer asked "what's the return window?" and the answer talks about shipping costs — irrelevant. | Does the answer actually address the question that was asked? | Extract keywords from the question → count how many appear in the answer. `found_keywords / total_keywords`. E.g. question "What is the refund policy?" has keywords [refund, policy], both found in answer → **1.000**. | Did the donkey arrive at the right house, or hand the parcel to the neighbour with a totally different question? |
-| **overall** | The donkey's **performance review** — a weighted average: 30% right packages (retrieval) + 40% didn't add extras (faithfulness) + 30% customer got what they asked for (relevance). A score of 0.70+ means the donkey gets to keep its job. | Weighted combination: retrieval x 0.3 + faithfulness x 0.4 + relevance x 0.3. | `(retrieval × 0.3) + (faithfulness × 0.4) + (relevance × 0.3)`. Faithfulness gets highest weight because hallucinated answers LOOK correct but are WRONG — most dangerous. E.g. (0.624×0.3)+(0.750×0.4)+(1.0×0.3) = **0.787** ✅ PASS (≥0.70). | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
-| **latency** | **How long** did the donkey take to walk to the shelf, pick packages, and deliver? A village donkey (local Ollama) takes 10–60 seconds. A racing donkey (cloud GPU) takes 1–3 seconds. | Total time from question to answer, including embedding, retrieval, and LLM generation. | Wall-clock time in milliseconds: `time_end - time_start`. Includes embedding (~50ms local, ~200ms cloud), vector search (~10ms), and LLM generation (dominates — local Ollama 10-60s, cloud GPU 1-3s). | Tachograph reading — total wall-clock time from question pickup to answer drop-off |
-| **top_k** | How many packages you **told the donkey to grab** from the shelf. `top_k=1` means "bring me only the single best match" (fast, precise, but risky if the answer spans multiple sections). `top_k=10` means "bring 10 packages" (slower, noisier, but the right one is probably in there somewhere). | Number of document chunks retrieved from the vector store per query. | Config parameter (not calculated). Passed to vector store: `vectorstore.similarity_search(query, k=top_k)`. Directly affects retrieval score — higher top_k pulls in lower-relevance chunks, dragging the average down. | Tells the donkey exactly how many backpacks to grab in one trip — bigger order, heavier load |
+| **retrieval** | Did the courier grab the **right packages** from the shelf? If you asked for "refund policy" and it brought back 3 refund-related packages out of 5 total, that's decent retrieval. If it brought back 5 packages about office furniture — terrible retrieval. | How relevant are the chunks the vector store returned for your question. | `avg(cosine_similarity)` of all retrieved chunks. Each chunk gets a 0.0–1.0 similarity score from the vector store. E.g. 5 chunks scoring [0.92, 0.85, 0.71, 0.45, 0.19] → retrieval = 3.12/5 = **0.624**. That's why top_k=1 scores higher (only the best chunk counts). | Average GPS-match score across every parcel the courier lugged back — high = right shelf, low = wrong aisle |
+| **faithfulness** | Did the courier **only deliver what it picked up**, or did it add random items from its own pocket? If the customer opens the delivery and finds exactly what was on the shelf — faithful. If the courier added a sandwich it found on the road — hallucination. | Does the LLM answer contain ONLY information from the retrieved chunks, or did it make things up? | Split answer into sentences → extract keywords per sentence (skip stop words) → check if ≥50% of keywords exist in the retrieved chunks. `grounded_sentences / total_sentences`. E.g. 3 of 4 sentences have keywords in context → **0.750**. Score of 0.000 = every sentence was hallucinated. | Did the courier deliver only what was in the parcel, or invent extras between stops? |
+| **answer_relevance** | Did the customer **get what they actually asked for?** The courier might faithfully deliver the right packages from the shelf, but if the customer asked "what's the return window?" and the answer talks about shipping costs — irrelevant. | Does the answer actually address the question that was asked? | Extract keywords from the question → count how many appear in the answer. `found_keywords / total_keywords`. E.g. question "What is the refund policy?" has keywords [refund, policy], both found in answer → **1.000**. | Did the courier arrive at the right house, or hand the parcel to the neighbour with a totally different question? |
+| **overall** | The courier's **performance review** — a weighted average: 30% right packages (retrieval) + 40% didn't add extras (faithfulness) + 30% customer got what they asked for (relevance). A score of 0.70+ means the courier gets to keep its job. | Weighted combination: retrieval x 0.3 + faithfulness x 0.4 + relevance x 0.3. | `(retrieval × 0.3) + (faithfulness × 0.4) + (relevance × 0.3)`. Faithfulness gets highest weight because hallucinated answers LOOK correct but are WRONG — most dangerous. E.g. (0.624×0.3)+(0.750×0.4)+(1.0×0.3) = **0.787** ✅ PASS (≥0.70). | How confidently the warehouse says 'this parcel matches' — higher = closer GPS hit |
+| **latency** | **How long** did the courier take to walk to the shelf, pick packages, and deliver? A village courier (local Ollama) takes 10–60 seconds. A racing courier (cloud GPU) takes 1–3 seconds. | Total time from question to answer, including embedding, retrieval, and LLM generation. | Wall-clock time in milliseconds: `time_end - time_start`. Includes embedding (~50ms local, ~200ms cloud), vector search (~10ms), and LLM generation (dominates — local Ollama 10-60s, cloud GPU 1-3s). | Tachograph reading — total wall-clock time from question pickup to answer drop-off |
+| **top_k** | How many packages you **told the courier to grab** from the shelf. `top_k=1` means "bring me only the single best match" (fast, precise, but risky if the answer spans multiple sections). `top_k=10` means "bring 10 packages" (slower, noisier, but the right one is probably in there somewhere). | Number of document chunks retrieved from the vector store per query. | Config parameter (not calculated). Passed to vector store: `vectorstore.similarity_search(query, k=top_k)`. Directly affects retrieval score — higher top_k pulls in lower-relevance chunks, dragging the average down. | Tells the courier exactly how many parcels to grab in one trip — bigger order, heavier load |
 
 **The key trade-off you'll discover in Lab 1:**
 
 ```text
-top_k=1:  🫏 grabs 1 package  → fast, precise, but might miss context
-top_k=5:  🫏 grabs 5 packages → balanced (the default)
-top_k=10: 🫏 grabs 10 packages → slow, noisy, but nothing is missed
+top_k=1:  🚚 grabs 1 package  → fast, precise, but might miss context
+top_k=5:  🚚 grabs 5 packages → balanced (the default)
+top_k=10: 🚚 grabs 10 packages → slow, noisy, but nothing is missed
 ```
 
-The donkey's dilemma: grab fewer packages (high retrieval score, risk missing info)
+The courier's dilemma: grab fewer packages (high retrieval score, risk missing info)
 or grab more (low retrieval score, but safer for complex questions). This is the
 **retrieval-faithfulness trade-off** — the foundation of every RAG system.
 
-- 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
+- 🚚 **Courier:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
 
 ---
 
@@ -181,13 +181,13 @@ Click **"Execute"**.
 
 📝 **Write down your baseline:**
 
-| Score | Your value | Quality label | 🫏 Donkey |
+| Score | Your value | Quality label | 🚚 Courier |
 |---|---|---| --- |
-| retrieval | ___ | ___ | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
-| faithfulness | ___ | ___ | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
+| retrieval | ___ | ___ | Courier grabs the nearest parcels from the GPS warehouse before writing the answer |
+| faithfulness | ___ | ___ | Did the courier stick to the parcels it was carrying, or invent stuff on the way? |
 | answer_relevance | ___ | ___ | Right address on the parcel — answer_relevance: ___ · ___ |
-| overall | ___ | ___ | Donkey-side view of overall — affects how the donkey loads, reads, or delivers the cargo |
-| latency | ___s | ___ | Tachograph reading — how long the donkey took on the round trip |
+| overall | ___ | ___ | Courier-side view of overall — affects how the courier loads, reads, or delivers the parcels |
+| latency | ___s | ___ | Tachograph reading — how long the courier took on the round trip |
 
 > **What to expect (local):** retrieval 0.55–0.70, faithfulness 0.70–0.85, answer_relevance 0.90–1.0, overall 0.70–0.85, latency 10–60s on CPU.
 
@@ -248,21 +248,21 @@ In **Swagger UI** → `POST /api/evaluate` → **"Try it out"**:
 
 📝 **Record your results:**
 
-| top_k | retrieval | faithfulness | overall | latency | What happened? | 🫏 Donkey |
+| top_k | retrieval | faithfulness | overall | latency | What happened? | 🚚 Courier |
 |---|---|---|---|---|---| --- |
-| 1 | ___ | ___ | ___ | ___s | ___ | Donkey-side view of 1 — affects how the donkey loads, reads, or delivers the cargo |
-| 5 (default) | ___ | ___ | ___ | ___s | ___ | Donkey-side view of 5 (default) — affects how the donkey loads, reads, or delivers the cargo |
-| 10 | ___ | ___ | ___ | ___s | ___ | Donkey-side view of 10 — affects how the donkey loads, reads, or delivers the cargo |
+| 1 | ___ | ___ | ___ | ___s | ___ | Courier-side view of 1 — affects how the courier loads, reads, or delivers the parcels |
+| 5 (default) | ___ | ___ | ___ | ___s | ___ | Courier-side view of 5 (default) — affects how the courier loads, reads, or delivers the parcels |
+| 10 | ___ | ___ | ___ | ___s | ___ | Courier-side view of 10 — affects how the courier loads, reads, or delivers the parcels |
 
 > **What to expect (local):** top_k=1 typically scores highest retrieval (0.70–0.80) but risks missing multi-section context. top_k=10 dilutes retrieval (0.45–0.60) but provides more context. Latency scales roughly linearly with top_k.
 
 **Expected pattern:**
 
-| top_k | Expected retrieval | Your result | Expected faithfulness | Your result | Why | 🫏 Donkey |
+| top_k | Expected retrieval | Your result | Expected faithfulness | Your result | Why | 🚚 Courier |
 |---|---|---|---|---|---| --- |
-| 1 | Higher (only best chunk) | ___ | May drop (missing context) | ___ | Only 1 chunk → focused answer, no filler sentences | Donkey grabs only the single best backpack — laser-focused, but one missed label means an empty trip |
-| 5 | Balanced | ___ | Balanced | ___ | Middle ground — LLM may add disclaimer | Donkey grabs five backpacks — balanced cargo load that usually produces the most well-rounded answer |
-| 10 | Lower (diluted by weak chunks) | ___ | May improve (more context) | ___ | All context available → confident answer | Donkey hauls ten backpacks home — full context covered, but the top-shelf signal gets diluted by stragglers |
+| 1 | Higher (only best chunk) | ___ | May drop (missing context) | ___ | Only 1 chunk → focused answer, no filler sentences | Courier grabs only the single best parcel — laser-focused, but one missed label means an empty trip |
+| 5 | Balanced | ___ | Balanced | ___ | Middle ground — LLM may add disclaimer | Courier grabs five parcels — balanced parcels load that usually produces the most well-rounded answer |
+| 10 | Lower (diluted by weak chunks) | ___ | May improve (more context) | ___ | All context available → confident answer | Courier hauls ten parcels home — full context covered, but the top-shelf signal gets diluted by stragglers |
 
 > ### 📊 What These Results Reveal — The Three Trade-offs
 >
@@ -314,14 +314,14 @@ In **Swagger UI** → `POST /api/evaluate`, enter:
 
 📝 **Results:**
 
-| Metric | Value | Interpretation | 🫏 Donkey |
+| Metric | Value | Interpretation | 🚚 Courier |
 | --- | --- | --- | --- |
-| retrieval | ___ | ChromaDB returned *something* — but nothing relevant | Donkey rummaged the local barn and brought *something* back, but none of it matches the customer's address |
-| faithfulness | ___ | Evaluator flagged sentences as "not from context" | Report card flagged sentences the donkey wrote that don't trace back to anything in the backpack |
-| has_hallucination | ___ | Check the analysis below | Did the donkey scribble extra packages onto the receipt that were never on the shelf? True = caught fabricating |
+| retrieval | ___ | ChromaDB returned *something* — but nothing relevant | Courier rummaged the local barn and brought *something* back, but none of it matches the customer's address |
+| faithfulness | ___ | Evaluator flagged sentences as "not from context" | Report card flagged sentences the courier wrote that don't trace back to anything in the parcel |
+| has_hallucination | ___ | Check the analysis below | Did the courier scribble extra packages onto the receipt that were never on the shelf? True = caught fabricating |
 | answer_relevance | ___ | ___ | Right address on the parcel — answer_relevance: ___ · ___ |
-| overall | ___ | ___ | Donkey-side view of overall — affects how the donkey loads, reads, or delivers the cargo |
-| evaluation_notes | ___ | ___ | Notes the evaluator scribbled on the donkey's report card explaining each scoring decision |
+| overall | ___ | ___ | Courier-side view of overall — affects how the courier loads, reads, or delivers the parcels |
+| evaluation_notes | ___ | ___ | Notes the evaluator scribbled on the courier's report card explaining each scoring decision |
 
 > **What to expect (local):** retrieval 0.40–0.60 (irrelevant chunks returned), faithfulness near 0.0 (refusal gets flagged), overall below 0.5 (FAIL). The failure is correct — see analysis below.
 
@@ -397,7 +397,7 @@ This trade-off is the first thing an AI engineer checks when debugging a bad ans
 > new documents. Fine-tuning is for when you need the model to behave differently (tone, format).
 > Your Lab 1 experience: upload `test-policy.txt` → instantly answerable. No training needed.
 
-- 🫏 **Donkey:** backpack-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
+- 🚚 **Courier:** parcel-sized pieces of parcels with overlapping edges, so no sentence is cut off at a seam.
 
 ---
 
@@ -433,13 +433,13 @@ In **Swagger UI** → `POST /api/evaluate`, enter:
 
 📝 **Results:**
 
-| Metric | Value | Interpretation | 🫏 Donkey |
+| Metric | Value | Interpretation | 🚚 Courier |
 | --- | --- | --- | --- |
-| retrieval | ___ | ___ | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
-| faithfulness | ___ | ___ | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
-| has_hallucination | ___ | ___ | Did the donkey echo the customer's "30 days" as fact even though no shelf carries that label? Possible fabrication |
+| retrieval | ___ | ___ | Courier grabs the nearest parcels from the GPS warehouse before writing the answer |
+| faithfulness | ___ | ___ | Did the courier stick to the parcels it was carrying, or invent stuff on the way? |
+| has_hallucination | ___ | ___ | Did the courier echo the customer's "30 days" as fact even though no shelf carries that label? Possible fabrication |
 | answer_relevance | ___ | ___ | Right address on the parcel — answer_relevance: ___ · ___ |
-| overall | ___ | ___ | Donkey-side view of overall — affects how the donkey loads, reads, or delivers the cargo |
+| overall | ___ | ___ | Courier-side view of overall — affects how the courier loads, reads, or delivers the parcels |
 
 > **What to expect (local):** retrieval 0.55–0.70 (found the right section), faithfulness 0.60–0.85, has_hallucination may be true (see analysis below). The LLM may correctly say "14 days" while quoting "30 days" from the question — which the evaluator flags.
 
@@ -466,25 +466,25 @@ In **Swagger UI** → `POST /api/evaluate`, enter:
 
 📝 **Results:**
 
-| Metric | Value | Interpretation | 🫏 Donkey |
+| Metric | Value | Interpretation | 🚚 Courier |
 | --- | --- | --- | --- |
-| retrieval | ___ | ___ | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
-| faithfulness | ___ | ___ | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
-| has_hallucination | ___ | ___ | Truthful question — donkey should pull the answer straight from a backpack with no need to invent anything |
+| retrieval | ___ | ___ | Courier grabs the nearest parcels from the GPS warehouse before writing the answer |
+| faithfulness | ___ | ___ | Did the courier stick to the parcels it was carrying, or invent stuff on the way? |
+| has_hallucination | ___ | ___ | Truthful question — courier should pull the answer straight from a parcel with no need to invent anything |
 | answer_relevance | ___ | ___ | Right address on the parcel — answer_relevance: ___ · ___ |
-| overall | ___ | ___ | Donkey-side view of overall — affects how the donkey loads, reads, or delivers the cargo |
-| latency | ___s | ___ | Tachograph reading — how long the donkey took on the round trip |
+| overall | ___ | ___ | Courier-side view of overall — affects how the courier loads, reads, or delivers the parcels |
+| latency | ___s | ___ | Tachograph reading — how long the courier took on the round trip |
 
 > **What to expect (local):** retrieval 0.65–0.80 (direct keyword match helps), faithfulness near 1.0 (answer comes straight from document), overall should pass comfortably.
 
 📝 **Compare:**
 
-| | Experiment 2a (trick) | Experiment 2b (truthful) | Gap | 🫏 Donkey |
+| | Experiment 2a (trick) | Experiment 2b (truthful) | Gap | 🚚 Courier |
 | --- | --- | --- | --- | --- |
-| faithfulness | ___ | ___ | The gap IS the hallucination signal | Faithfulness gap between trick and truthful runs — the bigger the drop, the more freely the donkey invented cargo |
-| has_hallucination | ___ | ___ | 2a may be flagged because LLM quoted "30 days" from the question | Did the donkey invent details not on the original cargo? Quoting the customer's words can falsely trigger the flag |
-| retrieval | ___ | ___ | "How many days" matches the document better than "after 30 days" | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
-| latency | ___s | ___s | Shorter answers = fewer output tokens = faster | Fewer output tokens = fewer hay-bales chewed = donkey trots back to the stable faster |
+| faithfulness | ___ | ___ | The gap IS the hallucination signal | Faithfulness gap between trick and truthful runs — the bigger the drop, the more freely the courier invented parcels |
+| has_hallucination | ___ | ___ | 2a may be flagged because LLM quoted "30 days" from the question | Did the courier invent details not on the original parcels? Quoting the customer's words can falsely trigger the flag |
+| retrieval | ___ | ___ | "How many days" matches the document better than "after 30 days" | Courier grabs the nearest parcels from the GPS warehouse before writing the answer |
+| latency | ___s | ___s | Shorter answers = fewer output tokens = faster | Fewer output tokens = fewer fuel-fuel loads chewed = courier trots back to the depot faster |
 
 ### Experiment 2c — Edge case: ambiguous question
 
@@ -500,13 +500,13 @@ In **Swagger UI** → `POST /api/evaluate`, enter:
 
 📝 **Results:**
 
-| Metric | Value | Interpretation | 🫏 Donkey |
+| Metric | Value | Interpretation | 🚚 Courier |
 | --- | --- | --- | --- |
-| retrieval | ___ | Lowest retrieval — "how long?" is too vague for precise vector search | GPS coordinates for "how long?" point everywhere at once — donkey returns with a confused mix of refund and shipping backpacks |
-| faithfulness | ___ | ___ | Did the donkey stick to the cargo it was carrying, or invent stuff on the way? |
-| has_hallucination | ___ | ___ | Did the donkey guess at the vague "how long?" or honestly admit it couldn't find a matching backpack? |
+| retrieval | ___ | Lowest retrieval — "how long?" is too vague for precise vector search | GPS coordinates for "how long?" point everywhere at once — courier returns with a confused mix of refund and shipping parcels |
+| faithfulness | ___ | ___ | Did the courier stick to the parcels it was carrying, or invent stuff on the way? |
+| has_hallucination | ___ | ___ | Did the courier guess at the vague "how long?" or honestly admit it couldn't find a matching parcel? |
 | answer_relevance | ___ | ___ | Right address on the parcel — answer_relevance: ___ · ___ |
-| overall | ___ | ___ | Donkey-side view of overall — affects how the donkey loads, reads, or delivers the cargo |
+| overall | ___ | ___ | Courier-side view of overall — affects how the courier loads, reads, or delivers the parcels |
 
 > **What to expect (local):** retrieval 0.40–0.55 (vague query = poor embedding match), faithfulness may be high if the model refuses to guess. overall may surprise you — see analysis below.
 
@@ -542,12 +542,12 @@ The evaluator catches hallucination by: splitting the answer into sentences → 
 
 **Your experiments revealed three patterns:**
 
-| Pattern | Evidence | Lesson | 🫏 Donkey |
+| Pattern | Evidence | Lesson | 🚚 Courier |
 | --- | --- | --- | --- |
-| Correct answer flagged as hallucination | 2a: LLM may say "No, not after 30 days" — correct, but flagged | Heuristic evaluators have false positives | The keyword-only report card sometimes marks a perfectly faithful donkey as cheating |
-| Direct quote = perfect faithfulness | 2b: LLM quoted "14 business days" directly → high faithfulness | Faithfulness rewards sticking to source text | When the donkey copies straight from the backpack, the evaluator awards full marks |
+| Correct answer flagged as hallucination | 2a: LLM may say "No, not after 30 days" — correct, but flagged | Heuristic evaluators have false positives | The keyword-only report card sometimes marks a perfectly faithful courier as cheating |
+| Direct quote = perfect faithfulness | 2b: LLM quoted "14 business days" directly → high faithfulness | Faithfulness rewards sticking to source text | When the courier copies straight from the parcel, the evaluator awards full marks |
 | Refusal beats risky correctness | 2c may score higher than 2a | "I don't know" is the safest answer for evaluation | The report card rewards a polite refusal more than a correct-but-quotable answer |
-| Vague question = retrieval problem | 2c: retrieval dropped significantly | Ambiguity hurts retrieval, not generation | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
+| Vague question = retrieval problem | 2c: retrieval dropped significantly | Ambiguity hurts retrieval, not generation | Courier grabs the nearest parcels from the GPS warehouse before writing the answer |
 
 **✅ Skill unlocked:** You can detect hallucination, understand the faithfulness score, and explain why it gets 40% weight. You can tell the difference between a retrieval problem (wrong chunks) and a generation problem (hallucinated from good chunks). You can also identify when the *evaluator itself* is wrong — a critical skill for AI engineering.
 
@@ -576,7 +576,7 @@ The evaluator catches hallucination by: splitting the answer into sentences → 
 > In production, you'd use LLM-as-judge (a second model evaluating the first) or Bedrock Guardrails
 > grounding checks — both understand context better than keyword overlap.
 
-- 🫏 **Donkey:** When the donkey ignores the backpack and invents an answer from memory — RAG is the cure.
+- 🚚 **Courier:** When the courier ignores the parcel and invents an answer from memory — RAG is the cure.
 
 ---
 
@@ -584,16 +584,16 @@ The evaluator catches hallucination by: splitting the answer into sentences → 
 
 After completing Labs 1 and 2, check off:
 
-| # | Skill | Lab | Can you explain it? | 🫏 Donkey |
+| # | Skill | Lab | Can you explain it? | 🚚 Courier |
 |---|---|---|---| --- |
-| 1 | Retrieval quality measurement | Lab 1 | [ ] Yes | Skill: judging whether the donkey grabbed the right backpacks for the customer's question |
-| 2 | Retrieval-faithfulness trade-off | Lab 1 | [ ] Yes | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
-| 3 | top_k tuning and its impact | Lab 1 | [ ] Yes | How many backpacks the donkey grabs from the warehouse for one delivery |
-| 4 | Hallucination detection | Lab 2 | [ ] Yes | Skill: spotting when the donkey slipped extra items into the delivery that were never in any backpack |
-| 5 | Faithfulness scoring and weight | Lab 2 | [ ] Yes | Reading the donkey's report card and explaining why faithfulness carries the heaviest weight |
-| 6 | Diagnosing retrieval vs generation problems | Lab 2 | [ ] Yes | Donkey grabs the nearest backpacks from the GPS warehouse before writing the answer |
+| 1 | Retrieval quality measurement | Lab 1 | [ ] Yes | Skill: judging whether the courier grabbed the right parcels for the customer's question |
+| 2 | Retrieval-faithfulness trade-off | Lab 1 | [ ] Yes | Courier grabs the nearest parcels from the GPS warehouse before writing the answer |
+| 3 | top_k tuning and its impact | Lab 1 | [ ] Yes | How many parcels the courier grabs from the warehouse for one delivery |
+| 4 | Hallucination detection | Lab 2 | [ ] Yes | Skill: spotting when the courier slipped extra items into the delivery that were never in any parcel |
+| 5 | Faithfulness scoring and weight | Lab 2 | [ ] Yes | Reading the courier's report card and explaining why faithfulness carries the heaviest weight |
+| 6 | Diagnosing retrieval vs generation problems | Lab 2 | [ ] Yes | Courier grabs the nearest parcels from the GPS warehouse before writing the answer |
 
-- 🫏 **Donkey:** A practice delivery run — the donkey completes a structured exercise to build muscle memory before real production routes.
+- 🚚 **Courier:** A practice delivery run — the courier completes a structured exercise to build muscle memory before real production routes.
 
 ---
 

@@ -26,24 +26,24 @@ Poetry is a **package manager for Python**. It does three things:
 
 Think of it as npm/yarn for Python.
 
-- 🫏 **Donkey:** The supply shed manifest — every tool and library is pinned to an exact version so any stable can reproduce the same setup.
+- 🚚 **Courier:** The supply shed manifest — every tool and library is pinned to an exact version so any depot can reproduce the same setup.
 
 ---
 
 ## Poetry vs pip — what is different
 
-| Task | pip (old way) | Poetry (this project) | 🫏 Donkey |
+| Task | pip (old way) | Poetry (this project) | 🚚 Courier |
 | --- | --- | --- | --- |
-| Define dependencies | `requirements.txt` (manual) | `pyproject.toml` (structured) | The supply shed manifest — every tool the donkey needs, structured and versioned |
-| Lock exact versions | `pip freeze > requirements.txt` (fragile) | `poetry.lock` (automatic) | Locks every tool to an exact version so any stable rebuilds the donkey identically |
+| Define dependencies | `requirements.txt` (manual) | `pyproject.toml` (structured) | The supply shed manifest — every tool the courier needs, structured and versioned |
+| Lock exact versions | `pip freeze > requirements.txt` (fragile) | `poetry.lock` (automatic) | Locks every tool to an exact version so any depot rebuilds the courier identically |
 | Install dependencies | `pip install -r requirements.txt` | `poetry install` | Tack-room inventory list — Install dependencies: pip install -r requirements.txt · poetry install |
 | Add a package | Edit requirements.txt + `pip install` | `poetry add <package>` | Supply shed manifest — Add a package: Edit requirements.txt + pip install · poetry add <package> |
-| Remove a package | Edit requirements.txt + `pip uninstall` | `poetry remove <package>` | Stable's supply ledger — Remove a package: Edit requirements.txt + pip uninstall · poetry remove <package> |
-| Create venv | `python -m venv .venv` (manual) | `poetry install` (automatic) | Stable's supply ledger — Create venv: python -m venv .venv (manual) · poetry install (automatic) |
-| Run a command in venv | `source .venv/bin/activate && python` | `poetry run python` | Stable's supply ledger — Run a command in venv: source .venv/bin/activate && python · poetry run python |
+| Remove a package | Edit requirements.txt + `pip uninstall` | `poetry remove <package>` | Depot's supply ledger — Remove a package: Edit requirements.txt + pip uninstall · poetry remove <package> |
+| Create venv | `python -m venv .venv` (manual) | `poetry install` (automatic) | Depot's supply ledger — Create venv: python -m venv .venv (manual) · poetry install (automatic) |
+| Run a command in venv | `source .venv/bin/activate && python` | `poetry run python` | Depot's supply ledger — Run a command in venv: source .venv/bin/activate && python · poetry run python |
 | Separate dev deps | Multiple requirements files | `[tool.poetry.group.dev.dependencies]` | Tack-room inventory list — Separate dev deps: Multiple requirements files · [tool.poetry.group.dev.dependencies] |
 
-- 🫏 **Donkey:** The supply shed manifest — every tool and library is pinned to an exact version so any stable can reproduce the same setup.
+- 🚚 **Courier:** The supply shed manifest — every tool and library is pinned to an exact version so any depot can reproduce the same setup.
 
 ---
 
@@ -94,7 +94,7 @@ This is the virtual environment. It contains:
 └── pyvenv.cfg
 ```
 
-- 🫏 **Donkey:** The supply shed manifest — every tool and library is pinned to an exact version so any stable can reproduce the same setup.
+- 🚚 **Courier:** The supply shed manifest — every tool and library is pinned to an exact version so any depot can reproduce the same setup.
 
 ---
 
@@ -134,7 +134,7 @@ ruff = "^0.6.0"               # Linter — not needed in production
 start = "src.main:run"        # `poetry run start` calls src/main.py → run()
 ```
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
@@ -238,7 +238,7 @@ poetry show --tree
 poetry check
 ```
 
-- 🫏 **Donkey:** The supply shed manifest — every tool and library is pinned to an exact version so any stable can reproduce the same setup.
+- 🚚 **Courier:** The supply shed manifest — every tool and library is pinned to an exact version so any depot can reproduce the same setup.
 
 ---
 
@@ -270,7 +270,7 @@ poetry run python -c "import fastapi; print(fastapi.__version__)"
 
 `poetry run` automatically uses the correct Python from `.venv/` without needing to activate.
 
-- 🫏 **Donkey:** The supply shed manifest — every tool and library is pinned to an exact version so any stable can reproduce the same setup.
+- 🚚 **Courier:** The supply shed manifest — every tool and library is pinned to an exact version so any depot can reproduce the same setup.
 
 ---
 
@@ -297,7 +297,7 @@ git add pyproject.toml poetry.lock
 git commit -m "feat: add Redis support"
 ```
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -336,4 +336,4 @@ poetry cache clear --all pypi
 poetry install
 ```
 
-- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
+- 🚚 **Courier:** When the courier returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.

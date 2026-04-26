@@ -75,7 +75,7 @@ from the vector store).
 **DE parallel:** Upload is an ETL pipeline. Extract (read the file) → Transform
 (chunk + embed) → Load (store in vector DB). List and Delete are standard CRUD.
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
@@ -148,7 +148,7 @@ Response: {
 }
 ```
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
@@ -170,10 +170,10 @@ SUPPORTED_EXTENSIONS = {".pdf", ".txt", ".md", ".csv", ".docx"}
 
 **What each line does:**
 
-| Line | Purpose | DE parallel | 🫏 Donkey |
+| Line | Purpose | DE parallel | 🚚 Courier |
 | --- | --- | --- | --- |
 | `_documents: dict[str, DocumentInfo] = {}` | In-memory storage for document metadata | Like a cache dict — in prod you'd use DynamoDB | Amazon's loading dock — _documents: dict[str, DocumentInfo] = {}: In-memory storage for document metadata · Like a cache dict — in prod you'd use DynamoDB |
-| `SUPPORTED_EXTENSIONS` | Allowlist of file types we can parse | Input validation — same as any upload endpoint | Where parcels are dropped at the stable — SUPPORTED_EXTENSIONS: Allowlist of file types we can parse · Input validation — same as any upload endpoint |
+| `SUPPORTED_EXTENSIONS` | Allowlist of file types we can parse | Input validation — same as any upload endpoint | Where parcels are dropped at the depot — SUPPORTED_EXTENSIONS: Allowlist of file types we can parse · Input validation — same as any upload endpoint |
 
 **Why in-memory?** This is a portfolio project. In production, you'd store this in
 DynamoDB (AWS) or CosmosDB (Azure) so it survives app restarts. The pattern is the
@@ -200,13 +200,13 @@ same — `_documents[id] = info` vs `dynamodb.put_item(item=info)`.
 
 **Why these specific formats?**
 
-| Format | Parser used | Why supported | 🫏 Donkey |
+| Format | Parser used | Why supported | 🚚 Courier |
 | --- | --- | --- | --- |
-| `.pdf` | `pypdf` (PdfReader) | Most common document format in enterprises | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
-| `.txt` | Built-in `.decode("utf-8")` | Plain text, simplest case | Donkey-side view of .txt — affects how the donkey loads, reads, or delivers the cargo |
-| `.md` | Built-in `.decode("utf-8")` | Documentation, READMEs | Donkey-side view of .md — affects how the donkey loads, reads, or delivers the cargo |
-| `.csv` | Built-in `.decode("utf-8")` | Tabular data (each row becomes text) | Donkey-side view of .csv — affects how the donkey loads, reads, or delivers the cargo |
-| `.docx` | `python-docx` | Microsoft Word — common in enterprises | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
+| `.pdf` | `pypdf` (PdfReader) | Most common document format in enterprises | Post office sorting raw mail into GPS-labelled boxes before the courier's first trip |
+| `.txt` | Built-in `.decode("utf-8")` | Plain text, simplest case | Courier-side view of .txt — affects how the courier loads, reads, or delivers the parcels |
+| `.md` | Built-in `.decode("utf-8")` | Documentation, READMEs | Courier-side view of .md — affects how the courier loads, reads, or delivers the parcels |
+| `.csv` | Built-in `.decode("utf-8")` | Tabular data (each row becomes text) | Courier-side view of .csv — affects how the courier loads, reads, or delivers the parcels |
+| `.docx` | `python-docx` | Microsoft Word — common in enterprises | Post office sorting raw mail into GPS-labelled boxes before the courier's first trip |
 
 **Not supported:** `.xlsx` (Excel), `.pptx` (PowerPoint), `.html` — each would need
 its own parser. These could be added later.
@@ -324,11 +324,11 @@ format (PDF/CSV/DOCX) into a common format (plain text). Same as reading a CSV f
 S3 and loading it into a Pandas DataFrame — the output format is always the same
 regardless of input format.
 
-| ETL Extract | RAG Extract | 🫏 Donkey |
+| ETL Extract | RAG Extract | 🚚 Courier |
 | --- | --- | --- |
-| Read CSV from S3 → DataFrame | Read PDF from upload → string | Same fetch-and-parse skill — instead of loading rows into pandas, the donkey loads pages into a string |
+| Read CSV from S3 → DataFrame | Read PDF from upload → string | Same fetch-and-parse skill — instead of loading rows into pandas, the courier loads pages into a string |
 | Read JSON from API → DataFrame | Read DOCX from upload → string | Door the customer knocks on — Read JSON from API → DataFrame: Read DOCX from upload → string |
-| Read Parquet from S3 → DataFrame | Read TXT from upload → string | Same fetch-and-parse skill — instead of columnar tables, the donkey reads plain text |
+| Read Parquet from S3 → DataFrame | Read TXT from upload → string | Same fetch-and-parse skill — instead of columnar tables, the courier reads plain text |
 
 **Why `[Page N]` markers?** When the document is later chunked, these markers help
 track which page each chunk came from. This is how `page_number` ends up in the
@@ -445,11 +445,11 @@ and aggregating data, you're splitting and sizing it. Think of it like partition
 a large file into smaller files for parallel processing, but with overlapping
 boundaries so you don't lose context at the edges.
 
-| ETL Transform | RAG Transform (chunking) | 🫏 Donkey |
+| ETL Transform | RAG Transform (chunking) | 🚚 Courier |
 | --- | --- | --- |
-| Split large CSV into 100 row batches | Split document into 1000 char chunks | Slice incoming mail into 1000-character backpack pockets the donkey can later carry one at a time. |
-| Partitioning with no overlap | Partitioning WITH overlap (200 chars) | Each backpack pocket shares 200 characters with its neighbour so a sentence cut at the seam isn't lost between trips. |
-| Purpose: parallel processing | Purpose: precise vector matching | Smaller backpack pockets get sharper GPS coordinate stamps so the warehouse can match a question to the right one. |
+| Split large CSV into 100 row batches | Split document into 1000 char chunks | Slice incoming mail into 1000-character parcel pockets the courier can later carry one at a time. |
+| Partitioning with no overlap | Partitioning WITH overlap (200 chars) | Each parcel pocket shares 200 characters with its neighbour so a sentence cut at the seam isn't lost between trips. |
+| Purpose: parallel processing | Purpose: precise vector matching | Smaller parcel pockets get sharper GPS coordinate stamps so the warehouse can match a question to the right one. |
 
 **Cost of this step:** $0 — pure Python computation, no API calls.
 
@@ -520,10 +520,10 @@ These vectors capture the *meaning* of each chunk. Later, when someone asks a qu
 transformation. First you chunked (split), now you embed (convert format). Think of
 it like:
 
-| ETL Transform | RAG Transform (embedding) | 🫏 Donkey |
+| ETL Transform | RAG Transform (embedding) | 🚚 Courier |
 | --- | --- | --- |
-| Convert CSV strings to typed columns | Convert text chunks to number vectors | The post office stamps each backpack with GPS coordinates — text becomes a vector the warehouse can sort by meaning. |
-| Parse dates, cast integers | Run through neural network to get floats | Stable yard fencing — controls which routes traffic may take in and out |
+| Convert CSV strings to typed columns | Convert text chunks to number vectors | The post office stamps each parcel with GPS coordinates — text becomes a vector the warehouse can sort by meaning. |
+| Parse dates, cast integers | Run through neural network to get floats | Depot yard fencing — controls which routes traffic may take in and out |
 | Output: structured rows | Output: vectors — 1024-dim (AWS Titan), 1536-dim (Azure), or 768-dim (Local Ollama) | Each chunk leaves the post office stamped with GPS coordinates — the dimension count depends on which embedding stamper you use |
 | Purpose: make data queryable by SQL | Purpose: make text searchable by meaning | Closest SQL/DE concept — for engineers who think in tables not GPS coordinates |
 
@@ -706,13 +706,13 @@ a graph structure that lets you jump to the most similar vectors in ~O(log N) ti
 into a database. The difference is the data type — instead of rows in Redshift,
 you're storing vectors in OpenSearch.
 
-| ETL Load | RAG Load | 🫏 Donkey |
+| ETL Load | RAG Load | 🚚 Courier |
 | --- | --- | --- |
 | Write rows to Redshift | Write vectors to OpenSearch / Azure AI Search | Amazon's index room — Write rows to Redshift: Write vectors to OpenSearch / Azure AI Search |
-| CREATE TABLE with columns | CREATE INDEX with knn_vector mapping (AWS) or SearchIndex (Azure) | Lay out the GPS warehouse aisles up front — declare the vector field and HNSW signs so the donkey can navigate. |
+| CREATE TABLE with columns | CREATE INDEX with knn_vector mapping (AWS) or SearchIndex (Azure) | Lay out the GPS warehouse aisles up front — declare the vector field and HNSW signs so the courier can navigate. |
 | INSERT INTO table VALUES | `client.index(body=doc)` (AWS) or `upload_documents(batch)` (Azure) | Amazon's loading dock — INSERT INTO table VALUES: client.index(body=doc) (AWS) or upload_documents(batch) (Azure) |
-| Each row has typed columns | Each doc has text + vector + metadata | Every backpack on the GPS warehouse shelf carries its text, its coordinate stamp, and a routing-label metadata tag. |
-| Queried with SQL WHERE | Queried with k-NN vector search | The donkey asks the GPS warehouse for the k nearest backpacks to the question's coordinate, not for an exact label match. |
+| Each row has typed columns | Each doc has text + vector + metadata | Every parcel on the GPS warehouse shelf carries its text, its coordinate stamp, and a routing-label metadata tag. |
+| Queried with SQL WHERE | Queried with k-NN vector search | The courier asks the GPS warehouse for the k nearest parcels to the question's coordinate, not for an exact label match. |
 
 **Why `document_id` is stored with every chunk:**
 
@@ -809,14 +809,14 @@ registry entry and returns the response.
 
 **What each field means:**
 
-| Field | Example | Purpose | 🫏 Donkey |
+| Field | Example | Purpose | 🚚 Courier |
 | --- | --- | --- | --- |
-| `document_id` | `"a1b2c3d4-..."` | Unique identifier | Tracking number stamped on the parcel so the donkey can find it again |
-| `filename` | `"refund-policy.pdf"` | Original filename | Stable keys — only authorised callers may ask the donkey to deliver |
-| `status` | `DocumentStatus.READY` | Lifecycle stage | Donkey-side view of status — affects how the donkey loads, reads, or delivers the cargo |
-| `chunk_count` | `42` | How many searchable pieces it became | Number of backpack pockets the document was split into — each pocket is one searchable piece on the warehouse shelf. |
-| `uploaded_at` | `2026-04-07T10:30:00Z` | When it was uploaded | Timestamp stamped on the trip log entry — when the donkey set off or returned |
-| `file_size_bytes` | `1048576` | File size (1 MB) | Donkey-side view of file_size_bytes — affects how the donkey loads, reads, or delivers the cargo |
+| `document_id` | `"a1b2c3d4-..."` | Unique identifier | Tracking number stamped on the parcel so the courier can find it again |
+| `filename` | `"refund-policy.pdf"` | Original filename | Depot keys — only authorised callers may ask the courier to deliver |
+| `status` | `DocumentStatus.READY` | Lifecycle stage | Courier-side view of status — affects how the courier loads, reads, or delivers the parcels |
+| `chunk_count` | `42` | How many searchable pieces it became | Number of parcel pockets the document was split into — each pocket is one searchable piece on the warehouse shelf. |
+| `uploaded_at` | `2026-04-07T10:30:00Z` | When it was uploaded | Timestamp stamped on the trip log entry — when the courier set off or returned |
+| `file_size_bytes` | `1048576` | File size (1 MB) | Courier-side view of file_size_bytes — affects how the courier loads, reads, or delivers the parcels |
 
 **Status lifecycle:**
 
@@ -924,7 +924,7 @@ async def list_documents() -> DocumentListResponse:
 }
 ```
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
@@ -961,7 +961,7 @@ results. This is a known limitation documented in the code.
 **DE parallel:** `DELETE FROM documents WHERE id = ?` + `DELETE FROM chunks WHERE document_id = ?`
 — cascading deletes. Nothing AI-specific here.
 
-- 🫏 **Donkey:** The specific delivery address the donkey is dispatched to — each route handles a different type of cargo drop-off.
+- 🚚 **Courier:** The specific delivery address the courier is dispatched to — each route handles a different type of parcels drop-off.
 
 ---
 
@@ -1003,7 +1003,7 @@ LOAD                                        LOAD (Step 4: STORE)
 - Querying isn't SQL WHERE — it's cosine similarity
 - "Quality" isn't data completeness — it's embedding accuracy and chunk granularity
 
-- 🫏 **Donkey:** Running multiple donkeys on the same route to confirm that AI engineering and data engineering practices mirror each other.
+- 🚚 **Courier:** Running multiple couriers on the same route to confirm that AI engineering and data engineering practices mirror each other.
 
 ---
 
@@ -1011,13 +1011,13 @@ LOAD                                        LOAD (Step 4: STORE)
 
 For a 12-page PDF (~8000 words, ~42 chunks):
 
-| Step | What happens | AWS cost | Azure cost | AWS time | Azure time | 🫏 Donkey |
+| Step | What happens | AWS cost | Azure cost | AWS time | Azure time | 🚚 Courier |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1. READ | Parse PDF → text | $0 | $0 | ~50ms | ~50ms | Free hay for the donkey — 1. READ: Parse PDF → text · $0 · $0 · ~50ms · ~50ms |
-| 2. CHUNK | Split into 42 pieces | $0 | $0 | ~5ms | ~5ms | Slice the parsed document into 42 backpack pockets — pure local Python, no API calls, costs nothing. |
+| 1. READ | Parse PDF → text | $0 | $0 | ~50ms | ~50ms | Free fuel for the courier — 1. READ: Parse PDF → text · $0 · $0 · ~50ms · ~50ms |
+| 2. CHUNK | Split into 42 pieces | $0 | $0 | ~5ms | ~5ms | Slice the parsed document into 42 parcel pockets — pure local Python, no API calls, costs nothing. |
 | 3. EMBED | Convert chunks → vectors | $0.000168 (Titan, 42 calls) | $0.000168 (text-embedding-3-small, 1 call) | **~2100ms** | **~150ms** | GPS stamp on the parcel — 3. EMBED: Convert chunks → vectors · $0.000168 (Titan, 42 calls) · $0.000168 (text-embedding-3-small, 1 call) · ~2100ms · |
 | 4. STORE | Write to vector database | ~$0 (OpenSearch) | ~$0 (AI Search) | **~420ms** | **~50ms** | OpenSearch sorting office — 4. STORE: Write to vector database · ~$0 (OpenSearch) · ~$0 (AI Search) · ~420ms · ~50ms |
-| **Total per doc** | | **~$0.0002** | **~$0.0002** | **~2.6s** | **~0.25s** | Stable's monthly feed bill — Total per doc: ~$0.0002 · ~$0.0002 · ~2.6s · ~0.25s |
+| **Total per doc** | | **~$0.0002** | **~$0.0002** | **~2.6s** | **~0.25s** | Depot's monthly feed bill — Total per doc: ~$0.0002 · ~$0.0002 · ~2.6s · ~0.25s |
 | **Monthly infra** | | ~$350 (OpenSearch 2 OCU) | ~$75 (AI Search Basic) | — | — | AWS search hub — Monthly infra: ~$350 (OpenSearch 2 OCU) · ~$75 (AI Search Basic) · — · — |
 
 **Key insight:** Same cost, but **Azure is ~10x faster for ingestion** due to native
@@ -1028,23 +1028,23 @@ both clouds — the expensive part is the monthly infrastructure.
 costs $0.0065. After ~30 questions about that document, the query costs have exceeded
 the ingestion cost 1000x.
 
-- 🫏 **Donkey:** The feed bill — how much hay (tokens) the donkey eats per delivery, and how to reduce waste without starving it.
+- 🚚 **Courier:** The feed bill — how much fuel (tokens) the courier eats per delivery, and how to reduce waste without starving it.
 
 ---
 
 ## What Could Go Wrong
 
-| Error scenario | What happens | HTTP status | 🫏 Donkey |
+| Error scenario | What happens | HTTP status | 🚚 Courier |
 | --- | --- | --- | --- |
-| Unsupported file type (.exe, .xlsx) | Validation rejects before any AI call | `400` | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
-| RAG chain not initialised | Route returns error immediately | `500` | Stable's front door — the URL customers use to drop off a question |
-| PDF is corrupted / unparseable | `read_document()` throws → caught by try/except | `500` | Stable broke down — donkey couldn't complete the trip, customer sees an error |
-| PDF is scanned images (no text) | `read_document()` returns empty string → 0 chunks | `200` (with chunk_count=0) | Scanned-image PDF yields no text, so the post office produces zero backpacks and the donkey has nothing to deliver. |
+| Unsupported file type (.exe, .xlsx) | Validation rejects before any AI call | `400` | Post office sorting raw mail into GPS-labelled boxes before the courier's first trip |
+| RAG chain not initialised | Route returns error immediately | `500` | Depot's front door — the URL customers use to drop off a question |
+| PDF is corrupted / unparseable | `read_document()` throws → caught by try/except | `500` | Depot broke down — courier couldn't complete the trip, customer sees an error |
+| PDF is scanned images (no text) | `read_document()` returns empty string → 0 chunks | `200` (with chunk_count=0) | Scanned-image PDF yields no text, so the post office produces zero parcels and the courier has nothing to deliver. |
 | Embedding API fails (Bedrock / Azure OpenAI down) | Exception in Step 3 → document saved as FAILED | `500` | GPS stamper is offline — the post office can't label parcels for the warehouse, so the document is shelved as FAILED |
 | Vector store down (OpenSearch / Azure AI Search) | Exception in Step 4 → document saved as FAILED | `500` | AWS search hub — Vector store down (OpenSearch / Azure AI Search): Exception in Step 4 → document saved as FAILED · 500 |
 | File is too large (out of memory) | `await file.read()` fails → exception | `500` | Line scribbled in the trip ledger — File is too large (out of memory): await file.read() fails → exception · 500 |
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -1074,4 +1074,4 @@ the ingestion cost 1000x.
 - [ ] When would you make ingestion async (background job) instead of synchronous?
 - [ ] How would you handle duplicate documents (re-uploading the same file)?
 
-- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.
+- 🚚 **Courier:** A quick quiz for the trainee dispatch clerk — answer these to confirm the key courier delivery concepts have landed.

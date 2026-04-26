@@ -40,7 +40,7 @@ The 16 labs are **NOT 16 different metrics**. They are **16 different things you
 
 So when you see Lab 11 (hybrid search) reporting `retrieval = 0.825, faithfulness = 1.00`, those numbers exist because that's how we tell whether **turning hybrid search ON** made the system better or worse than the Lab 1 baseline. The metrics are the ruler. The labs are the experiments. **The ruler doesn't change between labs — only the knob you're turning does.**
 
-🫏 **The donkey way:** the report card always grades the same 4 subjects. Each lab is a different lesson plan. The report card is how you know if the lesson worked.
+🚚 **The courier way:** the report card always grades the same 4 subjects. Each lab is a different lesson plan. The report card is how you know if the lesson worked.
 
 ---
 
@@ -148,8 +148,8 @@ The single sentence summary of every lab. Bookmark this table.
 4. **Compare against Local vs Azure vs AWS** in `scripts/lab_results/local-vs-azure-comparison.md`. Seeing the same lab across 3 providers makes the *what changed?* question concrete.
 5. **Ask:** "is this lab telling me a *number*, or a *trade-off*?" Most labs are trade-offs. The number is just one half of the story.
 
-🫏 **Final donkey wisdom:** every lab is one of these two questions, dressed differently:
+🚚 **Final courier wisdom:** every lab is one of these two questions, dressed differently:
 - "I changed knob X. Is the report card better or worse?" (Labs 1, 2, 6, 10, 11, 13)
-- "I changed knob X. Did the donkey now refuse / crash / answer slower?" (Labs 4, 8, 9, 12, 14, 15)
+- "I changed knob X. Did the courier now refuse / crash / answer slower?" (Labs 4, 8, 9, 12, 14, 15)
 
 Once you see this, the labs stop feeling repetitive. They become a series of small, controlled experiments — exactly what production AI engineering actually is.

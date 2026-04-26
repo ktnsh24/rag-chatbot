@@ -30,7 +30,7 @@ Simple analogy:
 - **Without RAG**: You ask someone a question and they answer from memory (might be wrong or outdated)
 - **With RAG**: You ask someone a question, they first look up relevant pages in a book, then answer based on what they found (grounded in facts)
 
-> 🫏 **Donkey analogy:** The LLM is the donkey — it carries your question to an answer. Without RAG, the donkey answers from memory — sometimes confidently wrong. With RAG, the donkey checks the backpack full of your documents before speaking. The backpack is the retrieval system. No backpack = guessing. Full backpack = grounded answers.
+> 🚚 **Courier analogy:** The LLM is the courier — it carries your question to an answer. Without RAG, the courier answers from memory — sometimes confidently wrong. With RAG, the courier checks the parcel full of your documents before speaking. The parcel is the retrieval system. No parcel = guessing. Full parcel = grounded answers.
 
 ---
 
@@ -50,7 +50,7 @@ RAG fixes all of these by:
 3. Giving those documents to the LLM as context
 4. The LLM answers based on your actual data
 
-> 🫏 **Donkey analogy:** Imagine a donkey that grew up reading only public newspapers (training data). Ask it about your company's internal refund policy — it will confidently make something up, because newspapers never covered that. RAG gives the donkey a private courier bag of YOUR documents before every delivery. Now it reads from the bag first. Hallucination fixed.
+> 🚚 **Courier analogy:** Imagine a courier that grew up reading only public newspapers (training data). Ask it about your company's internal refund policy — it will confidently make something up, because newspapers never covered that. RAG gives the courier a private courier bag of YOUR documents before every delivery. Now it reads from the bag first. Hallucination fixed.
 
 ---
 
@@ -101,7 +101,7 @@ Generate: Send to LLM:
 Answer: "Based on the documents, refunds are processed within 14 days..."
 ```
 
-> 🫏 **Donkey analogy:** Phase 1 (ingestion) is like the post office sorting all your letters into labelled boxes before the donkey arrives. Phase 2 (query) is the donkey's actual delivery run — it reads the address (your question), checks the right box (vector search), picks up the most relevant letters (top-k chunks), and delivers them to the LLM to write the final reply. No pre-sorting = the donkey has to read every letter on every delivery. Pre-sorted = instant pickup.
+> 🚚 **Courier analogy:** Phase 1 (ingestion) is like the post office sorting all your letters into labelled boxes before the courier arrives. Phase 2 (query) is the courier's actual delivery run — it reads the address (your question), checks the right box (vector search), picks up the most relevant letters (top-k chunks), and delivers them to the LLM to write the final reply. No pre-sorting = the courier has to read every letter on every delivery. Pre-sorted = instant pickup.
 
 ---
 
@@ -128,17 +128,17 @@ RAG has three completely different components. Confusing them is the #1 beginner
 | **Analogy** | Translator (English → coordinates) | Library catalogue | Author who writes answers |
 | **Example** | Titan Embeddings v2, text-embedding-3-small, nomic-embed-text | OpenSearch, Azure AI Search, ChromaDB | Claude 3.5 Sonnet, GPT-4o, llama3.2 |
 | **Runs when** | Ingestion + every query | Every query (search) | Every query (generation) |
-| **🫏 Donkey** | The translator who converts your text into GPS coordinates the warehouse understands | The GPS-indexed warehouse — finds the nearest shelf in milliseconds using stadium signs | The donkey — picks up the retrieved packages, reads them, and writes the final answer |
+| **🚚 Courier** | The translator who converts your text into GPS coordinates the warehouse understands | The GPS-indexed warehouse — finds the nearest shelf in milliseconds using stadium signs | The courier — picks up the retrieved packages, reads them, and writes the final answer |
 
 **Key insight:** OpenSearch / Azure AI Search / ChromaDB is a **database**, not a model.
 It doesn't understand text — it stores vectors and finds similar ones. The embedding
 model is what converts text into vectors that the store can work with.
 
-> 🫏 **Donkey analogy:** Three workers, one delivery:
+> 🚚 **Courier analogy:** Three workers, one delivery:
 > - The **embedding model** is the translator — it converts your question from English into coordinates on a map.
 > - The **vector store** is the warehouse with a GPS index — it finds the nearest box by coordinates instantly, without reading every label.
-> - The **LLM** is the donkey — it picks up those boxes, reads the contents, and writes the final answer.
-> Mix them up and the whole system breaks. You wouldn't ask the warehouse to write the answer, or the donkey to do the indexing.
+> - The **LLM** is the courier — it picks up those boxes, reads the contents, and writes the final answer.
+> Mix them up and the whole system breaks. You wouldn't ask the warehouse to write the answer, or the courier to do the indexing.
 
 ---
 
@@ -214,7 +214,7 @@ embedding model produces. This is a hard requirement:
 
 If these don't match, you get an error — like trying to put a square peg in a round hole.
 
-> 🫏 **Donkey analogy:** An embedding is the donkey's internal address book — it converts the meaning of any text into a precise GPS coordinate in a 1024-dimensional city. "Refund policy" and "money back guarantee" end up on the same street corner (similar coordinates). "Pizza recipe" ends up in a completely different neighbourhood. The donkey doesn't read words — it navigates by coordinates. That's why it finds related content even when you use different words.
+> 🚚 **Courier analogy:** An embedding is the courier's internal address book — it converts the meaning of any text into a precise GPS coordinate in a 1024-dimensional city. "Refund policy" and "money back guarantee" end up on the same street corner (similar coordinates). "Pizza recipe" ends up in a completely different neighbourhood. The courier doesn't read words — it navigates by coordinates. That's why it finds related content even when you use different words.
 
 ---
 
@@ -244,7 +244,7 @@ Most vector stores use **HNSW** (Hierarchical Navigable Small World) — a graph
 4. To find nearest neighbors: start at top, narrow down layer by layer
 5. Result: O(log N) search time instead of O(N) brute force
 
-> 🫏 **Donkey analogy:** A regular database is a donkey that checks every house on every street to find your package — fine for 10 houses, impossibly slow for 1 million. A vector store with HNSW is a donkey with a highway system: it jumps onto the motorway first (top layer, few exits), takes the right exit to a main road (middle layer), then navigates to the exact street (bottom layer). Instead of visiting 1,000,000 houses, it visits ~20 waypoints. That's why it answers in milliseconds.
+> 🚚 **Courier analogy:** A regular database is a courier that checks every house on every street to find your package — fine for 10 houses, impossibly slow for 1 million. A vector store with HNSW is a courier with a highway system: it jumps onto the motorway first (top layer, few exits), takes the right exit to a main road (middle layer), then navigates to the exact street (bottom layer). Instead of visiting 1,000,000 houses, it visits ~20 waypoints. That's why it answers in milliseconds.
 
 ---
 
@@ -332,39 +332,39 @@ Search process:
 Result: O(log N) comparisons instead of O(N). For 1 million vectors, that's ~20
 comparisons instead of 1,000,000.
 
-> 🫏 **Donkey analogy — how does the vector database find results so fast?**
+> 🚚 **Courier analogy — how does the vector database find results so fast?**
 >
-> The donkey needs to find the closest matching document chunk — and there are **50,000 chunks** in the vector store (like 50,000 seats in a football stadium).
+> The courier needs to find the closest matching document chunk — and there are **50,000 chunks** in the vector store (like 50,000 seats in a football stadium).
 >
 > ---
 >
 > **❌ Without HNSW (brute force):**
-> The donkey sniffs chunk #1... not a match. Chunk #2... not a match. Chunk #3...
-> → 50,000 sniffs. The donkey collapses before the answer is found.
+> The courier sniffs chunk #1... not a match. Chunk #2... not a match. Chunk #3...
+> → 50,000 sniffs. The courier collapses before the answer is found.
 >
 > ---
 >
-> **✅ With HNSW — the donkey follows the stadium signs:**
+> **✅ With HNSW — the courier follows the stadium signs:**
 >
-> The stadium has signs at every level. At each sign, the donkey asks one question:
+> The stadium has signs at every level. At each sign, the courier asks one question:
 > *"Am I getting warmer or colder?"* — and moves only toward warmer.
 >
 > **Sign 1 — Stadium entrance: Sections A–Z**
-> The donkey checks 3 section signs:
+> The courier checks 3 section signs:
 > - Section A → too far from the target meaning
 > - Section G → closer ✓ move here
 > - Section M → exact section ✓ stop
 > → **3 checks**
 >
 > **Sign 2 — Inside Section M: Rows 1–50**
-> The donkey checks 3 row markers:
+> The courier checks 3 row markers:
 > - Row 10 → getting warmer
 > - Row 20 → warmer still
 > - Row 23 → warmest ✓ stop
 > → **3 checks**
 >
 > **Sign 3 — Row 23: Seats 1–30**
-> The donkey checks 3 seats:
+> The courier checks 3 seats:
 > - Seat 5 → cold
 > - Seat 10 → warmer
 > - Seat 14 → hottest ✓ found it
@@ -376,9 +376,9 @@ comparisons instead of 1,000,000.
 >
 > Each "check" in real HNSW is: *measure cosine similarity between the query vector and this candidate vector — is it higher than the best so far?* If yes → move there and check its neighbours. If no → stop.
 >
-> The signs were built **at ingestion time** when you uploaded your documents. That's why uploading is slightly slower — the donkey is mapping the stadium once. Every search after that is instant, because the signs are already there.
+> The signs were built **at ingestion time** when you uploaded your documents. That's why uploading is slightly slower — the courier is mapping the stadium once. Every search after that is instant, because the signs are already there.
 >
-> Add 10× more chunks? The donkey just reads one more sign per level. That's O(log N) — the work barely grows as the data grows.
+> Add 10× more chunks? The courier just reads one more sign per level. That's O(log N) — the work barely grows as the data grows.
 
 > **For interviews:** Level 1 + Level 2 is sufficient. Level 3 is for senior
 > roles or if the interviewer asks "how does the vector database find results so fast?"
@@ -491,7 +491,7 @@ WITH OVERLAP (good):
 - Semantic: use an LLM to identify topic boundaries
 - Sliding window: fixed size with variable overlap
 
-> 🫏 **Donkey analogy:** Your document is a long cargo train — too heavy for one donkey trip. You cut it into backpack-sized loads (chunks). The trick: each bag shares the last few items with the next bag (overlap). Why? Because the important clue might be "the refund window is..." at the end of bag 4 and "...14 days from purchase" at the start of bag 5. Without overlap, you'd retrieve one bag and miss the answer. With overlap, both bags contain the full sentence, so whichever one the donkey retrieves has the complete thought.
+> 🚚 **Courier analogy:** Your document is a long parcels train — too heavy for one courier trip. You cut it into parcel-sized loads (chunks). The trick: each bag shares the last few items with the next bag (overlap). Why? Because the important clue might be "the refund window is..." at the end of bag 4 and "...14 days from purchase" at the start of bag 5. Without overlap, you'd retrieve one bag and miss the answer. With overlap, both bags contain the full sentence, so whichever one the courier retrieves has the complete thought.
 
 ---
 
@@ -515,7 +515,7 @@ They are independent:
 | **Can you change it?** | Yes — config parameter | No — fixed by model architecture |
 | **Typical values** | 200–2000 characters | 768, 1024, 1536, 3072 |
 | **Affects** | How many chunks you get | How "detailed" the meaning representation is |
-| **🫏 Donkey** | Size of each backpack — you pack it bigger or smaller before the trip | The GPS label format printed on every bag — always 1024 numbers, the model decides, you can't change it |
+| **🚚 Courier** | Size of each parcel — you pack it bigger or smaller before the trip | The GPS label format printed on every bag — always 1024 numbers, the model decides, you can't change it |
 
 ### The relationship
 
@@ -539,7 +539,7 @@ Think of it like writing a book summary:
 - **vector dimensions** = the summary form (always a 5-star rating + 10-word headline)
 - Short chapter or long chapter — the summary format stays the same
 
-> 🫏 **Donkey analogy:** The chunk size is the size of each package the donkey carries — you can choose small (200 chars) or big (2000 chars) packages. The vector dimensions are the size of the GPS coordinate label printed on each package — always the same 1024 numbers, no matter how small or large the package. The warehouse sorts packages by their GPS label, not by how heavy they are. Different loads, same label format — they always fit the same GPS slot.
+> 🚚 **Courier analogy:** The chunk size is the size of each package the courier carries — you can choose small (200 chars) or big (2000 chars) packages. The vector dimensions are the size of the GPS coordinate label printed on each package — always the same 1024 numbers, no matter how small or large the package. The warehouse sorts packages by their GPS label, not by how heavy they are. Different loads, same label format — they always fit the same GPS slot.
 
 ---
 
@@ -560,7 +560,7 @@ cos_similarity("What is the refund policy?", "Pizza recipe") = 0.05
 
 In this project, when you ask a question, the vector store returns chunks sorted by cosine similarity. The top-k chunks (highest scores) become the context for the LLM.
 
-> 🫏 **Donkey analogy:** Cosine similarity is the donkey's compass bearing. Two donkeys facing the same direction (same bearing = same semantic topic) are similar. The angle between them tells you how similar. If both face north-east (both about "refund policies") the angle is tiny → similarity near 1.0. If one faces north and one faces south-west ("pizza recipes"), the angle is huge → similarity near 0.0. The donkey doesn't care about the distance between them — only the direction they're pointing. "Refund" and "money back" point the same direction even if they're written completely differently.
+> 🚚 **Courier analogy:** Cosine similarity is the courier's compass bearing. Two couriers facing the same direction (same bearing = same semantic topic) are similar. The angle between them tells you how similar. If both face north-east (both about "refund policies") the angle is tiny → similarity near 1.0. If one faces north and one faces south-west ("pizza recipes"), the angle is huge → similarity near 0.0. The courier doesn't care about the distance between them — only the direction they're pointing. "Refund" and "money back" point the same direction even if they're written completely differently.
 
 ---
 
@@ -582,7 +582,7 @@ What is the refund policy?
 
 The quality of the prompt directly affects the quality of the answer. This is called **prompt engineering**.
 
-> 🫏 **Donkey analogy:** The prompt is the delivery note the donkey reads before each trip. It has three sections: (1) standing instructions tattooed on the stable wall ("only answer from your backpack, never make things up"), (2) today's cargo manifest — the retrieved document chunks, and (3) the customer's specific request. If the delivery note is unclear, the donkey delivers to the wrong address. A precise, well-structured prompt = the donkey delivers to exactly the right door every time.
+> 🚚 **Courier analogy:** The prompt is the shipping manifest the courier reads before each trip. It has three sections: (1) standing instructions tattooed on the dispatch board ("only answer from your parcel, never make things up"), (2) today's shipping manifest — the retrieved document chunks, and (3) the customer's specific request. If the shipping manifest is unclear, the courier delivers to the wrong address. A precise, well-structured prompt = the courier delivers to exactly the right door every time.
 
 ---
 
@@ -662,7 +662,7 @@ Your code just reads these numbers and passes them through to the `TokenUsage` m
 | **Azure GPT-4o** | $0.0025 / 1K tokens | $0.01 / 1K tokens |
 | **Local Ollama** | **$0** (runs on your machine) | **$0** |
 | **Ratio** | 1x | ~4-5x more expensive |
-| **🫏 Donkey** | Cargo the donkey picks up and loads into its backpack — reading is easy | Words the donkey writes on the delivery receipt — writing from scratch is harder work, so it costs more |
+| **🚚 Courier** | Parcels the courier picks up and loads into its parcel — reading is easy | Words the courier writes on the delivery receipt — writing from scratch is harder work, so it costs more |
 
 ### Quick cost math for a RAG query
 
@@ -681,34 +681,34 @@ Tokens matter because:
 - You pay per token (input and output separately)
 - More context chunks = more input tokens = higher cost
 
-> 🫏 **Donkey analogy:** A token is the smallest load the donkey can carry — not a whole package, not a letter, but a word-chunk. Common words are one carry ("the", "and"). Long or rare words get split ("authentication" → "auth" + "ent" + "ication" = 3 carries). The donkey has a maximum backpack size (context window) — it can only carry so many tokens per trip. Fill the bag with too many chunks and the last ones fall off. Each token costs a fraction of a cent: how many the donkey picks up (input) plus how many the LLM writes (output).
+> 🚚 **Courier analogy:** A token is the smallest load the courier can carry — not a whole package, not a letter, but a word-chunk. Common words are one carry ("the", "and"). Long or rare words get split ("authentication" → "auth" + "ent" + "ication" = 3 carries). The courier has a maximum parcel size (context window) — it can only carry so many tokens per trip. Fill the bag with too many chunks and the last ones fall off. Each token costs a fraction of a cent: how many the courier picks up (input) plus how many the LLM writes (output).
 
 ---
 
 ## RAG vs Fine-tuning
 
-| | RAG (what we build) | Fine-tuning | 🫏 Donkey |
+| | RAG (what we build) | Fine-tuning | 🚚 Courier |
 | --- | --- | --- | --- |
-| **How** | Add documents at runtime | Retrain the model on your data | Pack today's map in the backpack vs. teach the donkey a new route permanently |
-| **Data updates** | Upload new documents instantly | Retrain the model (hours/days) | Swap the map tonight vs. send the donkey back to school for months |
+| **How** | Add documents at runtime | Retrain the model on your data | Pack today's map in the parcel vs. teach the courier a new route permanently |
+| **Data updates** | Upload new documents instantly | Retrain the model (hours/days) | Swap the map tonight vs. send the courier back to school for months |
 | **Cost** | Per-query (token costs) | Upfront training cost ($100–$10K+) | Pay a small fee per delivery vs. pay a large school fee upfront |
-| **Accuracy** | Good with good retrieval | Better for specialized domains | Good if the map is accurate vs. donkey memorised every back alley |
-| **Sources** | Can cite exact documents | No source attribution | Donkey shows you the exact page of the map it used vs. donkey just knows, can't explain how |
-| **Best for** | Knowledge bases, Q&A | Tone/style changes, specialized tasks | Maps that change over time vs. tasks needing a permanently specialist donkey |
+| **Accuracy** | Good with good retrieval | Better for specialized domains | Good if the map is accurate vs. courier memorised every back alley |
+| **Sources** | Can cite exact documents | No source attribution | Courier shows you the exact page of the map it used vs. courier just knows, can't explain how |
+| **Best for** | Knowledge bases, Q&A | Tone/style changes, specialized tasks | Maps that change over time vs. tasks needing a permanently specialist courier |
 
 **For this project:** RAG is the right choice. Your documents change over time, you need source citations, and you don't want to pay for model training.
 
-> 🫏 **Donkey analogy:** Fine-tuning is like sending the donkey to a 6-month school to memorise your town's entire map. Expensive, takes time, and if the town changes — back to school again. RAG is like giving the donkey a fresh GPS map every morning before the delivery run. The donkey stays the same smart donkey it always was — but with the right map for today. Your knowledge base changes? Just update the map. No re-schooling. That's why RAG is the standard for document Q&A systems.
+> 🚚 **Courier analogy:** Fine-tuning is like sending the courier to a 6-month school to memorise your town's entire map. Expensive, takes time, and if the town changes — back to school again. RAG is like giving the courier a fresh GPS map every morning before the delivery run. The courier stays the same smart courier it always was — but with the right map for today. Your knowledge base changes? Just update the map. No re-schooling. That's why RAG is the standard for document Q&A systems.
 
 ---
 
 ## Common RAG problems and solutions
 
-| Problem | Cause | Solution | 🫏 Donkey |
+| Problem | Cause | Solution | 🚚 Courier |
 | --- | --- | --- | --- |
-| Wrong answer | Irrelevant chunks retrieved | Increase `top_k`, improve chunking | Donkey grabbed the wrong backpacks — they looked similar but were from the wrong shelf |
+| Wrong answer | Irrelevant chunks retrieved | Increase `top_k`, improve chunking | Courier grabbed the wrong parcels — they looked similar but were from the wrong shelf |
 | "I don't know" when answer exists | Chunk too small, question too vague | Increase chunk size, rephrase question | The answer was cut in half between two bags — neither bag had the full sentence |
-| Hallucination | LLM ignores context | Stronger system prompt ("ONLY use context") | Donkey ignored the backpack entirely and answered from memory — wrong, but confident |
-| Slow responses | Too many chunks sent to LLM | Reduce `top_k`, use faster model | Donkey is carrying 20 heavy bags when 3 would do — overloaded and slow |
+| Hallucination | LLM ignores context | Stronger system prompt ("ONLY use context") | Courier ignored the parcel entirely and answered from memory — wrong, but confident |
+| Slow responses | Too many chunks sent to LLM | Reduce `top_k`, use faster model | Courier is carrying 20 heavy bags when 3 would do — overloaded and slow |
 | High cost | Too many tokens per query | Reduce chunk size, reduce `top_k` | Same overloading problem, but measured in money instead of sweat |
-| Duplicate information | Overlapping chunks | Reduce `chunk_overlap` | Bag edges overlap too much — donkey delivers the same letter twice in different bags |
+| Duplicate information | Overlapping chunks | Reduce `chunk_overlap` | Bag edges overlap too much — courier delivers the same letter twice in different bags |

@@ -60,7 +60,7 @@ def chat(body: ChatRequest):
     print(body.question)  # Safe — always a valid string
 ```
 
-- 🫏 **Donkey:** The cargo manifest template — every field is typed and validated before the donkey is loaded, preventing mispackaged deliveries.
+- 🚚 **Courier:** The shipping manifest template — every field is typed and validated before the courier is loaded, preventing mispackaged deliveries.
 
 ---
 
@@ -68,11 +68,11 @@ def chat(body: ChatRequest):
 
 Pydantic models appear in **three roles**:
 
-| Role | Example | What it does | 🫏 Donkey |
+| Role | Example | What it does | 🚚 Courier |
 | --- | --- | --- | --- |
-| **Request model** | `ChatRequest` | Validates incoming JSON from the client | ChatRequest is the delivery note the customer hands in — Pydantic checks it's filled out before any donkey leaves. |
-| **Response model** | `ChatResponse` | Defines the shape of the JSON we return | ChatResponse is the signed receipt the donkey hands back — same fields every time so customers know what to expect. |
-| **Settings model** | `Settings` | Reads and validates environment variables | Settings is the stable's standing orders — read once at boot, validated, then every donkey trots to the same rules. |
+| **Request model** | `ChatRequest` | Validates incoming JSON from the client | ChatRequest is the shipping manifest the customer hands in — Pydantic checks it's filled out before any courier leaves. |
+| **Response model** | `ChatResponse` | Defines the shape of the JSON we return | ChatResponse is the signed receipt the courier hands back — same fields every time so customers know what to expect. |
+| **Settings model** | `Settings` | Reads and validates environment variables | Settings is the depot's shipping manifest — read once at boot, validated, then every courier trots to the same rules. |
 
 When FastAPI sees `def chat(body: ChatRequest)`:
 1. It reads the raw JSON from the HTTP request body
@@ -80,7 +80,7 @@ When FastAPI sees `def chat(body: ChatRequest)`:
 3. If validation fails → automatic 422 response with details
 4. If validation passes → your function receives a clean, typed object
 
-- 🫏 **Donkey:** The cargo manifest template — every field is typed and validated before the donkey is loaded, preventing mispackaged deliveries.
+- 🚚 **Courier:** The shipping manifest template — every field is typed and validated before the courier is loaded, preventing mispackaged deliveries.
 
 ---
 
@@ -98,36 +98,36 @@ class Settings(BaseSettings):
 - `BaseModel` only accepts data you pass explicitly
 - `BaseSettings` automatically reads from environment variables
 
-| Field | Type | Default | Env Variable | Purpose | 🫏 Donkey |
+| Field | Type | Default | Env Variable | Purpose | 🚚 Courier |
 | --- | --- | --- | --- | --- | --- |
-| `cloud_provider` | `CloudProvider` | `local` | `CLOUD_PROVIDER` | Controls which cloud backends to use | Picks which barn — local hay shed or AWS/Azure depot — handles the donkey's deliveries. |
-| `app_name` | `str` | `rag-chatbot` | `APP_NAME` | Service name in logs | Donkey's trip log — every delivery's details written to disk for later review |
-| `app_env` | `AppEnvironment` | `dev` | `APP_ENV` | Environment (affects logging) | Stable gate guard — app_env: AppEnvironment · dev · APP_ENV · Environment (affects logging) |
-| `app_port` | `int` | `8000` | `APP_PORT` | Server port | Donkey-side view of app_port — affects how the donkey loads, reads, or delivers the cargo |
-| `log_level` | `str` | `INFO` | `LOG_LEVEL` | Logging verbosity | Stable gate guard — log_level: str · INFO · LOG_LEVEL · Logging verbosity |
-| `rag_top_k` | `int` | `5` | `RAG_TOP_K` | Chunks retrieved per query | Sets how many backpack pockets the donkey grabs per delivery — five chunks fetched each query. |
-| `rag_chunk_size` | `int` | `1000` | `RAG_CHUNK_SIZE` | Max characters per chunk | Caps each backpack pocket at 1000 characters so no single chunk overstuffs the donkey's load. |
-| `rag_chunk_overlap` | `int` | `200` | `RAG_CHUNK_OVERLAP` | Overlap between chunks | Sews 200 characters of overlap between adjacent backpack pockets so the donkey never loses context at the edges. |
+| `cloud_provider` | `CloudProvider` | `local` | `CLOUD_PROVIDER` | Controls which cloud backends to use | Picks which barn — local fuel shed or AWS/Azure depot — handles the courier's deliveries. |
+| `app_name` | `str` | `rag-chatbot` | `APP_NAME` | Service name in logs | Courier's trip log — every delivery's details written to disk for later review |
+| `app_env` | `AppEnvironment` | `dev` | `APP_ENV` | Environment (affects logging) | Depot gate guard — app_env: AppEnvironment · dev · APP_ENV · Environment (affects logging) |
+| `app_port` | `int` | `8000` | `APP_PORT` | Server port | Courier-side view of app_port — affects how the courier loads, reads, or delivers the parcels |
+| `log_level` | `str` | `INFO` | `LOG_LEVEL` | Logging verbosity | Depot gate guard — log_level: str · INFO · LOG_LEVEL · Logging verbosity |
+| `rag_top_k` | `int` | `5` | `RAG_TOP_K` | Chunks retrieved per query | Sets how many parcel pockets the courier grabs per delivery — five chunks fetched each query. |
+| `rag_chunk_size` | `int` | `1000` | `RAG_CHUNK_SIZE` | Max characters per chunk | Caps each parcel pocket at 1000 characters so no single chunk overstuffs the courier's load. |
+| `rag_chunk_overlap` | `int` | `200` | `RAG_CHUNK_OVERLAP` | Overlap between chunks | Sews 200 characters of overlap between adjacent parcel pockets so the courier never loses context at the edges. |
 | `aws_region` | `str` | `eu-central-1` | `AWS_REGION` | AWS region | Amazon's loading dock — aws_region: str · eu-central-1 · AWS_REGION · AWS region |
-| `aws_bedrock_model_id` | `str` | Claude 3.5 Sonnet | `AWS_BEDROCK_MODEL_ID` | Bedrock model | Which AWS-depot donkey breed shows up to write the answer |
+| `aws_bedrock_model_id` | `str` | Claude 3.5 Sonnet | `AWS_BEDROCK_MODEL_ID` | Bedrock model | Which AWS-depot courier breed shows up to write the answer |
 | `aws_opensearch_endpoint` | `str` | `""` | `AWS_OPENSEARCH_ENDPOINT` | OpenSearch URL | AWS search hub — aws_opensearch_endpoint: str · "" · AWS_OPENSEARCH_ENDPOINT · OpenSearch URL |
-| `aws_s3_bucket_name` | `str` | `rag-chatbot-documents` | `AWS_S3_BUCKET_NAME` | S3 bucket | The AWS warehouse name where source documents are uploaded for the donkey to fetch |
+| `aws_s3_bucket_name` | `str` | `rag-chatbot-documents` | `AWS_S3_BUCKET_NAME` | S3 bucket | The AWS warehouse name where source documents are uploaded for the courier to fetch |
 | `aws_dynamodb_table_name` | `str` | `rag-chatbot-conversations` | `AWS_DYNAMODB_TABLE_NAME` | DynamoDB table (history) | Amazon's loading dock — aws_dynamodb_table_name: str · rag-chatbot-conversations · AWS_DYNAMODB_TABLE_NAME · DynamoDB table (history) |
 | `aws_dynamodb_vector_table_name` | `str` | `rag-chatbot-vectors` | `AWS_DYNAMODB_VECTOR_TABLE_NAME` | DynamoDB table (vector store — cheap alternative to OpenSearch) | OpenSearch sorting office — aws_dynamodb_vector_table_name: str · rag-chatbot-vectors · AWS_DYNAMODB_VECTOR_TABLE_NAME · DynamoDB table (vector store — cheap alternative to OpenSearch) |
 | `vector_store_type` | `VectorStoreType` | `auto` | `VECTOR_STORE_TYPE` | Override vector store: `auto` (default for provider) or `dynamodb` ($0/month) | AWS depot — vector_store_type: VectorStoreType · auto · VECTOR_STORE_TYPE · Override vector store: auto (default for provider) or dynamodb ($0/month) |
-| `azure_openai_endpoint` | `str` | `""` | `AZURE_OPENAI_ENDPOINT` | Azure OpenAI URL | The street address of the Azure-hub stable where the donkey reports for work |
-| `azure_openai_api_key` | `str` | `""` | `AZURE_OPENAI_API_KEY` | Azure OpenAI key | The stable-gate password that lets you summon the Azure-hub donkey |
-| `azure_openai_deployment_name` | `str` | `gpt-4o` | `AZURE_OPENAI_DEPLOYMENT_NAME` | Model deployment | Which specific Azure-hub donkey (by name) gets dispatched for each delivery |
-| `azure_search_endpoint` | `str` | `""` | `AZURE_SEARCH_ENDPOINT` | AI Search URL | URL of the Azure hub where the donkey looks up GPS coordinates during retrieval. |
-| `azure_search_api_key` | `str` | `""` | `AZURE_SEARCH_API_KEY` | AI Search key | Secret key the donkey shows at the Azure hub gate before it can run vector queries. |
-| `ollama_base_url` | `str` | `http://localhost:11434` | `OLLAMA_BASE_URL` | Ollama REST API URL | Front-door address of the local barn where the laptop donkey lives |
-| `ollama_model` | `str` | `llama3.2` | `OLLAMA_MODEL` | Ollama chat model | Which local barn donkey breed writes the answers on your laptop |
+| `azure_openai_endpoint` | `str` | `""` | `AZURE_OPENAI_ENDPOINT` | Azure OpenAI URL | The street address of the Azure-hub depot where the courier reports for work |
+| `azure_openai_api_key` | `str` | `""` | `AZURE_OPENAI_API_KEY` | Azure OpenAI key | The depot-gate password that lets you summon the Azure-hub courier |
+| `azure_openai_deployment_name` | `str` | `gpt-4o` | `AZURE_OPENAI_DEPLOYMENT_NAME` | Model deployment | Which specific Azure-hub courier (by name) gets dispatched for each delivery |
+| `azure_search_endpoint` | `str` | `""` | `AZURE_SEARCH_ENDPOINT` | AI Search URL | URL of the Azure hub where the courier looks up GPS coordinates during retrieval. |
+| `azure_search_api_key` | `str` | `""` | `AZURE_SEARCH_API_KEY` | AI Search key | Secret key the courier shows at the Azure hub gate before it can run vector queries. |
+| `ollama_base_url` | `str` | `http://localhost:11434` | `OLLAMA_BASE_URL` | Ollama REST API URL | Front-door address of the local barn where the laptop courier lives |
+| `ollama_model` | `str` | `llama3.2` | `OLLAMA_MODEL` | Ollama chat model | Which local barn courier breed writes the answers on your laptop |
 | `ollama_embedding_model` | `str` | `nomic-embed-text` | `OLLAMA_EMBEDDING_MODEL` | Ollama embedding model | The local barn worker that converts text into GPS coordinates for warehouse storage |
 | `chroma_collection_name` | `str` | `rag-chatbot` | `CHROMA_COLLECTION_NAME` | ChromaDB collection | Name of the stall inside the local barn where ChromaDB keeps this project's chunk vectors. |
-| `chroma_persist_directory` | `str` | `""` | `CHROMA_PERSIST_DIRECTORY` | ChromaDB storage path (empty = in-memory) | Folder on disk where the local barn stores chunks; empty means the donkey forgets after restart. |
-| `enable_tracing` | `bool` | `False` | `ENABLE_TRACING` | OpenTelemetry tracing | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
-| `query_log_enabled` | `bool` | `True` | `QUERY_LOG_ENABLED` | Structured per-query JSONL logging (I30) | Stable gate guard — query_log_enabled: bool · True · QUERY_LOG_ENABLED · Structured per-query JSONL logging (I30) |
-| `query_log_dir` | `str` | `logs/queries` | `QUERY_LOG_DIR` | Directory for daily JSONL log files | Donkey's trip log — every delivery's details written to disk for later review |
+| `chroma_persist_directory` | `str` | `""` | `CHROMA_PERSIST_DIRECTORY` | ChromaDB storage path (empty = in-memory) | Folder on disk where the local barn stores chunks; empty means the courier forgets after restart. |
+| `enable_tracing` | `bool` | `False` | `ENABLE_TRACING` | OpenTelemetry tracing | Tachograph reading — recorded on every courier trip and shown on the dashboard |
+| `query_log_enabled` | `bool` | `True` | `QUERY_LOG_ENABLED` | Structured per-query JSONL logging (I30) | Depot gate guard — query_log_enabled: bool · True · QUERY_LOG_ENABLED · Structured per-query JSONL logging (I30) |
+| `query_log_dir` | `str` | `logs/queries` | `QUERY_LOG_DIR` | Directory for daily JSONL log files | Courier's trip log — every delivery's details written to disk for later review |
 
 **How it works:**
 
@@ -143,7 +143,7 @@ settings.app_port        # → 8000
 settings.rag_top_k       # → 5
 ```
 
-- 🫏 **Donkey:** Adjusting the bag fit and route preferences so the donkey delivers to the right address every time.
+- 🚚 **Courier:** Adjusting the bag fit and route preferences so the courier delivers to the right address every time.
 
 ---
 
@@ -160,11 +160,11 @@ class ChatRequest(BaseModel):
 
 **What it is:** The JSON body sent by the client to `POST /api/chat`.
 
-| Field | Type | Required? | Validation | Purpose | 🫏 Donkey |
+| Field | Type | Required? | Validation | Purpose | 🚚 Courier |
 | --- | --- | --- | --- | --- | --- |
-| `question` | `str` | **Yes** | 1–5000 chars | The user's question | Stable broke down — donkey couldn't complete the trip, customer sees an error |
+| `question` | `str` | **Yes** | 1–5000 chars | The user's question | Depot broke down — courier couldn't complete the trip, customer sees an error |
 | `session_id` | `str` or `None` | No | None | Links follow-up questions together | Line scribbled in the trip ledger — session_id: str or None · No · None · Links follow-up questions together |
-| `top_k` | `int` or `None` | No | 1–20 if provided | Override default chunk count | Per-request override telling the donkey to grab between 1 and 20 backpack pockets instead of the default. |
+| `top_k` | `int` or `None` | No | 1–20 if provided | Override default chunk count | Per-request override telling the courier to grab between 1 and 20 parcel pockets instead of the default. |
 
 **What happens on invalid input:**
 
@@ -183,7 +183,7 @@ class ChatRequest(BaseModel):
 }
 ```
 
-- 🫏 **Donkey:** The cargo manifest template — every field is typed and validated before the donkey is loaded, preventing mispackaged deliveries.
+- 🚚 **Courier:** The shipping manifest template — every field is typed and validated before the courier is loaded, preventing mispackaged deliveries.
 
 ---
 
@@ -204,17 +204,17 @@ class ChatResponse(BaseModel):
 
 **What it is:** The JSON returned to the client after a chat query.
 
-| Field | Type | Purpose | 🫏 Donkey |
+| Field | Type | Purpose | 🚚 Courier |
 | --- | --- | --- | --- |
-| `answer` | `str` | The AI-generated answer | What the donkey wrote and brought back to the customer |
-| `sources` | `list[SourceChunk]` | Which document chunks were used (citations) | List of backpack pockets the donkey actually used as citations when writing the answer. |
+| `answer` | `str` | The AI-generated answer | What the courier wrote and brought back to the customer |
+| `sources` | `list[SourceChunk]` | Which document chunks were used (citations) | List of parcel pockets the courier actually used as citations when writing the answer. |
 | `session_id` | `str` | Session ID for follow-up questions | Trip log entry — session_id: str · Session ID for follow-up questions |
-| `request_id` | `UUID` | Unique ID for debugging/tracing | Tracking number stamped on every donkey trip — quote it to find this exact delivery in the logs |
-| `cloud_provider` | `CloudProvider` | Which cloud processed this request | Donkey-side view of cloud_provider — affects how the donkey loads, reads, or delivers the cargo |
-| `latency_ms` | `int` | Total processing time | Stable's monthly feed bill — latency_ms: int · Total processing time |
-| `token_usage` | `TokenUsage` or `None` | Token counts for cost tracking | Tachograph reading of how much hay the donkey burned producing this answer, used for cost tracking. |
+| `request_id` | `UUID` | Unique ID for debugging/tracing | Tracking number stamped on every courier trip — quote it to find this exact delivery in the logs |
+| `cloud_provider` | `CloudProvider` | Which cloud processed this request | Courier-side view of cloud_provider — affects how the courier loads, reads, or delivers the parcels |
+| `latency_ms` | `int` | Total processing time | Depot's monthly feed bill — latency_ms: int · Total processing time |
+| `token_usage` | `TokenUsage` or `None` | Token counts for cost tracking | Tachograph reading of how much fuel the courier burned producing this answer, used for cost tracking. |
 
-- 🫏 **Donkey:** The cargo manifest template — every field is typed and validated before the donkey is loaded, preventing mispackaged deliveries.
+- 🚚 **Courier:** The shipping manifest template — every field is typed and validated before the courier is loaded, preventing mispackaged deliveries.
 
 ---
 
@@ -222,14 +222,14 @@ class ChatResponse(BaseModel):
 
 **What it is:** A single piece of evidence that the LLM used. This is what makes RAG transparent.
 
-| Field | Type | Purpose | 🫏 Donkey |
+| Field | Type | Purpose | 🚚 Courier |
 | --- | --- | --- | --- |
-| `document_name` | `str` | Which file this chunk came from | Label on the backpack pocket showing which original document this chunk was torn from. |
-| `chunk_text` | `str` | The actual text content | The actual hay inside the backpack pocket — raw text the donkey reads when composing answers. |
-| `relevance_score` | `float` (0.0–1.0) | How similar to the question (1.0 = perfect) | Routing tag on the saddlebag — relevance_score: float (0.0–1.0) · How similar to the question (1.0 = perfect) |
-| `page_number` | `int` or `None` | Page in original PDF | Which page of the original mail the backpack came from |
+| `document_name` | `str` | Which file this chunk came from | Label on the parcel pocket showing which original document this chunk was torn from. |
+| `chunk_text` | `str` | The actual text content | The actual fuel inside the parcel pocket — raw text the courier reads when composing answers. |
+| `relevance_score` | `float` (0.0–1.0) | How similar to the question (1.0 = perfect) | Routing tag on the parcel — relevance_score: float (0.0–1.0) · How similar to the question (1.0 = perfect) |
+| `page_number` | `int` or `None` | Page in original PDF | Which page of the original mail the parcel came from |
 
-- 🫏 **Donkey:** backpack-sized pieces of cargo with overlapping edges, so no sentence is cut off at a seam.
+- 🚚 **Courier:** parcel-sized pieces of parcels with overlapping edges, so no sentence is cut off at a seam.
 
 ---
 
@@ -237,12 +237,12 @@ class ChatResponse(BaseModel):
 
 **What it is:** How many tokens the LLM consumed. Critical for cost tracking.
 
-| Field | Type | Purpose | 🫏 Donkey |
+| Field | Type | Purpose | 🚚 Courier |
 | --- | --- | --- | --- |
-| `input_tokens` | `int` | Tokens in the prompt (question + context) | Hay bales loaded into the donkey on the way in — the question plus retrieved context. |
-| `output_tokens` | `int` | Tokens in the generated answer | Hay bales the donkey produced on the way out — every token in the generated answer. |
-| `total_tokens` | `int` | Sum of input + output | Combined hay tally of input plus output, used to compute the trip's full delivery cost. |
-| `estimated_cost_usd` | `float` | Estimated cost based on model pricing | How many hay-bales this trip cost — printed on the receipt so the stable owner can tally up the month later. |
+| `input_tokens` | `int` | Tokens in the prompt (question + context) | fuel fuel loads loaded into the courier on the way in — the question plus retrieved context. |
+| `output_tokens` | `int` | Tokens in the generated answer | fuel fuel loads the courier produced on the way out — every token in the generated answer. |
+| `total_tokens` | `int` | Sum of input + output | Combined fuel tally of input plus output, used to compute the trip's full delivery cost. |
+| `estimated_cost_usd` | `float` | Estimated cost based on model pricing | How many fuel-fuel loads this trip cost — printed on the receipt so the depot owner can tally up the month later. |
 
 **Why this matters:**
 
@@ -254,7 +254,7 @@ Example cost calculation (Claude 3.5 Sonnet):
 - Total per query = **$0.0135**
 - 100 queries/day = **$1.35/day**
 
-- 🫏 **Donkey:** The cargo manifest template — every field is typed and validated before the donkey is loaded, preventing mispackaged deliveries.
+- 🚚 **Courier:** The shipping manifest template — every field is typed and validated before the courier is loaded, preventing mispackaged deliveries.
 
 ---
 
@@ -262,15 +262,15 @@ Example cost calculation (Claude 3.5 Sonnet):
 
 **What it is:** Returned after uploading a document.
 
-| Field | Type | Purpose | 🫏 Donkey |
+| Field | Type | Purpose | 🚚 Courier |
 | --- | --- | --- | --- |
-| `document_id` | `str` | Unique ID for this document | Donkey-side view of document_id — affects how the donkey loads, reads, or delivers the cargo |
-| `filename` | `str` | Original filename | Label on the original mail item the backpack was sliced from |
+| `document_id` | `str` | Unique ID for this document | Courier-side view of document_id — affects how the courier loads, reads, or delivers the parcels |
+| `filename` | `str` | Original filename | Label on the original mail item the parcel was sliced from |
 | `status` | `DocumentStatus` | pending / processing / ready / failed | Where this parcel is in the post-office flow — queued, being sorted, shelved and ready, or rejected |
-| `chunk_count` | `int` | How many searchable chunks were created | Number of backpack pockets the post office sliced this document into during ingestion. |
-| `message` | `str` | Human-readable status | Donkey-side view of message — affects how the donkey loads, reads, or delivers the cargo |
+| `chunk_count` | `int` | How many searchable chunks were created | Number of parcel pockets the post office sliced this document into during ingestion. |
+| `message` | `str` | Human-readable status | Courier-side view of message — affects how the courier loads, reads, or delivers the parcels |
 
-- 🫏 **Donkey:** The parcels being ingested — split into backpack-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.
+- 🚚 **Courier:** The parcels being ingested — split into parcel-sized chunks, GPS-stamped, and shelved in the warehouse for the courier to retrieve later.
 
 ---
 
@@ -319,7 +319,7 @@ class Settings(BaseSettings):
     # Reads APP_PORT from env, falls back to 8000
 ```
 
-- 🫏 **Donkey:** The cargo manifest template — every field is typed and validated before the donkey is loaded, preventing mispackaged deliveries.
+- 🚚 **Courier:** The shipping manifest template — every field is typed and validated before the courier is loaded, preventing mispackaged deliveries.
 
 ---
 
@@ -338,4 +338,4 @@ This means you get:
 - Automatic response serialization
 - Type-safe code (your IDE knows every field)
 
-- 🫏 **Donkey:** The stable's front door — defined entry points where questions arrive and answers depart.
+- 🚚 **Courier:** The depot's front door — defined entry points where questions arrive and answers depart.

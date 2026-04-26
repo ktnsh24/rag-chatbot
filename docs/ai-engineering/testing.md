@@ -36,7 +36,7 @@ poetry run pytest tests/ --cov=src --cov-report=term-missing
 poetry run pytest tests/test_integration_api.py::TestChatIntegration -v
 ```
 
-- 🫏 **Donkey:** Loading up the donkey for the first time — installing the bag, attaching the backpacks, and confirming the GPS coordinates before the first run.
+- 🚚 **Courier:** Loading up the courier for the first time — installing the bag, attaching the parcels, and confirming the GPS coordinates before the first run.
 
 ---
 
@@ -60,7 +60,7 @@ tests/
 
 All tests run **without external services** — no Ollama, no cloud APIs, no databases. They use `AsyncMock` for the RAG chain and `LocalGuardrails` (real implementation, no network calls) for guardrail tests.
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -79,7 +79,7 @@ All tests run **without external services** — no Ollama, no cloud APIs, no dat
          146 total
 ```
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -87,15 +87,15 @@ All tests run **without external services** — no Ollama, no cloud APIs, no dat
 
 All integration/E2E/feature tests share fixtures defined in `tests/conftest.py`:
 
-| Fixture | What it provides | 🫏 Donkey |
+| Fixture | What it provides | 🚚 Courier |
 |---|---| --- |
-| `mock_rag_chain` | `AsyncMock` with `.query()`, `.ingest_document()`, `.ingest_documents()`, `._vector_store` | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
-| `app_with_rag` | `create_app()` with mocked RAG chain on `app.state` | Practice deliveries with stand-in cargo — checks the donkey behaves correctly |
-| `client_with_rag` | `httpx.AsyncClient` using `ASGITransport` — full async HTTP testing | Stable manager — receives requests at the front door and dispatches the donkey |
-| `app_no_rag` | App where `app.state.rag_chain = None` (simulates init failure) | Donkey's report card — share of test deliveries that scored above the bar |
-| `client_no_rag` | Client for testing error paths when RAG chain is unavailable | Donkey-side view of client_no_rag — affects how the donkey loads, reads, or delivers the cargo |
+| `mock_rag_chain` | `AsyncMock` with `.query()`, `.ingest_document()`, `.ingest_documents()`, `._vector_store` | Post office sorting raw mail into GPS-labelled boxes before the courier's first trip |
+| `app_with_rag` | `create_app()` with mocked RAG chain on `app.state` | Practice deliveries with stand-in parcels — checks the courier behaves correctly |
+| `client_with_rag` | `httpx.AsyncClient` using `ASGITransport` — full async HTTP testing | Depot manager — receives requests at the front door and dispatches the courier |
+| `app_no_rag` | App where `app.state.rag_chain = None` (simulates init failure) | Courier's report card — share of test deliveries that scored above the bar |
+| `client_no_rag` | Client for testing error paths when RAG chain is unavailable | Courier-side view of client_no_rag — affects how the courier loads, reads, or delivers the parcels |
 | `mock_guardrails` | Real `LocalGuardrails()` instance (pattern-based, no network) | Posted notice at the gate — mock_guardrails: Real LocalGuardrails() instance (pattern-based, no network) |
-| `app_with_guardrails` | App with both RAG chain and guardrails enabled | Stable gate — refuses harmful or off-topic deliveries before the donkey leaves |
+| `app_with_guardrails` | App with both RAG chain and guardrails enabled | Depot gate — refuses harmful or off-topic deliveries before the courier leaves |
 | `client_with_guardrails` | Client for testing guardrail behavior end-to-end | Dry-run trip to check the harness — client_with_guardrails: Client for testing guardrail behavior end-to-end |
 
 **Mock response constant:**
@@ -108,7 +108,7 @@ MOCK_QUERY_RESPONSE = {
 }
 ```
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -116,19 +116,19 @@ MOCK_QUERY_RESPONSE = {
 
 Existing unit tests cover individual components in isolation:
 
-| File | Tests | What it covers | 🫏 Donkey |
+| File | Tests | What it covers | 🚚 Courier |
 |---|---|---| --- |
-| `test_chat.py` | 7 | Chat route logic, request validation, error handling | Report card for the chat door — does the stable manager validate the delivery note before sending the donkey out? |
+| `test_chat.py` | 7 | Chat route logic, request validation, error handling | Report card for the chat door — does the depot manager validate the shipping manifest before sending the courier out? |
 | `test_evaluate_route.py` | 16 | Evaluate route logic, response format, error handling | Verifies the grading window hands back the report card in the right shape and fails gracefully on bad requests |
-| `test_ingestion.py` | 9 | Document chunking, ingestion pipeline, deduplication | Tests the post office pre-sorter: slicing mail into backpacks, GPS-stamping them, and shelving them |
-| `test_evaluation.py` | 14 | Evaluation framework, metrics computation, golden dataset | Donkey's odometer dial — test_evaluation.py: 14 · Evaluation framework, metrics computation, golden dataset |
-| `test_guardrails.py` | 20 | Guardrail pattern matching, PII regex, injection detection | Practice run for the donkey — test_guardrails.py: 20 · Guardrail pattern matching, PII regex, injection detection |
-| `test_reranker.py` | 7 | Cross-encoder scoring, re-ranking logic | Confirms the quality inspector re-sorts backpack contents by score before the donkey heads out |
-| `test_hybrid_search.py` | 17 | BM25 tokenization, hybrid score fusion | Verifies the donkey checks both the GPS warehouse and keyword index before loading backpacks |
+| `test_ingestion.py` | 9 | Document chunking, ingestion pipeline, deduplication | Tests the post office pre-sorter: slicing mail into parcels, GPS-stamping them, and shelving them |
+| `test_evaluation.py` | 14 | Evaluation framework, metrics computation, golden dataset | Courier's odometer dial — test_evaluation.py: 14 · Evaluation framework, metrics computation, golden dataset |
+| `test_guardrails.py` | 20 | Guardrail pattern matching, PII regex, injection detection | Practice run for the courier — test_guardrails.py: 20 · Guardrail pattern matching, PII regex, injection detection |
+| `test_reranker.py` | 7 | Cross-encoder scoring, re-ranking logic | Confirms the quality inspector re-sorts parcel contents by score before the courier heads out |
+| `test_hybrid_search.py` | 17 | BM25 tokenization, hybrid score fusion | Verifies the courier checks both the GPS warehouse and keyword index before loading parcels |
 | `test_dynamodb_vectorstore.py` | 13 | DynamoDB CRUD, vector storage, batch operations | AWS depot — test_dynamodb_vectorstore.py: 13 · DynamoDB CRUD, vector storage, batch operations |
-| **Total** | **103** | | Cost of keeping the donkey fed — Total: 103 |
+| **Total** | **103** | | Cost of keeping the courier fed — Total: 103 |
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -138,17 +138,17 @@ Existing unit tests cover individual components in isolation:
 
 Tests every API endpoint through the full FastAPI stack (middleware, routing, serialization) using `httpx.AsyncClient` with `ASGITransport`. The RAG chain is mocked but all FastAPI machinery runs for real.
 
-| Class | Tests | What it validates | 🫏 Donkey |
+| Class | Tests | What it validates | 🚚 Courier |
 |---|---|---| --- |
-| `TestHealthIntegration` | 2 | `GET /health` returns status + services; degrades when RAG chain is missing | Quick check — is the donkey awake, loaded, and ready to deliver? |
-| `TestChatIntegration` | 6 | `POST /api/chat` — success, session IDs, custom `top_k`, validation (empty/missing question), 500 without RAG | How many backpacks the donkey grabs from the warehouse for one delivery |
-| `TestEvaluateIntegration` | 3 | `POST /api/evaluate` — single question, expected answer comparison, 500 without RAG | Stable's front door — the URL customers use to drop off a question |
-| `TestDocumentsIntegration` | 4 | `GET /api/documents`, `POST /api/documents/upload`, `POST /api/documents/upload/batch`, `DELETE /api/documents/{id}` | Practice run for the donkey — TestDocumentsIntegration: 4 · GET /api/documents, POST /api/documents/upload, POST /api/documents/upload/batch, DELETE /api/documents/{id} |
+| `TestHealthIntegration` | 2 | `GET /health` returns status + services; degrades when RAG chain is missing | Quick check — is the courier awake, loaded, and ready to deliver? |
+| `TestChatIntegration` | 6 | `POST /api/chat` — success, session IDs, custom `top_k`, validation (empty/missing question), 500 without RAG | How many parcels the courier grabs from the warehouse for one delivery |
+| `TestEvaluateIntegration` | 3 | `POST /api/evaluate` — single question, expected answer comparison, 500 without RAG | Depot's front door — the URL customers use to drop off a question |
+| `TestDocumentsIntegration` | 4 | `GET /api/documents`, `POST /api/documents/upload`, `POST /api/documents/upload/batch`, `DELETE /api/documents/{id}` | Practice run for the courier — TestDocumentsIntegration: 4 · GET /api/documents, POST /api/documents/upload, POST /api/documents/upload/batch, DELETE /api/documents/{id} |
 | `TestQueryAnalysisIntegration` | 4 | `GET /api/queries/stats`, `/api/queries/slow`, `/api/queries/patterns`, `/api/queries/recent` — returns 503 when query logger not configured | Dry-run trip to check the harness — TestQueryAnalysisIntegration: 4 · GET /api/queries/stats, /api/queries/slow, /api/queries/patterns, /api/queries/recent — returns 503 when query logger not configured |
-| `TestMetricsIntegration` | 1 | `GET /metrics` returns Prometheus format | Stopwatch on the donkey's harness — TestMetricsIntegration: 1 · GET /metrics returns Prometheus format |
+| `TestMetricsIntegration` | 1 | `GET /metrics` returns Prometheus format | Stopwatch on the courier's harness — TestMetricsIntegration: 1 · GET /metrics returns Prometheus format |
 | `TestErrorHandling` | 3 | Invalid JSON, wrong content type, non-existent endpoint | Dry-run trip to check the harness — TestErrorHandling: 3 · Invalid JSON, wrong content type, non-existent endpoint |
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -158,11 +158,11 @@ Tests every API endpoint through the full FastAPI stack (middleware, routing, se
 
 Simulates complete user journeys through the system. Uses a **stateful mock** that tracks uploaded documents — when you upload a doc, subsequent chat queries return content-aware answers.
 
-| Class | Tests | What it validates | 🫏 Donkey |
+| Class | Tests | What it validates | 🚚 Courier |
 |---|---|---| --- |
-| `TestE2EFullPipeline` | 4 | Upload → chat (gets relevant answer), upload → evaluate (scores returned), chat without docs (empty answer), multiple uploads → chat | Full route: drop mail at the post office, then watch the donkey deliver from it, get graded, and stay silent when the warehouse is empty |
+| `TestE2EFullPipeline` | 4 | Upload → chat (gets relevant answer), upload → evaluate (scores returned), chat without docs (empty answer), multiple uploads → chat | Full route: drop mail at the post office, then watch the courier deliver from it, get graded, and stay silent when the warehouse is empty |
 | `TestE2EConversation` | 2 | Multi-turn conversation in same session, session isolation between users | Two full delivery rounds: same customer remembered across stops, and two customers' notes never get mixed up. |
-| `TestE2EObservability` | 2 | Metrics counter increments after chat, health endpoint remains up after activity | Checks the tachograph logs trips and health endpoint confirms the donkey is awake and ready |
+| `TestE2EObservability` | 2 | Metrics counter increments after chat, health endpoint remains up after activity | Checks the tachograph logs trips and health endpoint confirms the courier is awake and ready |
 
 **Stateful mock pattern:**
 
@@ -180,7 +180,7 @@ async def mock_query(question, **kwargs):
     return {"answer": "No documents available", ...}
 ```
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
@@ -190,55 +190,55 @@ async def mock_query(question, **kwargs):
 
 Tests the guardrails feature flag (`GUARDRAILS_ENABLED`) by comparing behavior with guardrails ON vs OFF. Uses real `LocalGuardrails` (not mocked) — tests actual regex patterns.
 
-| Class | Tests | What it validates | 🫏 Donkey |
+| Class | Tests | What it validates | 🚚 Courier |
 |---|---|---| --- |
-| `TestGuardrailsInjection` | 4 | Prompt injection blocked (400), jailbreak blocked (400), safe questions pass, multiple safe questions pass | Note the donkey carries — TestGuardrailsInjection: 4 · Prompt injection blocked (400), jailbreak blocked (400), safe questions pass, multiple safe questions pass |
-| `TestGuardrailsPII` | 3 | Email/SSN/credit card detected and flagged in responses | Checks the donkey isn't shouting customers' SSNs and credit-card numbers out loud while delivering. |
-| `TestGuardrailsOff` | 2 | Same injection/PII queries pass through when guardrails disabled | Take the muzzle off and confirm the donkey really would blurt that PII — proves the guardrails were doing the work. |
-| `TestFeatureFlagBehavior` | 3 | Evaluate works regardless of features, chat includes `cloud_provider`, health always available | Verifies the stable manager switches cloud donkeys correctly and health checks always work |
+| `TestGuardrailsInjection` | 4 | Prompt injection blocked (400), jailbreak blocked (400), safe questions pass, multiple safe questions pass | Note the courier carries — TestGuardrailsInjection: 4 · Prompt injection blocked (400), jailbreak blocked (400), safe questions pass, multiple safe questions pass |
+| `TestGuardrailsPII` | 3 | Email/SSN/credit card detected and flagged in responses | Checks the courier isn't shouting customers' SSNs and credit-card numbers out loud while delivering. |
+| `TestGuardrailsOff` | 2 | Same injection/PII queries pass through when guardrails disabled | Take the muzzle off and confirm the courier really would blurt that PII — proves the guardrails were doing the work. |
+| `TestFeatureFlagBehavior` | 3 | Evaluate works regardless of features, chat includes `cloud_provider`, health always available | Verifies the depot manager switches cloud couriers correctly and health checks always work |
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
 ## Full Test Inventory
 
-| Test File | Tests | Type | Status | 🫏 Donkey |
+| Test File | Tests | Type | Status | 🚚 Courier |
 |---|---|---|---| --- |
 | `test_chat.py` | 7 | Unit | ✅ Passing | Dry-run trip to check the harness — test_chat.py: 7 · Unit · ✅ Passing |
 | `test_evaluate_route.py` | 16 | Unit | ✅ Passing | Unit cover for the report-card route — request shapes, score response, and graceful errors |
-| `test_ingestion.py` | 9 | Unit | ✅ Passing | Nine checks on the post office pre-sort — chunks the right size and every backpack label stuck on properly. |
+| `test_ingestion.py` | 9 | Unit | ✅ Passing | Nine checks on the post office pre-sort — chunks the right size and every parcel label stuck on properly. |
 | `test_evaluation.py` | 14 | Unit | ✅ Passing | Unit cover for the grading framework — score maths, thresholds, and golden dataset loading |
-| `test_guardrails.py` | 20 | Unit | ⚠️ 4 failures (redaction tag naming) | Practice run for the donkey — test_guardrails.py: 20 · Unit · ⚠️ 4 failures (redaction tag naming) |
+| `test_guardrails.py` | 20 | Unit | ⚠️ 4 failures (redaction tag naming) | Practice run for the courier — test_guardrails.py: 20 · Unit · ⚠️ 4 failures (redaction tag naming) |
 | `test_reranker.py` | 7 | Unit | ⚠️ 3 failures (score mismatches) | Dry-run trip to check the harness — test_reranker.py: 7 · Unit · ⚠️ 3 failures (score mismatches) |
-| `test_hybrid_search.py` | 17 | Unit | ⚠️ 9 errors (missing `rank_bm25` package) | Practice run for the donkey — test_hybrid_search.py: 17 · Unit · ⚠️ 9 errors (missing rank_bm25 package) |
+| `test_hybrid_search.py` | 17 | Unit | ⚠️ 9 errors (missing `rank_bm25` package) | Practice run for the courier — test_hybrid_search.py: 17 · Unit · ⚠️ 9 errors (missing rank_bm25 package) |
 | `test_dynamodb_vectorstore.py` | 13 | Unit | ✅ Passing | Amazon's loading dock — test_dynamodb_vectorstore.py: 13 · Unit · ✅ Passing |
-| `test_integration_api.py` | 23 | Integration | ✅ All 23 passing | 23 end-to-end deliveries through the stable's front door — request in, parcel out, full route exercised. |
-| `test_e2e_rag_pipeline.py` | 8 | E2E | ✅ All 8 passing | Robot stable hand — auto-tests the donkey and redeploys when code changes |
-| `test_integration_features.py` | 12 | Feature flags | ✅ All 12 passing | Practice run for the donkey — test_integration_features.py: 12 · Feature flags · ✅ All 12 passing |
-| **Total** | **146** | | **130 passing, 7 failing, 9 errors** | 146 report-card entries — 130 pass, 7 fail, 9 error. Mostly trustworthy donkey, a handful of routes still wobble. |
+| `test_integration_api.py` | 23 | Integration | ✅ All 23 passing | 23 end-to-end deliveries through the depot's front door — request in, parcel out, full route exercised. |
+| `test_e2e_rag_pipeline.py` | 8 | E2E | ✅ All 8 passing | Robot dispatch clerk — auto-tests the courier and redeploys when code changes |
+| `test_integration_features.py` | 12 | Feature flags | ✅ All 12 passing | Practice run for the courier — test_integration_features.py: 12 · Feature flags · ✅ All 12 passing |
+| **Total** | **146** | | **130 passing, 7 failing, 9 errors** | 146 report-card entries — 130 pass, 7 fail, 9 error. Mostly trustworthy courier, a handful of routes still wobble. |
 
-- 🫏 **Donkey:** Sending the donkey on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
+- 🚚 **Courier:** Sending the courier on 25 standard test deliveries (golden dataset) to verify it returns the right packages every time.
 
 ---
 
 ## Known Issues
 
-| Test File | Issue | Root Cause | 🫏 Donkey |
+| Test File | Issue | Root Cause | 🚚 Courier |
 |---|---|---| --- |
 | `test_guardrails.py` | 4 failures | Tests expect `[REDACTED_EMAIL]` but code produces `[EMAIL_REDACTED]` (naming convention mismatch) | Dry-run trip to check the harness — test_guardrails.py: 4 failures · Tests expect [REDACTED_EMAIL] but code produces [EMAIL_REDACTED] (naming convention mismatch) |
-| `test_reranker.py` | 3 failures | Expected re-ranking scores don't match actual cross-encoder output | Practice run for the donkey — test_reranker.py: 3 failures · Expected re-ranking scores don't match actual cross-encoder output |
+| `test_reranker.py` | 3 failures | Expected re-ranking scores don't match actual cross-encoder output | Practice run for the courier — test_reranker.py: 3 failures · Expected re-ranking scores don't match actual cross-encoder output |
 | `test_hybrid_search.py` | 9 errors | Missing `rank_bm25` package — install with `poetry add rank_bm25` | Dry-run trip to check the harness — test_hybrid_search.py: 9 errors · Missing rank_bm25 package — install with poetry add rank_bm25 |
 
 These are **pre-existing issues** unrelated to the integration/E2E tests.
 
-- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
+- 🚚 **Courier:** When the courier returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
 
 ---
 
 ## DE Parallel
 
-| AI Engineering Test | Data Engineering Equivalent | 🫏 Donkey |
+| AI Engineering Test | Data Engineering Equivalent | 🚚 Courier |
 |---|---| --- |
 | Mock RAG chain with `AsyncMock` | Mock DynamoDB with `moto`, mock S3 with `moto` | Amazon's loading dock — Mock RAG chain with AsyncMock: Mock DynamoDB with moto, mock S3 with moto |
 | `httpx.AsyncClient` + `ASGITransport` | `TestClient` for Flask/FastAPI in ETL APIs | Dry-run trip to check the harness — httpx.AsyncClient + ASGITransport: TestClient for Flask/FastAPI in ETL APIs |
@@ -246,7 +246,7 @@ These are **pre-existing issues** unrelated to the integration/E2E tests.
 | Feature flag tests (guardrails ON/OFF) | Feature flag tests (data validation strict/lenient mode) | Sandbox delivery — Feature flag tests (guardrails ON/OFF): Feature flag tests (data validation strict/lenient mode) |
 | `conftest.py` shared fixtures | `conftest.py` shared fixtures (same pattern, same tool) | Dry-run trip to check the harness — conftest.py shared fixtures: conftest.py shared fixtures (same pattern, same tool) |
 
-- 🫏 **Donkey:** Running multiple donkeys on the same route to confirm that AI engineering and data engineering practices mirror each other.
+- 🚚 **Courier:** Running multiple couriers on the same route to confirm that AI engineering and data engineering practices mirror each other.
 
 ---
 
@@ -256,4 +256,4 @@ These are **pre-existing issues** unrelated to the integration/E2E tests.
 - [Getting Started](../setup-and-tooling/getting-started.md) — setup instructions including test commands
 - [Cost Analysis](cost-analysis.md) — what it costs to run tests with cloud providers
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.

@@ -63,7 +63,7 @@ Returns the health status of the application and its connected services.
 }
 ```
 
-- 🫏 **Donkey:** Checking whether the donkey is awake, loaded up, and ready to run before dispatching it.
+- 🚚 **Courier:** Checking whether the courier is awake, loaded up, and ready to run before dispatching it.
 
 ---
 
@@ -75,11 +75,11 @@ Send a question and get an answer grounded in your uploaded documents.
 
 **Request Body:**
 
-| Field | Type | Required | Default | Description | 🫏 Donkey |
+| Field | Type | Required | Default | Description | 🚚 Courier |
 |---|---|---|---|---| --- |
-| `message` | string | ✅ | — | The user's question | Donkey-side view of message — affects how the donkey loads, reads, or delivers the cargo |
+| `message` | string | ✅ | — | The user's question | Courier-side view of message — affects how the courier loads, reads, or delivers the parcels |
 | `session_id` | string | ❌ | auto-generated UUID | Conversation session ID for history | Line scribbled in the trip ledger — session_id: string · ❌ · auto-generated UUID · Conversation session ID for history |
-| `max_sources` | integer | ❌ | `5` | Max source chunks to retrieve | Caps how many backpack pockets the donkey returns as citation sources for this chat answer. |
+| `max_sources` | integer | ❌ | `5` | Max source chunks to retrieve | Caps how many parcel pockets the courier returns as citation sources for this chat answer. |
 
 **Example Request:**
 
@@ -131,7 +131,7 @@ Send a question and get an answer grounded in your uploaded documents.
 }
 ```
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -146,9 +146,9 @@ embedded, and indexed in the vector store.
 
 **Form Fields:**
 
-| Field | Type | Required | Description | 🫏 Donkey |
+| Field | Type | Required | Description | 🚚 Courier |
 |---|---|---|---| --- |
-| `file` | file | ✅ | The document file (PDF, TXT, MD, CSV, DOCX) | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
+| `file` | file | ✅ | The document file (PDF, TXT, MD, CSV, DOCX) | Post office sorting raw mail into GPS-labelled boxes before the courier's first trip |
 
 **Supported file types:**
 - `.pdf` — Portable Document Format
@@ -205,7 +205,7 @@ async with httpx.AsyncClient() as client:
 }
 ```
 
-- 🫏 **Donkey:** The parcels being ingested — split into backpack-sized chunks, GPS-stamped, and shelved in the warehouse for the donkey to retrieve later.
+- 🚚 **Courier:** The parcels being ingested — split into parcel-sized chunks, GPS-stamped, and shelved in the warehouse for the courier to retrieve later.
 
 ---
 
@@ -245,9 +245,9 @@ Delete a document and all its associated vector embeddings.
 
 **Path Parameters:**
 
-| Parameter | Type | Description | 🫏 Donkey |
+| Parameter | Type | Description | 🚚 Courier |
 |---|---|---| --- |
-| `document_id` | string | The document's unique ID | Donkey-side view of document_id — affects how the donkey loads, reads, or delivers the cargo |
+| `document_id` | string | The document's unique ID | Courier-side view of document_id — affects how the courier loads, reads, or delivers the parcels |
 
 **Response `200 OK`:**
 
@@ -277,11 +277,11 @@ AND quality scores (retrieval, faithfulness, answer relevance, overall).
 
 **Request Body:**
 
-| Field | Type | Required | Default | Description | 🫏 Donkey |
+| Field | Type | Required | Default | Description | 🚚 Courier |
 |---|---|---|---|---| --- |
-| `question` | string | ✅ | — | The question to evaluate | The customer question the donkey will deliver an answer to — the only required field |
-| `expected_answer` | string | ❌ | `null` | Optional ground truth for comparison | The 25 standard test deliveries used to grade the donkey's report card |
-| `top_k` | integer | ❌ | `5` | Number of chunks to retrieve | Number of backpack pockets the donkey fetches from the GPS warehouse per query. |
+| `question` | string | ✅ | — | The question to evaluate | The customer question the courier will deliver an answer to — the only required field |
+| `expected_answer` | string | ❌ | `null` | Optional ground truth for comparison | The 25 standard test deliveries used to grade the courier's report card |
+| `top_k` | integer | ❌ | `5` | Number of chunks to retrieve | Number of parcel pockets the courier fetches from the GPS warehouse per query. |
 
 **Example Request:**
 
@@ -316,7 +316,7 @@ AND quality scores (retrieval, faithfulness, answer relevance, overall).
 }
 ```
 
-- 🫏 **Donkey:** The donkey's report card — did it grab the right backpacks and write an accurate answer?
+- 🚚 **Courier:** The courier's report card — did it grab the right parcels and write an accurate answer?
 
 ---
 
@@ -327,10 +327,10 @@ per-case results and aggregated metrics.
 
 **Request Body:**
 
-| Field | Type | Required | Default | Description | 🫏 Donkey |
+| Field | Type | Required | Default | Description | 🚚 Courier |
 |---|---|---|---|---| --- |
 | `categories` | string[] | ❌ | all | Filter by test categories (e.g. `["policy", "edge_case"]`) | Dry-run trip to check the harness — categories: string[] · ❌ · all · Filter by test categories (e.g. ["policy", "edge_case"]) |
-| `top_k` | integer | ❌ | `5` | Override top_k for all cases | How many backpacks the donkey grabs from the warehouse for one delivery |
+| `top_k` | integer | ❌ | `5` | Override top_k for all cases | How many parcels the courier grabs from the warehouse for one delivery |
 
 **Example Request:**
 
@@ -386,11 +386,11 @@ List recent queries that failed evaluation. Use this to diagnose production issu
 
 **Query Parameters:**
 
-| Param | Type | Default | Description | 🫏 Donkey |
+| Param | Type | Default | Description | 🚚 Courier |
 |---|---|---|---| --- |
-| `limit` | integer | `20` | Max results (1–100) | Donkey-side view of limit — affects how the donkey loads, reads, or delivers the cargo |
-| `days` | integer | `7` | How many days back (1–30) | Donkey-side view of days — affects how the donkey loads, reads, or delivers the cargo |
-| `category` | string | all | Filter: `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`, `marginal` | Filter the failure list by why the donkey strayed — bad retrieval, hallucination, off-topic, or marginal. |
+| `limit` | integer | `20` | Max results (1–100) | Courier-side view of limit — affects how the courier loads, reads, or delivers the parcels |
+| `days` | integer | `7` | How many days back (1–30) | Courier-side view of days — affects how the courier loads, reads, or delivers the parcels |
+| `category` | string | all | Filter: `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`, `marginal` | Filter the failure list by why the courier strayed — bad retrieval, hallucination, off-topic, or marginal. |
 
 **Example:**
 
@@ -422,7 +422,7 @@ GET /api/queries/failures?category=hallucination&limit=5&days=3
 
 **Response `503`** — Query logger not initialised (check `QUERY_LOG_ENABLED`).
 
-- 🫏 **Donkey:** Checking the donkey's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
+- 🚚 **Courier:** Checking the courier's hooves, bag straps, and GPS signal before concluding it's lost — most delivery failures have a simple root cause.
 
 ---
 
@@ -432,9 +432,9 @@ Aggregate query quality statistics for dashboards and monitoring.
 
 **Query Parameters:**
 
-| Param | Type | Default | Description | 🫏 Donkey |
+| Param | Type | Default | Description | 🚚 Courier |
 |---|---|---|---| --- |
-| `days` | integer | `1` | How many days to aggregate (1–30) | Donkey-side view of days — affects how the donkey loads, reads, or delivers the cargo |
+| `days` | integer | `1` | How many days to aggregate (1–30) | Courier-side view of days — affects how the courier loads, reads, or delivers the parcels |
 
 **Example:**
 
@@ -505,25 +505,25 @@ rag_queries_failure_hallucination 5
 
 **Metrics exposed:**
 
-| Metric | Type | Description | 🫏 Donkey |
+| Metric | Type | Description | 🚚 Courier |
 |---|---|---| --- |
-| `rag_chat_requests_total` | counter | Total chat requests | Tachograph counter — how many deliveries the donkey completed |
-| `rag_chat_errors_total` | counter | Total chat errors | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
-| `rag_chat_error_rate_percent` | gauge | Current error rate % | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
-| `rag_chat_latency_p50/p95/p99_ms` | gauge | Latency percentiles | Tachograph reading — how long the donkey took on the round trip |
-| `rag_tokens_input_total` | counter | Total input tokens | Counter totalling every hay bale loaded into the donkey across the lifetime of the service. |
-| `rag_tokens_output_total` | counter | Total output tokens | Counter of every output hay bale the donkey produced as answer tokens. |
-| `rag_tokens_cost_usd_total` | counter | Estimated cost in USD | Estimated dollar cost of all the hay the donkey has chewed through, in USD. |
-| `rag_documents_ingested_total` | counter | Documents ingested | Post office sorting raw mail into GPS-labelled boxes before the donkey's first trip |
-| `rag_chunks_created_total` | counter | Chunks created | Total number of backpack pockets stitched by the post office during all document uploads. |
-| `rag_uptime_seconds` | gauge | App uptime | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
-| `rag_queries_total` | gauge | Queries logged today | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
-| `rag_queries_pass_rate_percent` | gauge | Pass rate today | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
-| `rag_queries_avg_retrieval` | gauge | Avg retrieval score | Rolling average grading how accurately the donkey has been pulling backpack pockets lately. |
-| `rag_queries_avg_faithfulness` | gauge | Avg faithfulness score | How confidently the warehouse says 'this backpack matches' — higher = closer GPS hit |
-| `rag_queries_failure_{category}` | gauge | Failures by category | Tachograph reading — recorded on every donkey trip and shown on the dashboard |
+| `rag_chat_requests_total` | counter | Total chat requests | Tachograph counter — how many deliveries the courier completed |
+| `rag_chat_errors_total` | counter | Total chat errors | Tachograph reading — recorded on every courier trip and shown on the dashboard |
+| `rag_chat_error_rate_percent` | gauge | Current error rate % | Tachograph reading — recorded on every courier trip and shown on the dashboard |
+| `rag_chat_latency_p50/p95/p99_ms` | gauge | Latency percentiles | Tachograph reading — how long the courier took on the round trip |
+| `rag_tokens_input_total` | counter | Total input tokens | Counter totalling every fuel bale loaded into the courier across the lifetime of the service. |
+| `rag_tokens_output_total` | counter | Total output tokens | Counter of every output fuel bale the courier produced as answer tokens. |
+| `rag_tokens_cost_usd_total` | counter | Estimated cost in USD | Estimated dollar cost of all the fuel the courier has chewed through, in USD. |
+| `rag_documents_ingested_total` | counter | Documents ingested | Post office sorting raw mail into GPS-labelled boxes before the courier's first trip |
+| `rag_chunks_created_total` | counter | Chunks created | Total number of parcel pockets stitched by the post office during all document uploads. |
+| `rag_uptime_seconds` | gauge | App uptime | Tachograph reading — recorded on every courier trip and shown on the dashboard |
+| `rag_queries_total` | gauge | Queries logged today | Tachograph reading — recorded on every courier trip and shown on the dashboard |
+| `rag_queries_pass_rate_percent` | gauge | Pass rate today | Tachograph reading — recorded on every courier trip and shown on the dashboard |
+| `rag_queries_avg_retrieval` | gauge | Avg retrieval score | Rolling average grading how accurately the courier has been pulling parcel pockets lately. |
+| `rag_queries_avg_faithfulness` | gauge | Avg faithfulness score | How confidently the warehouse says 'this parcel matches' — higher = closer GPS hit |
+| `rag_queries_failure_{category}` | gauge | Failures by category | Tachograph reading — recorded on every courier trip and shown on the dashboard |
 
-- 🫏 **Donkey:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
+- 🚚 **Courier:** The tachograph reading — every delivery time, token cost, and quality score recorded for review.
 
 ---
 
@@ -534,7 +534,7 @@ rag_queries_failure_hallucination 5
 Serves the built-in chat web interface. Open this URL in your browser
 to interact with the chatbot through a graphical interface.
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -550,16 +550,16 @@ All error responses follow a consistent format:
 
 **Common HTTP Status Codes:**
 
-| Code | Meaning | 🫏 Donkey |
+| Code | Meaning | 🚚 Courier |
 |---|---| --- |
-| `200` | Success | Donkey delivered successfully — customer gets the answer |
-| `400` | Bad request — check your input | Customer's request was malformed — donkey refuses to leave the stable |
-| `404` | Resource not found | Customer's request was malformed — donkey refuses to leave the stable |
-| `413` | Payload too large | Customer's request was malformed — donkey refuses to leave the stable |
-| `500` | Internal server error | Donkey collapsed mid-trip — check the stable logs to find what went wrong |
-| `503` | Service unavailable — a dependency is down | Supply shed manifest — lists every tool the stable needs to operate |
+| `200` | Success | Courier delivered successfully — customer gets the answer |
+| `400` | Bad request — check your input | Customer's request was malformed — courier refuses to leave the depot |
+| `404` | Resource not found | Customer's request was malformed — courier refuses to leave the depot |
+| `413` | Payload too large | Customer's request was malformed — courier refuses to leave the depot |
+| `500` | Internal server error | Courier collapsed mid-trip — check the depot logs to find what went wrong |
+| `503` | Service unavailable — a dependency is down | Supply shed manifest — lists every tool the depot needs to operate |
 
-- 🫏 **Donkey:** When the donkey returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
+- 🚚 **Courier:** When the courier returns empty-hooved — use the trip log and bag inspection checklist to find what went wrong.
 
 ---
 
@@ -568,7 +568,7 @@ All error responses follow a consistent format:
 > **Note:** Authentication is not implemented in v0.1.0.
 > Planned for v0.2.0: API key authentication via `X-API-Key` header.
 
-- 🫏 **Donkey:** The stable's lock and key — only authorised riders can dispatch the donkey.
+- 🚚 **Courier:** The depot's lock and key — only authorised riders can dispatch the courier.
 
 ---
 
@@ -577,7 +577,7 @@ All error responses follow a consistent format:
 > **Note:** Rate limiting is not implemented in v0.1.0.
 > Planned for v0.2.0: 60 requests/minute per API key.
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -591,4 +591,4 @@ FastAPI provides auto-generated interactive API documentation:
 These are available in development and can be disabled in production via the
 `DOCS_ENABLED` environment variable.
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.

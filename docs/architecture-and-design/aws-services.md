@@ -15,19 +15,19 @@
 
 ## Overview
 
-| Service | Purpose in this project | Cost model | 🫏 Donkey |
+| Service | Purpose in this project | Cost model | 🚚 Courier |
 | --- | --- | --- | --- |
-| **Bedrock** | LLM inference (Claude) + embeddings (Titan) | Pay per token | Cloud stable that hires the donkey by the hay bale — Claude carries questions, Titan stamps text with GPS coordinates |
-| **S3** | Store uploaded documents | Pay per GB stored | AWS warehouse — pennies per month to store the donkey's source documents |
+| **Bedrock** | LLM inference (Claude) + embeddings (Titan) | Pay per token | Cloud depot that hires the courier by the fuel bale — Claude carries questions, Titan stamps text with GPS coordinates |
+| **S3** | Store uploaded documents | Pay per GB stored | AWS warehouse — pennies per month to store the courier's source documents |
 | **DynamoDB** | Conversation history + **vector store** (cheap mode) | Pay per request | AWS depot — DynamoDB: Conversation history + vector store (cheap mode) · Pay per request |
 | **OpenSearch Serverless** | Vector store for embeddings (production) | Pay per OCU-hour | Amazon's index room — OpenSearch Serverless: Vector store for embeddings (production) · Pay per OCU-hour |
 | **ECS Fargate** | Host the FastAPI container | Pay per vCPU/memory-hour | Stall that houses the worker — ECS Fargate: Host the FastAPI container · Pay per vCPU/memory-hour |
-| **ECR** | Docker image registry | Pay per GB stored | AWS Docker registry address where the donkey image is parked — billed per gigabyte stored. |
+| **ECR** | Docker image registry | Pay per GB stored | AWS Docker registry address where the courier image is parked — billed per gigabyte stored. |
 | **Lambda** | Event-driven document ingestion | Pay per invocation | Post office pre-sort — Lambda: Event-driven document ingestion · Pay per invocation |
-| **CloudWatch** | Logs, metrics, dashboards, alerts | Free tier generous | The tachograph display for the whole stable — logs, metrics, dashboards, alerts, and the first 10 GB are free. |
+| **CloudWatch** | Logs, metrics, dashboards, alerts | Free tier generous | The tachograph display for the whole depot — logs, metrics, dashboards, alerts, and the first 10 GB are free. |
 | **IAM** | Permissions and roles | Free | Complimentary feed allowance — IAM: Permissions and roles · Free |
 
-- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
+- 🚚 **Courier:** Think of this as the orientation briefing given to a new courier before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -61,12 +61,12 @@ response = self._runtime_client.converse(
 
 ### Models available
 
-| Model | Use case | Input cost | Output cost | 🫏 Donkey |
+| Model | Use case | Input cost | Output cost | 🚚 Courier |
 | --- | --- | --- | --- | --- |
-| Claude 3.5 Sonnet v2 | Best for RAG (accurate, fast) | $0.003/1K | $0.015/1K | Top-tier donkey — accurate and quick, the default carrier for production deliveries |
-| Claude 3 Haiku | Cheaper, faster, less accurate | $0.00025/1K | $0.00125/1K | Pony-sized donkey — cheaper hay and faster trips, but more likely to drop a detail |
+| Claude 3.5 Sonnet v2 | Best for RAG (accurate, fast) | $0.003/1K | $0.015/1K | Top-tier courier — accurate and quick, the default carrier for production deliveries |
+| Claude 3 Haiku | Cheaper, faster, less accurate | $0.00025/1K | $0.00125/1K | Pony-sized courier — cheaper fuel and faster trips, but more likely to drop a detail |
 | Titan Text Embeddings v2 | Convert text to vectors | $0.00002/1K | N/A | Complimentary feed allowance — Titan Text Embeddings v2: Convert text to vectors · $0.00002/1K · N/A |
-| Llama 3.1 70B | Open source alternative | $0.00099/1K | $0.00099/1K | Open-source donkey — same hay rate in and out, handy when you want to swap stables later |
+| Llama 3.1 70B | Open source alternative | $0.00099/1K | $0.00099/1K | Open-source courier — same fuel rate in and out, handy when you want to swap stables later |
 
 ### IAM permissions needed
 
@@ -85,7 +85,7 @@ response = self._runtime_client.converse(
 
 Bedrock models are opt-in. Go to AWS Console → Bedrock → Model access → Request access to Claude and Titan.
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -122,7 +122,7 @@ Features enabled:
 - Free tier: 5 GB for 12 months
 - For this project: essentially free (documents are small)
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -145,13 +145,13 @@ Sort Key: timestamp (String)
 TTL: expires_at (auto-delete old conversations)
 ```
 
-| Field | Type | Purpose | 🫏 Donkey |
+| Field | Type | Purpose | 🚚 Courier |
 | --- | --- | --- | --- |
 | `session_id` | String (PK) | Groups messages in a conversation | Trip log entry — session_id: String (PK) · Groups messages in a conversation |
-| `timestamp` | String (SK) | Orders messages chronologically | Timestamp stamped on the trip log entry — when the donkey set off or returned |
-| `role` | String | "user" or "assistant" | Stable keys — only authorised callers may ask the donkey to deliver |
-| `content` | String | The message text | The actual cargo text inside the backpack the donkey is carrying |
-| `expires_at` | Number | TTL — auto-delete after 7 days | Donkey-side view of expires_at — affects how the donkey loads, reads, or delivers the cargo |
+| `timestamp` | String (SK) | Orders messages chronologically | Timestamp stamped on the trip log entry — when the courier set off or returned |
+| `role` | String | "user" or "assistant" | Depot keys — only authorised callers may ask the courier to deliver |
+| `content` | String | The message text | The actual parcels text inside the parcel the courier is carrying |
+| `expires_at` | Number | TTL — auto-delete after 7 days | Courier-side view of expires_at — affects how the courier loads, reads, or delivers the parcels |
 
 ### Why DynamoDB and not PostgreSQL?
 
@@ -166,7 +166,7 @@ TTL: expires_at (auto-delete old conversations)
 - On-demand: $1.25 per million writes, $0.25 per million reads
 - Free tier covers most personal use
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -217,7 +217,7 @@ Only deploy OpenSearch Serverless when you need cloud-based vector search.
 }
 ```
 
-- 🫏 **Donkey:** The warehouse robot dispatched to find the right backpack shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
+- 🚚 **Courier:** The warehouse robot dispatched to find the right parcel shelf — it uses GPS coordinates (embeddings) to locate the nearest relevant chunks in ~9 hops.
 
 ---
 
@@ -233,18 +233,18 @@ Host the FastAPI application in production.
 
 ### Fargate vs EC2
 
-| | Fargate (our choice) | EC2 | 🫏 Donkey |
+| | Fargate (our choice) | EC2 | 🚚 Courier |
 | --- | --- | --- | --- |
-| Server management | None | You manage instances | Donkey-side view of Server management — affects how the donkey loads, reads, or delivers the cargo |
-| Scaling | Automatic | Configure auto-scaling groups | How the stable adds or removes donkeys when delivery volume changes |
-| Cost | Pay per vCPU/memory-hour | Pay per instance-hour | Fargate bills you per minute the donkey actually pulls; EC2 charges rent on the whole stall whether it works or not. |
-| Minimum | ~$30/month (0.25 vCPU) | ~$10/month (t3.micro) | Fuel-and-feed bill for keeping the donkey and stable running |
+| Server management | None | You manage instances | Courier-side view of Server management — affects how the courier loads, reads, or delivers the parcels |
+| Scaling | Automatic | Configure auto-scaling groups | How the depot adds or removes couriers when delivery volume changes |
+| Cost | Pay per vCPU/memory-hour | Pay per instance-hour | Fargate bills you per minute the courier actually pulls; EC2 charges rent on the whole stall whether it works or not. |
+| Minimum | ~$30/month (0.25 vCPU) | ~$10/month (t3.micro) | Fuel-and-feed bill for keeping the courier and depot running |
 
 ### Why Fargate
 
 For a single container app, Fargate is simpler. No SSH, no patches, no instance management.
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -270,7 +270,7 @@ AWS's monitoring service — logs, metrics, dashboards, and alarms.
 
 Generous enough for personal use.
 
-- 🫏 **Donkey:** Running the donkey on rented pasture — AWS or Azure provides the stable so you only pay for the hay consumed.
+- 🚚 **Courier:** Running the courier on rented pasture — AWS or Azure provides the depot so you only pay for the fuel consumed.
 
 ---
 
@@ -284,14 +284,14 @@ Identity and Access Management — controls who can do what in AWS.
 
 The ECS task has an IAM role with these permissions:
 
-| Permission | Resource | Why | 🫏 Donkey |
+| Permission | Resource | Why | 🚚 Courier |
 | --- | --- | --- | --- |
-| `s3:GetObject`, `s3:PutObject` | Documents bucket | Read/write documents | Permission slip letting the donkey pick up and drop off parcels at the AWS warehouse |
-| `dynamodb:GetItem`, `dynamodb:PutItem`, `dynamodb:Query` | Conversations table | Read/write history | AWS-side stable yard — dynamodb:GetItem, dynamodb:PutItem, dynamodb:Query: Conversations table · Read/write history |
-| `bedrock:InvokeModel` | All models | Call Claude and Titan | Without this permission the stable manager can't wake the donkey — every chat would die at the gate |
+| `s3:GetObject`, `s3:PutObject` | Documents bucket | Read/write documents | Permission slip letting the courier pick up and drop off parcels at the AWS warehouse |
+| `dynamodb:GetItem`, `dynamodb:PutItem`, `dynamodb:Query` | Conversations table | Read/write history | AWS-side depot yard — dynamodb:GetItem, dynamodb:PutItem, dynamodb:Query: Conversations table · Read/write history |
+| `bedrock:InvokeModel` | All models | Call Claude and Titan | Without this permission the depot manager can't wake the courier — every chat would die at the gate |
 
 ### Principle of least privilege
 
 Each permission is scoped to the specific resource (bucket ARN, table ARN). The role can't access any other S3 buckets or DynamoDB tables.
 
-- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
+- 🚚 **Courier:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for couriers running the cloud route.

@@ -67,7 +67,7 @@ With history:
     → AI understands "what about" refers to refunds
 ```
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -109,7 +109,7 @@ Think of it like a stored procedure that has no session state:
 - If you want context from previous calls, you must pass it explicitly
 - History storage = the table where you log inputs/outputs for replay
 
-- 🫏 **Donkey:** The donkey's trip log — it remembers what was said 3 questions ago so it doesn't re-ask for your address.
+- 🚚 **Courier:** The courier's trip log — it remembers what was said 3 questions ago so it doesn't re-ask for your address.
 
 ---
 
@@ -127,7 +127,7 @@ src/history/
 > provider focuses on LLM + vector store. Adding a local history backend
 > (e.g., SQLite) would follow the same `BaseConversationHistory` interface.
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -145,9 +145,9 @@ class ConversationMessage:
 
 The `BaseConversationHistory` abstract class defines three operations:
 
-| Method | What it does | DE equivalent | 🫏 Donkey |
+| Method | What it does | DE equivalent | 🚚 Courier |
 | --- | --- | --- | --- |
-| `add_message()` | Store one message | `INSERT INTO messages VALUES (...)` | Donkey-side view of add_message() — affects how the donkey loads, reads, or delivers the cargo |
+| `add_message()` | Store one message | `INSERT INTO messages VALUES (...)` | Courier-side view of add_message() — affects how the courier loads, reads, or delivers the parcels |
 | `get_history()` | Get last N messages for a session | `SELECT * FROM messages WHERE session_id = ? ORDER BY timestamp DESC LIMIT 10` | Line scribbled in the trip ledger — get_history(): Get last N messages for a session · SELECT * FROM messages WHERE session_id = ? ORDER |
 | `delete_session()` | Delete all messages for a session | `DELETE FROM messages WHERE session_id = ?` | Line scribbled in the trip ledger — delete_session(): Delete all messages for a session · DELETE FROM messages WHERE session_id = ? |
 
@@ -172,7 +172,7 @@ When you replay history in the prompt, each message must say who sent it:
 messages. More history = more input tokens = more cost. This is a trade-off between
 context quality and cost (explained in detail in [The Token Cost of History](#the-token-cost-of-history)).
 
-- 🫏 **Donkey:** The universal bag fitting — any donkey (AWS, Azure, local) accepts the same harness so you can swap providers without re-training the rider.
+- 🚚 **Courier:** The universal bag fitting — any courier (AWS, Azure, local) accepts the same harness so you can swap providers without re-training the rider.
 
 ---
 
@@ -238,7 +238,7 @@ ttl {
 Conversations auto-expire after 7 days. No cron job needed — DynamoDB handles deletion.
 This keeps costs down and avoids storing stale data forever.
 
-- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
+- 🚚 **Courier:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for couriers running the cloud route.
 
 ---
 
@@ -317,23 +317,23 @@ default_ttl = 604800  # 7 days in seconds
 
 Same concept as DynamoDB TTL — conversations auto-expire.
 
-- 🫏 **Donkey:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for donkeys on the Azure route.
+- 🚚 **Courier:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for couriers on the Azure route.
 
 ---
 
 ## AWS vs Azure — Side-by-Side Comparison
 
-| Aspect | AWS DynamoDB | Azure Cosmos DB | 🫏 Donkey |
+| Aspect | AWS DynamoDB | Azure Cosmos DB | 🚚 Courier |
 | --- | --- | --- | --- |
 | **SDK** | `boto3` (sync) | `azure-cosmos` (async native) | Application Insights diary — SDK: boto3 (sync) · azure-cosmos (async native) |
 | **Key design** | Composite: `session_id` (PK) + `timestamp` (SK) | `id` (unique) + `session_id` (partition key) | Line scribbled in the trip ledger — Key design: Composite: session_id (PK) + timestamp (SK) · id (unique) + session_id (partition key) |
-| **Unique ID** | Not needed — PK+SK is unique | Required — `id` field with UUID | Tracking number stamped on the parcel so the donkey can find it again |
+| **Unique ID** | Not needed — PK+SK is unique | Required — `id` field with UUID | Tracking number stamped on the parcel so the courier can find it again |
 | **Query language** | `KeyConditionExpression` (DynamoDB-specific) | SQL-like syntax (`SELECT`, `WHERE`, `ORDER BY`) | Amazon's loading dock — Query language: KeyConditionExpression (DynamoDB-specific) · SQL-like syntax (SELECT, WHERE, ORDER BY) |
-| **Get latest N** | `ScanIndexForward=False, Limit=N` + reverse | `SELECT TOP N ... ORDER BY timestamp DESC` + reverse | Practice run for the donkey — Get latest N: ScanIndexForward=False, Limit=N + reverse · SELECT TOP N ... ORDER BY timestamp DESC + reverse |
-| **Batch delete** | `batch_writer()` + loop | `async for` + `delete_item()` one by one | Donkey can run other errands while waiting for the warehouse to respond |
+| **Get latest N** | `ScanIndexForward=False, Limit=N` + reverse | `SELECT TOP N ... ORDER BY timestamp DESC` + reverse | Practice run for the courier — Get latest N: ScanIndexForward=False, Limit=N + reverse · SELECT TOP N ... ORDER BY timestamp DESC + reverse |
+| **Batch delete** | `batch_writer()` + loop | `async for` + `delete_item()` one by one | Courier can run other errands while waiting for the warehouse to respond |
 | **TTL** | `expires_at` attribute | `default_ttl` on container (seconds) | Both trip-logs auto-shred old conversation pages — DynamoDB reads `expires_at`, Cosmos uses a container-wide timer in seconds. |
-| **Cost (serverless)** | ~$0 idle, $1.25/M writes, $0.25/M reads | ~$0 idle, ~$0.28/M RUs | Cost of keeping the donkey fed — Cost (serverless): ~$0 idle, $1.25/M writes, $0.25/M reads · ~$0 idle, ~$0.28/M RUs |
-| **Consistency** | Eventually consistent (default) | Session consistency (configured) | Stable diary records — Consistency: Eventually consistent (default) · Session consistency (configured) |
+| **Cost (serverless)** | ~$0 idle, $1.25/M writes, $0.25/M reads | ~$0 idle, ~$0.28/M RUs | Cost of keeping the courier fed — Cost (serverless): ~$0 idle, $1.25/M writes, $0.25/M reads · ~$0 idle, ~$0.28/M RUs |
+| **Consistency** | Eventually consistent (default) | Session consistency (configured) | Depot logbook records — Consistency: Eventually consistent (default) · Session consistency (configured) |
 
 ### The code patterns side by side
 
@@ -370,7 +370,7 @@ async for item in container.query_items(query=query, partition_key=session_id):
     items.append(item)
 ```
 
-- 🫏 **Donkey:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for donkeys running the cloud route.
+- 🚚 **Courier:** The AWS depot — DynamoDB and OpenSearch serve as the GPS-indexed warehouse and trip-log database for couriers running the cloud route.
 
 ---
 
@@ -407,7 +407,7 @@ POST /api/chat  {"question": "What about digital products?", "session_id": "sess
 **Steps 6 is critical** — both the question AND the answer are saved. On the next
 question, `get_history()` returns all previous turns, including this one.
 
-- 🫏 **Donkey:** The donkey's trip log — it remembers what was said 3 questions ago so it doesn't re-ask for your address.
+- 🚚 **Courier:** The courier's trip log — it remembers what was said 3 questions ago so it doesn't re-ask for your address.
 
 ---
 
@@ -429,46 +429,46 @@ Total history tokens: ~123 input tokens added to EVERY subsequent prompt
 
 With the default `limit=10` (10 messages = 5 conversation turns):
 
-| Messages in history | Extra input tokens | Extra cost per query (Claude) | 🫏 Donkey |
+| Messages in history | Extra input tokens | Extra cost per query (Claude) | 🚚 Courier |
 | --- | --- | --- | --- |
-| 0 (first question) | 0 | $0.000 | Free hay for the donkey — 0 (first question): 0 · $0.000 |
-| 2 (1 turn) | ~60 | $0.00018 | Stable throws in free fodder — 2 (1 turn): ~60 · $0.00018 |
-| 6 (3 turns) | ~180 | $0.00054 | Stable throws in free fodder — 6 (3 turns): ~180 · $0.00054 |
-| 10 (5 turns) | ~300 | $0.00090 | Stable throws in free fodder — 10 (5 turns): ~300 · $0.00090 |
-| 20 (10 turns) | ~600 | $0.00180 | Free hay for the donkey — 20 (10 turns): ~600 · $0.00180 |
+| 0 (first question) | 0 | $0.000 | Free fuel for the courier — 0 (first question): 0 · $0.000 |
+| 2 (1 turn) | ~60 | $0.00018 | Depot throws in free supplies — 2 (1 turn): ~60 · $0.00018 |
+| 6 (3 turns) | ~180 | $0.00054 | Depot throws in free supplies — 6 (3 turns): ~180 · $0.00054 |
+| 10 (5 turns) | ~300 | $0.00090 | Depot throws in free supplies — 10 (5 turns): ~300 · $0.00090 |
+| 20 (10 turns) | ~600 | $0.00180 | Free fuel for the courier — 20 (10 turns): ~600 · $0.00180 |
 
 **This is why there's a limit.** Without it, a 50-message conversation would add ~1500
 tokens to every prompt — tripling the cost per query for diminishing returns.
 
 ### The trade-off
 
-| Fewer history messages | More history messages | 🫏 Donkey |
+| Fewer history messages | More history messages | 🚚 Courier |
 | --- | --- | --- |
-| Lower cost per query | Higher cost per query | Cost of keeping the donkey fed — Lower cost per query: Higher cost per query |
-| Less context for follow-ups | Better understanding of conversation | Stable diary records — Less context for follow-ups: Better understanding of conversation |
-| User may need to repeat context | Smooth, natural conversation | Stable diary records — User may need to repeat context: Smooth, natural conversation |
-| `limit=4` is minimum for usable follow-ups | `limit=20` is maximum before costs explode | Hay-and-oats invoice — limit=4 is minimum for usable follow-ups: limit=20 is maximum before costs explode |
+| Lower cost per query | Higher cost per query | Cost of keeping the courier fed — Lower cost per query: Higher cost per query |
+| Less context for follow-ups | Better understanding of conversation | Depot logbook records — Less context for follow-ups: Better understanding of conversation |
+| User may need to repeat context | Smooth, natural conversation | Depot logbook records — User may need to repeat context: Smooth, natural conversation |
+| `limit=4` is minimum for usable follow-ups | `limit=20` is maximum before costs explode | fuel-and-oats invoice — limit=4 is minimum for usable follow-ups: limit=20 is maximum before costs explode |
 
 The default `limit=10` is a good balance — 5 conversation turns gives enough context
 for most follow-up questions without excessive token costs.
 
-- 🫏 **Donkey:** The donkey's trip log — it remembers what was said 3 questions ago so it doesn't re-ask for your address.
+- 🚚 **Courier:** The courier's trip log — it remembers what was said 3 questions ago so it doesn't re-ask for your address.
 
 ---
 
 ## DE vs AI Engineer — What Each Sees
 
-| Aspect | What a DE sees | What an AI Engineer sees | 🫏 Donkey |
+| Aspect | What a DE sees | What an AI Engineer sees | 🚚 Courier |
 | --- | --- | --- | --- |
-| `ConversationMessage` model | Standard message table schema | Token budget — each message costs tokens in the next prompt | Each stored message costs hay later — every prior turn gets re-loaded into the donkey's next prompt. |
-| `add_message()` | Insert row, done | Must save BOTH user and assistant messages for complete replay | Donkey-side view of add_message() — affects how the donkey loads, reads, or delivers the cargo |
-| `get_history(limit=10)` | Pagination, standard | Token cost control — limit = max tokens spent on history | Pagination doubles as a hay budget — the limit caps how much trip log the donkey re-chews per turn. |
+| `ConversationMessage` model | Standard message table schema | Token budget — each message costs tokens in the next prompt | Each stored message costs fuel later — every prior turn gets re-loaded into the courier's next prompt. |
+| `add_message()` | Insert row, done | Must save BOTH user and assistant messages for complete replay | Courier-side view of add_message() — affects how the courier loads, reads, or delivers the parcels |
+| `get_history(limit=10)` | Pagination, standard | Token cost control — limit = max tokens spent on history | Pagination doubles as a fuel budget — the limit caps how much trip log the courier re-chews per turn. |
 | `delete_session()` | Cleanup, standard | Privacy + cost — old sessions = wasted storage + prompt bloat | Instructions tucked in the pannier — delete_session(): Cleanup, standard · Privacy + cost — old sessions = wasted storage + prompt bloat |
 | TTL (7 days) | Standard data retention | Context window management — conversations older than 7 days aren't useful | Line scribbled in the trip ledger — TTL (7 days): Standard data retention · Context window management — conversations older than 7 days aren't useful |
-| `session_id` | Partition key for grouping | Session isolation — one user's history never leaks into another's prompt | Partition key keeps each user in their own stable so trip logs never leak into another donkey's prompt. |
-| Sort by timestamp | Standard ordering | Chronological replay is required — LLM needs messages in order | Donkey replays the trip log in order — out-of-order messages would confuse the next answer |
+| `session_id` | Partition key for grouping | Session isolation — one user's history never leaks into another's prompt | Partition key keeps each user in their own depot so trip logs never leak into another courier's prompt. |
+| Sort by timestamp | Standard ordering | Chronological replay is required — LLM needs messages in order | Courier replays the trip log in order — out-of-order messages would confuse the next answer |
 
-- 🫏 **Donkey:** Like a well-trained donkey that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
+- 🚚 **Courier:** Like a well-trained courier that knows this part of the route by heart — reliable, consistent, and essential to the delivery system.
 
 ---
 
@@ -494,4 +494,4 @@ Test your understanding:
 6. Roughly 300 tokens (~30 tokens per message × 10 messages). At $0.003/1K tokens (Claude input), that's ~$0.0009 extra per query.
 7. DynamoDB uses a composite key (session_id + timestamp) which is naturally unique. Cosmos DB requires a standalone `id` field for document identity.
 
-- 🫏 **Donkey:** A quick quiz for the trainee stable hand — answer these to confirm the key donkey delivery concepts have landed.
+- 🚚 **Courier:** A quick quiz for the trainee dispatch clerk — answer these to confirm the key courier delivery concepts have landed.

@@ -15,19 +15,19 @@
 
 ## Overview
 
-| Service | Purpose in this project | Cost model | 🫏 Donkey |
+| Service | Purpose in this project | Cost model | 🚚 Courier |
 | --- | --- | --- | --- |
-| **Azure OpenAI** | LLM inference (GPT-4o) + embeddings | Pay per token | Azure-hosted stable that rents the donkey by the hay bale — GPT-4o writes answers, embeddings turn text into GPS coordinates |
-| **Blob Storage** | Store uploaded documents | Pay per GB stored | Azure's document warehouse — where the donkey picks up source files before pre-sorting them into chunks |
-| **Cosmos DB** | Conversation history | Pay per RU (serverless) | Azure's stable journal — Cosmos DB: Conversation history · Pay per RU (serverless) |
-| **AI Search** | Vector store for embeddings | Tier-based (Free available) | Azure hub's vector index where the donkey's embeddings live — billed by tier with a free option. |
-| **Container Apps** | Host the FastAPI container | Pay per vCPU/memory-second | Azure's stable building for your FastAPI donkey — billed by the second the donkey is actually moving. |
-| **Container Registry** | Docker image registry | Tier-based ($5/month Basic) | Azure hub's Docker registry address for the donkey image — Basic SKU runs about $5/month. |
+| **Azure OpenAI** | LLM inference (GPT-4o) + embeddings | Pay per token | Azure-hosted depot that rents the courier by the fuel bale — GPT-4o writes answers, embeddings turn text into GPS coordinates |
+| **Blob Storage** | Store uploaded documents | Pay per GB stored | Azure's document warehouse — where the courier picks up source files before pre-sorting them into chunks |
+| **Cosmos DB** | Conversation history | Pay per RU (serverless) | Azure's depot logbook — Cosmos DB: Conversation history · Pay per RU (serverless) |
+| **AI Search** | Vector store for embeddings | Tier-based (Free available) | Azure hub's vector index where the courier's embeddings live — billed by tier with a free option. |
+| **Container Apps** | Host the FastAPI container | Pay per vCPU/memory-second | Azure's depot building for your FastAPI courier — billed by the second the courier is actually moving. |
+| **Container Registry** | Docker image registry | Tier-based ($5/month Basic) | Azure hub's Docker registry address for the courier image — Basic SKU runs about $5/month. |
 | **Azure Functions** | Event-driven document ingestion | Pay per execution | Sorting bench before loading — Azure Functions: Event-driven document ingestion · Pay per execution |
-| **Azure Monitor** | Logs, metrics, dashboards, alerts | Free tier generous | Donkey's odometer dial — Azure Monitor: Logs, metrics, dashboards, alerts · Free tier generous |
-| **Managed Identity** | Passwordless auth between services | Free | Free hay for the donkey — Managed Identity: Passwordless auth between services · Free |
+| **Azure Monitor** | Logs, metrics, dashboards, alerts | Free tier generous | Courier's odometer dial — Azure Monitor: Logs, metrics, dashboards, alerts · Free tier generous |
+| **Managed Identity** | Passwordless auth between services | Free | Free fuel for the courier — Managed Identity: Passwordless auth between services · Free |
 
-- 🫏 **Donkey:** Think of this as the orientation briefing given to a new donkey before its first delivery run — it sets the context for everything that follows.
+- 🚚 **Courier:** Think of this as the orientation briefing given to a new courier before its first delivery run — it sets the context for everything that follows.
 
 ---
 
@@ -69,10 +69,10 @@ response = await self._client.chat.completions.create(
 
 ### Models to deploy
 
-| Model | Deployment name | Purpose | Input cost | Output cost | 🫏 Donkey |
+| Model | Deployment name | Purpose | Input cost | Output cost | 🚚 Courier |
 | --- | --- | --- | --- | --- | --- |
-| gpt-4o | `gpt-4o` | Answer generation | $0.0025/1K | $0.01/1K | The premium donkey on Azure — strong and accurate, the default carrier for answer generation |
-| text-embedding-3-small | `text-embedding-3-small` | Text to vectors | $0.00002/1K | N/A | Coordinates inked on the saddlebag — text-embedding-3-small: text-embedding-3-small · Text to vectors · $0.00002/1K · N/A |
+| gpt-4o | `gpt-4o` | Answer generation | $0.0025/1K | $0.01/1K | The premium courier on Azure — strong and accurate, the default carrier for answer generation |
+| text-embedding-3-small | `text-embedding-3-small` | Text to vectors | $0.00002/1K | N/A | Coordinates inked on the parcel — text-embedding-3-small: text-embedding-3-small · Text to vectors · $0.00002/1K · N/A |
 
 ### Setup steps
 
@@ -81,7 +81,7 @@ response = await self._client.chat.completions.create(
 3. Deploy models (gpt-4o + text-embedding-3-small)
 4. Copy endpoint + API key to `.env`
 
-- 🫏 **Donkey:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for donkeys on the Azure route.
+- 🚚 **Courier:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for couriers on the Azure route.
 
 ---
 
@@ -113,15 +113,15 @@ resource "azurerm_storage_account" "documents" {
 
 ### Why LRS and not GRS?
 
-| Replication | Cost | Durability | Use case | 🫏 Donkey |
+| Replication | Cost | Durability | Use case | 🚚 Courier |
 | --- | --- | --- | --- | --- |
-| **LRS** (our choice) | $0.02/GB | 11 nines (one datacenter) | Dev/personal | Free hay for the donkey — LRS (our choice): $0.02/GB · 11 nines (one datacenter) · Dev/personal |
+| **LRS** (our choice) | $0.02/GB | 11 nines (one datacenter) | Dev/personal | Free fuel for the courier — LRS (our choice): $0.02/GB · 11 nines (one datacenter) · Dev/personal |
 | GRS | $0.04/GB | 16 nines (two regions) | Production | Complimentary feed allowance — GRS: $0.04/GB · 16 nines (two regions) · Production |
-| ZRS | $0.025/GB | 12 nines (three zones) | Balanced | Free hay for the donkey — ZRS: $0.025/GB · 12 nines (three zones) · Balanced |
+| ZRS | $0.025/GB | 12 nines (three zones) | Balanced | Free fuel for the courier — ZRS: $0.025/GB · 12 nines (three zones) · Balanced |
 
 For a personal project, LRS is the cheapest option. Your documents are also on your local machine, so you can re-upload if anything happens.
 
-- 🫏 **Donkey:** Choosing between the local barn (ChromaDB), the AWS depot (DynamoDB/OpenSearch), or the Azure hub (Azure AI Search) to store the GPS-indexed backpacks.
+- 🚚 **Courier:** Choosing between the local barn (ChromaDB), the AWS depot (DynamoDB/OpenSearch), or the Azure hub (Azure AI Search) to store the GPS-indexed parcels.
 
 ---
 
@@ -148,10 +148,10 @@ resource "azurerm_cosmosdb_account" "main" {
 
 ### Why Serverless mode?
 
-| Mode | Cost | Idle cost | Best for | 🫏 Donkey |
+| Mode | Cost | Idle cost | Best for | 🚚 Courier |
 | --- | --- | --- | --- | --- |
 | **Serverless** (our choice) | ~$0.25/million RU | **$0** | Low traffic, dev | Complimentary feed allowance — Serverless (our choice): ~$0.25/million RU · $0 · Low traffic, dev |
-| Provisioned (autoscale) | $0.008/RU-hour | $$$$ | Production, steady traffic | Stable throws in free fodder — Provisioned (autoscale): $0.008/RU-hour · $$$$ · Production, steady traffic |
+| Provisioned (autoscale) | $0.008/RU-hour | $$$$ | Production, steady traffic | Depot throws in free supplies — Provisioned (autoscale): $0.008/RU-hour · $$$$ · Production, steady traffic |
 
 ### Container design
 
@@ -170,7 +170,7 @@ Partition key: `/session_id` — all messages in a conversation are in the same 
 
 TTL: 604800 seconds (7 days) — old conversations auto-delete.
 
-- 🫏 **Donkey:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for donkeys on the Azure route.
+- 🚚 **Courier:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for couriers on the Azure route.
 
 ---
 
@@ -190,11 +190,11 @@ Store document chunk embeddings and perform vector similarity search.
 
 ### Tiers
 
-| Tier | Cost/month | Storage | Indexes | Best for | 🫏 Donkey |
+| Tier | Cost/month | Storage | Indexes | Best for | 🚚 Courier |
 | --- | --- | --- | --- | --- | --- |
 | **Free** | $0 | 50 MB | 3 | **Development (use this!)** | Complimentary feed allowance — Free: $0 · 50 MB · 3 · Development (use this!) |
-| Basic | $75 | 2 GB | 15 | Small production | Fuel-and-feed bill for keeping the donkey and stable running |
-| Standard S1 | $250 | 25 GB | 50 | Medium production | Fuel-and-feed bill for keeping the donkey and stable running |
+| Basic | $75 | 2 GB | 15 | Small production | Fuel-and-feed bill for keeping the courier and depot running |
+| Standard S1 | $250 | 25 GB | 50 | Medium production | Fuel-and-feed bill for keeping the courier and depot running |
 
 ### Why Free tier for development?
 
@@ -220,7 +220,7 @@ fields = [
 ]
 ```
 
-- 🫏 **Donkey:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for donkeys on the Azure route.
+- 🚚 **Courier:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for couriers on the Azure route.
 
 ---
 
@@ -236,18 +236,18 @@ Host the FastAPI application in production.
 
 ### Why Container Apps and not App Service or AKS?
 
-| | Container Apps (our choice) | App Service | AKS (Kubernetes) | 🫏 Donkey |
+| | Container Apps (our choice) | App Service | AKS (Kubernetes) | 🚚 Courier |
 | --- | --- | --- | --- | --- |
-| Scale to zero | **Yes** | No (min 1 instance) | No (min 1 node) | How the stable adds or removes donkeys when delivery volume changes |
-| Min cost | $0 (idle) | ~$13/month (B1) | ~$100/month | Cost of keeping the donkey fed — Min cost: $0 (idle) · ~$13/month (B1) · ~$100/month |
-| Complexity | Low | Low | High | Donkey-side view of Complexity — affects how the donkey loads, reads, or delivers the cargo |
-| Container support | Docker | Docker or code | Docker | All three Azure barns happily house Docker-shaped donkeys; App Service will also accept a raw donkey without the crate. |
+| Scale to zero | **Yes** | No (min 1 instance) | No (min 1 node) | How the depot adds or removes couriers when delivery volume changes |
+| Min cost | $0 (idle) | ~$13/month (B1) | ~$100/month | Cost of keeping the courier fed — Min cost: $0 (idle) · ~$13/month (B1) · ~$100/month |
+| Complexity | Low | Low | High | Courier-side view of Complexity — affects how the courier loads, reads, or delivers the parcels |
+| Container support | Docker | Docker or code | Docker | All three Azure barns happily house Docker-shaped couriers; App Service will also accept a raw courier without the crate. |
 
 ### Cost advantage
 
 Container Apps charges per vCPU-second and memory-second. When no requests are coming in, it scales to zero replicas = **$0 idle cost**. This is perfect for a personal project that you only use during development hours.
 
-- 🫏 **Donkey:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for donkeys on the Azure route.
+- 🚚 **Courier:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for couriers on the Azure route.
 
 ---
 
@@ -271,7 +271,7 @@ Azure's monitoring suite. App Insights is the application performance monitoring
 - 90 days retention for free tier
 - Basic alerting included
 
-- 🫏 **Donkey:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for donkeys on the Azure route.
+- 🚚 **Courier:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for couriers on the Azure route.
 
 ---
 
@@ -298,4 +298,4 @@ In development, we use API keys (stored in `.env`). In production, we use Manage
 
 This is a key production security practice that demonstrates enterprise awareness.
 
-- 🫏 **Donkey:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for donkeys on the Azure route.
+- 🚚 **Courier:** The Azure hub — Azure AI Search and Cosmos DB serve as the GPS-indexed warehouse and trip-log database for couriers on the Azure route.
