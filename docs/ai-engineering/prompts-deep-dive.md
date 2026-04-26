@@ -148,7 +148,7 @@ Each rule targets a specific failure mode:
 
 | Rule | What it prevents | DE parallel | 🚚 Courier |
 |---|---|---| --- |
-| **Rule 1:** ONLY use context | Hallucination — making up facts | Referential integrity — no orphaned foreign keys | Forces courier to cite only parcel parcels — no guessing when it can't find the answer |
+| **Rule 1:** ONLY use context | Hallucination — making up facts | Referential integrity — no orphaned foreign keys | Forces the courier to cite only the parcels it was given — no guessing when it can't find the answer |
 | **Rule 2:** Say "I don't know" | Confident wrong answers | `COALESCE(result, 'No data available')` | The courier honestly admitting it has no matching parcel rather than guessing |
 | **Rule 3:** Cite sources | Untraceable claims | Audit trail — every row has a source system ID | Label on the original mail item the parcel was sliced from |
 | **Rule 4:** Be thorough | Incomplete answers | `SELECT *` vs `SELECT id` — return all relevant columns | How confidently the warehouse says 'this parcel matches' — higher = closer GPS hit |

@@ -239,10 +239,10 @@ class ChatResponse(BaseModel):
 
 | Field | Type | Purpose | 🚚 Courier |
 | --- | --- | --- | --- |
-| `input_tokens` | `int` | Tokens in the prompt (question + context) | fuel fuel loads loaded into the courier on the way in — the question plus retrieved context. |
-| `output_tokens` | `int` | Tokens in the generated answer | fuel fuel loads the courier produced on the way out — every token in the generated answer. |
+| `input_tokens` | `int` | Tokens in the prompt (question + context) | Fuel loaded into the courier on the way in — the question plus retrieved context. |
+| `output_tokens` | `int` | Tokens in the generated answer | Fuel burned by the courier on the way out — every token in the generated answer. |
 | `total_tokens` | `int` | Sum of input + output | Combined fuel tally of input plus output, used to compute the trip's full delivery cost. |
-| `estimated_cost_usd` | `float` | Estimated cost based on model pricing | How many fuel-fuel loads this trip cost — printed on the receipt so the depot owner can tally up the month later. |
+| `estimated_cost_usd` | `float` | Estimated cost based on model pricing | What this trip cost in fuel — printed on the receipt so the depot owner can tally up the month. |
 
 **Why this matters:**
 

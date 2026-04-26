@@ -70,7 +70,7 @@
 | | AWS (Bedrock - Claude 3.5 Sonnet v2) | Azure (Azure OpenAI - GPT-4o) | Local (Ollama - llama3.2) | 🚚 Courier |
 | --- | --- | --- | --- | --- |
 | **Input tokens** | $0.003 / 1K tokens | $0.0025 / 1K tokens | **$0** | Input tokens are the fuel you feed the courier — cost scales linearly with query size |
-| **Output tokens** | $0.015 / 1K tokens | $0.01 / 1K tokens | **$0** | Output tokens are answer-fuel — typically cost 3–5× more per fuel bale than input fuel |
+| **Output tokens** | $0.015 / 1K tokens | $0.01 / 1K tokens | **$0** | Output tokens are answer-fuel — typically cost 3–5× more than input tokens |
 | **Free tier** | None | None | Free forever | Free fuel for the courier — Free tier: None · None · Free forever |
 | **Minimum cost** | $0 (pay per token) | $0 (pay per token) | $0 (runs on your machine) | No monthly depot fee — you only pay fuel costs when the courier actually delivers |
 | **Per query (typical)** | ~$0.013 | ~$0.01 | **$0** | Complimentary feed allowance — Per query (typical): ~$0.013 · ~$0.01 · $0 |

@@ -29,7 +29,7 @@ This is the **first AI file** you encounter after Phase 1. It defines the contra
 
 | # | Concept | Method / class | DE parallel | What's new | 🚚 Courier |
 |---|---|---|---|---| --- |
-| 1 | **Tokens** | `LLMResponse` | RCU/WCU (DynamoDB capacity units) | The unit of cost — express delivery costs 5× standard pickup more than input | Loads of fuel the courier eats — output fuel loads cost 5× more than input fuel loads |
+| 1 | **Tokens** | `LLMResponse` | RCU/WCU (DynamoDB capacity units) | The unit of cost — output tokens cost 5× more than input tokens | Fuel the courier consumes — output costs 5× more than input (express vs standard delivery) |
 | 2 | **Generation** | `generate()` | `db.query(sql)` → rows | Send prompt + context → get text + token counts back | Courier reads shipping manifest and parcel, then writes answer and reports fuel consumed |
 | 3 | **Temperature** | `temperature` param | ❌ No parallel — pure AI | Controls randomness: 0.0 = deterministic, 1.0 = creative | How predictable the courier's writing is — low = same words every trip, high = the courier gets creative |
 | 4 | **Embeddings** | `get_embedding()` | ❌ No parallel — brand new | Converts text → fixed-size vector that captures meaning | GPS-stamping parcels so the warehouse robot knows exactly where to shelve this parcel |
@@ -314,7 +314,7 @@ USER: "What is the refund policy?"
 | Question | Answer | Concept it tests | 🚚 Courier |
 |---|---|---| --- |
 | "What does `get_embedding()` return for a 2-word input vs a 2000-word input?" | The same: a list of exactly 1024 floats (Titan). Input length doesn't affect output size. | Embeddings | GPS coordinates are always 1024 floats whether you stamp "hi" or a whole paragraph |
-| "Why does `LLMResponse` track `input_tokens` and `output_tokens` separately?" | Because express delivery costs 5× standard pickup more. Tracking separately enables cost optimisation. | Tokens & cost | Counting reading-fuel separately from writing-fuel so you can see which trips burn the courier's most expensive fuel loads |
+| "Why does `LLMResponse` track `input_tokens` and `output_tokens` separately?" | Because output tokens cost 5× more than input tokens. Tracking separately enables cost optimisation. | Tokens & cost | Counting reading-fuel separately from writing-fuel so you can see which trips burn the most expensive fuel |
 | "What happens if you use temperature=0.8 instead of 0.1 for this chatbot?" | Answers become inconsistent and creative. The same question might get different answers. Hallucination risk increases. | Temperature | At 0.8 the courier improvises wildly — memory drift where repeated trips yield different answers |
 | "Why is `get_embedding()` on the same `BaseLLM` class as `generate()`?" | Because the LLM *provider* (Bedrock/Azure) handles both, even though they use different models internally. It's an interface grouping by provider, not by model. | Strategy pattern | One dispatch clerkles both writing couriers and GPS-stamping workers — group by depot, not by job |
 | "What happens if you embed documents with Titan (1024-dim) but embed the question with Azure (1536-dim)?" | Vector search fails — you can't compare vectors of different dimensions. Both must use the same model. | Dimension matching | Mixing 1024-digit GPS stamps with 1536-digit stamps breaks the warehouse — dimensions must match |

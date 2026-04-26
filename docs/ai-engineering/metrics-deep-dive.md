@@ -38,7 +38,7 @@ In data engineering, you monitor pipeline runs, row counts, and job durations. I
 |---|---| --- |
 | Request counting and error rates | Pipeline run counts and failure rates | Mechanical groom — Request counting and error rates: Pipeline run counts and failure rates |
 | Latency tracking (P50/P95/P99) | Job duration monitoring | Stopwatch on the courier's harness — Latency tracking (P50/P95/P99): Job duration monitoring |
-| Token usage tracking | Row count / byte count tracking | Tracks how many fuel fuel loads (tokens) the courier ate per trip — key for cost monitoring |
+| Token usage tracking | Row count / byte count tracking | Tracks how many fuel loads (tokens) the courier consumed per trip — key for cost monitoring |
 | Cost estimation per request | Cloud cost per pipeline run | What the depot charges this month — Cost estimation per request: Cloud cost per pipeline run |
 | In-memory metrics collection | StatsD / Prometheus client | Courier's odometer dial — In-memory metrics collection: StatsD / Prometheus client |
 
@@ -471,7 +471,7 @@ These are metrics that **don't exist in traditional software** but are critical 
 
 | Metric | What it measures | Alert threshold | Why | 🚚 Courier |
 |---|---|---|---| --- |
-| **Token usage / request** | How much context + answer per query | > 2000 tokens/request | Cost growth | Over 2000 fuel fuel loads per trip means the courier is eating too much — review parcel sizes |
+| **Token usage / request** | How much context + answer per query | > 2000 tokens/request | Cost growth | Over 2000 fuel loads per trip means the courier is eating too much — review parcel sizes |
 | **Cost per query** | $ per chat interaction | > $0.02/query | Budget overrun | Cost of keeping the courier fed — Cost per query: $ per chat interaction · > $0.02/query · Budget overrun |
 | **Input/output ratio** | Input tokens ÷ output tokens | > 10:1 means verbose context | Over-retrieval | Input-to-output ratio over 10:1 means parcels are huge relative to the answer the courier wrote |
 | **Latency P99** | Worst-case response time | > 10s | UX degradation | Tachograph reading — how long the courier took on the round trip |

@@ -190,7 +190,7 @@ GUARDRAILS_ENABLED=false CLOUD_PROVIDER=local python -m uvicorn src.main:app --r
 | --- | --- | --- | --- |
 | HTTP Status | ___ | ___ | Door the customer knocks on — HTTP Status: ___ · ___ |
 | Latency | ___ | ___ | Tachograph reading — how long the courier took on the round trip |
-| Tokens Used | ___ | ___ | fuel fuel loads chewed per request — guardrails ON should be near zero on a blocked attack, OFF burns full fuel even on injections |
+| Tokens Used | ___ | ___ | Fuel loads consumed per request — guardrails ON should be near zero on a blocked attack; OFF burns full fuel even on injections |
 | LLM Called? | ___ | ___ | With the gate shut the courier never wakes up; with it open, the courier runs the full delivery whatever the input |
 | Risk | ___ | ___ | Courier-side view of Risk — affects how the courier loads, reads, or delivers the parcels |
 

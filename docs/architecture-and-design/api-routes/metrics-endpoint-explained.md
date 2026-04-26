@@ -115,8 +115,8 @@ async def prometheus_metrics(request: Request) -> Response:
 | --- | --- | --- | --- |
 | `rag_chat_requests_total` | counter | Total chat requests processed | Tachograph counter — how many deliveries the courier completed |
 | `rag_chat_errors_total` | counter | Total chat request errors | Tachograph reading — recorded on every courier trip and shown on the dashboard |
-| `rag_tokens_input_total` | counter | Total input tokens consumed | Tally of every fuel bale the courier chewed reading shipping manifests — counts input tokens consumed across all chat trips. |
-| `rag_tokens_output_total` | counter | Total output tokens generated | Tally of fuel fuel loads burned writing answers — counts output tokens the courier produced and acts as a generation-cost proxy. |
+| `rag_tokens_input_total` | counter | Total input tokens consumed | Tally of all fuel loads the courier consumed reading shipping manifests — counts input tokens across all chat trips. |
+| `rag_tokens_output_total` | counter | Total output tokens generated | Tally of fuel loads burned writing answers — counts output tokens the courier produced; acts as a generation-cost proxy. |
 | `rag_documents_uploaded_total` | counter | Total documents ingested | Post office sorting raw mail into GPS-labelled boxes before the courier's first trip |
 | `rag_queries_total` | counter | Total evaluated queries (from query logs) | Tachograph reading — recorded on every courier trip and shown on the dashboard |
 | `rag_queries_passed_total` | counter | Queries that passed evaluation | Tachograph reading — recorded on every courier trip and shown on the dashboard |

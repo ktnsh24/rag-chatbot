@@ -88,7 +88,7 @@ Before diving into each, here's the big picture comparison:
 | **Auth** | IAM roles / AWS credentials | API key or Managed Identity | **None** — localhost | Door the customer knocks on — Auth: IAM roles / AWS credentials · API key or Managed Identity · None — localhost |
 | **Batch embeddings** | ❌ Not native (loops one by one) | ✅ Native (send list, get list) | ✅ Native (send list, get list) | Azure and Ollama GPS-stamp whole batches; Bedrock's Titan stamps parcels one piece at a time |
 | **Async** | ❌ Sync boto3 (wrapped in async) | ✅ True async (`AsyncAzureOpenAI`) | ✅ True async (`httpx.AsyncClient`) | Can multiple deliveries run at once? Azure and Ollama yes; Bedrock pretends but actually queues |
-| **Input token price** | $0.003 / 1K | $0.0025 / 1K | **$0.00** | Bedrock charges $3 per million input fuel fuel loads; Azure charges $2.50; Ollama is free |
+| **Input token price** | $0.003 / 1K | $0.0025 / 1K | **$0.00** | Bedrock charges $3 per million input fuel loads; Azure charges $2.50; Ollama is free |
 | **Output token price** | $0.015 / 1K | $0.01 / 1K | **$0.00** | Bedrock charges $15 per million output tokens; Azure charges $10; Ollama is free |
 | **Quality** | ★★★★★ | ★★★★★ | ★★★☆☆ | Courier-side view of Quality — affects how the courier loads, reads, or delivers the parcels |
 | **Offline** | ❌ | ❌ | ✅ | Courier-side view of Offline — affects how the courier loads, reads, or delivers the parcels |
@@ -201,7 +201,7 @@ return result["embedding"]                   # [0.12, -0.45, ...] (1024 floats)
 |---|---| --- |
 | Model ID | `amazon.titan-embed-text-v2:0` | Blank shipping manifest — Model ID: amazon.titan-embed-text-v2:0 |
 | Output dimensions | **1024** floats | Length of the courier's GPS coordinate — more digits = finer location, more storage |
-| Max input | 8,192 tokens | Titan accepts up to 8,192 fuel fuel loads of input text before it hits its limit |
+| Max input | 8,192 tokens | Titan accepts up to 8,192 fuel loads of input text before it hits its limit |
 | Cost | $0.00002 / 1K tokens | Titan GPS-stamping costs only $0.02 per million tokens — 150× cheaper than generation |
 
 - 🚚 **Courier:** Converting text into GPS coordinates so the warehouse robot can find the nearest shelf in ~9 checks using stadium-sign HNSW layers.
@@ -303,7 +303,7 @@ resp["usage"]["outputTokens"]                     resp.usage.completion_tokens
 |---|---|---| --- |
 | **System prompt** | Separate `system=[...]` parameter | Inside `messages` as `{"role": "system", ...}` | Customer's written brief — System prompt: Separate system=[...] parameter · Inside messages as {"role": "system", ...} |
 | **Response parsing** | Dict keys: `response["output"]["message"]...` | Typed objects: `response.choices[0].message.content` | The actual parcels text inside the parcel the courier is carrying |
-| **Token naming** | `inputTokens` / `outputTokens` | `prompt_tokens` / `completion_tokens` | AWS calls fuel fuel loads "inputTokens"; Azure calls them "prompt_tokens" — same fuel |
+| **Token naming** | `inputTokens` / `outputTokens` | `prompt_tokens` / `completion_tokens` | AWS calls the fuel loads "inputTokens"; Azure calls them "prompt_tokens" — same fuel either way |
 | **Async** | Sync call (despite `async def`) | True `await` — non-blocking | Depot gate — refuses harmful or off-topic deliveries before the courier leaves |
 | **Content format** | Nested: `[{"text": "..."}]` | Flat string: `"..."` | Depot inspector — checks the code is tidy before letting the courier out |
 
