@@ -20,7 +20,7 @@
 
 ## Table of Contents
 
-0. [Plain-English Walkthrough (Start Here)](#plain-english-walkthrough-start-here)
+0. [Architecture Walkthrough (Start Here)](#architecture-walkthrough-start-here)
 1. [What This Endpoint Does — The 30-Second Version](#what-this-endpoint-does)
 2. [The Complete Request Flow (End to End)](#the-complete-request-flow)
 3. [Part 1: The Route Layer — What chat.py Does](#part-1-the-route-layer)
@@ -42,166 +42,205 @@
 
 ---
 
-## Plain-English Walkthrough (Start Here)
+## Architecture Walkthrough (Start Here)
 
-> **Read this first if you're new to the chatbot.** This explains, in plain English with worked examples, what really happens when someone calls `POST /api/chat`. It uses the courier analogy throughout: the chatbot is a **courier office** that takes a question, runs to the warehouse to find the right paragraphs, and writes you back a grounded answer. The detailed sections that follow this one are reference material that makes more sense once you have this mental picture.
+> This walkthrough explains what really happens when a request hits `POST /api/chat` — every design pattern, every strategy, every branch, every known quirk. It is written for a technical audience. No code snippets, no file paths — but every strategy and trade-off that matters is called out explicitly.
 
-### The shape of a chat request
+---
 
-When a request walks in the door, it's a single JSON object: a `question` string, an optional `session_id` (so a multi-turn conversation can be tracked), and an optional `top_k` (how many document paragraphs to retrieve). That's it. No model name, no temperature — those are picked up from environment config so a non-engineer can call this endpoint without knowing anything about LLMs.
+### How the system is assembled at startup (before the first request arrives)
 
-### Inside the office — the seven-step pipeline
+Before any request arrives, the app runs a **Factory Method** to build the RAG chain. The factory reads one environment variable — `CLOUD_PROVIDER` — and constructs the entire backend from that single value:
 
-Once the request lands, the handler runs **seven steps** in order. Each can stop the train.
+| `CLOUD_PROVIDER` | LLM backend | Vector store | Reranker (if enabled) |
+| --- | --- | --- | --- |
+| `aws` | AWS Bedrock (Claude 3.5 Sonnet v2) | Amazon OpenSearch Serverless (default) or DynamoDB (cheap mode) | Amazon Rerank 1.0 (Bedrock) |
+| `azure` | Azure OpenAI (GPT-4o) | Azure AI Search | Azure AI Search Semantic Ranker |
+| `local` | Ollama (model name from config) | ChromaDB (local disk) | sentence-transformers CrossEncoder (ms-marco-MiniLM-L-6-v2) |
 
-```
-1. Sanity check (is the RAG chain ready?)
-   → 2. Input guardrail (is the question safe to process?)
-      → 3. Retrieve (find the most relevant paragraphs)
-         → 4. Generate (LLM writes the answer)
-            → 5. Output guardrail (is the answer safe to return?)
-               → 6. Metrics (count latency, tokens, cost)
-                  → 7. Query log (write the trip + auto-evaluation to history)
-```
+Every backend — LLM, vector store, guardrails, reranker — implements an **abstract base class** (Strategy Pattern). The RAG chain itself only ever talks to the abstract interface, never to a concrete provider. This is why swapping `aws` → `local` in the env file requires zero code changes.
 
-### Step 1 — Sanity check (is the depot open?)
+**DynamoDB cheap mode** is a deliberate trade-off worth knowing: OpenSearch Serverless costs ~$350/month; DynamoDB free tier costs ~$0. The trade-off is the search algorithm. OpenSearch uses an **HNSW (Hierarchical Navigable Small World)** approximate nearest-neighbour index — sub-linear lookup time, scales to millions of vectors. DynamoDB has no ANN index, so the app loads every stored vector into memory and runs brute-force cosine similarity. Fine below ~10,000 chunks; unusable above that. The HNSW tuning parameters (`hnsw_m`, `hnsw_ef_construction`, `hnsw_ef_search`) are passed through from config to both OpenSearch and Azure AI Search — they control index graph connectivity, build quality, and query-time beam width respectively.
 
-Before doing anything, the handler checks whether the **RAG chain** — the orchestrator that knows how to talk to the vector store and the LLM — was successfully initialised at app startup. The chain only initialises if cloud credentials are present and valid. If they were missing or wrong, `rag_chain` is `None` and every chat request returns `500 RAG chain not initialized`.
+If the factory fails — missing credentials, wrong endpoint, unreachable service — `rag_chain` is set to `None` on app state. Every subsequent chat request will return `500 RAG chain not initialized` until the app is restarted with valid config.
 
-> **Courier version.** This is "is there actually a courier on duty today?" If the depot manager couldn't recruit any couriers this morning (cloud creds bad), every customer at the door is turned away.
+> **Courier version.** The depot is set up once before opening time. The manager reads the "which city are we in?" sign (CLOUD_PROVIDER) and hires the right team: AWS couriers know the Amazon warehouse, Azure couriers know the Microsoft depot, local couriers use the on-site storage room. Every courier follows the same job description (abstract interface) regardless of which city they're in.
 
-### Step 2 — Input guardrail (the bouncer at the front desk)
+---
 
-Every question runs through an **input guardrail** before it reaches the LLM. Today's guardrail is configurable — it can detect prompt injection attempts ("ignore previous instructions"), profanity, PII, off-topic questions, etc. The guardrail returns one of three actions:
+### The request pipeline — seven steps in sequence
 
-- **ALLOW** — pass the question through unchanged.
-- **REWRITE** — clean it up (strip PII, redact swearwords) and pass the cleaned version through.
-- **BLOCK** — refuse with a `400` and a category code like `prompt_injection` or `pii_detected`.
+Once a request arrives, the handler runs these seven steps. A failure at any step stops the chain and returns immediately.
 
-> **Courier version.** This is the bouncer who reads the letter at the door. "Asking for refund policy? Fine. Asking for someone's home address? Sorry, I'm rewriting that. Trying to bribe me to ignore the rules? Door's that way."
+---
 
-If the guardrail is disabled in config (none configured), this step is a no-op and every question passes through unchanged. That's fine for dev but not for production.
+#### Step 1 — Availability guard
 
-### Step 3 — Retrieve (the warehouse run)
+The handler checks `app.state.rag_chain` is not `None`. If it is: `500`. No further processing.
 
-This is where RAG happens. The handler hands the question to `rag_chain.query()`, which does this internally:
+---
 
-1. **Embed the question.** Turn it into a vector using the configured embedding model (Bedrock Titan, Azure OpenAI, or Ollama). Same as `/v1/embeddings` on the gateway — text in, ~1024 numbers out.
-2. **Search the vector store.** Send that vector to the warehouse (DynamoDB, Azure AI Search, or local Chroma) and ask "which `top_k` document chunks are nearest to this vector?". Default `top_k` is 5.
-3. **Optional rerank.** A second model can re-score the retrieved chunks for relevance. This catches cases where the initial vector match was loose. Disabled by default.
-4. **Return the chunks** — each one carries its text, the document it came from, a relevance score (0.0 to 1.0), and optionally a page number.
+#### Step 2 — Input guardrails (Strategy Pattern, three possible actions)
 
-**Concrete example.** User asks *"What's your refund policy?"*. The embedder turns it into a 1024-number vector. The warehouse returns the top 5 nearest chunks:
+The guardrails component is also resolved by the same factory at startup — provider matches `CLOUD_PROVIDER`:
 
-| Chunk | Document | Score |
+- **AWS** → AWS Bedrock Guardrails (managed content safety + PII detection)
+- **Azure** → Azure AI Content Safety + Azure Language Service (PII detection)
+- **Local** → a local rule-based guardrail (regex + keyword lists, no cloud call)
+
+Each provider implements the same abstract interface with a `check_input(text)` method. The method returns one of **three actions** — this is important because the current doc elsewhere says "REWRITE", which is wrong:
+
+| Action | What happens | Effect on pipeline |
 | --- | --- | --- |
-| "Refunds are available within 30 days..." | `policies.pdf` | 0.91 |
-| "To request a refund, contact support@..." | `policies.pdf` | 0.87 |
-| "Returns must be in original packaging..." | `returns.pdf` | 0.74 |
-| "Late shipments may be eligible for credit..." | `shipping.pdf` | 0.58 |
-| "We process payments via Stripe..." | `payments.pdf` | 0.42 |
+| `ALLOW` | Question is clean — pass through unchanged | Pipeline continues with original question |
+| `REDACT` | PII or sensitive content detected — guardrail rewrites the text with placeholders | Pipeline continues with the redacted version (logged question is the redacted one) |
+| `BLOCK` | Prompt injection, toxic content, policy violation | Handler raises `400` with `category` + `details` — LLM is never called |
 
-Notice the last chunk is barely relevant (score 0.42) — it got into the top 5 because we asked for 5, not because it was good. The LLM in the next step has to decide what to actually use.
+If guardrails are disabled in config (or `CLOUD_PROVIDER=local` with no guardrail configured), this step is a no-op — the original question passes through unchanged.
 
-> **Courier version.** The courier runs to the warehouse with the question pinned to her chest. She comes back carrying five binders the warehouse handed her. They're sorted by "this looks closest to your question" but the warehouse doesn't know which ones actually answer it — that's the courier's job to figure out next.
+> **Courier version.** The front-desk clerk reads every incoming letter. Clean letters go straight through. Letters with someone's home address get the address blacked out before they're processed. Letters that say "ignore all rules and do X" get binned at the door with a rejection slip. The clerk doesn't need to know what's in the warehouse — she just decides whether the letter is allowed in.
 
-### Step 4 — Generate (the LLM writes the answer)
+---
 
-The handler now sends the question **plus** the retrieved chunks to the LLM in a structured prompt that essentially says: "Here are some passages from our knowledge base. Using only those passages, answer the user's question. If the passages don't contain the answer, say so honestly."
+#### Step 3 — RAG retrieval (two-stage if reranker enabled)
 
-The LLM is whatever provider is configured — Bedrock (AWS), Azure OpenAI, or local Ollama. The same prompt template is used regardless of provider.
+This is the core of the system. The `rag_chain.query()` method runs retrieval in up to two stages:
 
-The response is a text answer plus token-usage info: how many tokens were in the prompt, how many in the answer, and an estimated cost in USD.
+**Stage 1 — Bi-encoder retrieval (always runs)**
 
-> **Courier version.** The courier sits at her desk with the five binders open and the question on top, and writes a one-page reply: "Based on these passages, here's the refund policy…" If the binders don't contain the answer, she's instructed to write "I couldn't find this in the knowledge base" rather than make something up.
+The question is converted to a dense vector using the configured embedding model (Bedrock Titan Embeddings, Azure OpenAI `text-embedding-ada-002`, or Ollama embedding model). This is a **bi-encoder**: the model encodes the question independently of the stored document chunks. The resulting vector is sent to the vector store which returns the nearest neighbours by cosine similarity.
 
-### Step 5 — Output guardrail (the bouncer at the back door)
+How many candidates to retrieve depends on whether a reranker is enabled:
+- Reranker **off**: retrieve exactly `top_k` (default 5)
+- Reranker **on**: retrieve `reranker_candidate_count` (default 20) — a wider net for stage 2 to refine
 
-Same as the input guardrail, but applied to the LLM's reply. Catches:
+**Stage 2 — Cross-encoder reranking (optional, off by default)**
 
-- The LLM accidentally including PII it inferred.
-- Toxic or unsafe content slipping through.
-- Hallucinated content that contradicts the source chunks (in stricter setups).
+If reranking is enabled, the 20 stage-1 candidates are re-scored by a **cross-encoder** model. The critical difference from stage 1:
 
-Same three actions: **ALLOW**, **REWRITE**, **BLOCK**. Block on output is rare but does happen for things like "the LLM wrote out a credit card number it shouldn't have".
+- Bi-encoder: encodes question and document chunk separately, then compares vectors — fast, approximate, misses subtle relationships
+- Cross-encoder: receives the question and one chunk concatenated as a single input, scores their relevance jointly — slow, precise, catches "same concept different wording" misses
 
-> **Courier version.** The bouncer reads the courier's reply before handing it back to the customer. Sensitive info gets redacted, anything dangerous gets the whole envelope sealed and a polite note returned instead.
+For local mode, the cross-encoder model (`ms-marco-MiniLM-L-6-v2`, 22M parameters) runs on CPU and adds ~50ms for 20 candidates. It outputs raw logit scores, which are normalised to [0, 1] via sigmoid before ranking. The top `top_k` of the re-ranked 20 are returned.
 
-### Step 6 — Metrics (the tachograph)
+**Worked example — why two stages matters:**
 
-If the in-process metrics collector is enabled, the handler records: total request count, latency in milliseconds, and token usage. These feed the `/api/metrics` Prometheus endpoint that monitoring systems scrape. **All in-memory** — they reset every time the process restarts.
+User asks: *"Can I get my money back?"*
 
-### Step 7 — Query log + automatic evaluation (the trip log + report card)
+| Chunk | Stage 1 cosine score | Stage 2 cross-encoder score | Kept? |
+| --- | --- | --- | --- |
+| "Refunds are available within 30 days of purchase." | 0.72 | 0.94 | ✅ top-5 |
+| "Returns must include the original packaging." | 0.70 | 0.88 | ✅ top-5 |
+| "Payment is processed via Stripe." | 0.65 | 0.21 | ❌ dropped by reranker |
+| "Customer satisfaction is our priority." | 0.64 | 0.18 | ❌ dropped |
+| "We process refund requests within 5 business days." | 0.61 | 0.91 | ✅ promoted |
 
-This is the **AI-engineering** part of the endpoint. After the response is built, the handler runs the question + answer + retrieved chunks through a **lightweight built-in evaluator** that scores three things:
+Stage 1 ranked "Payment is processed via Stripe" 3rd because the word "payment" has vector overlap with "money". The cross-encoder, seeing question + chunk together, correctly scores it 0.21 (not relevant). Meanwhile chunk 5 was ranked 5th by cosine but scores 0.91 by cross-encoder because the concept of "getting money back within days" is jointly understood.
 
-| Score | What it measures | What "good" looks like |
+If the vector store returns zero chunks (no documents uploaded yet), `rag_chain.query()` short-circuits and returns a fixed message without calling the LLM.
+
+---
+
+#### Step 4 — LLM generation (grounded generation, single provider, no fallback)
+
+The top `top_k` chunks and the original question (or the REDACTED version if guardrail rewrote it) are assembled into a prompt using a fixed template that instructs the LLM to: answer using only the provided context; if the context doesn't contain the answer, say so explicitly rather than hallucinating.
+
+The provider is whatever was built at startup — Bedrock, Azure OpenAI, or Ollama. There is **no fallback chain**: if the single provider returns a 5xx, the exception propagates and the user gets a `500`. Unlike the ai-gateway, this chatbot has no router, no retry logic, and no secondary provider.
+
+The LLM response carries: the generated text, input token count, and output token count. Cost is estimated from token counts using hard-coded per-provider pricing — Bedrock Claude 3.5 Sonnet v2 at $0.003/1K input + $0.015/1K output, GPT-4o at $0.0025/1K input + $0.01/1K output. Local Ollama always returns 0.0.
+
+---
+
+#### Step 5 — Output guardrails (same Strategy, same three actions)
+
+The LLM's answer is passed back through the same guardrail interface via `check_output(text)`. Same three actions — ALLOW, REDACT, BLOCK — but BLOCK on output is rare. The most common real case is the LLM inferring and including PII from the retrieved chunks (e.g., a chunk contained a customer name and the LLM echoed it in the answer).
+
+---
+
+#### Step 6 — In-process metrics
+
+If the metrics collector is attached to app state, it records: request count increment, latency in milliseconds, and token usage. These counters are **in-process only** — stored in a plain Python object with no persistence. Every process restart zeroes them. They are exposed in Prometheus text format via `GET /api/metrics`.
+
+---
+
+#### Step 7 — Heuristic evaluation + query log
+
+This step runs after the response is already built and ready to return. It does two things:
+
+**7a — Heuristic evaluation (three scores)**
+
+A lightweight `RAGEvaluator` runs synchronously, in-process, on every request. It computes three scores using word-overlap heuristics (not a neural model):
+
+| Score | How it is computed | Threshold for "passed" |
 | --- | --- | --- |
-| **Retrieval** | Did the warehouse return relevant chunks? | Average relevance score ≥ 0.70 |
-| **Faithfulness** | Did the LLM stick to what was in the chunks? | Score ≥ 0.70 |
-| **Answer relevance** | Did the answer actually address the question? | Score ≥ 0.70 |
+| **Retrieval quality** | Average cosine relevance score across all returned chunks | ≥ 0.70 |
+| **Faithfulness** | Fraction of words in the answer that appear in the retrieved chunks | ≥ 0.70 |
+| **Answer relevance** | Fraction of question words that appear in the answer | ≥ 0.70 |
 
-These three roll up into an **overall** score, and a `passed` boolean (true if overall ≥ 0.70). The handler then writes a row to the **query log** containing: the question, the chunks (truncated to 500 chars each), the answer, all four scores, latency, token counts, cost, and a **failure category** (e.g. `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`) computed from the score profile.
+These roll up to an `overall_score` (simple average). If `overall_score ≥ 0.70`, `passed = True`.
 
-This is what powers `GET /api/queries/failures` — the production debugging endpoint that lets engineers see which recent queries scored poorly and **why**, without trawling through logs.
+The faithfulness and answer-relevance scores use word overlap — this means they are **gameable**: an answer that dumps every word from the retrieved chunks into the response will score 1.0 faithfulness even if it makes no sense. This is a known limitation, not a mis-design — it's a fast, dependency-free heuristic appropriate for a portfolio system.
 
-The evaluation is wrapped in a `try/except` that warns but does not fail the request — so a broken evaluator does not break user replies. **Important:** the evaluator runs on every chat request, in-process. On a hot path with high QPS this adds latency. There's no async/background mode today.
+**7b — Failure classification and query log write**
 
-> **Courier version.** Every delivery goes into the trip log along with a quick self-graded report card: did I find the right binders? Did I quote them faithfully? Did my reply actually answer the question? The reports stack up so the manager can later flick through the failures and spot patterns.
+The four scores (retrieval, faithfulness, answer_relevance, overall) are passed to a `classify_failure()` function that maps score profiles to a category string:
 
-### What goes back to the caller
+| Score profile | Category |
+| --- | --- |
+| Retrieval < 0.70, faithfulness ok | `bad_retrieval` |
+| Retrieval ok, faithfulness < 0.70 | `hallucination` |
+| Both retrieval and faithfulness < 0.70 | `both_bad` |
+| Scores ok but answer_relevance < 0.70 | `off_topic` |
+| All scores ≥ 0.70 | `null` (no failure) |
 
-```jsonc
-{
-  "answer": "Refunds are available within 30 days of purchase. To request one...",
-  "sources": [
-    { "document_name": "policies.pdf", "chunk_text": "Refunds are available...", "relevance_score": 0.91, "page_number": 7 },
-    /* ... */
-  ],
-  "session_id": "8f3b...e2a1",
-  "request_id": "c9a4-...",
-  "cloud_provider": "aws",
-  "latency_ms": 1842,
-  "token_usage": { "input_tokens": 1203, "output_tokens": 87, "total_tokens": 1290, "estimated_cost_usd": 0.0042 }
-}
-```
+The handler writes a `QueryLogRecord` to the query logger (in-memory list, also reset on restart) containing: request ID, session ID, question, cloud provider, retrieved chunks (text truncated to 500 chars), top_k used, answer, all four scores, `passed`, failure category, latency, token counts, and estimated cost.
 
-Notice the source chunks are **always returned** — not optional, not gated by a flag. This is a design choice: every answer this chatbot gives is auditable. The user (or the UI) can show "the answer is based on these three paragraphs from policies.pdf, page 7" — which is the entire point of RAG over plain LLM Q&A.
+This log record is what `GET /api/queries/failures` reads to show engineers which requests scored below threshold and which failure category they fell into.
 
-### The whole condition matrix in one table
+The entire step 7 is wrapped in a `try/except` that logs a warning on failure but does **not** fail the request. A broken evaluator or full in-memory store does not affect the response the user receives.
 
-| Scenario | RAG init? | Guardrail in | Retrieval | LLM | Guardrail out | Logged? | Status |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Happy path | yes | ALLOW | yes | yes | ALLOW | yes | 200 |
-| Cloud creds missing | no | — | — | — | — | no | 500 |
-| Prompt injection detected | yes | BLOCK | — | — | — | no | 400 |
-| Question rewritten by guardrail | yes | REWRITE | yes (uses cleaned q) | yes | ALLOW | yes (logs cleaned q) | 200 |
-| Vector store unreachable | yes | ALLOW | fails | — | — | no | 500 |
-| LLM provider fails | yes | ALLOW | yes | fails | — | no | 500 |
-| LLM ok, output guardrail BLOCKS | yes | ALLOW | yes | yes | BLOCK | partial | 400 |
-| All ok, evaluator crashes | yes | ALLOW | yes | yes | ALLOW | no (warning only) | 200 |
-| All ok, query logger missing | yes | ALLOW | yes | yes | ALLOW | no | 200 |
+> **Courier version.** After handing over the delivery, the courier fills in a self-graded report card: "How good was the warehouse's selection? Did I stick to what the binders said? Did I actually answer the question?" A manager function reads the scores and stamps a failure reason if they're low. Both the card and the stamp go into the filing cabinet. The manager can pull out all the low-scoring trips later to see where the depot is underperforming.
 
-### The honest health check (what a code review would surface)
+---
 
-These are the rough edges worth knowing about:
+### Condition matrix
 
-1. **Hard-coded `top_k` default of 5.** No tuning per query type today; relevance below 0.70 in chunk 5 is common.
-2. **No cache.** Identical questions repeat the full embed → retrieve → LLM cycle. A simple keyed cache on `(question, top_k)` would slash latency and cost for FAQ-style traffic.
-3. **No retries on transient LLM failures.** A single 5xx from the provider becomes a 500 to the user.
-4. **No fallback provider.** Unlike the gateway, this app talks to one LLM only.
-5. **Evaluation is synchronous on the hot path.** Adds tens to hundreds of milliseconds per request.
-6. **Session ID is auto-generated when missing** — but there's no per-session memory in the prompt today, so two turns with the same `session_id` aren't actually aware of each other.
-7. **Source chunk text is truncated to 500 chars in the query log.** Long chunks lose tail context when you later debug from the log alone.
-8. **Estimated cost depends on the provider** — for local Ollama it'll always be 0, masking the compute cost.
+| Scenario | Guardrail action | Reranker | LLM | Eval runs | Status returned |
+| --- | --- | --- | --- | --- | --- |
+| Happy path, reranker off | ALLOW | skipped | success | yes | 200 |
+| Happy path, reranker on | ALLOW | runs (20→5) | success | yes | 200 |
+| RAG chain not initialized | — | — | — | no | 500 |
+| Input BLOCK (prompt injection) | BLOCK | — | never called | no | 400 |
+| Input REDACT (PII) | REDACT | runs on redacted q | success | yes (logs redacted q) | 200 |
+| No documents in vector store | ALLOW | — | skipped (fixed reply) | no | 200 |
+| Vector store unreachable | ALLOW | fails | — | no | 500 |
+| LLM provider 5xx | ALLOW | success | fails | no | 500 |
+| Output BLOCK | ALLOW | success | success | no | 400 |
+| Eval/logger crashes | ALLOW | success | success | fails (warning only) | 200 |
+
+---
+
+### 🩺 Honest health check
+
+1. **Guardrail action is REDACT, not REWRITE.** Earlier documentation called it "REWRITE" — the actual code action name is `REDACT`. The guardrail rewrites the text but the enum value is `REDACT`.
+2. **Word-overlap faithfulness scoring is gameable.** A response that pastes every chunk word gets a perfect score regardless of coherence. This is a heuristic, not a real faithfulness model (which would require an LLM judge or an NLI classifier).
+3. **Evaluation is synchronous on the hot path.** There's no background task, no queue, no fire-and-forget — the evaluator runs inline before the response is returned. At low QPS this is fine; at high QPS it adds measurable latency.
+4. **Session ID is generated but not used.** When `session_id` is absent, a UUID is generated and returned. However, the prompt template does not include any conversation history keyed by session ID — so two turns with the same session ID are not actually aware of each other. The session ID is tracking metadata only.
+5. **No cache.** Every question — including identical repeated questions — runs the full embed → retrieve → LLM cycle.
+6. **No retries, no fallback provider.** One failed LLM call = one 500 to the user.
+7. **Chunk text truncated to 500 chars in the log.** Long chunks lose tail context in the query log, which can make debugging difficult if the relevant content was in the second half of a chunk.
+8. **All query log and metrics state is in-memory.** Pod restart or horizontal scaling (multiple replicas) wipes or splits the data.
+9. **DynamoDB brute-force cosine has no upper-bound performance guarantee.** It works for small knowledge bases; it silently degrades as the chunk count grows past ~10,000 without any warning.
+
+---
 
 ### TL;DR
 
-- Seven-step pipeline: sanity → input guardrail → retrieve → LLM → output guardrail → metrics → log+eval.
-- Sources are **always returned** — every answer is auditable.
-- An in-process evaluator scores every reply on retrieval, faithfulness, and answer-relevance, and writes the result to a query log used by `/api/queries/failures`.
-- No cache, no retries, no fallback provider — this chatbot is a single-pipe, single-shot system today.
-- A failed cloud-cred check at startup makes every chat request return 500.
+- **Factory Method + Strategy Pattern** wire the entire backend from one env var (`CLOUD_PROVIDER`). All providers are interchangeable at config time.
+- **Two-stage retrieval** (bi-encoder vector search → cross-encoder reranking) is implemented but reranking is off by default. When on, it retrieves 20 candidates and cuts to 5, improving relevance at the cost of ~50ms extra latency.
+- **Guardrail actions are ALLOW / REDACT / BLOCK** — REDACT rewrites the text and continues; BLOCK returns 400 before the LLM is ever called.
+- **Heuristic evaluation on every request** scores retrieval, faithfulness (word overlap), and answer relevance — feeding the failures log used for production debugging.
+- **Single provider, no cache, no retries** — deliberate simplicity for a portfolio system; the gaps are documented honestly above.
 
 ---
 
