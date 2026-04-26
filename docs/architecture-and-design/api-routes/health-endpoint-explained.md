@@ -27,6 +27,74 @@
 
 ---
 
+## Plain-English Walkthrough (Start Here)
+
+> **Read this first if you're new to the chatbot.** Same courier analogy as the [Chat Walkthrough](./chat-endpoint-explained.md#plain-english-walkthrough-start-here). This explains what's specific about the health endpoint.
+
+### What this endpoint is for
+
+`GET /api/health` is the **"is the depot open?"** check. Load balancers, Kubernetes liveness probes, and Docker healthchecks hit this endpoint to decide whether the chatbot is alive and able to serve requests.
+
+> **Courier version.** It's the porch lamp at the depot, plus a quick wave through the door: "Are you still in business? Yes/no." The reply is one status card.
+
+### What really happens
+
+This is the simplest endpoint in the chatbot. There's no RAG pipeline, no LLM call, no database write. It does **one check**: was the RAG chain initialised at app startup? If yes, return `healthy`. If no, return `unhealthy`.
+
+```
+1. Read app.state.rag_chain
+2. If None  → service is unhealthy
+   If set  → service is healthy
+3. Compute uptime in seconds
+4. Return the response
+```
+
+The aggregation logic is genuinely correct here — unlike on the gateway side, the top-level `status` field **does** reflect whether the underlying services are unhealthy. If any service reports `UNHEALTHY`, the overall is `UNHEALTHY`. If any reports `DEGRADED`, the overall is `DEGRADED`. Otherwise it's `HEALTHY`.
+
+### What it does *not* check
+
+The check today is shallow. It only verifies the chain was constructed successfully — it does **not** ping any of the actual backends. So:
+
+- The vector store could be unreachable right now and `/health` will still say healthy.
+- The LLM provider could be down and `/health` will still say healthy.
+- The cloud storage (S3 / Blob) could be denying writes and `/health` will still say healthy.
+
+The chain-init check is essentially a "did the cloud creds work at startup?" check. It does not catch outages that happen after startup. A more thorough version would also try a tiny vector-store list call and a tiny LLM ping, but doing so on every probe call is expensive — that's a deliberate trade-off.
+
+### Worked example
+
+Your AWS creds are valid at startup but DynamoDB has an outage two hours later. You hit `/health`:
+
+```jsonc
+{
+  "status": "healthy",        // ← still healthy because chain was built
+  "cloud_provider": "aws",
+  "services": [
+    { "name": "rag_chain", "status": "healthy", "message": "RAG chain initialized and ready" }
+  ],
+  "uptime_seconds": 7234
+}
+```
+
+But hit `/api/chat` and it'll fail with a 500 because the vector store search throws. So `/health` here is **liveness** (the app process is up) more than **readiness** (the app can actually serve traffic).
+
+### Quirks worth knowing
+
+1. **Shallow check.** No live backend probes. A green `/health` does not guarantee `/api/chat` works.
+2. **Always returns 200.** Even when the chain is missing and `status: "unhealthy"`, the HTTP code is still 200. Orchestrators that interpret 5xx as unhealthy will never see one from this endpoint.
+3. **`uptime_seconds` is per-process.** Restarts reset it; multi-pod deployments report different uptimes per pod.
+4. **No auth.** Anyone hitting your URL can read the cloud provider and uptime. Standard for liveness probes.
+5. **Single service in the list today.** The structure is set up to track many services (`services: list[ServiceHealth]`) but only `rag_chain` is added. Future: add per-backend probes.
+
+### TL;DR
+
+- Single check: was the RAG chain successfully initialised at startup?
+- **Liveness, not readiness.** Doesn't actually probe the backends.
+- Always returns HTTP 200; check the `status` field, not the response code.
+- Aggregation logic across services *is* correct — just only one service is reported today.
+
+---
+
 ## What This Endpoint Does
 
 A health check endpoint answers one question: **"Is this app working?"**

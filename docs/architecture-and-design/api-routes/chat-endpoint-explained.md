@@ -20,6 +20,7 @@
 
 ## Table of Contents
 
+0. [Plain-English Walkthrough (Start Here)](#plain-english-walkthrough-start-here)
 1. [What This Endpoint Does — The 30-Second Version](#what-this-endpoint-does)
 2. [The Complete Request Flow (End to End)](#the-complete-request-flow)
 3. [Part 1: The Route Layer — What chat.py Does](#part-1-the-route-layer)
@@ -38,6 +39,169 @@
 7. [DE vs AI Engineer — What Each Sees in This Route](#de-vs-ai-engineer)
 8. [What Could Go Wrong — Error Scenarios](#what-could-go-wrong)
 9. [Self-Check Questions](#self-check-questions)
+
+---
+
+## Plain-English Walkthrough (Start Here)
+
+> **Read this first if you're new to the chatbot.** This explains, in plain English with worked examples, what really happens when someone calls `POST /api/chat`. It uses the courier analogy throughout: the chatbot is a **courier office** that takes a question, runs to the warehouse to find the right paragraphs, and writes you back a grounded answer. The detailed sections that follow this one are reference material that makes more sense once you have this mental picture.
+
+### The shape of a chat request
+
+When a request walks in the door, it's a single JSON object: a `question` string, an optional `session_id` (so a multi-turn conversation can be tracked), and an optional `top_k` (how many document paragraphs to retrieve). That's it. No model name, no temperature — those are picked up from environment config so a non-engineer can call this endpoint without knowing anything about LLMs.
+
+### Inside the office — the seven-step pipeline
+
+Once the request lands, the handler runs **seven steps** in order. Each can stop the train.
+
+```
+1. Sanity check (is the RAG chain ready?)
+   → 2. Input guardrail (is the question safe to process?)
+      → 3. Retrieve (find the most relevant paragraphs)
+         → 4. Generate (LLM writes the answer)
+            → 5. Output guardrail (is the answer safe to return?)
+               → 6. Metrics (count latency, tokens, cost)
+                  → 7. Query log (write the trip + auto-evaluation to history)
+```
+
+### Step 1 — Sanity check (is the depot open?)
+
+Before doing anything, the handler checks whether the **RAG chain** — the orchestrator that knows how to talk to the vector store and the LLM — was successfully initialised at app startup. The chain only initialises if cloud credentials are present and valid. If they were missing or wrong, `rag_chain` is `None` and every chat request returns `500 RAG chain not initialized`.
+
+> **Courier version.** This is "is there actually a courier on duty today?" If the depot manager couldn't recruit any couriers this morning (cloud creds bad), every customer at the door is turned away.
+
+### Step 2 — Input guardrail (the bouncer at the front desk)
+
+Every question runs through an **input guardrail** before it reaches the LLM. Today's guardrail is configurable — it can detect prompt injection attempts ("ignore previous instructions"), profanity, PII, off-topic questions, etc. The guardrail returns one of three actions:
+
+- **ALLOW** — pass the question through unchanged.
+- **REWRITE** — clean it up (strip PII, redact swearwords) and pass the cleaned version through.
+- **BLOCK** — refuse with a `400` and a category code like `prompt_injection` or `pii_detected`.
+
+> **Courier version.** This is the bouncer who reads the letter at the door. "Asking for refund policy? Fine. Asking for someone's home address? Sorry, I'm rewriting that. Trying to bribe me to ignore the rules? Door's that way."
+
+If the guardrail is disabled in config (none configured), this step is a no-op and every question passes through unchanged. That's fine for dev but not for production.
+
+### Step 3 — Retrieve (the warehouse run)
+
+This is where RAG happens. The handler hands the question to `rag_chain.query()`, which does this internally:
+
+1. **Embed the question.** Turn it into a vector using the configured embedding model (Bedrock Titan, Azure OpenAI, or Ollama). Same as `/v1/embeddings` on the gateway — text in, ~1024 numbers out.
+2. **Search the vector store.** Send that vector to the warehouse (DynamoDB, Azure AI Search, or local Chroma) and ask "which `top_k` document chunks are nearest to this vector?". Default `top_k` is 5.
+3. **Optional rerank.** A second model can re-score the retrieved chunks for relevance. This catches cases where the initial vector match was loose. Disabled by default.
+4. **Return the chunks** — each one carries its text, the document it came from, a relevance score (0.0 to 1.0), and optionally a page number.
+
+**Concrete example.** User asks *"What's your refund policy?"*. The embedder turns it into a 1024-number vector. The warehouse returns the top 5 nearest chunks:
+
+| Chunk | Document | Score |
+| --- | --- | --- |
+| "Refunds are available within 30 days..." | `policies.pdf` | 0.91 |
+| "To request a refund, contact support@..." | `policies.pdf` | 0.87 |
+| "Returns must be in original packaging..." | `returns.pdf` | 0.74 |
+| "Late shipments may be eligible for credit..." | `shipping.pdf` | 0.58 |
+| "We process payments via Stripe..." | `payments.pdf` | 0.42 |
+
+Notice the last chunk is barely relevant (score 0.42) — it got into the top 5 because we asked for 5, not because it was good. The LLM in the next step has to decide what to actually use.
+
+> **Courier version.** The courier runs to the warehouse with the question pinned to her chest. She comes back carrying five binders the warehouse handed her. They're sorted by "this looks closest to your question" but the warehouse doesn't know which ones actually answer it — that's the courier's job to figure out next.
+
+### Step 4 — Generate (the LLM writes the answer)
+
+The handler now sends the question **plus** the retrieved chunks to the LLM in a structured prompt that essentially says: "Here are some passages from our knowledge base. Using only those passages, answer the user's question. If the passages don't contain the answer, say so honestly."
+
+The LLM is whatever provider is configured — Bedrock (AWS), Azure OpenAI, or local Ollama. The same prompt template is used regardless of provider.
+
+The response is a text answer plus token-usage info: how many tokens were in the prompt, how many in the answer, and an estimated cost in USD.
+
+> **Courier version.** The courier sits at her desk with the five binders open and the question on top, and writes a one-page reply: "Based on these passages, here's the refund policy…" If the binders don't contain the answer, she's instructed to write "I couldn't find this in the knowledge base" rather than make something up.
+
+### Step 5 — Output guardrail (the bouncer at the back door)
+
+Same as the input guardrail, but applied to the LLM's reply. Catches:
+
+- The LLM accidentally including PII it inferred.
+- Toxic or unsafe content slipping through.
+- Hallucinated content that contradicts the source chunks (in stricter setups).
+
+Same three actions: **ALLOW**, **REWRITE**, **BLOCK**. Block on output is rare but does happen for things like "the LLM wrote out a credit card number it shouldn't have".
+
+> **Courier version.** The bouncer reads the courier's reply before handing it back to the customer. Sensitive info gets redacted, anything dangerous gets the whole envelope sealed and a polite note returned instead.
+
+### Step 6 — Metrics (the tachograph)
+
+If the in-process metrics collector is enabled, the handler records: total request count, latency in milliseconds, and token usage. These feed the `/api/metrics` Prometheus endpoint that monitoring systems scrape. **All in-memory** — they reset every time the process restarts.
+
+### Step 7 — Query log + automatic evaluation (the trip log + report card)
+
+This is the **AI-engineering** part of the endpoint. After the response is built, the handler runs the question + answer + retrieved chunks through a **lightweight built-in evaluator** that scores three things:
+
+| Score | What it measures | What "good" looks like |
+| --- | --- | --- |
+| **Retrieval** | Did the warehouse return relevant chunks? | Average relevance score ≥ 0.70 |
+| **Faithfulness** | Did the LLM stick to what was in the chunks? | Score ≥ 0.70 |
+| **Answer relevance** | Did the answer actually address the question? | Score ≥ 0.70 |
+
+These three roll up into an **overall** score, and a `passed` boolean (true if overall ≥ 0.70). The handler then writes a row to the **query log** containing: the question, the chunks (truncated to 500 chars each), the answer, all four scores, latency, token counts, cost, and a **failure category** (e.g. `bad_retrieval`, `hallucination`, `both_bad`, `off_topic`) computed from the score profile.
+
+This is what powers `GET /api/queries/failures` — the production debugging endpoint that lets engineers see which recent queries scored poorly and **why**, without trawling through logs.
+
+The evaluation is wrapped in a `try/except` that warns but does not fail the request — so a broken evaluator does not break user replies. **Important:** the evaluator runs on every chat request, in-process. On a hot path with high QPS this adds latency. There's no async/background mode today.
+
+> **Courier version.** Every delivery goes into the trip log along with a quick self-graded report card: did I find the right binders? Did I quote them faithfully? Did my reply actually answer the question? The reports stack up so the manager can later flick through the failures and spot patterns.
+
+### What goes back to the caller
+
+```jsonc
+{
+  "answer": "Refunds are available within 30 days of purchase. To request one...",
+  "sources": [
+    { "document_name": "policies.pdf", "chunk_text": "Refunds are available...", "relevance_score": 0.91, "page_number": 7 },
+    /* ... */
+  ],
+  "session_id": "8f3b...e2a1",
+  "request_id": "c9a4-...",
+  "cloud_provider": "aws",
+  "latency_ms": 1842,
+  "token_usage": { "input_tokens": 1203, "output_tokens": 87, "total_tokens": 1290, "estimated_cost_usd": 0.0042 }
+}
+```
+
+Notice the source chunks are **always returned** — not optional, not gated by a flag. This is a design choice: every answer this chatbot gives is auditable. The user (or the UI) can show "the answer is based on these three paragraphs from policies.pdf, page 7" — which is the entire point of RAG over plain LLM Q&A.
+
+### The whole condition matrix in one table
+
+| Scenario | RAG init? | Guardrail in | Retrieval | LLM | Guardrail out | Logged? | Status |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Happy path | yes | ALLOW | yes | yes | ALLOW | yes | 200 |
+| Cloud creds missing | no | — | — | — | — | no | 500 |
+| Prompt injection detected | yes | BLOCK | — | — | — | no | 400 |
+| Question rewritten by guardrail | yes | REWRITE | yes (uses cleaned q) | yes | ALLOW | yes (logs cleaned q) | 200 |
+| Vector store unreachable | yes | ALLOW | fails | — | — | no | 500 |
+| LLM provider fails | yes | ALLOW | yes | fails | — | no | 500 |
+| LLM ok, output guardrail BLOCKS | yes | ALLOW | yes | yes | BLOCK | partial | 400 |
+| All ok, evaluator crashes | yes | ALLOW | yes | yes | ALLOW | no (warning only) | 200 |
+| All ok, query logger missing | yes | ALLOW | yes | yes | ALLOW | no | 200 |
+
+### The honest health check (what a code review would surface)
+
+These are the rough edges worth knowing about:
+
+1. **Hard-coded `top_k` default of 5.** No tuning per query type today; relevance below 0.70 in chunk 5 is common.
+2. **No cache.** Identical questions repeat the full embed → retrieve → LLM cycle. A simple keyed cache on `(question, top_k)` would slash latency and cost for FAQ-style traffic.
+3. **No retries on transient LLM failures.** A single 5xx from the provider becomes a 500 to the user.
+4. **No fallback provider.** Unlike the gateway, this app talks to one LLM only.
+5. **Evaluation is synchronous on the hot path.** Adds tens to hundreds of milliseconds per request.
+6. **Session ID is auto-generated when missing** — but there's no per-session memory in the prompt today, so two turns with the same `session_id` aren't actually aware of each other.
+7. **Source chunk text is truncated to 500 chars in the query log.** Long chunks lose tail context when you later debug from the log alone.
+8. **Estimated cost depends on the provider** — for local Ollama it'll always be 0, masking the compute cost.
+
+### TL;DR
+
+- Seven-step pipeline: sanity → input guardrail → retrieve → LLM → output guardrail → metrics → log+eval.
+- Sources are **always returned** — every answer is auditable.
+- An in-process evaluator scores every reply on retrieval, faithfulness, and answer-relevance, and writes the result to a query log used by `/api/queries/failures`.
+- No cache, no retries, no fallback provider — this chatbot is a single-pipe, single-shot system today.
+- A failed cloud-cred check at startup makes every chat request return 500.
 
 ---
 

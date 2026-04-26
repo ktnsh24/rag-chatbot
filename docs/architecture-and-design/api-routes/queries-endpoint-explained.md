@@ -30,6 +30,111 @@
 
 ---
 
+## Plain-English Walkthrough (Start Here)
+
+> **Read this first if you're new to the chatbot.** Same courier analogy as the [Chat Walkthrough](./chat-endpoint-explained.md#plain-english-walkthrough-start-here). This explains what's specific about the queries endpoints.
+
+### What these endpoints are for
+
+Every time `/api/chat` answers a question, it also runs a built-in evaluator that scores the answer (Step 7 in the chat walkthrough) and writes a row to a **query log**. These two endpoints are the read side of that log:
+
+| Route | Purpose |
+| --- | --- |
+| `GET /api/queries/failures` | List recent low-scoring queries with their chunks, answer, and a triage category. |
+| `GET /api/queries/stats` | Aggregate: pass rate, average scores, failure breakdown by category. |
+
+> **Courier version.** Every delivery the courier makes goes into a trip-log book with a self-graded report card. These two endpoints are how the depot manager flicks through the failures (which deliveries went wrong and why) and reads the weekly scoreboard (how many made the grade).
+
+### Why this matters
+
+Without these endpoints, the only way to know your chatbot is degrading is to read every log line by hand or notice angry users. With them, you can:
+
+1. Watch `pass_rate` over time — if it drops from 90% to 70%, something is wrong.
+2. Hit `/api/queries/failures` to see exactly *which* queries failed and *why*.
+3. Read the chunks the warehouse returned for each failure — was the data missing? Was the LLM hallucinating?
+4. Fix the root cause, redeploy, and watch the pass rate recover.
+
+This is the **production debugging workflow** for a RAG system. It's the difference between "the chatbot feels worse this week" and "vector store recall on `policy.*` questions dropped to 0.42 because someone uploaded a malformed PDF on Tuesday."
+
+### Failures endpoint — what really happens
+
+`GET /api/queries/failures` returns a list of failed query records. A query is considered failed if its overall evaluator score is below 0.70.
+
+Three query parameters control the view:
+
+- **`limit`** (1–100, default 20) — how many rows to return.
+- **`days`** (1–30, default 7) — how far back to look.
+- **`category`** (optional) — filter to one of the failure categories.
+
+The handler delegates to `query_logger.get_failures(limit, days, category)` which runs a SELECT against the query log table. There's no expensive computation in the route itself — it's a thin reader.
+
+### The five failure categories
+
+Every failed query is automatically classified into one of these buckets when it's logged:
+
+| Category | What it means | What to investigate |
+| --- | --- | --- |
+| **`bad_retrieval`** | Chunks were irrelevant; LLM had nothing useful to work with. | Vector store quality — chunk size, embedding model, or missing data. |
+| **`hallucination`** | Chunks were good; LLM made stuff up anyway. | Prompt template, model temperature, model choice. |
+| **`both_bad`** | Wrong chunks **and** the LLM improvised on top of them. | The whole pipeline — start with retrieval. |
+| **`off_topic`** | Good chunks, faithful answer, but didn't address the question. | Prompt template — the LLM is summarising rather than answering. |
+| **`marginal`** | Failed overall but no single dimension is terrible. | Often a borderline case; not worth deep investigation individually. |
+
+The classification is computed by `QueryLogger.classify_failure(scores)` based on which sub-scores are below threshold. You don't have to know the rules — just look at the categories in `/api/queries/failures` to triage faster.
+
+### Stats endpoint — what really happens
+
+`GET /api/queries/stats` returns a single dictionary aggregating the last `days` (default 1) of query log activity:
+
+```jsonc
+{
+  "total_queries": 412,
+  "passed": 360,
+  "failed": 52,
+  "pass_rate": 87.4,
+  "avg_retrieval": 0.81,
+  "avg_faithfulness": 0.79,
+  "avg_relevance": 0.84,
+  "failure_breakdown": {
+    "bad_retrieval": 18,
+    "hallucination": 11,
+    "both_bad": 3,
+    "off_topic": 14,
+    "marginal": 6
+  }
+}
+```
+
+This is what `/api/metrics` reads internally to expose pass rate and per-category counts to Prometheus.
+
+### A worked debugging session
+
+1. You hit `/api/queries/stats?days=7` and notice `pass_rate` dropped from 91% (last week) to 73% (this week).
+2. You hit `/api/queries/failures?days=7&limit=50&category=bad_retrieval` to focus on the most common failure type.
+3. Each record shows the question, the chunks the warehouse returned (with their relevance scores), and the LLM's answer. You spot a pattern: every failure is asking about a specific product line.
+4. You check the document upload log — that product's PDF was re-ingested on Tuesday with a different chunk size. The smaller chunks no longer contain enough context for the embedder to match.
+5. You revert the chunk-size change and reprocess. Pass rate climbs back over the next few hours as new traffic arrives.
+
+This is the loop the queries endpoints are designed to support.
+
+### Quirks worth knowing
+
+1. **Returns 503 if the query logger isn't initialised.** Both endpoints depend on `app.state.query_logger`. If it failed to initialise (database creds missing, etc.) you get `503 Query logger not initialized` rather than empty results. That makes the failure mode obvious but means you can't get a "yes the table is just empty" response.
+2. **No auth.** Anyone hitting the URL can read every recent failed question, including the original user text. If users ask sensitive questions, those become readable here. Lock down at the network layer.
+3. **The `category` parameter is unvalidated.** You can pass any string and the handler will happily filter by it — likely returning zero results for typos.
+4. **Stats are computed on every request.** No caching. On a large log table this can be slow; index `(created_at, scores_overall)`.
+5. **`marginal` is a heuristic catch-all** — it doesn't mean anything specific is wrong. Don't spend time on these one by one.
+
+### TL;DR
+
+- Two read-only endpoints over the query log table that gets written on every chat call.
+- Failures endpoint lets you list low-scoring queries by category with full chunks + answer.
+- Stats endpoint produces the aggregate dashboard view (pass rate, averages, failure breakdown).
+- Together they form the production debugging workflow: watch the rate, drill into failures, fix root causes.
+- No auth — sensitive questions become readable. Lock down at the network layer if needed.
+
+---
+
 ## What These Endpoints Do
 
 Every time `/api/evaluate` runs, the QueryLogger writes a structured JSONL record

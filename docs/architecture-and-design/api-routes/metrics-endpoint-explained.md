@@ -26,6 +26,76 @@
 
 ---
 
+## Plain-English Walkthrough (Start Here)
+
+> **Read this first if you're new to the chatbot.** Same courier analogy as the [Chat Walkthrough](./chat-endpoint-explained.md#plain-english-walkthrough-start-here). This explains what's specific about the metrics endpoint.
+
+### What this endpoint is for
+
+`GET /api/metrics` returns a **plain-text** dump of internal counters and gauges in the format that Prometheus scrapers understand. Prometheus periodically polls this URL, parses the lines, stores them in its time-series database, and Grafana then graphs them.
+
+> **Courier version.** It's the courier's logbook hanging by the door. Every few seconds an inspector (Prometheus) walks past, copies down the latest tally — how many parcels delivered, average delivery time, total fuel spent — and adds it to a wall chart so the depot manager can see trends.
+
+### What really happens
+
+This endpoint does **no expensive work**. It reads two in-memory objects — the `MetricsCollector` and the `QueryLogger` — and formats their current values as Prometheus exposition text. The only "computation" is summarising query stats over the last 24 hours via the query logger's stats method.
+
+```
+1. Read MetricsCollector summary  (in-memory; instant)
+2. Read QueryLogger stats(days=1) (database query — slower)
+3. Format as Prometheus text lines
+4. Return as text/plain
+```
+
+### What metrics are exposed
+
+Two families:
+
+| Family | Counters/Gauges | Source |
+| --- | --- | --- |
+| **Chat** | request count, error count, error rate, latency p50/p95/p99, input/output/cost tokens, document count, chunk count, uptime | `MetricsCollector` (in-memory) |
+| **Quality** | total queries today, passed, failed, pass rate, avg retrieval/faithfulness/relevance, failure breakdown per category | `QueryLogger.get_stats(days=1)` (database) |
+
+A truncated example response:
+
+```
+# HELP rag_chat_requests_total Total chat requests processed.
+# TYPE rag_chat_requests_total counter
+rag_chat_requests_total 1428
+
+# HELP rag_chat_latency_p95_ms Chat latency 95th percentile in ms.
+# TYPE rag_chat_latency_p95_ms gauge
+rag_chat_latency_p95_ms 2341
+
+# HELP rag_queries_pass_rate_percent Evaluation pass rate today.
+# TYPE rag_queries_pass_rate_percent gauge
+rag_queries_pass_rate_percent 87.4
+```
+
+### The two storage models
+
+Notice the family-1 (chat) metrics are **in-memory only** — they reset every time the process restarts. So a restart at 09:00 wipes the request count, even though Prometheus stores its own history elsewhere. This is fine if you only ever look at the values *after* Prometheus has scraped them — Prometheus itself preserves the historical view.
+
+The family-2 (quality) metrics come from the query log database, so they survive restarts. But they're computed **every time `/api/metrics` is hit** by re-running the query log's `get_stats` query. If your scraper hits this endpoint every 15 seconds, you're running that database query every 15 seconds. Cheap on a small log table; not free at scale.
+
+### Quirks worth knowing
+
+1. **Per-process counters reset on restart.** Multi-pod deployments will have different counts per pod; Prometheus will see them as separate time series unless you aggregate by `job` and not `instance`.
+2. **No auth.** Anyone hitting the URL can read your operational metrics including total cost. Standard for Prometheus, but think twice about exposing publicly.
+3. **Quality metrics run a database query on every scrape.** Index `query_logs(created_at)` if your log table grows large.
+4. **No histograms** — only pre-computed percentiles. So you can't re-bucket latencies in Grafana; you're stuck with whatever percentiles the collector pre-computes (p50/p95/p99).
+5. **Cost tracker is a counter** — there's no per-provider breakdown in the metrics, only total dollars across all providers.
+6. **Failure-category gauges are dynamic** — only categories with non-zero counts in the last 24h appear. Your Grafana dashboard needs `or vector(0)` clauses to handle the missing-series case.
+
+### TL;DR
+
+- Plain-text endpoint, designed for Prometheus scraping.
+- Two metric families: chat counters (in-memory, per-process) and quality stats (from query log, recomputed each scrape).
+- No auth; no histograms; counters reset per process restart.
+- Total cost is a single counter — no per-provider breakdown today.
+
+---
+
 ## What This Endpoint Does
 
 Returns application metrics in **Prometheus text exposition format** — the standard

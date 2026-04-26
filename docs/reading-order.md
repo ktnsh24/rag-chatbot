@@ -4,6 +4,18 @@
 
 ---
 
+## 🚀 Want the whole architecture in one read?
+
+If you only have time for **one document** to understand how the chatbot actually works end-to-end — every step, every branch, every quirk, in plain English with worked examples and the courier analogy — read this:
+
+➡️ **[Chat Endpoint → Plain-English Walkthrough](architecture-and-design/api-routes/chat-endpoint-explained.md#plain-english-walkthrough-start-here)**
+
+It covers the full RAG pipeline (guardrails → retrieval → reranking → LLM → output guardrails → logging), every failure mode, and the honest list of rough edges a code review would surface.
+
+Each of the other endpoint docs in [Level 4](#level-4--understand-the-api) opens with its own **Plain-English Walkthrough** for that route's specific behaviour — same style, same analogy. So once you've read the chat walkthrough, the others are quick add-ons covering only what's different.
+
+---
+
 ## Level 1 — Start Here (The Big Picture)
 
 Read these first to understand what this project is and how it works.
@@ -48,10 +60,12 @@ Deep dives into each component of the RAG pipeline, in data-flow order.
 
 How the FastAPI server exposes the RAG pipeline.
 
+> 💡 **Each endpoint doc starts with a "Plain-English Walkthrough" section** that explains the full request flow — pipeline, branches, conditions, quirks — using the courier analogy and worked examples. The schemas and error tables follow as reference. So even if you came here just for the API, the architecture story is one click away.
+
 | # | Document | What you'll learn | 🚚 Courier |
 |---|----------|-------------------|-----------|
 | 14 | [API Routes Overview](architecture-and-design/api-routes-explained.md) | All endpoints at a glance | The depot's front door signs — all entry points, what goes in, what comes out |
-| 15 | [Chat Endpoint](architecture-and-design/api-routes/chat-endpoint-explained.md) | The main RAG endpoint — query → answer | The main delivery window — hand in a question, the courier brings back a grounded answer |
+| 15 | [Chat Endpoint](architecture-and-design/api-routes/chat-endpoint-explained.md) ⭐ **includes the full architecture walkthrough** | The main RAG endpoint — query → answer. The walkthrough at the top of this doc is the single best end-to-end explanation of how the chatbot works. | The main delivery window — hand in a question, the courier brings back a grounded answer |
 | 16 | [Documents Endpoint](architecture-and-design/api-routes/documents-endpoint-explained.md) | Upload, list, delete documents | The intake desk — drop off new documents, check what's in stock, remove old ones |
 | 17 | [Evaluate Endpoint](architecture-and-design/api-routes/evaluate-endpoint-explained.md) | Run evaluation suites via API | The quality inspector's window — trigger scoring runs without touching the code |
 | 18 | [Health Endpoint](architecture-and-design/api-routes/health-endpoint-explained.md) | Health checks and readiness | The depot health check — is the courier awake, loaded up, and ready to run? |

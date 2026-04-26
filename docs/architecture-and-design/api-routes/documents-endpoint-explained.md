@@ -22,6 +22,7 @@
 ## Table of Contents
 
 - [Documents Endpoint — Deep Dive](#documents-endpoint--deep-dive)
+  - [Plain-English Walkthrough (Start Here)](#plain-english-walkthrough-start-here)
   - [Table of Contents](#table-of-contents)
   - [What These Endpoints Do](#what-these-endpoints-do)
   - [Endpoint 1: Upload](#endpoint-1-upload)
@@ -54,6 +55,103 @@
     - [Tier 1 — Must understand](#tier-1--must-understand)
     - [Tier 2 — Should understand](#tier-2--should-understand)
     - [Tier 3 — AI engineering territory](#tier-3--ai-engineering-territory)
+
+---
+
+## Plain-English Walkthrough (Start Here)
+
+> **Read this first if you're new to the chatbot.** Same courier analogy as the [Chat Walkthrough](./chat-endpoint-explained.md#plain-english-walkthrough-start-here). This explains what's specific about the documents endpoints.
+
+### What these endpoints are for
+
+Before the chatbot can answer anything, **someone has to put documents into the warehouse**. That's what this set of routes is for. There are four of them, and they form a small lifecycle:
+
+| Route | Purpose | Courier |
+| --- | --- | --- |
+| `POST /api/documents/upload` | Upload one document | Drop a single binder at the intake desk. |
+| `POST /api/documents/upload-batch` | Upload many in one call | Drop a whole stack at intake; clerk processes them as a batch. |
+| `GET /api/documents` | List what's been uploaded | Read the intake clipboard. |
+| `DELETE /api/documents/{id}` | Remove a document | Tell the clerk to take a binder off the shelf. |
+
+### What happens during an upload
+
+When you upload a file, four things happen in order:
+
+1. **Validate the extension** — only `.pdf`, `.txt`, `.md`, `.csv`, `.docx` are accepted. Anything else gets a `400` immediately. The file is *not* opened to verify its real type — the check is purely on the suffix. So a renamed `.exe → .pdf` would slip past this gate; the parser would then likely fail in step 3.
+2. **Check the RAG chain is up.** Same as `/api/chat` — if cloud creds are missing, every upload returns `500`.
+3. **Run the ingestion.** The handler hands the file to `rag_chain.ingest_document()`, which does the real work: read the file → split into chunks → embed each chunk → write the vectors to the warehouse.
+4. **Track in a registry.** A successful upload is recorded in an in-memory dictionary keyed by document ID, so `GET /api/documents` can list it later.
+
+### The single most important quirk
+
+The document registry is a **plain Python dictionary**:
+
+```python
+_documents: dict[str, DocumentInfo] = {}
+```
+
+That dictionary lives **in the process's memory**. So:
+
+- **It's lost on restart.** Restart the container and `/api/documents` returns an empty list — even though the chunks are still in the vector store. The actual knowledge base is intact, but the registry is gone.
+- **It's not shared across replicas.** If you scale to 4 pods, each pod has its own registry. An upload to pod #1 will only be visible to `/api/documents` calls that happen to land on pod #1.
+
+This is fine for a single-machine demo. It's a real bug for production. The route source even acknowledges this with a comment: *"in production, this would be in DynamoDB/CosmosDB"*.
+
+> **Courier version.** The intake clipboard is on the front desk only. If the clerk goes home for the night and a different clerk comes in tomorrow, the new clerk has no idea what's already in the warehouse — until someone tells him to walk back and look.
+
+### What happens during chunking + embedding
+
+Inside `rag_chain.ingest_document()`, here's the sequence (using a 30-page PDF as a worked example):
+
+| Step | What happens | Worked example |
+| --- | --- | --- |
+| 1. **Parse** | Pull the text out of the file (PyPDF for PDFs, plain read for txt/md, python-docx for docx, csv module for csv). | 30-page PDF → ~24,000 words of plain text. |
+| 2. **Split** | Break the text into smaller "chunks" of fixed size with some overlap. | Chunk size 1,000 chars, overlap 200 → ~30 chunks. |
+| 3. **Embed each chunk** | Send every chunk to the embedding model. | 30 embedding API calls (or one batch, depending on provider). |
+| 4. **Write to warehouse** | Send each (chunk, vector, metadata) tuple to the vector store. | DynamoDB / AI Search / Chroma upsert; 30 rows. |
+
+This is **synchronous**. The HTTP request hangs until every chunk is embedded and stored. For a 30-page PDF that's typically a few seconds; for a 500-page document on a slow embedder it can be minutes.
+
+### Batch upload — same work, batched smarter
+
+The batch route accepts multiple files in one HTTP call. The smart bit is what happens inside `rag_chain.ingest_documents()` (plural) — instead of N round-trips to the vector store, it uses each provider's bulk-write API (OpenSearch's `_bulk`, Azure Search's batch upload). On a 50-document upload that's the difference between 50 round-trips and 1.
+
+The batch handler **validates all extensions up front** before processing any of them — so if file 47 in a batch of 50 is a `.png`, you get a `400` before any work has been done. Each individual file's success or failure is reported per-file in the response, so a partial-success batch is still useful.
+
+### Delete — reads the registry only
+
+The delete handler checks whether the document ID exists in the in-memory registry and removes it from there. **It does not actually remove the chunks from the vector store** — there's a `# TODO` comment in the code marking this as unfinished. So a deleted document still answers questions in `/api/chat` until either the vector store is wiped or someone implements the deletion path.
+
+### The condition matrix
+
+| Scenario | Validation | RAG init? | Ingest | Registry | Status |
+| --- | --- | --- | --- | --- | --- |
+| Upload `.pdf` ok | pass | yes | succeeds | added | 200 |
+| Upload `.exe` | fail | — | — | — | 400 |
+| Upload `.pdf`, RAG missing | pass | no | — | — | 500 |
+| Upload `.pdf`, parser crashes | pass | yes | fails | added with `FAILED` status | 500 |
+| Batch with one bad extension | fail at first bad file | — | — | — | 400 (whole batch rejected) |
+| Batch with one bad parse | pass | yes | per-file results | per-file status | 200 with mixed results |
+| List documents | — | — | — | reads in-mem dict | 200 (possibly empty after restart) |
+| Delete known ID | — | — | — | removes from dict only | 200 (chunks remain in warehouse) |
+| Delete unknown ID | — | — | — | — | 404 |
+
+### The honest health check
+
+1. **In-memory registry.** Restarts wipe it; multi-replica setups are inconsistent.
+2. **Delete doesn't actually delete.** Vector store chunks remain. The next `/api/chat` will still surface them.
+3. **Extension check is name-based only.** A renamed file slips past validation; the parser might then crash with a confusing error.
+4. **Synchronous ingestion.** A large PDF blocks the HTTP request for minutes. No background-job pattern.
+5. **No size limit.** A 1 GB upload will be read entirely into memory before the parser runs.
+6. **No deduplication.** Uploading the same file twice creates two document IDs and double the chunks in the warehouse.
+
+### TL;DR
+
+- Four routes covering the upload → list → delete lifecycle.
+- The document registry is in-memory only — fine for demo, broken for production.
+- Delete removes the registry entry but **leaves the chunks** in the warehouse (`# TODO` in code).
+- Batch upload uses provider bulk APIs for big speed gains.
+- Validation is name-only and there's no size cap.
 
 ---
 

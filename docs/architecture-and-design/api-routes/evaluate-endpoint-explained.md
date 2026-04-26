@@ -31,6 +31,104 @@
 
 ---
 
+## Plain-English Walkthrough (Start Here)
+
+> **Read this first if you're new to the chatbot.** Same courier analogy as the [Chat Walkthrough](./chat-endpoint-explained.md#plain-english-walkthrough-start-here). This explains what's specific about the evaluate endpoints.
+
+### What these endpoints are for
+
+The chatbot can answer questions. Fine. But how do you know whether the answers are *good*? `/api/chat` doesn't tell you — it just gives you whatever the LLM produced. The evaluate endpoints exist to **grade the chatbot's homework**: run a question (or a whole test suite) through the same RAG pipeline that `/api/chat` uses, then score the answer on retrieval quality, faithfulness, and relevance.
+
+There are two routes:
+
+| Route | Purpose |
+| --- | --- |
+| `POST /api/evaluate` | Grade one question. Useful for tuning ("did changing chunk size make this question score better?"). |
+| `POST /api/evaluate/suite` | Grade the entire **golden dataset** — a built-in list of expected questions and their hand-picked good answers. Useful for regression testing. |
+
+> **Courier version.** The first route is "send out one parcel, time the run, then have an inspector grade how well I did". The second is "run today's full delivery roster against a known-good route map and tell me my pass rate."
+
+### Single-question evaluation — what really happens
+
+The flow is identical to `/api/chat` for the first three steps, then diverges at the end:
+
+```
+1. Run the question through rag_chain.query()  ← same as /api/chat
+2. Build (chunk, score) tuples from the sources
+3. Run RAGEvaluator.evaluate(question, answer, chunks)
+4. Return the answer + scores
+```
+
+The evaluator is the **same evaluator** that runs automatically on every `/api/chat` request (Step 7 of the chat walkthrough). The difference is that here it's the *point* of the call rather than a side effect — and the scores are returned to the client in full detail rather than only being written to the query log.
+
+### What the three scores actually measure
+
+| Score | Question it answers | How it's computed |
+| --- | --- | --- |
+| **Retrieval** | Did the warehouse give us relevant chunks? | Average relevance score across the retrieved chunks (0.0 to 1.0). |
+| **Faithfulness** | Did the LLM stick to what was in the chunks? | Word-overlap heuristic between answer and chunks — high overlap suggests the LLM cited the source. |
+| **Answer relevance** | Did the answer actually address the question? | Word-overlap heuristic between answer and question. |
+
+These are **lightweight heuristics**, not LLM-graded judgements. They're fast (microseconds) and cheap (zero LLM calls) but they can be fooled. A truly faithful answer that paraphrases will score low on word-overlap; a hallucination that happens to share words with the chunks will score high. For higher-quality evaluation you'd plug in an LLM-as-judge — the code structure makes that swap straightforward but it's not the default today.
+
+The four scores roll up:
+
+- **`overall`** is the average of the three.
+- **`passed`** is `overall ≥ 0.70`.
+
+### Suite evaluation — the regression test
+
+The suite endpoint runs the same single-question logic for every question in the **golden dataset** (a hard-coded list in `src/evaluation/golden_dataset.py`). The dataset has questions, expected ground-truth answers (used for stricter scoring if enabled), and category tags. The handler iterates over the whole list and aggregates:
+
+- Per-case results (every question with its scores and pass/fail).
+- Aggregate stats: total cases, passed, failed, average scores per dimension, total cost in USD, total runtime.
+
+> **Courier version.** It's like a driving test. The depot manager hands the courier a sealed envelope of 30 questions, runs them through the full pipeline, grades each one, and at the end produces a single report card: "27/30 passed, average retrieval 0.83, total run cost $0.12, took 47 seconds."
+
+### How the dataset works
+
+The dataset is **baked into the code** — `GOLDEN_DATASET` is a Python list. There's no API to add questions, no CSV upload, no way to mark some questions as "smoke test only". To grow your eval set you edit the source and redeploy. This is fine when the eval set is small and stable; it's awkward as the chatbot matures and you want non-engineers to add edge cases.
+
+### A worked example
+
+You hit `POST /api/evaluate/suite` with `top_k: 5`. The dataset has 30 cases. The handler:
+
+1. Sequentially runs each question through `rag_chain.query()` — that's 30 full RAG cycles (embed → search → LLM → response).
+2. Scores each one with the heuristic evaluator.
+3. Aggregates the results.
+
+If your provider is Bedrock with Claude Sonnet, that's roughly 30 × ~2 seconds = ~60 seconds of wall-clock time, plus 30 × ~$0.005 = ~$0.15 of LLM cost. Worth knowing before you run it casually — and **definitely** worth knowing before you wire it into a CI/CD pipeline that runs on every commit. If you do that with paid LLMs, you'll spend real money quickly.
+
+### The condition matrix
+
+| Scenario | RAG init? | Per-case run | Aggregation | Status |
+| --- | --- | --- | --- | --- |
+| Single, happy path | yes | 1 RAG cycle + score | n/a | 200 |
+| Single, RAG missing | no | — | — | 500 |
+| Single, LLM fails | yes | RAG cycle fails | — | 500 |
+| Suite, all pass | yes | N RAG cycles | yes | 200 |
+| Suite, some fail | yes | N RAG cycles | yes (failed cases recorded) | 200 |
+| Suite, mid-run LLM outage | yes | partial | depends on impl — likely 500 with no aggregate | 500 |
+
+### The honest health check
+
+1. **Heuristic scoring only.** Word-overlap is gameable; not a substitute for proper LLM-as-judge or human review.
+2. **Suite is sequential** — no parallelism, no rate-limit awareness. A large dataset takes a long time and a sudden burst can trigger provider rate limits.
+3. **Dataset is hard-coded** — no UI/API to add cases without a deploy.
+4. **No partial-run resilience** — if case 17 of 30 fails, you may lose the partial result depending on the implementation of the suite endpoint.
+5. **Cost can surprise** — every suite run pays for N full LLM calls. There's no caching of stable answers between runs.
+6. **Same evaluator runs on every chat call too** — so you're effectively double-paying for grading whenever you also use this endpoint.
+
+### TL;DR
+
+- Two routes: grade-one-question and grade-the-whole-golden-dataset.
+- Uses the same in-process heuristic scorer as `/api/chat`'s background evaluator.
+- Word-overlap heuristics — fast and cheap but gameable.
+- Suite runs are sequential, hard-coded, and pay for N real LLM calls each time.
+- Great as a manual tuning loop; treat with care if you wire it into CI on a paid provider.
+
+---
+
 ## What This Endpoint Does
 
 **`/api/evaluate`** does everything `/api/chat` does (retrieve chunks → generate answer),
