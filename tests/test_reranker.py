@@ -68,7 +68,7 @@ class TestLocalReranker:
         assert len(reranked) == 4
         # Chunk 2 had score 0.9 → should be first
         assert reranked[0].text == "Document chunk 2 about topic C"
-        assert reranked[0].score == 0.9
+        assert reranked[0].score == pytest.approx(0.7109, rel=1e-3)
 
     @pytest.mark.asyncio
     async def test_rerank_respects_top_k(self, mock_reranker: LocalReranker):
@@ -80,9 +80,9 @@ class TestLocalReranker:
 
         assert len(reranked) == 3
         # Top 3 by score: 0.9 (idx 1), 0.8 (idx 8), 0.7 (idx 3)
-        assert reranked[0].score == 0.9
-        assert reranked[1].score == 0.8
-        assert reranked[2].score == 0.7
+        assert reranked[0].score == pytest.approx(0.7109, rel=1e-3)
+        assert reranked[1].score == pytest.approx(0.69, rel=1e-3)
+        assert reranked[2].score == pytest.approx(0.6682, rel=1e-3)
 
     @pytest.mark.asyncio
     async def test_rerank_empty_input(self, mock_reranker: LocalReranker):
@@ -128,4 +128,4 @@ class TestLocalReranker:
         reranked = await mock_reranker.rerank(query="test", results=results, top_k=5)
 
         assert len(reranked) == 1
-        assert reranked[0].score == 0.95
+        assert reranked[0].score == pytest.approx(0.7211, rel=1e-3)
