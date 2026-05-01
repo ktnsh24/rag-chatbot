@@ -13,9 +13,9 @@
 > - [API Routes Overview](../api-routes-explained.md) — how all routes fit together
 > - [Health Endpoint Deep Dive](health-endpoint-explained.md) — the simplest route ★☆☆☆☆
 > - [Chat Endpoint Deep Dive](chat-endpoint-explained.md) — the RAG query route ★★★★★
-> - [API Reference → Documents](../reference/api-reference.md) — request/response examples
-> - [Pydantic Models → DocumentUploadResponse](../reference/pydantic-models.md) — model fields
-> - [RAG Concepts](../ai-engineering/rag-concepts.md) — chunking and embeddings explained
+> - [API Reference → Documents](../../reference/api-reference.md) — request/response examples
+> - [Pydantic Models → DocumentUploadResponse](../../reference/pydantic-models.md) — model fields
+> - [RAG Concepts](../../ai-engineering/rag-concepts.md) — chunking and embeddings explained
 
 ---
 

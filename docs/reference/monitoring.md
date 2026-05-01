@@ -5,7 +5,7 @@
 > **Related docs:**
 > - [API Reference — Queries](api-reference.md#query-debugging-i30) — endpoint specs
 > - [API Reference — Metrics](api-reference.md#prometheus-metrics-i31) — Prometheus format
-> - [Hands-On Labs Phase 5](../docs/hands-on-labs/hands-on-labs-phase-5.md) — Labs 14–16
+> - [Hands-On Labs Phase 5](../hands-on-labs/hands-on-labs-phase-5.md) — Labs 14–16
 
 ---
 

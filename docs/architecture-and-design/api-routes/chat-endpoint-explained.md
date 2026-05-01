@@ -11,10 +11,10 @@
 > - [API Routes Overview](../api-routes-explained.md) — how all routes fit together
 > - [Health Endpoint Deep Dive](health-endpoint-explained.md) — the simplest route ★☆☆☆☆
 > - [Documents Endpoint Deep Dive](documents-endpoint-explained.md) — the ingestion route ★★★★☆
-> - [API Reference → Chat](../reference/api-reference.md) — request/response examples
-> - [Pydantic Models → ChatRequest/ChatResponse](../reference/pydantic-models.md) — model fields
-> - [RAG Concepts](../ai-engineering/rag-concepts.md) — embeddings, vectors, chunking explained
-> - [Cost Analysis](../ai-engineering/cost-analysis.md) — token costs and optimisation techniques
+> - [API Reference → Chat](../../reference/api-reference.md) — request/response examples
+> - [Pydantic Models → ChatRequest/ChatResponse](../../reference/pydantic-models.md) — model fields
+> - [RAG Concepts](../../ai-engineering/rag-concepts.md) — embeddings, vectors, chunking explained
+> - [Cost Analysis](../../ai-engineering/cost-analysis.md) — token costs and optimisation techniques
 
 ---
 
@@ -1235,7 +1235,7 @@ essentially free. Optimising costs means reducing what you send to the LLM:
 - Smaller chunks (lower `chunk_size`)
 - Filter out low-scoring chunks before sending to the LLM
 
-See [Cost Analysis](../ai-engineering/cost-analysis.md) for cost optimisation techniques.
+See [Cost Analysis](../../ai-engineering/cost-analysis.md) for cost optimisation techniques.
 
 - 🚚 **Courier:** The feed bill — how much fuel (tokens) the courier eats per delivery, and how to reduce waste without starving it.
 

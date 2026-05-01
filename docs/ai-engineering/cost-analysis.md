@@ -1,5 +1,7 @@
 # Cost Analysis — AWS vs Azure, Free Tiers, and Alternatives
 
+**Shared baseline:** [Cost Analysis Playbook (portfolio-level)](../../../../docs/shared/ai-engineering/cost-analysis-playbook.md)
+
 ## Table of Contents
 
 - [Monthly cost summary](#monthly-cost-summary)

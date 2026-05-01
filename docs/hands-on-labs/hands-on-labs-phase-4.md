@@ -2,6 +2,12 @@
 
 ---
 
+## Mode Scope
+
+- Mode flag for this phase: Generic (mode-agnostic)
+- Labs in this file are written to work in `rule_based`, `llm_judge`, or `combined`.
+- "Combined" in this phase can also refer to retrieval pipelines (for example hybrid retrieval), not only evaluation mode.
+
 ## Table of Contents
 
 - [🚚 The Courier Analogy — Understanding Phase 4 Metrics](#-the-courier-analogy--understanding-phase-4-metrics)
@@ -990,7 +996,7 @@ Each component is optional (feature-flagged) and follows the same Strategy Patte
 These labs complete the advanced RAG techniques.
 Continue to [Phase 5 Labs](hands-on-labs-phase-5.md) to learn about production observability — query logging, metrics, and regression testing.
 
-For a different project, see [Phase 2: AI Gateway](../../ai-gateway/) to learn about LLM routing, caching, and rate limiting.
+For a different project, see [Phase 2: AI Gateway](../../../ai-gateway/) to learn about LLM routing, caching, and rate limiting.
 
 - 🚚 **Courier:** The route map for tomorrow's training run — follow these signposts to deepen your understanding of the delivery system.
 

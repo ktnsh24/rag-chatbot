@@ -10,8 +10,8 @@
 > - [API Routes Overview](../api-routes-explained.md) — how all routes fit together
 > - [Chat Endpoint Deep Dive](chat-endpoint-explained.md) — the RAG query route ★★★★★
 > - [Documents Endpoint Deep Dive](documents-endpoint-explained.md) — the ingestion route ★★★★☆
-> - [API Reference → Health](../reference/api-reference.md) — request/response examples
-> - [Pydantic Models → HealthResponse](../reference/pydantic-models.md) — model fields
+> - [API Reference → Health](../../reference/api-reference.md) — request/response examples
+> - [Pydantic Models → HealthResponse](../../reference/pydantic-models.md) — model fields
 
 ---
 
@@ -389,7 +389,7 @@ class HealthResponse(BaseModel):
     uptime_seconds: int           # How long the app has been running
 ```
 
-See [Pydantic Models Guide](../reference/pydantic-models.md) for full field details.
+See [Pydantic Models Guide](../../reference/pydantic-models.md) for full field details.
 
 - 🚚 **Courier:** The shipping manifest template — every field is typed and validated before the courier is loaded, preventing mispackaged deliveries.
 

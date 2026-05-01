@@ -571,8 +571,8 @@ Here's a summary of every component covered across the docs:
 ### Phase 2 — Bridge files ✅
 - [x] #7: [`src/llm/base.py`](llm-interface-deep-dive.md) — LLM interface
 - [x] #8: [`src/vectorstore/base.py`](vectorstore-interface-deep-dive.md) — Vector store interface
-- [x] #9: [`src/embeddings/base.py`](embedding-interface-deep-dive.md) — Embedding interface
-- [x] #10: [`src/models/`](pydantic-models.md) — Pydantic models
+- [x] #9: [`src/embeddings/base.py`](vectorstore-interface-deep-dive.md) — Embedding interface
+- [x] #10: [`src/models/`](../reference/pydantic-models.md) — Pydantic models
 - [x] #11: [`src/rag/ingestion.py`](ingestion-pipeline-deep-dive.md) — Ingestion pipeline
 
 ### Phase 3 — Pure AI engineering ✅
