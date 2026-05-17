@@ -167,6 +167,7 @@ rag-chatbot/
 ├── data/                       # Drop your documents here
 ├── pyproject.toml              # Poetry dependencies
 ├── Dockerfile                  # Container image
+├── docker-compose.yml          # Local stack: app + Ollama
 └── .env.example                # Environment variable template
 ```
 
@@ -194,7 +195,21 @@ poetry run uvicorn src.main:app --reload
 # → http://localhost:8000
 ```
 
-### Option 2: AWS or Azure
+### Option 2: Docker Compose (local app + Ollama)
+
+```bash
+# 1. Start API + Ollama
+docker compose up -d
+
+# 2. Pull local models once
+docker compose exec ollama ollama pull llama3.2
+docker compose exec ollama ollama pull nomic-embed-text
+
+# 3. Open API docs
+# → http://localhost:8000/docs
+```
+
+### Option 3: AWS or Azure
 
 ```bash
 # 1. Install dependencies
