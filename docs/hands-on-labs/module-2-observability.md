@@ -23,11 +23,7 @@ Learn the difference between counters (cumulative totals) and gauges (point-in-t
 
 `GET /api/metrics` → opens Prometheus text format.
 
-Copy the URL `http://localhost:8000/api/metrics` into your browser or use curl:
-
-```bash
-curl http://localhost:8000/api/metrics
-```
+Open Swagger UI -> `GET /api/metrics` -> "Try it out" -> "Execute".
 
 ### Sample output with numbers
 

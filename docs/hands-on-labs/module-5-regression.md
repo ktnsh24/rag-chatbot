@@ -2,17 +2,18 @@
 
 **Question this module answers:** "How do I prevent quality regressions before deploying?"
 
-**Labs in this module:** 2 hands-on experiments
-- Lab 14: Golden Dataset Basics
-- Lab 15: Regression Testing as Release Gate
+**Labs in this module:** 3 hands-on experiments
+- Lab 15: Golden Dataset Basics
+- Lab 16: Regression Testing as Release Gate
+- Lab 17: LLM-as-a-Judge Validation
 
-**Time:** 90 minutes total
+**Time:** 120 minutes total
 
 **Prerequisite:** Module 1-4 (you've tuned the system to ≥ 70% pass rate).
 
 ---
 
-## Lab 14: Golden Dataset Basics
+## Lab 15: Golden Dataset Basics
 
 ### Goal
 
@@ -73,7 +74,7 @@ Check the golden dataset:
 
 ---
 
-## Lab 15: Regression Testing as Release Gate
+## Lab 16: Regression Testing as Release Gate
 
 ### Goal
 
@@ -162,6 +163,136 @@ When a production failure happens:
 
 ---
 
+## Lab 17: LLM-as-a-Judge Validation
+
+### Goal
+
+Run evaluation with `llm_judge`, compare it with `rule_based`, and confirm the recommended `combined` behavior.
+
+### Run in Swagger UI
+
+Open Swagger UI -> `POST /api/evaluate` -> "Try it out" -> run the same question in these 3 modes.
+
+Run 1 (`rule_based`):
+
+```json
+{
+  "question": "What is the refund policy for digital products?",
+  "eval_mode": "rule_based"
+}
+```
+
+Run 2 (`llm_judge`):
+
+```json
+{
+  "question": "What is the refund policy for digital products?",
+  "eval_mode": "llm_judge"
+}
+```
+
+Run 3 (`combined`):
+
+```json
+{
+  "question": "What is the refund policy for digital products?",
+  "eval_mode": "combined"
+}
+```
+
+### Sample output with numbers
+
+```json
+{
+  "question": "What is the refund policy for digital products?",
+  "eval_mode": "combined",
+  "rule_based": {
+    "retrieval_score": 0.74,
+    "faithfulness_score": 0.82,
+    "answer_relevance_score": 0.95,
+    "overall_score": 0.84,
+    "passed": true
+  },
+  "llm_judge": {
+    "faithfulness": 0.8,
+    "answer_relevance": 0.9,
+    "notes": [
+      "Answer is grounded in retrieved context.",
+      "Could include more detail about exclusions."
+    ]
+  },
+  "final_overall": 0.86,
+  "passed": true,
+  "latency_ms": 39541
+}
+```
+
+### Calculate the judge metrics (worked example)
+
+Use the numbers above and calculate these metrics explicitly:
+
+| Metric | Formula | Example calculation | Result |
+| --- | --- | --- | --- |
+| Judge proxy overall | `(judge_faithfulness + judge_answer_relevance) / 2` | `(0.80 + 0.90) / 2` | `0.85` |
+| Faithfulness delta | `abs(rule_faithfulness - judge_faithfulness)` | `abs(0.82 - 0.80)` | `0.02` |
+| Relevance delta | `abs(rule_relevance - judge_relevance)` | `abs(0.95 - 0.90)` | `0.05` |
+| Lane delta | `abs(rule_overall - judge_proxy_overall)` | `abs(0.84 - 0.85)` | `0.01` |
+| Agreement percent | `(1 - ((faithfulness_delta + relevance_delta) / 2)) * 100` | `(1 - ((0.02 + 0.05)/2)) * 100` | `96.5%` |
+| Combined gain | `final_overall - rule_overall` | `0.86 - 0.84` | `+0.02` |
+
+### Calculate latency and parser reliability
+
+Run the same query 3 times (`rule_based`, `llm_judge`, `combined`) and record `latency_ms` from each response.
+
+Sample timing sheet:
+
+| Mode | latency_ms |
+| --- | --- |
+| rule_based | 31000 |
+| llm_judge | 39000 |
+| combined | 39541 |
+
+Derived metrics:
+
+| Metric | Formula | Example |
+| --- | --- | --- |
+| Judge overhead vs rule-based | `llm_judge_latency - rule_based_latency` | `39000 - 31000 = 8000 ms` |
+| Combined overhead vs rule-based | `combined_latency - rule_based_latency` | `39541 - 31000 = 8541 ms` |
+| Overhead percent | `((combined_latency - rule_based_latency) / rule_based_latency) * 100` | `(8541 / 31000) * 100 = 27.6%` |
+
+Parser reliability metric (from logs):
+
+| Metric | Formula | Example |
+| --- | --- | --- |
+| Judge parse error rate | `(invalid_json_warnings / llm_judge_runs) * 100` | `(1 / 10) * 100 = 10%` |
+
+Target guidance:
+
+- Agreement percent: prefer `>= 90%`
+- Lane delta: prefer `<= 0.10`
+- Judge parse error rate: prefer `< 5%`
+- Combined overhead: team-defined, typically keep `< 30%`
+
+### Interpret results
+
+| Comparison | Meaning | First action |
+| --- | --- | --- |
+| `rule_based` high + `llm_judge` high | Stable quality by both methods | Keep as release baseline |
+| `rule_based` high + `llm_judge` low | Semantically weak answer despite overlap | Improve grounding/prompt clarity |
+| `rule_based` low + `llm_judge` high | Heuristic thresholds may be strict | Review rubric and thresholds |
+| Judge parse warnings in logs | Judge returned malformed JSON | Tighten judge output schema prompt |
+
+### Action table
+
+| If you see this | First action |
+| --- | --- |
+| `Judge response was not valid JSON` warning | Force strict JSON schema in judge prompt and keep parser fallback enabled |
+| Judge latency dominates total latency | Use `combined` for regression suites, not every interactive chat |
+| Judge scores fluctuate heavily run-to-run | Run 3 repeats and compare variance; tune rubric wording |
+| Judge gives high scores to weak answers | Add negative examples and stricter faithfulness rubric |
+
+---
+
 ## Release Gate Checklist
 
 Before deploying code or tuning changes:
@@ -193,7 +324,7 @@ You've completed all 5 modules:
 2. ✅ **Module 2:** Observability (metrics, counters, gauges)
 3. ✅ **Module 3:** Failure Diagnosis (logs, categories, patterns)
 4. ✅ **Module 4:** Tuning (top_k, chunk_size, reranker, hybrid, HNSW)
-5. ✅ **Module 5:** Regression Testing (golden dataset, release gate)
+5. ✅ **Module 5:** Regression Testing (golden dataset, release gate, llm-as-a-judge)
 
 You now know:
 - How RAG quality works and what each metric means
@@ -201,5 +332,6 @@ You now know:
 - How to diagnose why it fails
 - How to improve it systematically
 - How to prevent regressions before shipping
+- How to validate quality with `llm_judge` vs `rule_based`
 
 **Next:** Apply this framework to your own RAG system. Start with Module 1, run the labs, then pick which Module 4 tuning lever to pull first based on your failure categories.

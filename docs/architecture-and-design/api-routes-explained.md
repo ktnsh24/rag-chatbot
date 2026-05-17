@@ -160,7 +160,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
 ### DE comparison
 
-This is **identical** to `BnaEventMiddleware` in the shared-proxy. Same pattern:
+This is **identical** to event middleware in a typical enterprise API gateway. Same pattern:
 log request → call next → log response → add headers. Nothing AI-specific here.
 
 ### Request lifecycle with middleware
@@ -324,7 +324,7 @@ the same and what's different:
 | --- | --- | --- | --- |
 | **Framework** | FastAPI | FastAPI | Where parcels are dropped at the depot — Framework: FastAPI · FastAPI |
 | **Router pattern** | `APIRouter()` + `include_router()` | `APIRouter()` + `include_router()` | Depot's front door — Router pattern: APIRouter() + include_router() · APIRouter() + include_router() |
-| **Middleware** | `BnaEventMiddleware` | `RequestLoggingMiddleware` | Bouncer at the depot door — Middleware: BnaEventMiddleware · RequestLoggingMiddleware |
+| **Middleware** | `EventLoggingMiddleware` | `RequestLoggingMiddleware` | Bouncer at the depot door — Middleware: EventLoggingMiddleware · RequestLoggingMiddleware |
 | **Request validation** | Pydantic models | Pydantic models | Both stables check the shipping manifest with Pydantic before saddling the courier — same gatekeeper, same form. |
 | **Dependency injection** | `app.state` or FastAPI `Depends()` | `app.state` (for rag_chain) | Depot manager — receives requests at the front door and dispatches the courier |
 | **Error handling** | `HTTPException` | `HTTPException` | Depot's front door — Error handling: HTTPException · HTTPException |

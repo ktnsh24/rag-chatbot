@@ -6,7 +6,7 @@ Logs every HTTP request with:
     - Processing time (latency)
     - Request ID for tracing
 
-Similar to BnaEventMiddleware in the shared-proxy project.
+Similar to event middleware patterns in enterprise API gateways.
 """
 
 import time

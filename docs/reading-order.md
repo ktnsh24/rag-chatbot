@@ -21,7 +21,7 @@ Each of the other endpoint docs in [Level 4](#level-4--understand-the-api) opens
 Read these first to understand what this project is and how it works.
 
 | # | Document | What you'll learn | 🚚 Courier |
-|---|----------|-------------------|-----------|
+| --- | --- | --- | --- |
 | 1 | [README.md](../README.md) | Project overview, features, tech stack, quick start | The depot notice board — what the courier does, what tools it carries, how to get it started in 60 seconds |
 | 2 | [RAG Concepts](ai-engineering/rag-concepts.md) | What is RAG? Embeddings, vector search, retrieval — explained simply | The courier's training manual — why it checks the parcel instead of answering from memory |
 | 3 | [Architecture Overview](architecture-and-design/architecture.md) | System diagram, component relationships, data flow | The delivery route map — all roads, stops, and handoffs from question to answer |
@@ -109,18 +109,21 @@ How to measure quality and run the 58-experiment lab suite.
 
 ## Level 7 — Hands-On Labs (Do the Exercises)
 
-**Read [How to Read the Labs](hands-on-labs/how-to-read-the-labs.md) FIRST.** It explains why every lab seems to report the same metrics — without that mental model the labs feel repetitive and confusing.
+**Read [How to Read the Labs](hands-on-labs/how-to-read-the-labs.md) FIRST.** It explains the baseline metrics, the later business/safety metrics that sit on top of them, and the default learner path.
 
-Then run all 58 experiments yourself — follow Phase 1 → 5 in order.
+The default reading path is intentionally simple: **Lab 1 → Lab 2 → Lab 3 → Lab 4 → Lab 5 → Lab 6**, then move to the more advanced retrieval, scaling, monitoring, regression, and judge labs. The phase docs are still reference containers, but the first pass should feel sequential, not jumpy.
+
+For side-by-side evaluator vs judge comparisons during labs, use `EVAL_MODE=combined`.
 
 | # | Document | What you'll learn | 🚚 Courier |
 |---|----------|-------------------|-----------|
 | 35b | [How to Read the Labs](hands-on-labs/how-to-read-the-labs.md) | Why all labs share the same yardstick; 5-question method to read any lab; suggested study order | Read this BEFORE Phase 1 — the missing intro that makes the report card make sense |
-| 36 | [Phase 1 — Foundation](hands-on-labs/hands-on-labs-phase-1.md) | Basic queries, top_k tuning, first evaluation | First solo trips — basic deliveries, tune the parcel size, read the first report card |
-| 37 | [Phase 2 — Bridge Skills](hands-on-labs/hands-on-labs-phase-2.md) | Multi-turn, injection tests, tracing, dashboards | Advanced trips — multi-leg journeys, injection attack tests, live GPS tracking on the dashboard |
-| 38 | [Phase 3 — Production AI](hands-on-labs/hands-on-labs-phase-3.md) | Document upload, golden dataset, guardrails | Real-world runs — upload your own docs, run the 25-question benchmark, add safety guardrails |
-| 39 | [Phase 4 — Advanced RAG](hands-on-labs/hands-on-labs-phase-4.md) | Query types, reranking, multi-doc, HNSW indexing | Expert tricks — rerank packages by quality, handle multi-doc loads, tune the HNSW stadium signs |
-| 40 | [Phase 5 — Full Suite](hands-on-labs/hands-on-labs-phase-5.md) | Run all 25 golden questions + edge cases | The final exam — all 25 golden deliveries plus edge cases, one complete run to prove the system works |
+| 36 | [Phase 1 — Foundation](hands-on-labs/hands-on-labs-phase-1.md) | Labs 1-2: baseline metrics, top_k trade-offs, first evaluation | First solo trips — lock in the baseline report card before changing anything else |
+| 37 | [Phase 2 — Bridge Skills](hands-on-labs/hands-on-labs-phase-2.md) | Labs 3-5: business metrics, injection tests, tracing, dashboards | Translate the same quality loop into usefulness, safety, and observability |
+| 38 | [Phase 3 — Production AI](hands-on-labs/hands-on-labs-phase-3.md) | Labs 6-8: data flywheel, scaling thinking, RLHF thinking | Turn failures into fixes, then widen to longer-horizon AI-engineering patterns |
+| 39 | [Phase 4 — Advanced RAG](hands-on-labs/hands-on-labs-phase-4.md) | Labs 9-13: advanced safety, reranking, hybrid search, HNSW, bulk ingestion | Advanced retrieval and safety knobs after the baseline and feedback loop are familiar |
+| 40 | [Phase 5 — Full Suite](hands-on-labs/hands-on-labs-phase-5.md) | Labs 14-16: query logs, live metrics, regression suites | Production monitoring and regression control once the mental model is stable |
+| 40b | [Phase 6 — LLM-as-Judge (Tier 5)](hands-on-labs/hands-on-labs-phase-6.md) | Labs 17-19: side-by-side rule-based vs judge scoring, disagreement analysis, production policy design | The second referee — compare two report cards in one panel, then decide what should gate production |
 
 ---
 
@@ -132,6 +135,7 @@ After running the labs, read the results to see how Local, Azure, and AWS compar
 |---|----------|-------------------|-----------|
 | 41 | [AWS Cloud Labs Results](aws-cloud-labs-results.md) | 4 AWS runs, root causes, fixes, courier analogy | The AWS trip report — 4 runs, what broke, what was fixed, full courier post-mortem included |
 | 42 | [3-Way Comparison: Local vs Azure vs AWS](../scripts/lab_results/local-vs-azure-comparison.md) | Head-to-head on 40 comparable experiments across Labs 1–13 (Phases 1–4) | Three providers, one race — local barn vs Azure vs AWS, winner per metric per lab |
+| 42b | [Phase 6 Framework Report](../scripts/lab_results/llm-judge-evaluation-framework.md) | How to interpret side-by-side evaluator vs judge outcomes and define policy | Two referees at the depot desk — one checks strict rules, one checks meaning, and you decide the final call |
 | 43 | [History Explained](architecture-and-design/history-explained.md) | Conversation history and session management | The courier's memory between trips — how it remembers what you said 3 questions ago without losing the thread |
 
 ---
@@ -142,4 +146,4 @@ After running the labs, read the results to see how Local, Azure, and AWS compar
 - **"I want to understand RAG"** → Start at doc #2 (RAG Concepts)
 - **"I want to see results"** → Jump to doc #41 (AWS Results) and #42 (3-Way Comparison)
 - **"I want to deploy to AWS"** → Read docs #24–27
-- **"I want to run the labs"** → Read docs #36–40
+- **"I want to run the labs"** → Read doc #35b first, then start sequentially with docs #36 → #37 → #38 before moving to docs #39–40b

@@ -23,6 +23,7 @@ See docs/cost-analysis.md for cost comparison.
 import json
 
 import boto3
+from langfuse.decorators import observe
 from loguru import logger
 
 from src.llm.base import BaseLLM, LLMResponse
@@ -51,6 +52,7 @@ class BedrockLLM(BaseLLM):
         self._embedding_model_id = "amazon.titan-embed-text-v2:0"
         logger.info(f"Bedrock LLM initialized: model={model_id}, region={region}")
 
+    @observe(name="bedrock-generate")
     async def generate(self, prompt: str, context: list[str], temperature: float = 0.1) -> LLMResponse:
         """
         Send a prompt to Claude via Bedrock's Converse API.

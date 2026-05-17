@@ -62,7 +62,7 @@ class PortfolioPDF(FPDF):
         self.set_y(-15)
         self.set_font(self._f, "I", 7)
         self.set_text_color(*GRAY)
-        self.cell(0, 10, "Ketan Sahu | AI & Data Engineering Portfolio", align="C")
+        self.cell(0, 10, "AI & Data Engineering Portfolio", align="C")
 
     def cover_page(self) -> None:
         self.add_page()
@@ -77,7 +77,7 @@ class PortfolioPDF(FPDF):
         self.ln(30)
         self.set_font(self._f, "", 11)
         self.set_text_color(*GRAY)
-        self.cell(0, 8, "Ketan Sahu", align="C")
+        self.cell(0, 8, "Data Engineer", align="C")
         self.ln(6)
         self.cell(0, 8, "Data Engineer | AI Engineering Portfolio", align="C")
 

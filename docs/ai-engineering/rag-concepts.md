@@ -9,6 +9,9 @@
 - [What are embeddings?](#what-are-embeddings)
 - [What is a vector store?](#what-is-a-vector-store)
 - [How vector search actually works](#how-vector-search-actually-works)
+- [Two-stage retrieval: vector search + reranking](#two-stage-retrieval-vector-search--reranking)
+- [Hybrid search: semantic + keyword](#hybrid-search-semantic--keyword)
+- [What is semantic search?](#what-is-semantic-search)
 - [What is chunking?](#what-is-chunking)
 - [Chunks vs vectors — the key distinction](#chunks-vs-vectors--the-key-distinction)
 - [What is cosine similarity?](#what-is-cosine-similarity)
@@ -385,6 +388,232 @@ comparisons instead of 1,000,000.
 
 ---
 
+## Two-stage retrieval: vector search + reranking
+
+Vector search alone has a blind spot: the embedding model encodes the **query** and
+the **chunk** separately, then compares the resulting vectors. It never sees them
+together. Two chunks can point in roughly the same direction in vector space but
+still differ a lot in how directly they answer the specific question.
+
+Reranking fixes this by adding a second, slower, more accurate pass.
+
+### Stage 1 — Vector search (bi-encoder, fast)
+
+The embedding model is a **bi-encoder**: it encodes each text independently into
+a fixed-size vector. At query time, it encodes the question the same way, then
+compares vectors with cosine similarity.
+
+- Fast: query and chunks are compared as pre-computed numbers
+- Runs on DynamoDB (brute-force) or OpenSearch/Azure AI Search (HNSW)
+- Returns **top 20 candidates** — broad net, some noise allowed
+
+### Stage 2 — Reranker (cross-encoder, slow but accurate)
+
+A **cross-encoder** takes the query and a chunk **together** as one input and
+outputs a single relevance score. Because it sees both at once, it can model
+subtle relationships the bi-encoder missed.
+
+```
+Bi-encoder:                    Cross-encoder:
+
+Query → [embed] → vector Q     Query + Chunk → [model] → score 0.94
+Chunk → [embed] → vector C                                score 0.41
+                                                          score 0.87
+cosine(Q, C) = 0.82            Re-ordered: 0.94, 0.87, 0.41
+```
+
+The reranker scores all 20 candidates, sorts by the new score, and keeps **top 5**.
+
+### Why not use the cross-encoder for everything?
+
+Because it's slow. A cross-encoder must run a full model pass for every
+query-chunk pair. With 10,000 chunks, that's 10,000 forward passes — unusable
+in real time. The bi-encoder narrows the field to 20 first, then the
+cross-encoder polishes those 20.
+
+```
+Query
+  → embed (bi-encoder)
+  → vector store search → top 20 candidates    ← fast, broad
+  → reranker cross-encoder → top 5             ← slow, precise
+  → LLM prompt
+  → Answer
+```
+
+### What rag-chatbot uses (from the code)
+
+Three implementations, switched by `CLOUD_PROVIDER` env var:
+
+| Provider | Model | Latency |
+| --- | --- | --- |
+| `local` | `cross-encoder/ms-marco-MiniLM-L-6-v2` (22M params) | ~50ms for 20 candidates on CPU |
+| `aws` | `amazon.rerank-v1:0` via Bedrock | ~100–200ms (API call) |
+| `azure` | Azure AI Search Semantic Ranker | ~100–200ms (API call) |
+
+Disabled by default — enable with `RERANKER_ENABLED=true`.
+
+The local reranker also applies a **sigmoid function** to normalize raw cross-encoder
+logit scores (which can be any number) into a 0.0–1.0 range:
+
+```
+raw score from model: 3.7  (logit, unbounded)
+sigmoid(3.7) = 1 / (1 + e^-3.7) = 0.976  (normalized probability)
+```
+
+The final `score` stored on each `VectorSearchResult` is this normalized value,
+and the original bi-encoder score is kept in `metadata["original_score"]` for
+comparison.
+
+### When does reranking help most?
+
+- Queries where **phrasing differs** from the document wording (bi-encoder struggles, cross-encoder doesn't)
+- Large corpora (> 5,000 chunks) where the top-20 from HNSW may include noise
+- Questions requiring **multi-sentence reasoning** across a chunk
+
+### When to skip reranking
+
+- Small corpora (< 1,000 chunks) — brute-force cosine already returns high-quality top-5
+- Latency-sensitive paths where +100ms is unacceptable
+- Costs — each AWS/Azure rerank call adds API cost
+
+> 🚚 **Courier analogy:** The bi-encoder is the sorting depot computer — it groups
+> parcels by rough destination (postcode) and picks the 20 closest to your address.
+> Fast, but it picks by postcode alone and a few wrong parcels slip through.
+> The reranker is the senior sorter who reads the actual label on each of those
+> 20 parcels — full address, recipient name, special instructions — and keeps
+> only the 5 that are truly correct. Slower per parcel, but far fewer misdeliveries.
+
+---
+
+## Hybrid search: semantic + keyword
+
+Vector search is great at meaning — but it can miss **exact words**.
+
+Example: query `"error code 5412"`
+- Vector search finds chunks about "error handling", "troubleshooting" — semantically close
+- But the chunk that literally contains `"5412"` in a table may rank low because its overall meaning vector is not that close to the query vector
+- A keyword search finds `"5412"` instantly — exact token match
+
+Hybrid search runs **both** and merges the results.
+
+### What is BM25 (keyword search)?
+
+BM25 is the algorithm behind Elasticsearch and classic search engines. It scores chunks by:
+- How often the query words appear in the chunk
+- How rare those words are across all chunks (rare words are more informative)
+- Adjusted for chunk length (long chunks are not unfairly rewarded)
+
+No embeddings, no vectors — pure word frequency math.
+
+```
+Query: "error code 5412"
+
+BM25 score for chunk "Error code 5412 means disk full":  high  ← exact match
+BM25 score for chunk "General error handling patterns":   low   ← no exact match
+BM25 score for chunk "See section 5412 in the manual":    medium ← partial match
+```
+
+### How RRF merges the two ranked lists
+
+After vector search and BM25 each return their top 20, the code merges them with
+**Reciprocal Rank Fusion (RRF)**:
+
+```
+RRF score = alpha * 1/(60 + vector_rank) + (1-alpha) * 1/(60 + bm25_rank)
+```
+
+`alpha=0.7` means 70% weight to vector search, 30% to BM25. Default in rag-chatbot.
+
+Concrete example:
+
+```
+Chunk                               vector_rank  bm25_rank  RRF score
+"Error code 5412 means disk full"       8            1        0.0153  ← BM25 boost
+"General error handling..."             1           15        0.0155  ← vector boost
+"5412 triggers a rollback..."           3            2        0.0161  ← high in both → WINS
+```
+
+A chunk that ranks high in **both** systems wins. A chunk only found by one system
+still gets credit — it's not discarded.
+
+### What rag-chatbot uses (from the code)
+
+| Provider | Vector search | Keyword search |
+| --- | --- | --- |
+| `local` | ChromaDB or DynamoDB | `rank-bm25` library (in-memory) |
+| `aws` | OpenSearch k-NN | OpenSearch BM25 (native) |
+| `azure` | Azure AI Search HNSW | Azure AI Search BM25 (native) |
+
+Disabled by default — enable with `HYBRID_SEARCH_ENABLED=true`.
+
+### The complete retrieval stack (all three layers)
+
+```
+Vector search (bi-encoder)   — ALWAYS on
+Hybrid search (BM25 + RRF)   — optional: HYBRID_SEARCH_ENABLED=true
+Reranker (cross-encoder)     — optional: RERANKER_ENABLED=true
+```
+
+You can mix and match — but the most common production setup is:
+- Small corpus: vector search only
+- Mixed queries (semantic + keyword): hybrid
+- High accuracy needed: hybrid + reranker
+
+> 🚚 **Courier analogy:** Vector search is the depot's GPS routing system — finds
+> parcels in the same neighbourhood as your address. BM25 is the handwritten
+> label scanner — finds parcels with your exact house number on the label.
+> RRF is the supervisor who looks at both lists and promotes any parcel that
+> appears on both. If only GPS found it → maybe. If only label scanner found it → maybe.
+> If both found it → that parcel definitely goes first.
+
+---
+
+## What is semantic search?
+
+"Semantic search" is the broad term for **searching by meaning** rather than by
+exact keywords. Vector search is one implementation of semantic search.
+
+### Keyword search vs semantic search
+
+```
+Query: "how do I get my money back?"
+
+Keyword search (BM25):
+  Looks for chunks containing: "money", "back"
+  Misses: "refund policy", "return procedure", "reimbursement"
+  Finds:  "the money flows back to the account" ← wrong context but keyword match
+
+Semantic search (vector):
+  Looks for chunks whose MEANING is close to "get money back"
+  Finds:  "refund policy allows returns within 30 days" ← no shared words, but same meaning
+  Finds:  "to request a reimbursement, visit the portal" ← same meaning, different words
+  Misses: "error code 5412" ← no semantic overlap
+```
+
+Semantic search works because the embedding model was trained on billions of
+sentences — it learned that "get money back", "refund", and "reimbursement"
+all point in the same direction in vector space.
+
+### Why RAG uses semantic search
+
+Users ask questions in their own words. Documents are written by product teams
+in different words. Keyword search fails this mismatch. Semantic search bridges it.
+
+### Semantic search in rag-chatbot
+
+Every query goes through `embed_text()` before hitting the vector store. The
+embedding model (`amazon.titan-embed-text-v2:0` on AWS, `text-embedding-3-small`
+on Azure) converts the question into a 1024-dimensional vector. The vector store
+then finds the stored chunk vectors closest to it — that is semantic search.
+
+> 🚚 **Courier analogy:** Keyword search is a courier who only delivers to
+> addresses spelled exactly as written. "Jane Smith" and "J. Smith" are different
+> addresses — no match. Semantic search is a courier who understands that both
+> mean the same person and delivers to both. The embedding model is the courier's
+> common sense — trained on so many addresses it knows the equivalences.
+
+---
+
 ## What is chunking?
 
 **Chunking** is splitting a large document into smaller pieces.
@@ -397,10 +626,10 @@ Why?
 
 ### Chunking strategies
 
-**Fixed-size chunks (what we use):**
-- Split every 1000 characters with 200 character overlap
-- Simple and effective
-- Overlap prevents sentences from being cut in half
+**Recursive paragraph → sentence → word (what we use):**
+- Uses `RecursiveCharacterTextSplitter` — tries separators in order: paragraph (`\n\n`), line (`\n`), sentence (period+space), word (space), character
+- Only falls to the next separator if a chunk is still too big after splitting on the current one
+- Max chunk size = 1000 characters, overlap = 200 characters between consecutive chunks
 
 ```
 Document: "AAAA BBBB CCCC DDDD EEEE FFFF GGGG HHHH"
@@ -486,10 +715,82 @@ WITH OVERLAP (good):
 > 1000 to preserve a complete sentence.
 
 **Other strategies (not used here, documented for reference):**
-- Sentence-based: split on sentence boundaries
-- Paragraph-based: split on double newlines
-- Semantic: use an LLM to identify topic boundaries
-- Sliding window: fixed size with variable overlap
+
+**Strategy 1 — Sentence-based:** split on sentence boundaries (`.!?`)
+
+```text
+text = "Returns take 5 days. Electronics have 14 days. Contact support."
+
+chunks = [
+    "Returns take 5 days.",
+    "Electronics have 14 days.",
+    "Contact support.",
+]
+```
+
+Best for: short factual documents (FAQs, policies).
+Weakness: very short chunks lose context — "Electronics have 14 days." — 14 days for WHAT?
+
+---
+
+**Strategy 2 — Paragraph-based:** split on double newlines (`\n\n`)
+
+```text
+text = "Returns policy:\n\nShopStream accepts returns within 30 days.
+        Items must be in original condition.\n\nFor electronics,
+        the return window is 14 days."
+
+chunks = [
+    "Returns policy:",
+    "ShopStream accepts returns within 30 days. Items must be in original condition.",
+    "For electronics, the return window is 14 days.",
+]
+```
+
+Best for: documents with clear paragraph structure (reports, manuals).
+Weakness: paragraph length varies wildly — one chunk may be 10 words, the next 500.
+
+---
+
+**Strategy 3 — Sliding window (what rag-chatbot uses):** fixed size with overlap
+
+```text
+text = "A B C D E F G H I J"   (size=6 words, overlap=2 words)
+
+chunks = [
+    "A B C D E F",       <- window 1
+    "E F G H I J",       <- window 2 (E F overlap)
+]
+```
+
+This is `RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)` in the code.
+Best for: dense technical text where every sentence matters equally.
+
+---
+
+**Strategy 4 — Semantic:** use an LLM to identify topic boundaries
+
+```text
+Step 1: split into sentences -> ["S1", "S2", "S3", "S4", "S5", "S6"]
+Step 2: ask LLM "where does the topic change?" -> [3]
+Step 3: merge into chunks:
+    Chunk 1: "S1 S2 S3"   (topic A)
+    Chunk 2: "S4 S5 S6"   (topic B)
+```
+
+Best for: long documents with mixed topics (50-page legal contracts).
+Weakness: expensive — one LLM call per document.
+
+---
+
+**Decision table — which strategy to pick:**
+
+| Content type | Best strategy |
+| --- | --- |
+| FAQs, policies, short docs | Sentence-based |
+| Reports, manuals, structured | Paragraph-based |
+| Dense technical text, code docs | **Sliding window ← rag-chatbot uses this** |
+| Long contracts, mixed topics | Semantic (LLM) |
 
 > 🚚 **Courier analogy:** Your document is a long parcels train — too heavy for one courier trip. You cut it into parcel-sized loads (chunks). The trick: each bag shares the last few items with the next bag (overlap). Why? Because the important clue might be "the refund window is..." at the end of bag 4 and "...14 days from purchase" at the start of bag 5. Without overlap, you'd retrieve one bag and miss the answer. With overlap, both bags contain the full sentence, so whichever one the courier retrieves has the complete thought.
 

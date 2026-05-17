@@ -28,6 +28,7 @@ Setup:
 """
 
 import httpx
+from langfuse.decorators import observe
 from loguru import logger
 
 from src.llm.base import BaseLLM, LLMResponse
@@ -60,6 +61,7 @@ class OllamaLLM(BaseLLM):
         self._client = httpx.AsyncClient(base_url=self.base_url, timeout=120.0)
         logger.info(f"Ollama LLM initialized: model={model_name}, embeddings={embedding_model}, url={base_url}")
 
+    @observe(name="ollama-generate")
     async def generate(self, prompt: str, context: list[str], temperature: float = 0.1) -> LLMResponse:
         """
         Send a prompt to a local Ollama model.

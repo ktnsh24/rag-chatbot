@@ -20,6 +20,7 @@ See docs/azure-services.md for deep dive.
 See docs/cost-analysis.md for cost comparison.
 """
 
+from langfuse.decorators import observe
 from loguru import logger
 from openai import AsyncAzureOpenAI
 
@@ -61,6 +62,7 @@ class AzureOpenAILLM(BaseLLM):
         )
         logger.info(f"Azure OpenAI initialized: deployment={deployment_name}, endpoint={endpoint}")
 
+    @observe(name="azure-openai-generate")
     async def generate(self, prompt: str, context: list[str], temperature: float = 0.1) -> LLMResponse:
         """
         Send a prompt to GPT-4o via Azure OpenAI.

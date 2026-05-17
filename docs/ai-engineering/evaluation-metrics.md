@@ -4,9 +4,10 @@ This page is a lookup reference, not a tutorial.
 
 Use modules to learn concepts and run experiments:
 
-- [Quality labs](../hands-on-labs/hands-on-labs-phase-1.md)
-- [Observability labs](../hands-on-labs/hands-on-labs-phase-5.md)
-- [Advanced tuning labs](../hands-on-labs/hands-on-labs-phase-4.md)
+- [Quality labs](../hands-on-labs/module-1-quality.md)
+- [Observability labs](../hands-on-labs/module-2-observability.md)
+- [Tuning labs](../hands-on-labs/module-4-tuning.md)
+- [Regression and llm_judge labs](../hands-on-labs/module-5-regression.md)
 
 DE parallel: this file is the data dictionary for AI quality and observability.
 
@@ -16,9 +17,10 @@ DE parallel: this file is the data dictionary for AI quality and observability.
 - [2. Observability Metrics (Real /api/metrics Names)](#2-observability-metrics-real-apimetrics-names)
 - [3. Tuning Knobs](#3-tuning-knobs)
 - [4. Evaluation Modes](#4-evaluation-modes)
-- [5. Score Interpretation Bands](#5-score-interpretation-bands)
-- [6. Shorthand-to-Real Metric Mapping](#6-shorthand-to-real-metric-mapping)
-- [7. Formula Cheatsheet](#7-formula-cheatsheet)
+- [5. LLM-as-a-Judge Operational Notes](#5-llm-as-a-judge-operational-notes)
+- [6. Score Interpretation Bands](#6-score-interpretation-bands)
+- [7. Shorthand-to-Real Metric Mapping](#7-shorthand-to-real-metric-mapping)
+- [8. Formula Cheatsheet](#8-formula-cheatsheet)
 
 ## 1. Quality Scores
 
@@ -68,7 +70,16 @@ DE parallel: this file is the data dictionary for AI quality and observability.
 | `llm_judge` | LLM rubric scoring | Semantic quality checks |
 | `combined` | Both lanes on the same result page | Default for lab comparisons |
 
-## 5. Score Interpretation Bands
+## 5. LLM-as-a-Judge Operational Notes
+
+| Check | Why it matters | What to do |
+| --- | --- | --- |
+| Judge JSON validity | The parser expects strict JSON; malformed responses reduce judge signal quality. | Enforce JSON-only rubric output and keep parser fallback. |
+| Judge latency impact | Judge calls can increase total evaluation latency. | Use `combined` for regression gates/suites instead of every interactive call. |
+| Judge variance | LLM judge can vary run-to-run on borderline answers. | Repeat evaluation 3 times for borderline cases and compare spread. |
+| Rule-vs-judge disagreement | Indicates rubric/threshold mismatch. | Review rubric criteria and pass threshold assumptions. |
+
+## 6. Score Interpretation Bands
 
 | Band | Interpretation | Default action |
 | --- | --- | --- |
@@ -77,7 +88,7 @@ DE parallel: this file is the data dictionary for AI quality and observability.
 | `0.50-0.69` | Weak | Investigate promptly |
 | `< 0.50` | Poor | Treat as failing quality |
 
-## 6. Shorthand-to-Real Metric Mapping
+## 7. Shorthand-to-Real Metric Mapping
 
 | Shorthand used in discussion | Real metric in `/api/metrics` |
 | --- | --- |
@@ -89,12 +100,18 @@ DE parallel: this file is the data dictionary for AI quality and observability.
 | `failure_category_hallucination` | `rag_queries_failure_hallucination` |
 | `failure_category_off_topic` | `rag_queries_failure_off_topic` |
 
-## 7. Formula Cheatsheet
+## 8. Formula Cheatsheet
 
 | Metric | Formula |
 | --- | --- |
 | `rag_chat_error_rate_percent` | `(rag_chat_errors_total / rag_chat_requests_total) * 100` |
 | `rag_queries_pass_rate_percent` | `(passed_queries / total_queries) * 100` |
 | `rag_chat_latency_p95_ms` | 95th percentile of collected `latency_ms` samples |
+| `judge_proxy_overall` | `(llm_judge_faithfulness + llm_judge_answer_relevance) / 2` |
+| `judge_faithfulness_delta` | `abs(rule_faithfulness - llm_judge_faithfulness)` |
+| `judge_relevance_delta` | `abs(rule_answer_relevance - llm_judge_answer_relevance)` |
+| `judge_lane_delta` | `abs(rule_overall - judge_proxy_overall)` |
+| `judge_agreement_percent` | `(1 - ((judge_faithfulness_delta + judge_relevance_delta) / 2)) * 100` |
+| `judge_parse_error_rate_percent` | `(invalid_judge_json_warnings / llm_judge_runs) * 100` |
 
 For implementation details, see [evaluation-framework-deep-dive.md](evaluation-framework-deep-dive.md).

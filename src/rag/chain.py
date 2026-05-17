@@ -47,6 +47,11 @@ class RAGChain:
         self._settings = settings
         self._reranker = reranker
 
+    @property
+    def llm(self) -> BaseLLM:
+        """Expose the active runtime LLM for evaluation helpers."""
+        return self._llm
+
     @classmethod
     async def create(cls, settings: Settings) -> "RAGChain":
         """

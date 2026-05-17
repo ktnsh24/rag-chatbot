@@ -2,7 +2,7 @@
 
 **Welcome.** These labs teach you how to build, measure, debug, and improve a RAG system using concrete experiments and real metric numbers.
 
-**Structure:** 5 modules, 15 labs, ~6 hours total.
+**Structure:** 5 modules, 17 labs, ~7 hours total.
 
 **Approach:** Swagger UI examples, sample outputs with numbers, interpretation tables, action tables. No tutorials or narratives.
 
@@ -15,9 +15,9 @@
 | "Is my RAG working?" | [Module 1: Quality](module-1-quality.md) | 60 min |
 | "What is it doing in production?" | [Module 2: Observability](module-2-observability.md) | 90 min |
 | "Why did this fail?" | [Module 3: Diagnosis](module-3-diagnosis.md) | 60 min |
-| "How do I make it better?" | [Module 4: Tuning](module-4-tuning.md) | 150 min |
-| "How do I prevent regressions?" | [Module 5: Regression](module-5-regression.md) | 90 min |
-| All of the above | Start at Module 1, work through sequentially | 450 min (~6 hrs) |
+| "How do I make it better?" | [Module 4: Tuning](module-4-tuning.md) | 180 min |
+| "How do I prevent regressions?" | [Module 5: Regression](module-5-regression.md) | 120 min |
+| All of the above | Start at Module 1, work through sequentially | 510 min (~7 hrs) |
 
 ---
 
@@ -70,19 +70,21 @@ When things break, read logs and spot patterns.
 
 ---
 
-### Module 4: Tuning and Trade-offs (150 min)
+### Module 4: Tuning and Trade-offs (180 min)
 
 Improve quality, speed, and cost by changing configuration.
 
-- **Lab 9:** Chunk Size Tuning
+- **Lab 9:** Guardrails
+  - Test prompt-injection and sensitive-data leakage handling.
+- **Lab 10:** Chunk Size Tuning
   - How big should each context chunk be?
-- **Lab 10:** Top-K Tuning
+- **Lab 11:** Top-K Tuning
   - How many chunks should we send to the LLM?
-- **Lab 11:** Re-Ranking
+- **Lab 12:** Re-Ranking
   - Add a second-pass relevance sort before LLM generation?
-- **Lab 12:** Hybrid Search
+- **Lab 13:** Hybrid Search
   - Mix semantic + keyword retrieval?
-- **Lab 13:** HNSW Tuning
+- **Lab 14:** HNSW Tuning
   - How deep should vector index search go?
 
 **Knobs introduced:** RAG_CHUNK_SIZE, RAG_TOP_K, RERANKER_ENABLED, HYBRID_SEARCH_ENABLED, HNSW_M, HNSW_EF_SEARCH
@@ -91,14 +93,16 @@ Improve quality, speed, and cost by changing configuration.
 
 ---
 
-### Module 5: Regression and Release Gate (90 min)
+### Module 5: Regression and Release Gate (120 min)
 
 Prevent quality regressions before deploying.
 
-- **Lab 14:** Golden Dataset Basics
+- **Lab 15:** Golden Dataset Basics
   - Build a curated test suite from production failures.
-- **Lab 15:** Regression Testing as Release Gate
+- **Lab 16:** Regression Testing as Release Gate
   - Check pass rate before each deployment.
+- **Lab 17:** LLM-as-a-Judge Validation
+  - Compare `rule_based`, `llm_judge`, and `combined` evaluation modes.
 
 **Concept introduced:** golden dataset, regression testing, release criteria
 
@@ -111,6 +115,32 @@ Prevent quality regressions before deploying.
 1. Repo is running locally: `docker-compose up`
 2. Swagger UI available at `http://localhost:8000/docs`
 3. One test document uploaded (instructions in Module 1)
+
+---
+
+## Automated Lab Runner (New Order)
+
+If you want all labs executed in the new sequence with generated result artifacts:
+
+1. Start API server.
+2. Run: `python scripts/run_all_labs.py`
+3. Open generated outputs in `scripts/lab_results/<env>/latest/`
+
+Result files now follow module pattern:
+
+- `module-1-results.md`
+- `module-2-results.md`
+- `module-3-results.md`
+- `module-4-results.md`
+- `module-5-results.md`
+- `full-summary.md`
+- `raw-results.json`
+
+LLM-as-a-judge run artifacts are included in Module 5 via experiments:
+
+- `17a` (`rule_based`)
+- `17b` (`llm_judge`)
+- `17c` (`combined`)
 
 ---
 
@@ -178,5 +208,7 @@ For quick lookup of what each metric means, see [evaluation-metrics.md](../ai-en
 - "What's the difference between retrieval and faithfulness?" → [Module 1, Lab 2](module-1-quality.md#lab-2-faithfulness--)
 - "Which metric should I alert on?" → [Module 2, Lab 5](module-2-observability.md#lab-5-quality-and-reliability-metrics)
 - "Why is my pass rate dropping?" → [Module 3, Lab 8](module-3-diagnosis.md#lab-8-failure-pattern-analysis)
-- "How do I make it faster?" → [Module 4, Lab 9](module-4-tuning.md#lab-9-chunk-size-tuning)
-- "How do I prevent regressions?" → [Module 5, Lab 15](module-5-regression.md#lab-15-regression-testing-as-release-gate)
+- "How do I make it safer first?" -> [Module 4, Lab 9](module-4-tuning.md#lab-9-guardrails)
+- "How do I make it faster?" → [Module 4, Lab 10](module-4-tuning.md#lab-10-chunk-size-tuning)
+- "How do I prevent regressions?" → [Module 5, Lab 16](module-5-regression.md#lab-16-regression-testing-as-release-gate)
+- "How do I run llm-as-a-judge?" -> [Module 5, Lab 17](module-5-regression.md#lab-17-llm-as-a-judge-validation)

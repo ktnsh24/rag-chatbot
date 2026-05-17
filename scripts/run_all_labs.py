@@ -2,7 +2,7 @@
 """
 🧪 Hands-On Labs Automation Runner
 
-Runs ALL hands-on lab experiments (Phase 1-3) programmatically against the
+Runs ALL hands-on lab experiments (Phase 1-5) programmatically against the
 rag-chatbot API server and generates updated markdown documentation with
 real results for each environment (local, aws, azure).
 
@@ -19,7 +19,7 @@ Usage:
     # Dry-run (show what would be executed, no API calls):
     python scripts/run_all_labs.py --dry-run
 
-    # Skip Phase 3 (requires document upload & golden dataset edit):
+    # Skip Phase 3 (and dependent mutating labs):
     python scripts/run_all_labs.py --skip-phase3
 
     # Only run a specific experiment:
@@ -28,13 +28,16 @@ Usage:
 What it does:
     1. Hits the evaluate, chat, and document endpoints for each experiment
     2. Captures all scores, latencies, answers, and metadata
-    3. Generates 3 markdown files (one per phase) with results filled in
-    4. Creates a summary JSON file with all raw results
+    3. Generates 5 markdown files (one per phase) with results filled in
+    4. Creates a run-specific execution plan and a raw-results JSON file
+    5. Refreshes the latest cross-environment comparison when multiple envs exist
+    6. Generates a Tier 5 LLM-as-judge framework report scaffold
 
 Note: This script does NOT modify the original hands-on lab docs in-place.
-      It generates new files in output/<env>/ so you can review them first.
+      It generates new files in scripts/lab_results/<env>/<timestamp>/ so you can
+      review them first.
 
-Author: Ketan (personal automation — not part of the rag-chatbot repo)
+Author: Portfolio author (personal automation — not part of the rag-chatbot repo)
 """
 
 from __future__ import annotations
@@ -83,6 +86,65 @@ DEFAULT_BASE_URL = "http://localhost:8000"
 DEFAULT_TIMEOUT = 900  # seconds (6d golden dataset suite runs 25 cases ~30s each)
 SERVER_RECOVERY_MAX_WAIT = 120  # seconds to wait for server to come back after crash
 SERVER_RECOVERY_INTERVAL = 5   # seconds between health check retries
+
+LAB_EXECUTION_PLAN = [
+    {
+        "step": 0,
+        "labs": "Primer",
+        "focus": "Read the lab mental model before touching any endpoints",
+        "why": "Learn the shared yardstick first so later labs feel like controlled deltas, not 16 unrelated exercises.",
+        "docs": "docs/hands-on-labs/README.md",
+        "results": "No API run yet — this is the ruler, not an experiment.",
+    },
+    {
+        "step": 1,
+        "labs": "1, 2",
+        "focus": "Foundation metrics",
+        "why": "Lock in retrieval, faithfulness, and answer relevance before adding business, safety, or advanced retrieval complexity.",
+        "docs": "Module 1 — Labs 1 and 2",
+        "results": "Use these as the baseline rows for every later delta.",
+    },
+    {
+        "step": 2,
+        "labs": "3, 4",
+        "focus": "Usefulness and safety",
+        "why": "After the baseline, the next natural question is whether the answer is useful to the user and safe to serve.",
+        "docs": "Module 2/4 bridge — Labs 3 and 4",
+        "results": "Adds business framing and guardrail thinking on top of the same scoring loop.",
+    },
+    {
+        "step": 3,
+        "labs": "5, 6",
+        "focus": "Observability and the fix loop",
+        "why": "Once you know what good and bad quality look like, learn how to trace it in production and then improve it.",
+        "docs": "Module 2/3 bridge — Labs 5 and 6",
+        "results": "Shows the path from seeing a bad answer to fixing it and proving it improved.",
+    },
+    {
+        "step": 4,
+        "labs": "7, 8",
+        "focus": "Longer-horizon AI thinking",
+        "why": "These are concept-heavy labs about feedback loops and scaling, so place them after the concrete fix loop, not before it.",
+        "docs": "Module 3 — Labs 7 and 8",
+        "results": "Architecture and operating-model thinking rather than fresh score tables.",
+    },
+    {
+        "step": 5,
+        "labs": "9, 10, 11, 12, 13",
+        "focus": "Advanced safety, retrieval, and ingestion knobs",
+        "why": "Only after the fundamentals are stable should you widen into reranking, hybrid search, HNSW, and batch ingestion.",
+        "docs": "Module 4 — Labs 9 to 14",
+        "results": "Compare each advanced knob back to the Phase 1-3 baseline, not just to neighbouring advanced labs.",
+    },
+    {
+        "step": 6,
+        "labs": "15, 16, 17",
+        "focus": "Production observability and regression gates",
+        "why": "Once the system behaviour is familiar, learn how to monitor it and prevent regressions at scale.",
+        "docs": "Module 5 — Labs 15 to 17",
+        "results": "Query-log triage, metrics, and golden-dataset pass rates.",
+    },
+]
 
 # ---------------------------------------------------------------------------
 # Test data configuration (loaded from YAML or hardcoded fallback)
@@ -178,6 +240,15 @@ class ExperimentResult:
     answer_relevance_quality: str | None = None
     overall: float | None = None
     passed: bool | None = None
+    evaluation_method: str | None = None
+    judge_provider: str | None = None
+    faithfulness_judge: float | None = None
+    answer_relevance_judge: float | None = None
+    overall_judge: float | None = None
+    score_delta_overall: float | None = None
+    method_agreement: bool | None = None
+    judge_notes: list[str] = field(default_factory=list)
+    judge_latency_ms: int | None = None
     sources_used: int | None = None
     latency_ms: int | None = None
     request_id: str | None = None
@@ -189,6 +260,9 @@ class ExperimentResult:
     suite_failed: int | None = None
     pass_rate: float | None = None
     avg_overall_score: float | None = None
+    judge_pass_rate: float | None = None
+    agreement_rate: float | None = None
+    disagreement_cases: list[str] = field(default_factory=list)
     suite_cases: list[dict[str, Any]] = field(default_factory=list)
     # For document upload
     document_id: str | None = None
@@ -248,6 +322,7 @@ class LabAPIClient:
         question: str,
         expected_answer: str | None = None,
         top_k: int | None = None,
+        eval_mode: str | None = None,
     ) -> dict[str, Any]:
         """POST /api/evaluate — evaluate a single question."""
         body: dict[str, Any] = {"question": question}
@@ -255,6 +330,8 @@ class LabAPIClient:
             body["expected_answer"] = expected_answer
         if top_k:
             body["top_k"] = top_k
+        if eval_mode:
+            body["eval_mode"] = eval_mode
         resp = self.client.post("/api/evaluate", json=body)
         resp.raise_for_status()
         return resp.json()
@@ -399,6 +476,15 @@ def _extract_scores(data: dict[str, Any]) -> dict[str, Any]:
         "answer_relevance_quality": scores.get("answer_relevance_quality"),
         "overall": scores.get("overall"),
         "passed": scores.get("passed"),
+        "evaluation_method": scores.get("evaluation_method"),
+        "judge_provider": scores.get("judge_provider"),
+        "judge_latency_ms": scores.get("judge_latency_ms"),
+        "faithfulness_judge": scores.get("faithfulness_judge"),
+        "answer_relevance_judge": scores.get("answer_relevance_judge"),
+        "overall_judge": scores.get("overall_judge"),
+        "score_delta_overall": scores.get("score_delta_overall"),
+        "method_agreement": scores.get("method_agreement"),
+        "judge_notes": scores.get("judge_notes", []),
     }
 
 
@@ -458,6 +544,7 @@ def run_evaluate_experiment(
     question: str,
     top_k: int | None = None,
     expected_answer: str | None = None,
+    eval_mode: str | None = None,
 ) -> ExperimentResult:
     """Run a single evaluate experiment (with server crash recovery)."""
     result = ExperimentResult(
@@ -472,7 +559,12 @@ def run_evaluate_experiment(
     for attempt in range(max_retries + 1):
         try:
             print(f"  ▶ [{exp_id}] Evaluating: {question[:60]}...", flush=True)
-            data = client.evaluate(question=question, top_k=top_k, expected_answer=expected_answer)
+            data = client.evaluate(
+                question=question,
+                top_k=top_k,
+                expected_answer=expected_answer,
+                eval_mode=eval_mode,
+            )
             scores = _extract_scores(data)
             result.answer = data.get("answer", "")
             result.retrieval = scores["retrieval"]
@@ -483,6 +575,15 @@ def run_evaluate_experiment(
             result.answer_relevance_quality = scores["answer_relevance_quality"]
             result.overall = scores["overall"]
             result.passed = scores["passed"]
+            result.evaluation_method = scores["evaluation_method"]
+            result.judge_provider = scores["judge_provider"]
+            result.judge_latency_ms = scores["judge_latency_ms"]
+            result.faithfulness_judge = scores["faithfulness_judge"]
+            result.answer_relevance_judge = scores["answer_relevance_judge"]
+            result.overall_judge = scores["overall_judge"]
+            result.score_delta_overall = scores["score_delta_overall"]
+            result.method_agreement = scores["method_agreement"]
+            result.judge_notes = scores["judge_notes"]
             result.sources_used = data.get("sources_used")
             result.latency_ms = data.get("latency_ms")
             result.request_id = data.get("request_id")
@@ -859,6 +960,9 @@ def run_phase_3(client: LabAPIClient, output_dir: Path) -> list[ExperimentResult
         result_6d.suite_failed = data.get("failed")
         result_6d.pass_rate = data.get("pass_rate")
         result_6d.avg_overall_score = data.get("average_overall_score")
+        result_6d.judge_pass_rate = data.get("judge_pass_rate")
+        result_6d.agreement_rate = data.get("agreement_rate")
+        result_6d.disagreement_cases = data.get("disagreement_cases", [])
         result_6d.latency_ms = data.get("latency_ms")
         result_6d.request_id = data.get("request_id")
         result_6d.cloud_provider = data.get("cloud_provider")
@@ -1220,7 +1324,7 @@ def run_phase_4(client: LabAPIClient, output_dir: Path) -> list[ExperimentResult
 
 
 def run_phase_5(client: LabAPIClient) -> list[ExperimentResult]:
-    """Phase 5: Production Observability (Labs 14-16)."""
+    """Phase 5: Production Observability + Regression (Labs 14-17)."""
     print("\n" + "=" * 70)
     print("📓 PHASE 5 - Production Observability")
     print("=" * 70)
@@ -1323,6 +1427,9 @@ def run_phase_5(client: LabAPIClient) -> list[ExperimentResult]:
         result_16a.suite_failed = data.get("failed")
         result_16a.pass_rate = data.get("pass_rate")
         result_16a.avg_overall_score = data.get("average_overall_score")
+        result_16a.judge_pass_rate = data.get("judge_pass_rate")
+        result_16a.agreement_rate = data.get("agreement_rate")
+        result_16a.disagreement_cases = data.get("disagreement_cases", [])
         result_16a.latency_ms = data.get("latency_ms")
         result_16a.suite_cases = data.get("cases", [])
         result_16a.status = "success"
@@ -1353,6 +1460,9 @@ def run_phase_5(client: LabAPIClient) -> list[ExperimentResult]:
         result_16b.suite_failed = data.get("failed")
         result_16b.pass_rate = data.get("pass_rate")
         result_16b.avg_overall_score = data.get("average_overall_score")
+        result_16b.judge_pass_rate = data.get("judge_pass_rate")
+        result_16b.agreement_rate = data.get("agreement_rate")
+        result_16b.disagreement_cases = data.get("disagreement_cases", [])
         result_16b.latency_ms = data.get("latency_ms")
         result_16b.suite_cases = data.get("cases", [])
         result_16b.status = "success"
@@ -1366,6 +1476,47 @@ def run_phase_5(client: LabAPIClient) -> list[ExperimentResult]:
         result_16b.error_message = str(e)
         print(f"    x ERROR: {e}", flush=True)
     results.append(result_16b)
+
+    # --- Lab 17: LLM-as-a-Judge Validation ---
+    print("\n🔬 Lab 17: LLM-as-a-Judge Validation")
+
+    judge_question = "What is the refund policy for digital products?"
+
+    results.append(
+        run_evaluate_experiment(
+            client,
+            exp_id="17a",
+            phase=5,
+            lab=17,
+            description="LLM-judge validation: rule_based mode",
+            question=judge_question,
+            eval_mode="rule_based",
+        )
+    )
+
+    results.append(
+        run_evaluate_experiment(
+            client,
+            exp_id="17b",
+            phase=5,
+            lab=17,
+            description="LLM-judge validation: llm_judge mode",
+            question=judge_question,
+            eval_mode="llm_judge",
+        )
+    )
+
+    results.append(
+        run_evaluate_experiment(
+            client,
+            exp_id="17c",
+            phase=5,
+            lab=17,
+            description="LLM-judge validation: combined mode",
+            question=judge_question,
+            eval_mode="combined",
+        )
+    )
 
     return results
 
@@ -1392,6 +1543,191 @@ def _pass_fail(value: bool | None) -> str:
     if value is None:
         return "—"
     return "✅ PASS" if value else "❌ FAIL"
+
+
+def _excerpt(text: str | None, max_len: int = 300) -> str:
+    """Create a readable excerpt without cutting words mid-token.
+
+    Adds a clear truncation marker so partial snippets are not mistaken for broken text.
+    """
+    if not text:
+        return ""
+    cleaned = " ".join(str(text).split())
+    if len(cleaned) <= max_len:
+        return cleaned
+    clipped = cleaned[:max_len]
+    if " " in clipped:
+        clipped = clipped.rsplit(" ", 1)[0]
+    return f"{clipped} ... [truncated]"
+
+
+def _judge_pass(result: ExperimentResult | None) -> bool | None:
+    if not result or result.overall_judge is None:
+        return None
+    return result.overall_judge >= 0.7
+
+
+def _judge_agreement(result: ExperimentResult | None) -> str:
+    if not result or result.overall_judge is None:
+        return "—"
+    return "agree" if result.method_agreement else "disagree"
+
+
+def _lane_low_point(result: ExperimentResult | None, lane: str) -> tuple[str, float] | None:
+    if not result:
+        return None
+
+    if lane == "rule":
+        candidates = [
+            ("retrieval", result.retrieval),
+            ("faithfulness", result.faithfulness),
+            ("answer relevance", result.answer_relevance),
+        ]
+    else:
+        candidates = [
+            ("faithfulness", result.faithfulness_judge),
+            ("answer relevance", result.answer_relevance_judge),
+        ]
+
+    valid = [(name, value) for name, value in candidates if value is not None]
+    if not valid:
+        return None
+    return min(valid, key=lambda item: item[1])
+
+
+def _judge_explanation(result: ExperimentResult | None) -> str:
+    if not result or result.overall is None or result.overall_judge is None:
+        return ""
+
+    rule_low = _lane_low_point(result, "rule")
+    judge_low = _lane_low_point(result, "judge")
+    rule_pass = _pass_fail(result.passed)
+    judge_pass = _pass_fail(_judge_pass(result))
+
+    if result.method_agreement:
+        outcome_line = (
+            f"Both lanes **{rule_pass}**. Treat this like a row-count check and a business reviewer both reaching the same conclusion."
+        )
+    elif result.passed and _judge_pass(result) is False:
+        outcome_line = (
+            f"Rule-based says **{rule_pass}** but judge says **{judge_pass}**. That usually means keyword overlap looked acceptable, but the semantic answer quality was weaker than the heuristic lane suggests."
+        )
+    elif (result.passed is False or result.passed is None) and _judge_pass(result):
+        outcome_line = (
+            f"Rule-based says **{rule_pass}** but judge says **{judge_pass}**. That usually means the heuristic lane punished wording or refusals more harshly than a semantic reviewer would."
+        )
+    else:
+        outcome_line = (
+            f"The lanes diverged: rule-based is **{rule_pass}** while judge is **{judge_pass}**. Read the weaker lane first before trusting the average."
+        )
+
+    rule_low_line = ""
+    if rule_low is not None:
+        rule_low_line = (
+            f"- Rule-based came out at **{_score_cell(result.overall)}**; its weakest component was **{rule_low[0]} = {_score_cell(rule_low[1])}**. "
+            "That lane behaves like deterministic data-quality checks: fast, repeatable, but sensitive to surface wording."
+        )
+
+    judge_low_line = ""
+    if judge_low is not None:
+        judge_low_line = (
+            f"- LLM judge came out at **{_score_cell(result.overall_judge)}**; its weakest component was **{judge_low[0]} = {_score_cell(judge_low[1])}**. "
+            "That lane behaves like a semantic reviewer checking whether the answer actually solved the business question."
+        )
+
+    notes_line = ""
+    if result.judge_notes:
+        notes_line = f"- Judge notes: {'; '.join(result.judge_notes[:2])}."
+
+    return "\n".join(
+        part
+        for part in [
+            "#### Why The Two Lanes Look Different",
+            "",
+            outcome_line,
+            "",
+            rule_low_line,
+            judge_low_line,
+            notes_line,
+            "",
+        ]
+        if part
+    )
+
+
+def _judge_readout_block(results: list[ExperimentResult | None], heading: str = "#### Rule-Based vs LLM Judge Readout") -> str:
+    blocks: list[str] = []
+    for result in results:
+        if not result or result.overall_judge is None:
+            continue
+        label = result.question or result.description or result.experiment_id
+        blocks.append(
+            "\n".join(
+                [
+                    f"##### {result.experiment_id} — {label}",
+                    "",
+                    _judge_same_panel(result),
+                    _judge_explanation(result),
+                ]
+            )
+        )
+
+    if not blocks:
+        return ""
+
+    return "\n\n".join([heading, "", *blocks])
+
+
+def _require_combined_judge(results: list[ExperimentResult]) -> None:
+    scored = [r for r in results if r.experiment_type == "run" and r.status == "success" and r.overall is not None]
+    if not scored:
+        return
+    if any(r.overall_judge is not None or r.judge_pass_rate is not None for r in scored):
+        return
+    raise RuntimeError(
+        "No LLM-as-judge scores were returned. Start the API with EVAL_MODE=combined and rerun the labs so every report page contains both lanes."
+    )
+
+
+def _judge_same_panel(result: ExperimentResult | None) -> str:
+    """Render a side-by-side rule-based vs judge table when judge scores exist."""
+    if not result or result.overall_judge is None:
+        return ""
+
+    notes = "<br>".join(result.judge_notes[:3]) if result.judge_notes else "—"
+    return f"""
+#### Same Panel — Rule-Based vs LLM Judge
+
+| Dimension | Rule-based | LLM judge | Compare |
+| --- | --- | --- | --- |
+| retrieval | {_score_cell(result.retrieval)} | {_score_cell(result.retrieval)} | shared deterministic retrieval score |
+| faithfulness | {_score_cell(result.faithfulness)} | {_score_cell(result.faithfulness_judge)} | {_delta(result.faithfulness, result.faithfulness_judge)} |
+| answer_relevance | {_score_cell(result.answer_relevance)} | {_score_cell(result.answer_relevance_judge)} | {_delta(result.answer_relevance, result.answer_relevance_judge)} |
+| overall | {_score_cell(result.overall)} | {_score_cell(result.overall_judge)} | {_score_cell(result.score_delta_overall)} |
+| pass/fail | {_pass_fail(result.passed)} | {_pass_fail(_judge_pass(result))} | {_judge_agreement(result)} |
+| provider / latency | rule-based | {result.judge_provider or "—"} / {result.judge_latency_ms or "—"}ms | same answer, second scorer |
+| judge notes | — | {notes} | rationale |
+
+> Retrieval is calculated once from vector similarity and reused by both lanes.
+> The LLM judge only re-scores faithfulness and answer relevance, then recomputes overall.
+"""
+
+
+def _judge_suite_panel(result: ExperimentResult | None) -> str:
+    """Render suite-level agreement stats when judge scoring exists."""
+    if not result or result.judge_pass_rate is None:
+        return ""
+
+    disagreements = ", ".join(result.disagreement_cases[:8]) if result.disagreement_cases else "—"
+    return f"""
+#### Same Panel — Suite-Level Rule-Based vs LLM Judge
+
+| Metric | Rule-based | LLM judge | Compare |
+| --- | --- | --- | --- |
+| pass rate | {result.pass_rate if result.pass_rate is not None else "—"}% | {result.judge_pass_rate if result.judge_pass_rate is not None else "—"}% | agreement={result.agreement_rate if result.agreement_rate is not None else "—"}% |
+| passed | {result.suite_passed if result.suite_passed is not None else "—"} | {"—" if result.judge_pass_rate is None else "derived from judge lane"} | same cases |
+| disagreement cases | — | {disagreements} | inspect these first |
+"""
 
 
 def _get_result(results: list[ExperimentResult], exp_id: str) -> ExperimentResult | None:
@@ -1511,9 +1847,13 @@ def generate_phase_1_report(results: list[ExperimentResult], env: str) -> str:
 | latency | {r1a.latency_ms if r1a else "—"}ms | — |
 | sources_used | {r1a.sources_used if r1a else "—"} | — |
 
-{'**Answer produced by LLM:**' + chr(10) + f'> {r1a.answer[:300]}...' if r1a and r1a.answer else ''}
+{'**Answer produced by LLM:**' + chr(10) + f'> {_excerpt(r1a.answer, 300)}' if r1a and r1a.answer else ''}
 
 **Expected answer:** Should mention the 14 business days refund window and conditions from the refund policy document.
+
+{_judge_same_panel(r1a)}
+
+{_judge_explanation(r1a)}
 
 {analyse_lab1_baseline(
     r1a.retrieval if r1a else None,
@@ -1527,11 +1867,13 @@ def generate_phase_1_report(results: list[ExperimentResult], env: str) -> str:
 
 ### Experiment 1b — top_k Variations
 
-| Setting | retrieval | faithfulness | answer_relevance | overall | passed | latency |
-| --- | --- | --- | --- | --- | --- | --- |
-| top_k=1 | {_score_cell(r1b_1.retrieval if r1b_1 else None)} | {_score_cell(r1b_1.faithfulness if r1b_1 else None)} | {_score_cell(r1b_1.answer_relevance if r1b_1 else None)} | {_score_cell(r1b_1.overall if r1b_1 else None)} | {_pass_fail(r1b_1.passed if r1b_1 else None)} | {r1b_1.latency_ms if r1b_1 else "—"}ms |
-| top_k=5 (default) | {_score_cell(r1b_5.retrieval if r1b_5 else None)} | {_score_cell(r1b_5.faithfulness if r1b_5 else None)} | {_score_cell(r1b_5.answer_relevance if r1b_5 else None)} | {_score_cell(r1b_5.overall if r1b_5 else None)} | {_pass_fail(r1b_5.passed if r1b_5 else None)} | {r1b_5.latency_ms if r1b_5 else "—"}ms |
-| top_k=10 | {_score_cell(r1b_10.retrieval if r1b_10 else None)} | {_score_cell(r1b_10.faithfulness if r1b_10 else None)} | {_score_cell(r1b_10.answer_relevance if r1b_10 else None)} | {_score_cell(r1b_10.overall if r1b_10 else None)} | {_pass_fail(r1b_10.passed if r1b_10 else None)} | {r1b_10.latency_ms if r1b_10 else "—"}ms |
+| Setting | retrieval | rule faithfulness | judge faithfulness | rule overall | judge overall | agreement | latency |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| top_k=1 | {_score_cell(r1b_1.retrieval if r1b_1 else None)} | {_score_cell(r1b_1.faithfulness if r1b_1 else None)} | {_score_cell(r1b_1.faithfulness_judge if r1b_1 else None)} | {_score_cell(r1b_1.overall if r1b_1 else None)} | {_score_cell(r1b_1.overall_judge if r1b_1 else None)} | {_judge_agreement(r1b_1)} | {r1b_1.latency_ms if r1b_1 else "—"}ms |
+| top_k=5 (default) | {_score_cell(r1b_5.retrieval if r1b_5 else None)} | {_score_cell(r1b_5.faithfulness if r1b_5 else None)} | {_score_cell(r1b_5.faithfulness_judge if r1b_5 else None)} | {_score_cell(r1b_5.overall if r1b_5 else None)} | {_score_cell(r1b_5.overall_judge if r1b_5 else None)} | {_judge_agreement(r1b_5)} | {r1b_5.latency_ms if r1b_5 else "—"}ms |
+| top_k=10 | {_score_cell(r1b_10.retrieval if r1b_10 else None)} | {_score_cell(r1b_10.faithfulness if r1b_10 else None)} | {_score_cell(r1b_10.faithfulness_judge if r1b_10 else None)} | {_score_cell(r1b_10.overall if r1b_10 else None)} | {_score_cell(r1b_10.overall_judge if r1b_10 else None)} | {_judge_agreement(r1b_10)} | {r1b_10.latency_ms if r1b_10 else "—"}ms |
+
+{_judge_readout_block([r1b_1, r1b_5, r1b_10], heading="#### top_k Comparison — Rule-Based vs LLM Judge")}
 
 {analyse_lab1_topk_comparison(topk_data, env)}
 
@@ -1549,9 +1891,13 @@ def generate_phase_1_report(results: list[ExperimentResult], env: str) -> str:
 | overall | {_score_cell(r1c.overall if r1c else None)} |
 | passed | {_pass_fail(r1c.passed if r1c else None)} |
 
-{'**Answer produced by LLM:**' + chr(10) + f'> {r1c.answer[:300]}...' if r1c and r1c.answer else ''}
+{'**Answer produced by LLM:**' + chr(10) + f'> {_excerpt(r1c.answer, 300)}' if r1c and r1c.answer else ''}
 
 **Expected answer:** Should refuse or indicate this topic is not covered in the knowledge base.
+
+{_judge_same_panel(r1c)}
+
+{_judge_explanation(r1c)}
 
 {analyse_lab1_out_of_scope(
     r1c.retrieval if r1c else None,
@@ -1597,9 +1943,13 @@ The **retrieval-faithfulness trade-off** played out with real numbers:
 | overall | {_score_cell(r2a.overall if r2a else None)} |
 | passed | {_pass_fail(r2a.passed if r2a else None)} |
 
-{'**Answer produced by LLM:**' + chr(10) + f'> {r2a.answer[:300]}...' if r2a and r2a.answer else ''}
+{'**Answer produced by LLM:**' + chr(10) + f'> {_excerpt(r2a.answer, 300)}' if r2a and r2a.answer else ''}
 
 **Expected answer:** Should clarify that the refund window is 14 business days, not 30 days. The "30 days" in the question is a trick — the AI should correct it, not agree.
+
+{_judge_same_panel(r2a)}
+
+{_judge_explanation(r2a)}
 
 {analyse_lab2_trick(
     r2a.retrieval if r2a else None,
@@ -1623,9 +1973,13 @@ The **retrieval-faithfulness trade-off** played out with real numbers:
 | overall | {_score_cell(r2b.overall if r2b else None)} |
 | passed | {_pass_fail(r2b.passed if r2b else None)} |
 
-{'**Answer produced by LLM:**' + chr(10) + f'> {r2b.answer[:300]}...' if r2b and r2b.answer else ''}
+{'**Answer produced by LLM:**' + chr(10) + f'> {_excerpt(r2b.answer, 300)}' if r2b and r2b.answer else ''}
 
 **Expected answer:** Should state 14 business days, grounded in the refund policy document.
+
+{_judge_same_panel(r2b)}
+
+{_judge_explanation(r2b)}
 
 ### Experiment 2c — Ambiguous Question
 
@@ -1641,9 +1995,13 @@ The **retrieval-faithfulness trade-off** played out with real numbers:
 | overall | {_score_cell(r2c.overall if r2c else None)} |
 | passed | {_pass_fail(r2c.passed if r2c else None)} |
 
-{'**Answer produced by LLM:**' + chr(10) + f'> {r2c.answer[:300]}...' if r2c and r2c.answer else ''}
+{'**Answer produced by LLM:**' + chr(10) + f'> {_excerpt(r2c.answer, 300)}' if r2c and r2c.answer else ''}
 
 **Expected answer:** Ambiguous — no clear "right" answer. The AI should either ask for clarification or attempt a reasonable interpretation.
+
+{_judge_same_panel(r2c)}
+
+{_judge_explanation(r2c)}
 
 {analyse_lab2_comparison(trick_data, truthful_data, ambiguous_data)}
 
@@ -1663,15 +2021,15 @@ and identify when the *evaluator itself* is wrong.
 
 ## Phase 1 Summary
 
-| Experiment | Question | Overall | Passed | Key Insight |
-| --- | --- | --- | --- | --- |
-| 1a | Refund policy (baseline) | {_score_cell(r1a.overall if r1a else None)} | {_pass_fail(r1a.passed if r1a else None)} | Baseline performance |
-| 1b (k=1) | Refund policy (top_k=1) | {_score_cell(r1b_1.overall if r1b_1 else None)} | {_pass_fail(r1b_1.passed if r1b_1 else None)} | Fewer chunks, higher precision |
-| 1b (k=10) | Refund policy (top_k=10) | {_score_cell(r1b_10.overall if r1b_10 else None)} | {_pass_fail(r1b_10.passed if r1b_10 else None)} | More chunks, lower precision |
-| 1c | Remote work (out-of-scope) | {_score_cell(r1c.overall if r1c else None)} | {_pass_fail(r1c.passed if r1c else None)} | Correct refusal paradox |
-| 2a | 30-day trick | {_score_cell(r2a.overall if r2a else None)} | {_pass_fail(r2a.passed if r2a else None)} | Evaluator flags question-quoting |
-| 2b | How many days (truthful) | {_score_cell(r2b.overall if r2b else None)} | {_pass_fail(r2b.passed if r2b else None)} | Perfect grounding |
-| 2c | How long? (ambiguous) | {_score_cell(r2c.overall if r2c else None)} | {_pass_fail(r2c.passed if r2c else None)} | Refusal scores well |
+| Experiment | Question | Rule overall | Judge overall | Agreement | Key Insight |
+| --- | --- | --- | --- | --- | --- |
+| 1a | Refund policy (baseline) | {_score_cell(r1a.overall if r1a else None)} | {_score_cell(r1a.overall_judge if r1a else None)} | {_judge_agreement(r1a)} | Baseline performance |
+| 1b (k=1) | Refund policy (top_k=1) | {_score_cell(r1b_1.overall if r1b_1 else None)} | {_score_cell(r1b_1.overall_judge if r1b_1 else None)} | {_judge_agreement(r1b_1)} | Fewer chunks, higher precision |
+| 1b (k=10) | Refund policy (top_k=10) | {_score_cell(r1b_10.overall if r1b_10 else None)} | {_score_cell(r1b_10.overall_judge if r1b_10 else None)} | {_judge_agreement(r1b_10)} | More chunks, lower precision |
+| 1c | Remote work (out-of-scope) | {_score_cell(r1c.overall if r1c else None)} | {_score_cell(r1c.overall_judge if r1c else None)} | {_judge_agreement(r1c)} | Correct refusal paradox |
+| 2a | 30-day trick | {_score_cell(r2a.overall if r2a else None)} | {_score_cell(r2a.overall_judge if r2a else None)} | {_judge_agreement(r2a)} | Evaluator flags question-quoting |
+| 2b | How many days (truthful) | {_score_cell(r2b.overall if r2b else None)} | {_score_cell(r2b.overall_judge if r2b else None)} | {_judge_agreement(r2b)} | Perfect grounding |
+| 2c | How long? (ambiguous) | {_score_cell(r2c.overall if r2c else None)} | {_score_cell(r2c.overall_judge if r2c else None)} | {_judge_agreement(r2c)} | Refusal scores well |
 
 {skills_checklist(1)}
 """
@@ -1782,10 +2140,13 @@ def generate_phase_2_report(results: list[ExperimentResult], env: str) -> str:
 | --- | --- | --- | --- |
 | Question | {r3a_s1.question if r3a_s1 else "—"} | {r3a_s2.question if r3a_s2 else "—"} | — |
 | retrieval | {_score_cell(r3a_s1.retrieval if r3a_s1 else None)} | {_score_cell(r3a_s2.retrieval if r3a_s2 else None)} | {_score_cell(r3a_s1.retrieval - r3a_s2.retrieval if r3a_s1 and r3a_s2 and r3a_s1.retrieval and r3a_s2.retrieval else None)} |
-| faithfulness | {_score_cell(r3a_s1.faithfulness if r3a_s1 else None)} | {_score_cell(r3a_s2.faithfulness if r3a_s2 else None)} | {_score_cell(r3a_s1.faithfulness - r3a_s2.faithfulness if r3a_s1 and r3a_s2 and r3a_s1.faithfulness and r3a_s2.faithfulness else None)} |
-| answer_relevance | {_score_cell(r3a_s1.answer_relevance if r3a_s1 else None)} | {_score_cell(r3a_s2.answer_relevance if r3a_s2 else None)} | — |
-| overall | {_score_cell(r3a_s1.overall if r3a_s1 else None)} | {_score_cell(r3a_s2.overall if r3a_s2 else None)} | {_score_cell(r3a_s1.overall - r3a_s2.overall if r3a_s1 and r3a_s2 and r3a_s1.overall and r3a_s2.overall else None)} |
-| passed | {_pass_fail(r3a_s1.passed if r3a_s1 else None)} | {_pass_fail(r3a_s2.passed if r3a_s2 else None)} | — |
+| rule faithfulness | {_score_cell(r3a_s1.faithfulness if r3a_s1 else None)} | {_score_cell(r3a_s2.faithfulness if r3a_s2 else None)} | {_score_cell(r3a_s1.faithfulness - r3a_s2.faithfulness if r3a_s1 and r3a_s2 and r3a_s1.faithfulness and r3a_s2.faithfulness else None)} |
+| judge faithfulness | {_score_cell(r3a_s1.faithfulness_judge if r3a_s1 else None)} | {_score_cell(r3a_s2.faithfulness_judge if r3a_s2 else None)} | — |
+| rule overall | {_score_cell(r3a_s1.overall if r3a_s1 else None)} | {_score_cell(r3a_s2.overall if r3a_s2 else None)} | {_score_cell(r3a_s1.overall - r3a_s2.overall if r3a_s1 and r3a_s2 and r3a_s1.overall and r3a_s2.overall else None)} |
+| judge overall | {_score_cell(r3a_s1.overall_judge if r3a_s1 else None)} | {_score_cell(r3a_s2.overall_judge if r3a_s2 else None)} | — |
+| agreement | {_judge_agreement(r3a_s1)} | {_judge_agreement(r3a_s2)} | — |
+
+{_judge_readout_block([r3a_s1, r3a_s2], heading="#### Lab 3 — Rule-Based vs LLM Judge")}
 
 {analyse_lab3_comparison(clear_data, vague_data)}
 
@@ -1821,6 +2182,10 @@ business metrics in a design review and translate AI metrics into business langu
 | overall | {_score_cell(r4a_eval.overall if r4a_eval else None)} |
 | faithfulness | {_score_cell(r4a_eval.faithfulness if r4a_eval else None)} |
 | has_hallucination | {_bool_cell(r4a_eval.has_hallucination if r4a_eval else None)} |
+
+{_judge_same_panel(r4a_eval)}
+
+{_judge_explanation(r4a_eval)}
 
 {analyse_lab4_injection(injection_attempts, eval_data)}
 
@@ -1858,6 +2223,10 @@ with real examples, and propose a 4-layer safety design.
 | overall | {_score_cell(r5a.overall if r5a else None)} |
 | passed | {_pass_fail(r5a.passed if r5a else None)} |
 
+{_judge_same_panel(r5a)}
+
+{_judge_explanation(r5a)}
+
 > **📊 Trace Analysis:** The request_id lets you trace through 5 pipeline stages:
 > middleware → route handler → RAG pipeline (retrieve + generate) → evaluator → response.
 >
@@ -1865,13 +2234,15 @@ with real examples, and propose a 4-layer safety design.
 
 ### Experiment 5b — Mini Observability Dashboard
 
-| # | Question | retrieval | faithfulness | overall | passed | latency |
+| # | Question | retrieval | rule overall | judge overall | agreement | latency |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Refund policy | {_score_cell(r5b_q1.retrieval if r5b_q1 else None)} | {_score_cell(r5b_q1.faithfulness if r5b_q1 else None)} | {_score_cell(r5b_q1.overall if r5b_q1 else None)} | {_pass_fail(r5b_q1.passed if r5b_q1 else None)} | {r5b_q1.latency_ms if r5b_q1 else "—"}ms |
-| 2 | Digital returns | {_score_cell(r5b_q2.retrieval if r5b_q2 else None)} | {_score_cell(r5b_q2.faithfulness if r5b_q2 else None)} | {_score_cell(r5b_q2.overall if r5b_q2 else None)} | {_pass_fail(r5b_q2.passed if r5b_q2 else None)} | {r5b_q2.latency_ms if r5b_q2 else "—"}ms |
-| 3 | Return shipping | {_score_cell(r5b_q3.retrieval if r5b_q3 else None)} | {_score_cell(r5b_q3.faithfulness if r5b_q3 else None)} | {_score_cell(r5b_q3.overall if r5b_q3 else None)} | {_pass_fail(r5b_q3.passed if r5b_q3 else None)} | {r5b_q3.latency_ms if r5b_q3 else "—"}ms |
-| 4 | Remote work policy | {_score_cell(r5b_q4.retrieval if r5b_q4 else None)} | {_score_cell(r5b_q4.faithfulness if r5b_q4 else None)} | {_score_cell(r5b_q4.overall if r5b_q4 else None)} | {_pass_fail(r5b_q4.passed if r5b_q4 else None)} | {r5b_q4.latency_ms if r5b_q4 else "—"}ms |
-| 5 | How long? | {_score_cell(r5b_q5.retrieval if r5b_q5 else None)} | {_score_cell(r5b_q5.faithfulness if r5b_q5 else None)} | {_score_cell(r5b_q5.overall if r5b_q5 else None)} | {_pass_fail(r5b_q5.passed if r5b_q5 else None)} | {r5b_q5.latency_ms if r5b_q5 else "—"}ms |
+| 1 | Refund policy | {_score_cell(r5b_q1.retrieval if r5b_q1 else None)} | {_score_cell(r5b_q1.overall if r5b_q1 else None)} | {_score_cell(r5b_q1.overall_judge if r5b_q1 else None)} | {_judge_agreement(r5b_q1)} | {r5b_q1.latency_ms if r5b_q1 else "—"}ms |
+| 2 | Digital returns | {_score_cell(r5b_q2.retrieval if r5b_q2 else None)} | {_score_cell(r5b_q2.overall if r5b_q2 else None)} | {_score_cell(r5b_q2.overall_judge if r5b_q2 else None)} | {_judge_agreement(r5b_q2)} | {r5b_q2.latency_ms if r5b_q2 else "—"}ms |
+| 3 | Return shipping | {_score_cell(r5b_q3.retrieval if r5b_q3 else None)} | {_score_cell(r5b_q3.overall if r5b_q3 else None)} | {_score_cell(r5b_q3.overall_judge if r5b_q3 else None)} | {_judge_agreement(r5b_q3)} | {r5b_q3.latency_ms if r5b_q3 else "—"}ms |
+| 4 | Remote work policy | {_score_cell(r5b_q4.retrieval if r5b_q4 else None)} | {_score_cell(r5b_q4.overall if r5b_q4 else None)} | {_score_cell(r5b_q4.overall_judge if r5b_q4 else None)} | {_judge_agreement(r5b_q4)} | {r5b_q4.latency_ms if r5b_q4 else "—"}ms |
+| 5 | How long? | {_score_cell(r5b_q5.retrieval if r5b_q5 else None)} | {_score_cell(r5b_q5.overall if r5b_q5 else None)} | {_score_cell(r5b_q5.overall_judge if r5b_q5 else None)} | {_judge_agreement(r5b_q5)} | {r5b_q5.latency_ms if r5b_q5 else "—"}ms |
+
+{_judge_readout_block([r5b_q1, r5b_q2, r5b_q3, r5b_q4, r5b_q5], heading="#### Lab 5 Dashboard — Rule-Based vs LLM Judge")}
 
 {analyse_lab5_dashboard(dashboard_results, env)}
 
@@ -1979,6 +2350,10 @@ But for AI, the "tests" grow from real user interactions.
 | overall | {_score_cell(r6a.overall if r6a else None)} |
 | passed | {_pass_fail(r6a.passed if r6a else None)} |
 
+{_judge_same_panel(r6a)}
+
+{_judge_explanation(r6a)}
+
 > **Flywheel signal:** Low scores = the system doesn't have this content. Time to add it.
 
 ### Experiment 6b — Upload Missing Document
@@ -2003,9 +2378,13 @@ But for AI, the "tests" grow from real user interactions.
 | overall | {_score_cell(r6a.overall if r6a else None)} | {_score_cell(r6c.overall if r6c else None)} | {_delta(r6a.overall if r6a else None, r6c.overall if r6c else None)} |
 | passed | {_pass_fail(r6a.passed if r6a else None)} | {_pass_fail(r6c.passed if r6c else None)} | {"🎉 Fixed!" if r6c and r6c.passed else "Still failing"} |
 
-{'**Answer produced by LLM:**' + chr(10) + f'> {r6c.answer[:300]}...' if r6c and r6c.answer else ''}
+{'**Answer produced by LLM:**' + chr(10) + f'> {_excerpt(r6c.answer, 300)}' if r6c and r6c.answer else ''}
 
 **Expected answer:** Should now accurately describe the remote work policy from the newly uploaded document.
+
+{_judge_same_panel(r6c)}
+
+{_judge_explanation(r6c)}
 
 {analyse_lab6_flywheel(before_data, after_data, upload_data)}
 
@@ -2019,6 +2398,8 @@ But for AI, the "tests" grow from real user interactions.
 | Pass rate | {r6d.pass_rate if r6d else "—"}% |
 | Avg overall | {_score_cell(r6d.avg_overall_score if r6d else None)} |
 | Latency | {r6d.latency_ms if r6d else "—"}ms |
+
+{_judge_suite_panel(r6d)}
 
 {analyse_lab6_suite(
     r6d.total_cases if r6d else None,
@@ -2051,12 +2432,12 @@ and you can explain how it works in production.
 
 ## Phase 3 Summary
 
-| Experiment | Result |
-| --- | --- |
-| 6a | Failing question identified: overall={_score_cell(r6a.overall if r6a else None)} {_pass_fail(r6a.passed if r6a else None)} |
-| 6b | Document uploaded: {r6b.chunk_count if r6b else "—"} chunks |
-| 6c | After fix: overall={_score_cell(r6c.overall if r6c else None)} {_pass_fail(r6c.passed if r6c else None)} |
-| 6d | Suite: {r6d.suite_passed if r6d else "—"}/{r6d.total_cases if r6d else "—"} passed ({r6d.pass_rate if r6d else "—"}%) |
+| Experiment | Rule lane | Judge lane |
+| --- | --- | --- |
+| 6a | overall={_score_cell(r6a.overall if r6a else None)} {_pass_fail(r6a.passed if r6a else None)} | overall={_score_cell(r6a.overall_judge if r6a else None)} {_pass_fail(_judge_pass(r6a))} |
+| 6b | Document uploaded: {r6b.chunk_count if r6b else "—"} chunks | — |
+| 6c | overall={_score_cell(r6c.overall if r6c else None)} {_pass_fail(r6c.passed if r6c else None)} | overall={_score_cell(r6c.overall_judge if r6c else None)} {_pass_fail(_judge_pass(r6c))} |
+| 6d | Suite: {r6d.suite_passed if r6d else "—"}/{r6d.total_cases if r6d else "—"} passed ({r6d.pass_rate if r6d else "—"}%) | judge pass rate={r6d.judge_pass_rate if r6d else "—"}% |
 
 {skills_checklist(3)}
 """
@@ -2094,7 +2475,7 @@ def generate_phase_4_report(results: list[ExperimentResult], env: str) -> str:
         return (
             f"| {r.experiment_id} | {r.question[:40] if r.question else '—'}... "
             f"| {_score_cell(r.retrieval)} | {_score_cell(r.faithfulness)} "
-            f"| {_score_cell(r.overall)} | {_pass_fail(r.passed)} | {r.latency_ms or '—'}ms |"
+            f"| {_score_cell(r.overall)} | {_score_cell(r.overall_judge)} | {_judge_agreement(r)} | {r.latency_ms or '—'}ms |"
         )
 
     r10a_rows = "\n".join(_eval_row(r) for r in r10a_results)
@@ -2204,15 +2585,17 @@ def generate_phase_4_report(results: list[ExperimentResult], env: str) -> str:
 
 ### Experiment 10a — Direct Queries
 
-| Exp | Question | Retrieval | Faithfulness | Overall | Passed | Latency |
-| --- | --- | --- | --- | --- | --- | --- |
+| Exp | Question | Retrieval | Faithfulness | Rule Overall | Judge Overall | Agreement | Latency |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 {r10a_rows}
 
 ### Experiment 10b — Ambiguous Queries
 
-| Exp | Question | Retrieval | Faithfulness | Overall | Passed | Latency |
-| --- | --- | --- | --- | --- | --- | --- |
+| Exp | Question | Retrieval | Faithfulness | Rule Overall | Judge Overall | Agreement | Latency |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 {r10b_rows}
+
+{_judge_readout_block(r10a_results + r10b_results, heading="#### Lab 10 — Rule-Based vs LLM Judge")}
 
 > **DE parallel:** Re-ranking is like sorting your `GROUP BY` results by a
 > secondary score. First pass = rough filter (WHERE), second pass = precise
@@ -2233,21 +2616,23 @@ def generate_phase_4_report(results: list[ExperimentResult], env: str) -> str:
 
 ### Experiment 11a — Keyword Queries
 
-| Exp | Question | Retrieval | Faithfulness | Overall | Passed | Latency |
-| --- | --- | --- | --- | --- | --- | --- |
+| Exp | Question | Retrieval | Faithfulness | Rule Overall | Judge Overall | Agreement | Latency |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 {r11a_rows}
 
 ### Experiment 11b — Semantic Queries
 
-| Exp | Question | Retrieval | Faithfulness | Overall | Passed | Latency |
-| --- | --- | --- | --- | --- | --- | --- |
+| Exp | Question | Retrieval | Faithfulness | Rule Overall | Judge Overall | Agreement | Latency |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 {r11b_rows}
 
 ### Experiment 11c — Mixed Queries
 
-| Exp | Question | Retrieval | Faithfulness | Overall | Passed | Latency |
-| --- | --- | --- | --- | --- | --- | --- |
+| Exp | Question | Retrieval | Faithfulness | Rule Overall | Judge Overall | Agreement | Latency |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 {r11c_rows}
+
+{_judge_readout_block(r11a_results + r11b_results + r11c_results, heading="#### Lab 11 — Rule-Based vs LLM Judge")}
 
 > **DE parallel:** Hybrid search = combining two indexes. Like querying both a
 > full-text index (BM25 ≈ `tsvector` in Postgres) and a vector index (≈ `pgvector`)
@@ -2295,9 +2680,13 @@ def generate_phase_4_report(results: list[ExperimentResult], env: str) -> str:
 | overall | {_score_cell(r12b.overall if r12b else None)} |
 | passed | {_pass_fail(r12b.passed if r12b else None)} |
 
-{'**Answer produced by LLM:**' + chr(10) + f'> {r12b.answer[:300]}...' if r12b and r12b.answer else ''}
+{'**Answer produced by LLM:**' + chr(10) + f'> {_excerpt(r12b.answer, 300)}' if r12b and r12b.answer else ''}
 
 **Expected answer:** Should reference content from batch-uploaded test documents about topic 3.
+
+{_judge_same_panel(r12b)}
+
+{_judge_explanation(r12b)}
 
 ### What You Learned - Lab 12
 
@@ -2324,11 +2713,17 @@ Bulk ingestion is not a feature - it's a **performance requirement**:
 | Passed | {_pass_fail(r13a.passed if r13a else None)} |
 | Latency | {r13a.latency_ms if r13a else '—'}ms |
 
+{_judge_same_panel(r13a)}
+
+{_judge_explanation(r13a)}
+
 ### Experiment 13b — ef_search Consistency
 
-| Exp | Question | Retrieval | Faithfulness | Overall | Passed | Latency |
-| --- | --- | --- | --- | --- | --- | --- |
+| Exp | Question | Retrieval | Faithfulness | Rule Overall | Judge Overall | Agreement | Latency |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 {r13b_rows}
+
+{_judge_readout_block(r13b_results, heading="#### Lab 13b — Rule-Based vs LLM Judge")}
 
 ### Experiment 13c — Cross-provider Baseline
 
@@ -2340,6 +2735,10 @@ Bulk ingestion is not a feature - it's a **performance requirement**:
 | Overall | {_score_cell(r13c.overall if r13c else None)} |
 | Latency | {r13c.latency_ms if r13c else '—'}ms |
 
+{_judge_same_panel(r13c)}
+
+{_judge_explanation(r13c)}
+
 > Run with `CLOUD_PROVIDER=local`, then `=aws`, then `=azure` to compare.
 
 ### Experiment 13d — Broad Retrieval (top_k=10)
@@ -2350,6 +2749,10 @@ Bulk ingestion is not a feature - it's a **performance requirement**:
 | Retrieval | {_score_cell(r13d.retrieval if r13d else None)} |
 | Overall | {_score_cell(r13d.overall if r13d else None)} |
 | Latency | {r13d.latency_ms if r13d else '—'}ms |
+
+{_judge_same_panel(r13d)}
+
+{_judge_explanation(r13d)}
 
 > **DE parallel:** HNSW tuning ≈ database index tuning. `m` = B-tree fanout,
 > `ef_search` = how many pages to scan. Higher = better recall, slower queries.
@@ -2365,13 +2768,13 @@ Bulk ingestion is not a feature - it's a **performance requirement**:
 
 ## Phase 4 Summary
 
-| Lab | Experiments | Key Finding |
+| Lab | Experiments | Rule/Judge view |
 | --- | --- | --- |
-| 9 (Guardrails) | 9a (injection x3), 9b (PII x3), 9c (baseline) | {blocked_count}/{total_guardrail} blocked |
-| 10 (Re-ranking) | 10a (direct x3), 10b (ambiguous x3) | Scores reflect RERANKER_ENABLED setting |
-| 11 (Hybrid) | 11a (keyword x3), 11b (semantic x3), 11c (mixed x2) | Scores reflect HYBRID_SEARCH_ENABLED setting |
+| 9 (Guardrails) | 9a (injection x3), 9b (PII x3), 9c (baseline) | {blocked_count}/{total_guardrail} blocked; use baseline readout for combined scoring |
+| 10 (Re-ranking) | 10a (direct x3), 10b (ambiguous x3) | Rule and judge scores now sit in the same table for every query |
+| 11 (Hybrid) | 11a (keyword x3), 11b (semantic x3), 11c (mixed x2) | Agreement column shows where lexical and semantic views diverge |
 | 12 (Bulk) | 12a (upload), 12b (verify) | {batch_data.get("succeeded", "—")}/{batch_data.get("total_files", "—")} files, {r12a.chunk_count if r12a else "—"} chunks |
-| 13 (HNSW) | 13a (baseline), 13b (consistency x3), 13c (provider), 13d (broad) | Scores with current HNSW settings |
+| 13 (HNSW) | 13a (baseline), 13b (consistency x3), 13c (provider), 13d (broad) | Baseline and consistency runs now include judge comparisons inline |
 
 {skills_checklist(4)}
 """
@@ -2384,6 +2787,9 @@ def generate_phase_5_report(results: list[ExperimentResult], env: str) -> str:
     r15a = _get_result(results, "15a")
     r16a = _get_result(results, "16a")
     r16b = _get_result(results, "16b")
+    r17a = _get_result(results, "17a")
+    r17b = _get_result(results, "17b")
+    r17c = _get_result(results, "17c")
 
     env_upper = env.upper()
 
@@ -2431,6 +2837,10 @@ def generate_phase_5_report(results: list[ExperimentResult], env: str) -> str:
 - [Lab 16: Golden Dataset Regression Testing](#lab-16-golden-dataset-regression-testing)
   - [Experiment 16a - Full Suite](#experiment-16a--full-golden-dataset-suite)
   - [Experiment 16b - Edge Cases](#experiment-16b--edge-case-analysis)
+- [Lab 17: LLM-as-a-Judge Validation](#lab-17-llm-as-a-judge-validation)
+    - [Experiment 17a - Rule-Based](#experiment-17a--rule-based)
+    - [Experiment 17b - LLM Judge](#experiment-17b--llm-judge)
+    - [Experiment 17c - Combined](#experiment-17c--combined)
 - [Phase 5 Summary](#phase-5-summary)
 
 ---
@@ -2489,7 +2899,7 @@ Structured query logging with failure categories lets you triage production issu
 | `rag_chat_latency_p99_ms` | {metrics_parsed.get("rag_chat_latency_p99_ms", "—")}ms | Gauge |
 | `rag_tokens_input_total` | {metrics_parsed.get("rag_tokens_input_total", "—")} | Counter |
 | `rag_tokens_output_total` | {metrics_parsed.get("rag_tokens_output_total", "—")} | Counter |
-| `rag_evaluation_pass_rate` | {metrics_parsed.get("rag_evaluation_pass_rate", "—")} | Gauge |
+| `rag_queries_pass_rate_percent` | {metrics_parsed.get("rag_queries_pass_rate_percent", "—")} | Gauge |
 
 {analyse_lab15_metrics(env)}
 
@@ -2517,6 +2927,8 @@ Error rate = `errors / requests`. P95 latency = 95% of requests are faster than 
 | Avg overall | {_score_cell(r16a.avg_overall_score if r16a else None)} |
 | Latency | {r16a.latency_ms if r16a else "—"}ms |
 
+{_judge_suite_panel(r16a)}
+
 #### Results by Category
 
 | Category | Passed | Total | Pass Rate |
@@ -2533,6 +2945,8 @@ Error rate = `errors / requests`. P95 latency = 95% of requests are faster than 
 | Passed | {r16b.suite_passed if r16b else "—"} |
 | Failed | {r16b.suite_failed if r16b else "—"} |
 | Pass rate | {r16b.pass_rate if r16b else "—"}% |
+
+{_judge_suite_panel(r16b)}
 
 {"#### Edge Case Details" if r16b and r16b.suite_cases else ""}
 
@@ -2552,6 +2966,47 @@ The golden dataset is a **living document** for regression testing:
 
 ---
 
+## Lab 17: LLM-as-a-Judge Validation
+
+### Experiment 17a - Rule-Based
+
+| Metric | Value |
+| --- | --- |
+| Overall | {_score_cell(r17a.overall if r17a else None)} |
+| Passed | {_pass_fail(r17a.passed if r17a else None)} |
+| Latency | {r17a.latency_ms if r17a else "—"}ms |
+
+### Experiment 17b - LLM Judge
+
+| Metric | Value |
+| --- | --- |
+| Rule overall (if returned) | {_score_cell(r17b.overall if r17b else None)} |
+| Judge overall | {_score_cell(r17b.overall_judge if r17b else None)} |
+| Faithfulness (judge) | {_score_cell(r17b.faithfulness_judge if r17b else None)} |
+| Relevance (judge) | {_score_cell(r17b.answer_relevance_judge if r17b else None)} |
+| Judge provider | {r17b.judge_provider if r17b else "—"} |
+| Judge latency | {r17b.judge_latency_ms if r17b else "—"}ms |
+
+### Experiment 17c - Combined
+
+| Metric | Formula | Value |
+| --- | --- | --- |
+| Rule overall | — | {_score_cell(r17c.overall if r17c else None)} |
+| Judge overall | — | {_score_cell(r17c.overall_judge if r17c else None)} |
+| Delta | `abs(rule - judge)` | {_score_cell(abs((r17c.overall or 0) - (r17c.overall_judge or 0)) if r17c and r17c.overall is not None and r17c.overall_judge is not None else None)} |
+| Agreement | `delta <= 0.10` | {"✅" if r17c and r17c.overall is not None and r17c.overall_judge is not None and abs(r17c.overall - r17c.overall_judge) <= 0.10 else "⚠️" if r17c and r17c.overall is not None and r17c.overall_judge is not None else "—"} |
+| Overall latency | — | {r17c.latency_ms if r17c else "—"}ms |
+
+### What You Learned - Lab 17
+
+Use `combined` as the default for regression checks when you need both heuristic and semantic quality signals.
+
+- If rule-based and judge scores diverge, review rubric/thresholds.
+- If judge latency is too high, run judge-heavy checks in batch/suites, not interactive flows.
+- If judge output is malformed, tighten JSON schema constraints in judge prompts.
+
+---
+
 ## Phase 5 Summary
 
 | Experiment | Result |
@@ -2561,6 +3016,9 @@ The golden dataset is a **living document** for regression testing:
 | 15a | {len(metrics_parsed)} Prometheus metrics exposed |
 | 16a | Suite: {r16a.suite_passed if r16a else "—"}/{r16a.total_cases if r16a else "—"} passed ({r16a.pass_rate if r16a else "—"}%) |
 | 16b | Edge cases: {r16b.suite_passed if r16b else "—"}/{r16b.total_cases if r16b else "—"} passed |
+| 17a | Rule-based: overall={_score_cell(r17a.overall if r17a else None)} |
+| 17b | Judge: overall={_score_cell(r17b.overall_judge if r17b else None)} provider={r17b.judge_provider if r17b else "—"} |
+| 17c | Combined delta={_score_cell(abs((r17c.overall or 0) - (r17c.overall_judge or 0)) if r17c and r17c.overall is not None and r17c.overall_judge is not None else None)} |
 
 {skills_checklist(5)}
 """
@@ -2572,6 +3030,8 @@ def generate_full_summary(summary: LabRunSummary) -> str:
 
     all_run = [r for r in summary.results if r.experiment_type == "run"]
     errors = [r for r in all_run if r.status == "error"]
+
+    has_judge = any(r.overall_judge is not None or r.judge_pass_rate is not None for r in all_run)
 
     lines = [
         f"# Full Lab Results Summary — {env_upper}",
@@ -2595,37 +3055,81 @@ def generate_full_summary(summary: LabRunSummary) -> str:
         "",
         "## All API Experiment Results",
         "",
-        "| Exp | Phase | Question | Overall | Passed | Retrieval | Faith. | Latency |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
+
+    if has_judge:
+        lines.extend(
+            [
+                "| Exp | Phase | Question | Rule overall | Judge overall | Compare | Retrieval | Faith. | Latency |",
+                "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "| Exp | Phase | Question | Overall | Passed | Retrieval | Faith. | Latency |",
+                "| --- | --- | --- | --- | --- | --- | --- | --- |",
+            ]
+        )
 
     for r in all_run:
         if r.status == "success" and r.overall is not None:
-            lines.append(
-                f"| {r.experiment_id} | P{r.phase} | "
-                f"{(r.question or '—')[:35]}... | "
-                f"{_score_cell(r.overall)} | {_pass_fail(r.passed)} | "
-                f"{_score_cell(r.retrieval)} | {_score_cell(r.faithfulness)} | "
-                f"{r.latency_ms}ms |"
-            )
+            if has_judge:
+                comparison = "agree" if r.method_agreement else ("disagree" if r.overall_judge is not None else "—")
+                lines.append(
+                    f"| {r.experiment_id} | P{r.phase} | "
+                    f"{(r.question or '—')[:35]}... | "
+                    f"{_score_cell(r.overall)} | {_score_cell(r.overall_judge)} | {comparison} | "
+                    f"{_score_cell(r.retrieval)} | {_score_cell(r.faithfulness)} | "
+                    f"{r.latency_ms}ms |"
+                )
+            else:
+                lines.append(
+                    f"| {r.experiment_id} | P{r.phase} | "
+                    f"{(r.question or '—')[:35]}... | "
+                    f"{_score_cell(r.overall)} | {_pass_fail(r.passed)} | "
+                    f"{_score_cell(r.retrieval)} | {_score_cell(r.faithfulness)} | "
+                    f"{r.latency_ms}ms |"
+                )
         elif r.status == "success" and r.document_id:
-            lines.append(
-                f"| {r.experiment_id} | P{r.phase} | " f"Upload: {r.filename or '—'} | — | ✅ | " f"— | — | — |"
-            )
+            if has_judge:
+                lines.append(
+                    f"| {r.experiment_id} | P{r.phase} | Upload: {r.filename or '—'} | — | — | — | — | — | — |"
+                )
+            else:
+                lines.append(
+                    f"| {r.experiment_id} | P{r.phase} | Upload: {r.filename or '—'} | — | ✅ | — | — | — |"
+                )
         elif r.status == "success" and r.total_cases:
-            lines.append(
-                f"| {r.experiment_id} | P{r.phase} | "
-                f"Suite: {r.suite_passed}/{r.total_cases} passed | "
-                f"{_score_cell(r.avg_overall_score)} | "
-                f"{'✅' if r.suite_failed == 0 else '⚠️'} | "
-                f"— | — | {r.latency_ms}ms |"
-            )
+            if has_judge:
+                compare = f"agree={r.agreement_rate}%" if r.agreement_rate is not None else "—"
+                lines.append(
+                    f"| {r.experiment_id} | P{r.phase} | "
+                    f"Suite: {r.suite_passed}/{r.total_cases} passed | "
+                    f"{_score_cell(r.avg_overall_score)} | {r.judge_pass_rate if r.judge_pass_rate is not None else '—'}% | {compare} | "
+                    f"— | — | {r.latency_ms}ms |"
+                )
+            else:
+                lines.append(
+                    f"| {r.experiment_id} | P{r.phase} | "
+                    f"Suite: {r.suite_passed}/{r.total_cases} passed | "
+                    f"{_score_cell(r.avg_overall_score)} | "
+                    f"{'✅' if r.suite_failed == 0 else '⚠️'} | "
+                    f"— | — | {r.latency_ms}ms |"
+                )
         elif r.status == "error":
-            lines.append(
-                f"| {r.experiment_id} | P{r.phase} | "
-                f"{(r.question or r.description)[:35]}... | "
-                f"ERROR | ❌ | — | — | — |"
-            )
+            if has_judge:
+                lines.append(
+                    f"| {r.experiment_id} | P{r.phase} | "
+                    f"{(r.question or r.description)[:35]}... | "
+                    f"ERROR | — | ❌ | — | — | — |"
+                )
+            else:
+                lines.append(
+                    f"| {r.experiment_id} | P{r.phase} | "
+                    f"{(r.question or r.description)[:35]}... | "
+                    f"ERROR | ❌ | — | — | — |"
+                )
 
     if errors:
         lines.extend(
@@ -2639,6 +3143,252 @@ def generate_full_summary(summary: LabRunSummary) -> str:
             lines.append(f"- **{r.experiment_id}**: {r.error_message}")
 
     lines.append("")
+    return "\n".join(lines)
+
+
+def generate_lab_execution_plan() -> str:
+    """Generate the recommended lab execution order used by the reports."""
+    lines = [
+        "# Hands-On Lab Execution Plan",
+        "",
+        "> This is the recommended learning order for the rag-chatbot labs.",
+        ">",
+        "> It keeps the first pass mostly sequential so a learner can move through the labs",
+        "> in a human-friendly order before branching into advanced retrieval and judge policy.",
+        "",
+        "## Why this order works",
+        "",
+        "| Principle | Why it matters |",
+        "| --- | --- |",
+        "| Sequential first | The first pass should feel like Lab 1 -> 2 -> 3 -> 4 -> 5 -> 6, not like a scavenger hunt. |",
+        "| Baseline before optimization | Advanced retrieval knobs only matter after retrieval, faithfulness, and relevance already make sense. |",
+        "| One panel, two lanes | When judge scoring is enabled, compare it next to the rule-based result in the same table. |",
+        "",
+        "## Recommended execution order",
+        "",
+        "| Step | Labs | Focus | Why now? | Results to compare |",
+        "| --- | --- | --- | --- | --- |",
+    ]
+
+    for item in LAB_EXECUTION_PLAN:
+        lines.append(
+            f"| {item['step']} | {item['labs']} | {item['focus']} | {item['why']} | {item['results']} |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## How to read the generated result files",
+            "",
+            "1. Start with `module-1-results.md` and lock in your baseline numbers.",
+            "2. For later modules, compare each lab back to that baseline or to the immediately previous lab that changed the same knob.",
+            "3. Read `full-summary.md` last. It is a roll-up, not the place to learn the concepts for the first time.",
+            "4. Read `local-vs-azure-comparison.md` after you have run at least two environments. Cross-environment comparison is only useful once the same lab has been run more than once.",
+            "5. If judge mode is enabled, read the side-by-side rule-based vs judge tables in the same result panel before reading judge notes in isolation.",
+            "",
+        ]
+    )
+
+    return "\n".join(lines)
+
+
+def generate_llm_judge_framework_report() -> str:
+    """Generate the Tier 5 LLM-as-judge framework report scaffold."""
+    lines = [
+        "# Phase 6 Framework — LLM-as-Judge + Rule-Based Evaluation",
+        "",
+        "> This file defines how to read and compare side-by-side evaluator results.",
+        ">",
+        "> It is generated with each lab run so the interpretation contract stays consistent",
+        "> across local, AWS, and Azure runs.",
+        "",
+        "## Two-Lane Model",
+        "",
+        "| Lane | Purpose | Strength | Limitation |",
+        "| --- | --- | --- | --- |",
+        "| Rule-based | Deterministic baseline scoring | Fast, cheap, reproducible | Misses semantic nuance in edge cases |",
+        "| LLM judge | Semantic quality check | Better nuance and reasoning | Slower, costlier, model-dependent |",
+        "",
+        "## Agreement Interpretation",
+        "",
+        "| Situation | Typical meaning | Recommended action |",
+        "| --- | --- | --- |",
+        "| Both pass | High confidence | Keep current config, monitor latency/cost |",
+        "| Both fail | Real quality issue | Fix retrieval/prompt/model before deploy |",
+        "| Rule pass, judge fail | Semantic weakness | Review judge notes and source grounding |",
+        "| Rule fail, judge pass | Heuristic limitation likely | Treat as borderline and inspect manually |",
+        "",
+        "## Environment-Native Judge Routing",
+        "",
+        "| Runtime environment | Judge provider |",
+        "| --- | --- |",
+        "| local | local judge |",
+        "| aws | Bedrock judge |",
+        "| azure | Azure judge |",
+        "",
+        "## Cost-Aware Policy Baseline",
+        "",
+        "1. Local development: run rule-based by default; use judge for disagreement learning.",
+        "2. CI regression: run judge on failed and borderline rule-based cases first.",
+        "3. Pre-release: run full side-by-side for critical flows.",
+        "4. Production: sample judge checks or run on risky categories.",
+        "",
+        "## Result Table Contract",
+        "",
+        "Use these columns in all Tier 5 reports:",
+        "",
+        "- dimension",
+        "- rule_overall",
+        "- judge_overall",
+        "- delta_overall",
+        "- method_agreement",
+        "- disagreement_type",
+        "- judge_notes",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def _latest_results_by_env(script_dir: Path) -> dict[str, tuple[Path, dict[str, Any]]]:
+    """Load the latest raw results for each available environment."""
+    loaded: dict[str, tuple[Path, dict[str, Any]]] = {}
+    for env in ("local", "azure", "aws"):
+        latest_link = script_dir / "lab_results" / env / "latest"
+        if not latest_link.exists():
+            continue
+        latest_dir = latest_link.resolve()
+        raw_path = latest_dir / "raw-results.json"
+        if not raw_path.exists():
+            continue
+        with open(raw_path) as f:
+            loaded[env] = (latest_dir, json.load(f))
+    return loaded
+
+
+def _average_metric(results: list[dict[str, Any]], metric: str) -> float | None:
+    values = [r.get(metric) for r in results if isinstance(r.get(metric), (int, float))]
+    if not values:
+        return None
+    return sum(values) / len(values)
+
+
+def _cross_env_note(experiment_rows: dict[str, dict[str, Any]]) -> str:
+    """Generate a short explanation of the main cross-environment difference."""
+    available = {
+        env: row for env, row in experiment_rows.items() if isinstance(row.get("overall"), (int, float))
+    }
+    if len(available) < 2:
+        return "Need at least two environments to explain a difference."
+
+    ranked = sorted(available.items(), key=lambda item: item[1]["overall"], reverse=True)
+    best_env, best_row = ranked[0]
+    worst_env, worst_row = ranked[-1]
+    delta = best_row["overall"] - worst_row["overall"]
+
+    if delta < 0.03:
+        return "Quality is effectively similar across environments here; compare latency, cost, and operational constraints instead of chasing tiny score differences."
+
+    if best_env in {"aws", "azure"} and worst_env == "local":
+        return "Cloud quality is materially higher here, which usually means the stronger embedding or LLM model changed the answer quality more than the retrieval pipeline itself."
+
+    if best_env == "local":
+        return "Local won this lab on quality, so this knob is probably pipeline-driven rather than model-driven. That makes it a good candidate to tune cheaply before paying for bigger models."
+
+    return f"{best_env.upper()} leads this lab by {delta:.3f} overall, so inspect that environment's model and retrieval settings before copying the result to the others."
+
+
+def generate_cross_environment_comparison(script_dir: Path) -> str:
+    """Generate a Local vs Azure vs AWS comparison using the latest available runs."""
+    loaded = _latest_results_by_env(script_dir)
+    lines = [
+        "# Local vs Azure vs AWS — Latest Lab Comparison",
+        "",
+        "> This file is regenerated from the latest available `raw-results.json` for each environment.",
+        ">",
+        "> Read it after the per-environment phase reports. It answers: *for the same lab, what changed across local, Azure, and AWS?*",
+        "",
+    ]
+
+    if not loaded:
+        lines.append("No lab runs found yet. Run `python scripts/run_all_labs.py --env local` first.")
+        return "\n".join(lines)
+
+    lines.extend(
+        [
+            "## Loaded runs",
+            "",
+            "| Environment | Latest run | Status |",
+            "| --- | --- | --- |",
+        ]
+    )
+    for env in ("local", "azure", "aws"):
+        if env in loaded:
+            latest_dir, data = loaded[env]
+            count = len(data.get("results", []))
+            lines.append(f"| {env} | `{latest_dir.name}` | loaded ({count} results) |")
+        else:
+            lines.append(f"| {env} | — | missing |")
+
+    all_results = {env: data.get("results", []) for env, (_, data) in loaded.items()}
+    lines.extend(
+        [
+            "",
+            "## Aggregate view",
+            "",
+            "| Environment | Avg retrieval | Avg faithfulness | Avg overall | Avg latency (ms) |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+    )
+    for env in ("local", "azure", "aws"):
+        results = all_results.get(env)
+        if not results:
+            lines.append(f"| {env} | — | — | — | — |")
+            continue
+        lines.append(
+            f"| {env} | {_score_cell(_average_metric(results, 'retrieval'))} | "
+            f"{_score_cell(_average_metric(results, 'faithfulness'))} | "
+            f"{_score_cell(_average_metric(results, 'overall'))} | "
+            f"{int(_average_metric(results, 'latency_ms') or 0) if _average_metric(results, 'latency_ms') is not None else '—'} |"
+        )
+
+    experiment_index: dict[str, dict[str, dict[str, Any]]] = {}
+    for env, results in all_results.items():
+        for result in results:
+            experiment_index.setdefault(result["experiment_id"], {})[env] = result
+
+    def sort_key(item: tuple[str, dict[str, dict[str, Any]]]) -> tuple[int, int, str]:
+        _, env_rows = item
+        sample = next(iter(env_rows.values()))
+        return (sample.get("phase", 99), sample.get("lab", 99), sample.get("experiment_id", ""))
+
+    lines.extend(
+        [
+            "",
+            "## Lab-by-lab comparison",
+            "",
+            "| Experiment | Local overall | Azure overall | AWS overall | Explanation |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+    )
+    for experiment_id, env_rows in sorted(experiment_index.items(), key=sort_key):
+        lines.append(
+            f"| {experiment_id} | {_score_cell(env_rows.get('local', {}).get('overall'))} | "
+            f"{_score_cell(env_rows.get('azure', {}).get('overall'))} | "
+            f"{_score_cell(env_rows.get('aws', {}).get('overall'))} | "
+            f"{_cross_env_note(env_rows)} |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## How to use this comparison",
+            "",
+            "1. Start with labs where cloud materially beats local. Those are usually model-quality or embedding-quality gaps, not pipeline bugs.",
+            "2. If all three environments are close, optimize for cost, latency, and operational simplicity instead of chasing tiny score gains.",
+            "3. If only one environment is missing, re-run that same lab suite there before drawing conclusions from the comparison.",
+            "",
+        ]
+    )
     return "\n".join(lines)
 
 
@@ -2675,10 +3425,15 @@ def run_all_labs(
 
     if dry_run:
         print("\n🔍 DRY RUN — showing what would be executed:\n")
+        print("Recommended learner path: 1 -> 2 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17")
+        print("Recommended comparison mode: set EVAL_MODE=combined before starting the API")
+        print("")
         print("Phase 1: 1a, 1b(k=1,5,10), 1c, 2a, 2b, 2c")
         print("Phase 2: 3a(seq1,seq2), 4a(3 injections + eval), 5a, 5b(5 questions)")
         if not skip_phase3:
             print("Phase 3: 6a, 6b(upload), 6c, 6d(suite)")
+            print("Phase 4: 9a, 9b, 9c, 10a, 10b, 11a, 11b, 11c, 12a, 12b, 12c, 13a, 13b, 13c, 13d")
+        print("Phase 5: 14a, 14b, 15a, 16a, 16b, 17a(rule_based), 17b(llm_judge), 17c(combined)")
         print(f"\nOutput: {output_dir}/")
         return summary
 
@@ -2722,6 +3477,7 @@ def run_all_labs(
 
     # --- Phase 1 ---
     phase1_results = run_phase_1(client)
+    _require_combined_judge(phase1_results)
     all_results.extend(phase1_results)
 
     # --- Phase 2 ---
@@ -2775,37 +3531,62 @@ def run_all_labs(
     print("📝 Generating Reports")
     print("=" * 70)
 
-    # Phase 1 report
+    # Module 1 report (legacy phase-1 alias kept for compatibility)
     phase1_md = generate_phase_1_report(all_results, env)
     (output_dir / "phase-1-results.md").write_text(phase1_md)
+    (output_dir / "module-1-results.md").write_text(phase1_md)
     print(f"  ✅ {output_dir}/phase-1-results.md")
+    print(f"  ✅ {output_dir}/module-1-results.md")
 
-    # Phase 2 report
+    # Module 2 report (legacy phase-2 alias kept for compatibility)
     phase2_md = generate_phase_2_report(all_results, env)
     (output_dir / "phase-2-results.md").write_text(phase2_md)
+    (output_dir / "module-2-results.md").write_text(phase2_md)
     print(f"  ✅ {output_dir}/phase-2-results.md")
+    print(f"  ✅ {output_dir}/module-2-results.md")
 
-    # Phase 3 report
+    # Module 3 report (legacy phase-3 alias kept for compatibility)
     if not skip_phase3:
         phase3_md = generate_phase_3_report(all_results, env)
         (output_dir / "phase-3-results.md").write_text(phase3_md)
+        (output_dir / "module-3-results.md").write_text(phase3_md)
         print(f"  ✅ {output_dir}/phase-3-results.md")
+        print(f"  ✅ {output_dir}/module-3-results.md")
 
-    # Phase 4 report
+    # Module 4 report (legacy phase-4 alias kept for compatibility)
     if not skip_phase3:
         phase4_md = generate_phase_4_report(all_results, env)
         (output_dir / "phase-4-results.md").write_text(phase4_md)
+        (output_dir / "module-4-results.md").write_text(phase4_md)
         print(f"  ✅ {output_dir}/phase-4-results.md")
+        print(f"  ✅ {output_dir}/module-4-results.md")
 
-    # Phase 5 report
+    # Module 5 report (legacy phase-5 alias kept for compatibility)
     phase5_md = generate_phase_5_report(all_results, env)
     (output_dir / "phase-5-results.md").write_text(phase5_md)
+    (output_dir / "module-5-results.md").write_text(phase5_md)
     print(f"  ✅ {output_dir}/phase-5-results.md")
+    print(f"  ✅ {output_dir}/module-5-results.md")
 
     # Full summary
     full_md = generate_full_summary(summary)
     (output_dir / "full-summary.md").write_text(full_md)
     print(f"  ✅ {output_dir}/full-summary.md")
+
+    # Execution plan for this run
+    execution_plan_md = generate_lab_execution_plan()
+    (output_dir / "lab-execution-plan.md").write_text(execution_plan_md)
+    print(f"  ✅ {output_dir}/lab-execution-plan.md")
+
+    # Tier 5 LLM-as-judge framework scaffold
+    llm_framework_md = generate_llm_judge_framework_report()
+    framework_targets = [
+        output_dir / "phase-6-llm-judge-framework.md",
+        script_dir / "lab_results" / "llm-judge-evaluation-framework.md",
+    ]
+    for framework_target in framework_targets:
+        framework_target.write_text(llm_framework_md)
+        print(f"  ✅ {framework_target}")
 
     # Raw JSON (for programmatic access)
     raw_data = {
@@ -2827,6 +3608,16 @@ def run_all_labs(
     json_path = output_dir / "raw-results.json"
     json_path.write_text(json.dumps(raw_data, indent=2, default=str))
     print(f"  ✅ {json_path}")
+
+    # Cross-environment comparison based on latest runs
+    cross_env_md = generate_cross_environment_comparison(script_dir)
+    comparison_targets = [
+        script_dir / "lab_results" / "local-vs-azure-comparison.md",
+        output_dir / "cross-environment-comparison.md",
+    ]
+    for comparison_target in comparison_targets:
+        comparison_target.write_text(cross_env_md)
+        print(f"  ✅ {comparison_target}")
 
     # Per-lab JSON files already written incrementally after each phase
     print(f"  ✅ Per-lab JSON files in {output_dir.parent}/")
@@ -2955,7 +3746,7 @@ def generate_comparison_report(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Run all hands-on lab experiments and generate reports.",
+        description="Run all hands-on lab experiments and generate five-phase reports.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -2963,7 +3754,7 @@ Examples:
   python scripts/run_all_labs.py --env aws --base-url https://api.example.com
   python scripts/run_all_labs.py --env azure --base-url https://api.example.com
   python scripts/run_all_labs.py --dry-run                # Preview only
-  python scripts/run_all_labs.py --skip-phase3            # Skip document upload
+    python scripts/run_all_labs.py --skip-phase3            # Skip document-upload-dependent labs
   python scripts/run_all_labs.py --only 1a,2b,5b          # Specific experiments
   python scripts/run_all_labs.py --test-config scripts/config/test-data/my-doc.yaml  # Custom document
         """,
