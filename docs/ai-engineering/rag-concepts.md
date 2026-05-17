@@ -607,7 +607,7 @@ on Azure) converts the question into a 1024-dimensional vector. The vector store
 then finds the stored chunk vectors closest to it — that is semantic search.
 
 > 🚚 **Courier analogy:** Keyword search is a courier who only delivers to
-> addresses spelled exactly as written. "Jane Smith" and "J. Smith" are different
+> addresses spelled exactly as written. "Ketan" and "K." are different
 > addresses — no match. Semantic search is a courier who understands that both
 > mean the same person and delivers to both. The embedding model is the courier's
 > common sense — trained on so many addresses it knows the equivalences.

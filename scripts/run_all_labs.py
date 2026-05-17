@@ -37,7 +37,7 @@ Note: This script does NOT modify the original hands-on lab docs in-place.
       It generates new files in scripts/lab_results/<env>/<timestamp>/ so you can
       review them first.
 
-Author: Portfolio author (personal automation — not part of the rag-chatbot repo)
+Author: Ketan (personal automation — not part of the rag-chatbot repo)
 """
 
 from __future__ import annotations

@@ -8,7 +8,7 @@ takes real scores and generates the same depth of insight found in
 
 The analysis is **conditional** — different score ranges produce different explanations.
 
-Author: Portfolio author (personal automation — not part of the rag-chatbot repo)
+Author: Ketan (personal automation — not part of the rag-chatbot repo)
 """
 
 from __future__ import annotations

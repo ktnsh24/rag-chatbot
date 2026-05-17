@@ -337,7 +337,7 @@ PII types detected:
 | BSN | 123456789 | All (Dutch national ID) |
 | DATE_OF_BIRTH | born 01/01/1990 | All |
 | IP_ADDRESS | 192.168.1.1 | All |
-| PERSON_NAME | Jane Smith | AWS/Azure only (needs ML) |
+| PERSON_NAME | Ketan | AWS/Azure only (needs ML) |
 | ADDRESS | Stationsplein 1, Amsterdam | AWS/Azure only |
 
 ---
