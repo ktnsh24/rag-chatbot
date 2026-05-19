@@ -1,0 +1,44 @@
+# Docker Compose — RAG Chatbot Local Development
+#
+# Starts the RAG API + Ollama in one command.
+#
+# Usage:
+#   docker compose up -d
+#   docker compose logs -f app
+#   docker compose exec ollama ollama pull llama3.2
+#   docker compose exec ollama ollama pull nomic-embed-text
+#   docker compose down
+
+services:
+  app:
+    build: .
+    container_name: rag-chatbot
+    ports:
+      - "8000:8000"
+    environment:
+      - CLOUD_PROVIDER=local
+      - APP_ENV=dev
+      - LOG_LEVEL=INFO
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_MODEL=llama3.2
+      - OLLAMA_EMBEDDING_MODEL=nomic-embed-text
+      - CHROMA_PERSIST_DIRECTORY=/app/data/chroma
+      - QUERY_LOG_ENABLED=true
+      - QUERY_LOG_DIR=/app/logs/queries
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    depends_on:
+      ollama:
+        condition: service_started
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: rag-chatbot-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+volumes:
+  ollama_data:
